@@ -1,0 +1,24 @@
+name: Inspect V14.7 Chunks
+on:
+  push:
+    branches: ["v147-finalize"]
+    paths: [".github/workflows/inspect-chunks.yml"]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v147-finalize
+      - name: Inspect corrupt chunk boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in .bootstrap20/z00.b64 .bootstrap20/r02.b64; do
+            tr -d '\r\n ' < "$f" > /tmp/c
+            echo "$f bytes=$(wc -c < /tmp/c)"
+            echo "$f first=$(head -c 40 /tmp/c)"
+            echo "$f last=$(tail -c 40 /tmp/c)"
+          done
