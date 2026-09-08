@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>7Fit Training System V14.7｜F111 自由组合编课矩阵</title>
+<link href="assets/app.css" rel="stylesheet"/>
+<link href="assets/7fit-logo-official.jpeg" rel="icon" type="image/jpeg"/></head>
+<body data-mode="coach">
+<div class="app-shell">
+<aside aria-label="主导航" class="sidebar" id="app-sidebar">
+<div class="brand-block">
+<div aria-label="7Fit" class="brand-mark"><img alt="7Fit" data-brand-logo="official" src="assets/7fit-logo-official.jpeg"/></div>
+<div><strong>7Fit Training</strong><span>Coach System · V14.7</span></div>
+</div>
+<nav class="primary-nav">
+<a data-area="coach" data-primary-nav="" href="#/coach"><span>编课中心</span></a>
+<a data-area="system" data-primary-nav="" href="#/system/patterns"><span>训练体系</span></a>
+<a data-area="rules" data-primary-nav="" href="#/rules/venue"><span>编排规则</span></a>
+<a data-area="library" data-primary-nav="" href="#/library"><span>动作库</span></a>
+<a data-area="maintenance" data-primary-nav="" href="#/maintenance"><span>系统维护</span></a>
+</nav>
+<div class="sidebar-foot">
+<button aria-label="切换界面模式" data-mode="coach" id="mode-toggle" type="button">
+<span class="mode-dot"></span><b>教练模式</b><small>隐藏开发 / 审计字段</small>
+</button>
+</div>
+</aside>
+<section class="app-column">
+<header class="topbar" id="app-header">
+<button aria-label="打开导航" class="mobile-menu-button" id="mobile-menu-button" type="button">☰</button>
+<div class="topbar-copy"><b id="page-title">编课中心</b><span id="page-subtitle">F111 女性综合 1+1+1</span></div>
+<div class="topbar-actions">
+<a class="quick-library" href="#/library">搜索动作</a>
+</div>
+</header>
+<main aria-live="polite" id="app-main" tabindex="-1"></main>
+</section>
+</div>
+<nav aria-label="移动端主导航" class="mobile-nav" id="mobile-nav">
+<a data-area="coach" href="#/coach"><span>编课</span></a>
+<a data-area="system" href="#/system/patterns"><span>体系</span></a>
+<a data-area="rules" href="#/rules/venue"><span>规则</span></a>
+<a data-area="library" href="#/library"><span>动作库</span></a>
+<a data-area="maintenance" href="#/maintenance"><span>更多</span></a>
+</nav>
+<div class="drawer" hidden="" id="global-drawer"></div>
+<script src="data/system-data.js"></script>
+<script src="data/anatomy-data.js"></script>
+<script src="js/router.js"></script>
+<script src="js/state.js"></script>
+<script src="js/anatomy.js"></script>
+<script src="js/composer.js"></script>
+<script src="js/conflict.js"></script>
+<script src="js/module-copy.js"></script>
+<script src="js/action-detail.js"></script>
+<script src="js/session-copy.js"></script>
+<script src="js/views-coach.js"></script>
+<script src="js/views-system.js"></script>
+<script src="js/views-rules.js"></script>
+<script src="js/views-library.js"></script>
+<script src="js/views-maintenance.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
