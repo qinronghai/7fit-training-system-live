@@ -1,5 +1,6 @@
 name: Bootstrap V14.7 Final
 
+# retry after restoring missing r06 payload
 on:
   push:
     branches: ["v147-finalize"]
