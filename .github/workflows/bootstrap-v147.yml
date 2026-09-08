@@ -1,6 +1,5 @@
 name: Bootstrap V14.7 Final
 
-# diagnostic retry: verify every normalized payload chunk before finalizing
 on:
   push:
     branches: ["v147-finalize"]
@@ -21,40 +20,39 @@ jobs:
           ref: v147-finalize
           fetch-depth: 0
 
-      - name: Reassemble and verify V14.7 payload
+      - name: Reassemble, repair, and verify V14.7 payload
         shell: bash
         run: |
           set -euo pipefail
-          files=(
-            .bootstrap20/z00.b64
-            .bootstrap20/z01.b64
-            .bootstrap20/z02.b64
-            .bootstrap20/z03.b64
-            .bootstrap20/z04.b64
-            .bootstrap20/r00.b64
-            .bootstrap20/r01.b64
-            .bootstrap20/r02.b64
-            .bootstrap20/r03.b64
-            .bootstrap20/r04.b64
-            .bootstrap20/r05.b64
-            .bootstrap20/r06.b64
-            .bootstrap20/r07.b64
-          )
+
+          # Normalize z00 and remove the single extra trailing character introduced during staging.
+          tr -d '\r\n ' < .bootstrap20/z00.b64 > /tmp/z00.raw
+          head -c 20000 /tmp/z00.raw > /tmp/z00.fixed
+          echo "ed5ad2105a5aa6b0751bc87948df07b682f99deb368ab13f2eb9e61bf8e0eec6  /tmp/z00.fixed" | sha256sum -c -
+
+          # Normalize r02 and restore the single missing character at 0-based index 8581.
+          tr -d '\r\n ' < .bootstrap20/r02.b64 > /tmp/r02.raw
+          head -c 8581 /tmp/r02.raw > /tmp/r02.fixed
+          printf 'v' >> /tmp/r02.fixed
+          tail -c +8582 /tmp/r02.raw >> /tmp/r02.fixed
+          test "$(wc -c < /tmp/r02.fixed)" -eq 20000
+          echo "73bdd84ce9e5c60fb28c0847d68c6be9c6777a3859c5b3d428c8496ebfe5e28e  /tmp/r02.fixed" | sha256sum -c -
+
           : > /tmp/v147.b64
-          for f in "${files[@]}"; do
-            tr -d '\r\n ' < "$f" > /tmp/chunk.norm
-            printf '%s bytes=' "$f"
-            wc -c < /tmp/chunk.norm
-            printf '%s sha256=' "$f"
-            sha256sum /tmp/chunk.norm | cut -d' ' -f1
-            cat /tmp/chunk.norm >> /tmp/v147.b64
+          cat /tmp/z00.fixed >> /tmp/v147.b64
+          for f in .bootstrap20/z01.b64 .bootstrap20/z02.b64 .bootstrap20/z03.b64 .bootstrap20/z04.b64 .bootstrap20/r00.b64 .bootstrap20/r01.b64; do
+            tr -d '\r\n ' < "$f" >> /tmp/v147.b64
           done
-          echo "combined-bytes=$(wc -c < /tmp/v147.b64)"
-          echo "combined-sha256=$(sha256sum /tmp/v147.b64 | cut -d' ' -f1)"
-          base64 --decode /tmp/v147.b64 > /tmp/v147.tar.xz
-          echo "decoded-sha256=$(sha256sum /tmp/v147.tar.xz | cut -d' ' -f1)"
+          cat /tmp/r02.fixed >> /tmp/v147.b64
+          for f in .bootstrap20/r03.b64 .bootstrap20/r04.b64 .bootstrap20/r05.b64 .bootstrap20/r06.b64 .bootstrap20/r07.b64; do
+            tr -d '\r\n ' < "$f" >> /tmp/v147.b64
+          done
+
+          test "$(wc -c < /tmp/v147.b64)" -eq 242652
           echo "5a4dfbbdcc92c55c7864464d16c38d49bd19510fc7336078307b7a935ff79115  /tmp/v147.b64" | sha256sum -c -
+          base64 --decode /tmp/v147.b64 > /tmp/v147.tar.xz
           echo "773906770962018b703091bdf255123505274fc0ed22fae3b61df823e41a713e  /tmp/v147.tar.xz" | sha256sum -c -
+
           mkdir -p /tmp/v147-stage
           tar -xJf /tmp/v147.tar.xz -C /tmp/v147-stage
           test -f /tmp/v147-stage/7fit-training-system-v14.7/index.html
@@ -83,7 +81,7 @@ jobs:
           for f in tests/*_test.js; do node "$f"; done
           find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
 
-      - name: Replace migration tree with V14.7 source
+      - name: Replace migration tree with clean V14.7 source
         shell: bash
         run: |
           set -euo pipefail
