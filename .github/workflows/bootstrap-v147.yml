@@ -1,6 +1,6 @@
 name: Bootstrap V14.7 Final
 
-# retry after restoring missing r06 payload
+# diagnostic retry: verify every normalized payload chunk before finalizing
 on:
   push:
     branches: ["v147-finalize"]
@@ -25,22 +25,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat \
-            .bootstrap20/z00.b64 \
-            .bootstrap20/z01.b64 \
-            .bootstrap20/z02.b64 \
-            .bootstrap20/z03.b64 \
-            .bootstrap20/z04.b64 \
-            .bootstrap20/r00.b64 \
-            .bootstrap20/r01.b64 \
-            .bootstrap20/r02.b64 \
-            .bootstrap20/r03.b64 \
-            .bootstrap20/r04.b64 \
-            .bootstrap20/r05.b64 \
-            .bootstrap20/r06.b64 \
-            .bootstrap20/r07.b64 \
-            | tr -d '\r\n ' > /tmp/v147.b64
+          files=(
+            .bootstrap20/z00.b64
+            .bootstrap20/z01.b64
+            .bootstrap20/z02.b64
+            .bootstrap20/z03.b64
+            .bootstrap20/z04.b64
+            .bootstrap20/r00.b64
+            .bootstrap20/r01.b64
+            .bootstrap20/r02.b64
+            .bootstrap20/r03.b64
+            .bootstrap20/r04.b64
+            .bootstrap20/r05.b64
+            .bootstrap20/r06.b64
+            .bootstrap20/r07.b64
+          )
+          : > /tmp/v147.b64
+          for f in "${files[@]}"; do
+            tr -d '\r\n ' < "$f" > /tmp/chunk.norm
+            printf '%s bytes=' "$f"
+            wc -c < /tmp/chunk.norm
+            printf '%s sha256=' "$f"
+            sha256sum /tmp/chunk.norm | cut -d' ' -f1
+            cat /tmp/chunk.norm >> /tmp/v147.b64
+          done
+          echo "combined-bytes=$(wc -c < /tmp/v147.b64)"
+          echo "combined-sha256=$(sha256sum /tmp/v147.b64 | cut -d' ' -f1)"
           base64 --decode /tmp/v147.b64 > /tmp/v147.tar.xz
+          echo "decoded-sha256=$(sha256sum /tmp/v147.tar.xz | cut -d' ' -f1)"
+          echo "5a4dfbbdcc92c55c7864464d16c38d49bd19510fc7336078307b7a935ff79115  /tmp/v147.b64" | sha256sum -c -
           echo "773906770962018b703091bdf255123505274fc0ed22fae3b61df823e41a713e  /tmp/v147.tar.xz" | sha256sum -c -
           mkdir -p /tmp/v147-stage
           tar -xJf /tmp/v147.tar.xz -C /tmp/v147-stage
