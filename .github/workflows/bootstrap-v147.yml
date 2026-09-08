@@ -1,0 +1,154 @@
+name: Bootstrap V14.7 Final
+
+on:
+  push:
+    branches: ["v147-finalize"]
+    paths:
+      - ".github/workflows/bootstrap-v147.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: v147-finalize
+          fetch-depth: 0
+
+      - name: Reassemble and verify V14.7 payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat \
+            .bootstrap20/z00.b64 \
+            .bootstrap20/z01.b64 \
+            .bootstrap20/z02.b64 \
+            .bootstrap20/z03.b64 \
+            .bootstrap20/z04.b64 \
+            .bootstrap20/r00.b64 \
+            .bootstrap20/r01.b64 \
+            .bootstrap20/r02.b64 \
+            .bootstrap20/r03.b64 \
+            .bootstrap20/r04.b64 \
+            .bootstrap20/r05.b64 \
+            .bootstrap20/r06.b64 \
+            .bootstrap20/r07.b64 \
+            | tr -d '\r\n ' > /tmp/v147.b64
+          base64 --decode /tmp/v147.b64 > /tmp/v147.tar.xz
+          echo "773906770962018b703091bdf255123505274fc0ed22fae3b61df823e41a713e  /tmp/v147.tar.xz" | sha256sum -c -
+          mkdir -p /tmp/v147-stage
+          tar -xJf /tmp/v147.tar.xz -C /tmp/v147-stage
+          test -f /tmp/v147-stage/7fit-training-system-v14.7/index.html
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run Python test suite
+        working-directory: /tmp/v147-stage/7fit-training-system-v14.7
+        run: |
+          python -m pip install --quiet pytest
+          python -m pytest -q
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run Node runtime tests and syntax checks
+        working-directory: /tmp/v147-stage/7fit-training-system-v14.7
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in tests/*_test.js; do node "$f"; done
+          find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Replace migration tree with V14.7 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/v147-stage/7fit-training-system-v14.7/. .
+          rm -rf .pytest_cache tests/__pycache__
+          touch .nojekyll
+          mkdir -p .github/workflows
+          cat > .github/workflows/deploy-pages.yml <<'YAML'
+          name: Deploy 7Fit Training System
+
+          on:
+            push:
+              branches: ["master"]
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+            pages: write
+            id-token: write
+
+          concurrency:
+            group: pages
+            cancel-in-progress: true
+
+          jobs:
+            verify:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-python@v5
+                  with:
+                    python-version: "3.13"
+                - name: Python tests
+                  run: |
+                    python -m pip install --quiet pytest
+                    python -m pytest -q
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: "22"
+                - name: Node runtime and JS syntax
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    for f in tests/*_test.js; do node "$f"; done
+                    find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+                - name: Prepare static site
+                  run: |
+                    mkdir -p _site
+                    cp index.html _site/
+                    cp -a assets data js _site/
+                    touch _site/.nojekyll
+                - name: Configure Pages
+                  uses: actions/configure-pages@v5
+                  with:
+                    enablement: true
+                - name: Upload Pages artifact
+                  uses: actions/upload-pages-artifact@v4
+                  with:
+                    path: _site
+
+            deploy:
+              needs: verify
+              runs-on: ubuntu-latest
+              environment:
+                name: github-pages
+                url: ${{ steps.deployment.outputs.page_url }}
+              steps:
+                - name: Deploy Pages
+                  id: deployment
+                  uses: actions/deploy-pages@v4
+          YAML
+
+      - name: Commit finalized V14.7 tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "7Fit Migration Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "release: migrate V14.7 FINAL to live mainline"
+          git push origin HEAD:v147-finalize
