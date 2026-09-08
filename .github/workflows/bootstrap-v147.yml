@@ -24,13 +24,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # Normalize z00 and remove the single extra trailing character introduced during staging.
           tr -d '\r\n ' < .bootstrap20/z00.b64 > /tmp/z00.raw
           head -c 20000 /tmp/z00.raw > /tmp/z00.fixed
           echo "ed5ad2105a5aa6b0751bc87948df07b682f99deb368ab13f2eb9e61bf8e0eec6  /tmp/z00.fixed" | sha256sum -c -
 
-          # Normalize r02 and restore the single missing character at 0-based index 8581.
           tr -d '\r\n ' < .bootstrap20/r02.b64 > /tmp/r02.raw
           head -c 8581 /tmp/r02.raw > /tmp/r02.fixed
           printf 'v' >> /tmp/r02.fixed
@@ -52,7 +49,6 @@ jobs:
           echo "5a4dfbbdcc92c55c7864464d16c38d49bd19510fc7336078307b7a935ff79115  /tmp/v147.b64" | sha256sum -c -
           base64 --decode /tmp/v147.b64 > /tmp/v147.tar.xz
           echo "773906770962018b703091bdf255123505274fc0ed22fae3b61df823e41a713e  /tmp/v147.tar.xz" | sha256sum -c -
-
           mkdir -p /tmp/v147-stage
           tar -xJf /tmp/v147.tar.xz -C /tmp/v147-stage
           test -f /tmp/v147-stage/7fit-training-system-v14.7/index.html
@@ -65,7 +61,7 @@ jobs:
       - name: Run Python test suite
         working-directory: /tmp/v147-stage/7fit-training-system-v14.7
         run: |
-          python -m pip install --quiet pytest
+          python -m pip install --quiet pytest beautifulsoup4
           python -m pytest -q
 
       - name: Setup Node
@@ -117,7 +113,7 @@ jobs:
                     python-version: "3.13"
                 - name: Python tests
                   run: |
-                    python -m pip install --quiet pytest
+                    python -m pip install --quiet pytest beautifulsoup4
                     python -m pytest -q
                 - uses: actions/setup-node@v4
                   with:
