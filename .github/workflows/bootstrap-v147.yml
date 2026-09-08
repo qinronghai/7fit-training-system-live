@@ -77,86 +77,22 @@ jobs:
           for f in tests/*_test.js; do node "$f"; done
           find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
 
-      - name: Replace migration tree with clean V14.7 source
+      - name: Replace staging tree with clean V14.7 source
         shell: bash
         run: |
           set -euo pipefail
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          # Preserve .github temporarily because the Actions token may not modify workflow files.
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github -exec rm -rf {} +
           cp -a /tmp/v147-stage/7fit-training-system-v14.7/. .
           rm -rf .pytest_cache tests/__pycache__
           touch .nojekyll
-          mkdir -p .github/workflows
-          cat > .github/workflows/deploy-pages.yml <<'YAML'
-          name: Deploy 7Fit Training System
 
-          on:
-            push:
-              branches: ["master"]
-            workflow_dispatch:
-
-          permissions:
-            contents: read
-            pages: write
-            id-token: write
-
-          concurrency:
-            group: pages
-            cancel-in-progress: true
-
-          jobs:
-            verify:
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-python@v5
-                  with:
-                    python-version: "3.13"
-                - name: Python tests
-                  run: |
-                    python -m pip install --quiet pytest beautifulsoup4
-                    python -m pytest -q
-                - uses: actions/setup-node@v4
-                  with:
-                    node-version: "22"
-                - name: Node runtime and JS syntax
-                  shell: bash
-                  run: |
-                    set -euo pipefail
-                    for f in tests/*_test.js; do node "$f"; done
-                    find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
-                - name: Prepare static site
-                  run: |
-                    mkdir -p _site
-                    cp index.html _site/
-                    cp -a assets data js _site/
-                    touch _site/.nojekyll
-                - name: Configure Pages
-                  uses: actions/configure-pages@v5
-                  with:
-                    enablement: true
-                - name: Upload Pages artifact
-                  uses: actions/upload-pages-artifact@v4
-                  with:
-                    path: _site
-
-            deploy:
-              needs: verify
-              runs-on: ubuntu-latest
-              environment:
-                name: github-pages
-                url: ${{ steps.deployment.outputs.page_url }}
-              steps:
-                - name: Deploy Pages
-                  id: deployment
-                  uses: actions/deploy-pages@v4
-          YAML
-
-      - name: Commit finalized V14.7 tree
+      - name: Commit verified V14.7 source
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "7Fit Migration Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A
-          git commit -m "release: migrate V14.7 FINAL to live mainline"
+          git add -A -- . ':!.github/workflows/*'
+          git commit -m "release: migrate V14.7 FINAL source"
           git push origin HEAD:v147-finalize
