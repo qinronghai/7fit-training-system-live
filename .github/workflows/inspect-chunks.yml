@@ -12,13 +12,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: v147-finalize
-      - name: Locate missing r02 character
+      - name: Narrow missing r02 character
         shell: bash
         run: |
           set -euo pipefail
           tr -d '\r\n ' < .bootstrap20/r02.b64 > /tmp/r02
-          echo "r02-bytes=$(wc -c < /tmp/r02)"
-          for n in $(seq 1000 1000 19000); do
+          for n in $(seq 8100 100 9000); do
             h=$(head -c "$n" /tmp/r02 | sha256sum | cut -d' ' -f1)
             echo "prefix-$n=$h"
           done
