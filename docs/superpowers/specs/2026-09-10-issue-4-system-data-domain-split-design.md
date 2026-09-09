@@ -60,11 +60,13 @@ window.V14_DATA.tenPatternCatalog
 ```text
 领域 JSON Source of Truth
         ↓
+data/src/manifest.json  [所有权契约]
+        ↓
 tools/build_system_data.py
         ↓
 确定性 top-level merge
         ↓
-data/system-data.js   [GENERATED]
+data/system-data.js     [GENERATED]
         ↓
 window.V14_DATA
         ↓
@@ -85,6 +87,7 @@ window.V14_DATA
 ```text
 data/
 ├── src/
+│   ├── manifest.json
 │   ├── actions.json
 │   ├── patterns.json
 │   ├── sessions.json
@@ -108,7 +111,7 @@ tests/
 
 ### 5.1 每个 source 文件的格式
 
-每个领域 JSON 都是一个 **partial `V14_DATA` object**，即它拥有一个或多个完整的顶层 key，而不是任意深层 patch。
+除 `manifest.json` 外，每个领域 JSON 都是一个 **partial `V14_DATA` object**，即它拥有一个或多个完整的顶层 key，而不是任意深层 patch。
 
 示例：
 
@@ -140,15 +143,54 @@ Composer：
 
 因此每个顶层 key **必须且只能由一个领域文件拥有**。
 
-构建器遇到重复顶层 key 时立即失败：
+## 6. Ownership Manifest
+
+新增：
 
 ```text
-Duplicate top-level key: composer
-owned by: composer.json
-also found in: system.json
+data/src/manifest.json
 ```
 
-## 6. 领域所有权
+它不进入 `window.V14_DATA`，只定义构建期所有权和正式 fragment 顺序。
+
+结构：
+
+```json
+{
+  "schemaVersion": 1,
+  "fragments": [
+    {
+      "file": "actions.json",
+      "owns": ["actions"]
+    },
+    {
+      "file": "support.json",
+      "owns": ["supportIds", "supportDetails"]
+    }
+  ]
+}
+```
+
+迁移时必须从拆分前正式 bundle 获取完整顶层 key inventory，并把每个 key 显式登记到一个且仅一个 `owns` 集合。
+
+构建器必须验证：
+
+```text
+actual keys(fragment) == manifest owns(fragment)
+```
+
+因此以下情况全部失败：
+
+- manifest 声明拥有某 key，但文件漏了；
+- 文件出现 manifest 未登记的新 key；
+- 两个 fragment 声明同一个 key；
+- 两个 fragment 实际包含同一个 key；
+- manifest 漏掉拆分基线中的顶层 key；
+- manifest 指向不存在的 source file。
+
+新版本如果需要增加 `V14_DATA` 顶层 key，必须同时显式修改 manifest；不能通过“往某个 JSON 随手加字段”静默进入 Runtime。
+
+## 7. 领域所有权
 
 拆分遵循“业务责任”而不是文件大小。
 
@@ -224,29 +266,35 @@ also found in: system.json
 
 `system.json` **禁止**成为“其他都塞这里”的垃圾桶。任何可明确归属 actions / sessions / patterns / support / core / prep / foam / composer / venue 的字段都必须进入对应文件。
 
-## 7. 顶层 key inventory
+## 8. 顶层 key inventory
 
-迁移开始时，构建工具相关测试必须先记录当前 `window.V14_DATA` 的完整顶层 key 集合。
+迁移开始时先从当前正式 `master` 的 `window.V14_DATA` 获取完整顶层 key 集合。
 
 迁移完成后必须满足：
 
 ```text
-union(all data/src/*.json top-level keys)
+union(manifest.fragments[*].owns)
 ==
-current formal V14_DATA top-level keys
+baseline V14_DATA top-level keys
 ```
 
-并且：
+同时：
 
 ```text
-intersection(keys(file_a), keys(file_b)) == ∅
+owns(file_a) ∩ owns(file_b) == ∅
 ```
 
-任何漏迁 key 或重复 key 都必须阻断 CI。
+以及对每个 fragment：
+
+```text
+actual top-level keys == declared owns
+```
+
+任何漏迁 key、重复 key、未登记 key 或错误归属都必须阻断 CI。
 
 本设计不允许因为“暂时不知道放哪里”而静默删除字段。
 
-## 8. 构建器
+## 9. 构建器
 
 新增：
 
@@ -254,7 +302,7 @@ intersection(keys(file_a), keys(file_b)) == ∅
 tools/build_system_data.py
 ```
 
-### 8.1 固定接口
+### 9.1 固定接口
 
 ```bash
 python tools/build_system_data.py
@@ -262,19 +310,22 @@ python tools/build_system_data.py
 
 行为：
 
-1. 按固定顺序读取 `data/src/*.json` 的正式领域文件；
-2. 验证每个文件顶层必须是 JSON object；
-3. 验证不存在重复顶层 key；
-4. 合并为一个 Python dict；
-5. 用 UTF-8、`ensure_ascii=False`、稳定 separators 生成：
+1. 读取 `data/src/manifest.json`；
+2. 按 manifest 顺序读取正式领域文件；
+3. 验证 manifest schemaVersion 与 fragment 声明；
+4. 验证每个文件顶层必须是 JSON object；
+5. 验证 `actual keys == owns`；
+6. 验证不存在 duplicate ownership；
+7. 合并为一个 Python dict；
+8. 用 UTF-8、`ensure_ascii=False`、稳定 separators 生成：
 
 ```js
 window.V14_DATA=<canonical-json>;
 ```
 
-6. 写入 `data/system-data.js`。
+9. 写入 `data/system-data.js`。
 
-### 8.2 Check mode
+### 9.2 Check mode
 
 必须支持：
 
@@ -290,9 +341,9 @@ python tools/build_system_data.py --check
 system-data.js is stale; run: python tools/build_system_data.py
 ```
 
-### 8.3 Determinism
+### 9.3 Determinism
 
-相同 `data/src` 输入必须永远生成相同 bytes。
+相同 `manifest.json + data/src/*.json` 输入必须永远生成相同 bytes。
 
 规范：
 
@@ -305,11 +356,11 @@ json.dumps(
 )
 ```
 
-顶层 key 顺序由构建器固定的 source file 顺序决定；每个领域文件内部保留 JSON 文件中的插入顺序。
+顶层 key 顺序由 manifest 的 fragment 顺序及每个 `owns` 顺序决定；每个顶层值内部保留 source JSON 中的插入顺序。
 
 生成文件只允许一个统一格式，不接受手工格式化版本。
 
-## 9. Source of Truth 规则
+## 10. Source of Truth 规则
 
 Issue #4 合并后：
 
@@ -319,6 +370,12 @@ Issue #4 合并后：
 
 ```text
 data/src/*.json
+```
+
+如果增加/移动顶层 key，同时更新：
+
+```text
+data/src/manifest.json
 ```
 
 然后执行：
@@ -337,7 +394,7 @@ data/system-data.js
 
 CI 的 `--check` 会阻止“只改 bundle、不改 source”以及“只改 source、忘记重新 build”两种漂移。
 
-## 10. 迁移策略
+## 11. 迁移策略
 
 必须小步完成，不进行一次性人工复制重写。
 
@@ -345,16 +402,16 @@ CI 的 `--check` 会阻止“只改 bundle、不改 source”以及“只改 sou
 
 从当前正式 `master` 的 `data/system-data.js` 解析出完整 payload。
 
-建立回归测试，冻结：
+建立迁移回归证据，冻结：
 
-- payload 顶层 key 集合；
+- payload 顶层 key inventory；
 - 已由 #3 冻结的 32 Session / 8 Recipe / 30 SUPPORT / 20 CORE / 20 PREP / 12 Foam；
 - 243 Action 当前 inventory；
 - Composer 5 × 4、8 preset 等既有契约。
 
 ### Phase 2｜Mechanical split
 
-通过脚本/确定性转换把当前 payload 的顶层 key 分配到各领域 JSON。
+通过脚本/确定性转换把当前 payload 的顶层 key 分配到各领域 JSON，并生成 ownership manifest。
 
 禁止在迁移过程中顺手：
 
@@ -375,8 +432,10 @@ CI 的 `--check` 会阻止“只改 bundle、不改 source”以及“只改 sou
 先验证 semantic parity：
 
 ```python
-load_generated_bundle() == load_frozen_baseline_bundle()
+load_generated_bundle() == load_pre_split_baseline_bundle()
 ```
+
+这项 equality 是 #4 迁移验收证据；它验证值和结构不变，不要求把历史 bundle 的非语义格式永久当作测试契约。
 
 在 semantic parity 成立后，generated bundle 才能替代旧人工 bundle。
 
@@ -385,12 +444,15 @@ load_generated_bundle() == load_frozen_baseline_bundle()
 测试和 Validator 的加载链调整为：
 
 ```text
-data/src → build/check → data/system-data.js → schema/runtime tests
+data/src + manifest
+→ build/check
+→ data/system-data.js
+→ schema/runtime tests
 ```
 
 现有浏览器代码仍从 `data/system-data.js` 读取。
 
-## 11. 与 Issue #3 Schema Gate 的关系
+## 12. 与 Issue #3 Schema Gate 的关系
 
 #3 已建立：
 
@@ -401,7 +463,7 @@ V14_DATA → JSON Schema → cross-record invariants
 #4 在它前面增加一层：
 
 ```text
-data/src
+data/src + manifest
    ↓
 build_system_data.py --check
    ↓
@@ -414,7 +476,7 @@ Python / Node / JS runtime tests
 
 Schema 不负责判断 bundle 是否过期；build check 不负责重新定义训练 Schema。两者职责分离。
 
-## 12. 测试设计
+## 13. 测试设计
 
 新增：
 
@@ -424,13 +486,13 @@ tests/test_v148_data_build.py
 
 至少覆盖：
 
-### 12.1 RED：源目录不存在/不完整
+### 13.1 RED：源目录不存在/不完整
 
-在第一步测试中要求 `data/src` 和正式领域文件存在；当前 branch 应先失败。
+在第一步测试中要求 `data/src`、`manifest.json` 和正式领域文件存在；当前 branch 在实现前应失败。
 
-### 12.2 顶层 key 唯一所有权
+### 13.2 Manifest 所有权
 
-构造两个 fragment 都包含：
+构造两个 fragment 都声明/包含：
 
 ```json
 {"composer": {}}
@@ -438,23 +500,33 @@ tests/test_v148_data_build.py
 
 必须失败并明确报告 duplicate owner。
 
-### 12.3 Missing key
+### 13.3 Manifest/fragment mismatch
 
-从 fragment set 中删除一个冻结的顶层 key，必须失败 inventory parity。
+例如 manifest 声明：
 
-### 12.4 Deterministic build
+```json
+{"file":"composer.json","owns":["composer"]}
+```
+
+但文件实际出现额外 `newKey`，必须失败，不允许静默进入 Runtime。
+
+### 13.4 Missing key
+
+manifest 声明拥有某 baseline key，但 fragment 删除它，必须失败。
+
+### 13.5 Deterministic build
 
 连续生成两次，结果 bytes 完全一致。
 
-### 12.5 Stale bundle
+### 13.6 Stale bundle
 
 修改 source 但不更新 `system-data.js`，`--check` 必须返回失败。
 
-### 12.6 Semantic parity
+### 13.7 Semantic parity
 
 迁移后的 source 聚合 payload 必须与 Issue #4 起始 baseline payload 深度相等。
 
-### 12.7 Schema continuity
+### 13.8 Schema continuity
 
 执行：
 
@@ -464,7 +536,7 @@ python tools/validate_v148_schema.py
 
 必须继续 PASS。
 
-### 12.8 Runtime continuity
+### 13.9 Runtime continuity
 
 全部现有 Python tests、Node runtime tests、JS syntax tests 必须继续通过。
 
@@ -477,7 +549,7 @@ python tools/validate_v148_schema.py
 - D1/D2 `1F_ONLY`；
 - Action/Anatomy/Conflict/Copy 相关 runtime tests。
 
-## 13. Browser Smoke
+## 14. Browser Smoke
 
 由于 `index.html` 的加载方式保持不变，#4 不需要把浏览器加载器改成新的异步体系，但合并前必须做至少以下 Smoke：
 
@@ -492,7 +564,7 @@ python tools/validate_v148_schema.py
 
 如果 #6 Browser CI 已完成，则复用 Playwright Gate；如果 #6 尚未完成，本 Issue 只沿用仓库当前可用的 browser/manual smoke，不在 #4 中扩大为完整 Playwright 项目。
 
-## 14. CI / Pages Gate
+## 15. CI / Pages Gate
 
 现有 `V14.8 Schema Check` 与 `Deploy 7Fit Training System` 都应在 Schema Validator 之前增加：
 
@@ -513,16 +585,18 @@ pytest
 
 这样任何 source/bundle 漂移都无法进入 `master`。
 
-## 15. Error handling
+## 16. Error handling
 
 构建器必须 fail-fast，并返回可定位错误。
 
 必须阻断：
 
+- manifest JSON 语法/结构错误；
 - source JSON 语法错误；
 - source 顶层不是 object；
-- duplicate top-level key；
-- 正式领域文件缺失；
+- duplicate ownership；
+- fragment 实际 key 与 manifest `owns` 不一致；
+- manifest 指向的正式领域文件缺失；
 - bundle 与 source 不同步；
 - 迁移阶段 baseline key 遗失。
 
@@ -533,7 +607,7 @@ pytest
 - 自动修改训练数据以通过 Schema；
 - 在 build 时引入业务默认值。
 
-## 16. Rollback
+## 17. Rollback
 
 Issue #4 不改变浏览器接口，因此回滚简单：
 
@@ -543,7 +617,7 @@ Issue #4 不改变浏览器接口，因此回滚简单：
 
 不需要数据 migration rollback，也不涉及用户端存储格式升级。
 
-## 17. Documentation
+## 18. Documentation
 
 合并前更新：
 
@@ -551,12 +625,14 @@ Issue #4 不改变浏览器接口，因此回滚简单：
 - 新增 `docs/V14.8-DATA-MAINTENANCE.md`：说明如何编辑领域数据、build、check、validate；
 - README 中明确：`data/system-data.js` 为 GENERATED，不接受直接人工修改。
 
-## 18. Definition of Done
+## 19. Definition of Done
 
 Issue #4 只有在以下全部满足后才能关闭：
 
 - [ ] `data/src` 已按领域拆分；
+- [ ] `manifest.json` 完整记录正式 fragment 和 top-level ownership；
 - [ ] 每个顶层 key 只有一个 owner；
+- [ ] fragment 实际 key 与 manifest 完全一致；
 - [ ] `tools/build_system_data.py` 支持 build 与 `--check`；
 - [ ] `data/system-data.js` 明确成为 generated artifact；
 - [ ] 聚合 payload 与拆分前 baseline semantic parity 成立；
@@ -571,7 +647,7 @@ Issue #4 只有在以下全部满足后才能关闭：
 - [ ] Pages Release Gate 成功；
 - [ ] Issue #4 关闭为 Completed。
 
-## 19. 明确不属于 #4 的后续工作
+## 20. 明确不属于 #4 的后续工作
 
 以下内容不得顺带进入本 PR：
 
