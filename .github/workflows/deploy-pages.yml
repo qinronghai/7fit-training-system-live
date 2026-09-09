@@ -93,7 +93,7 @@ jobs:
       - name: Install pinned Playwright Chromium
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.63.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
 
       - name: Playwright browser smoke
         run: npx playwright test
