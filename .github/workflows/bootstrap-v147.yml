@@ -18,7 +18,7 @@ jobs:
           ref: v147-bootstrap
           fetch-depth: 0
 
-      - name: Recover and validate XZ bootstrap archive
+      - name: Recover and fully validate XZ bootstrap archive
         shell: bash
         run: |
           python3 - <<'PY'
@@ -38,55 +38,68 @@ jobs:
               chunks[name] = re.sub(rb'\s+', b'', p.read_bytes())
               print(name, len(chunks[name]))
 
-          # z00 was uploaded with one extra byte in the first staging pass. In the
-          # common case it is whitespace and has already disappeared above. If not,
-          # try only the two boundary trims; never silently mutate the middle.
-          z00_variants = [chunks['z00.b64']]
-          if len(chunks['z00.b64']) == 20001:
-              z00_variants = [chunks['z00.b64'][:-1], chunks['z00.b64'][1:]]
+          z00 = chunks['z00.b64']
+          if len(z00) == 20001:
+              z00_variants = [
+                  ('trim-z00-tail', z00[:-1]),
+                  ('trim-z00-head', z00[1:]),
+              ]
+          else:
+              z00_variants = [('z00-as-is', z00)]
 
           z06 = chunks['z06.b64']
           alphabet = b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-          z06_variants = []
           if len(z06) == 19999:
-              # The failed upload lost one boundary character. Try both boundaries.
+              z06_variants = []
               for c in alphabet:
-                  z06_variants.append(z06 + bytes([c]))
-                  z06_variants.append(bytes([c]) + z06)
+                  z06_variants.append((f'append-{chr(c)}', z06 + bytes([c])))
+                  z06_variants.append((f'prepend-{chr(c)}', bytes([c]) + z06))
           else:
-              z06_variants = [z06]
+              z06_variants = [('z06-as-is', z06)]
 
           before = [chunks[f'z0{i}.b64'] for i in range(1,6)]
           after = [chunks['z07a.b64'],chunks['z07b.b64'],chunks['z08.b64'],chunks['z09.b64'],chunks['z10.b64'],chunks['z11.b64'],chunks['z12.b64']]
 
           recovered = None
-          for z00 in z00_variants:
-              for z06c in z06_variants:
-                  b64 = b''.join([z00, *before, z06c, *after])
+          selected = None
+          for z00_name, z00c in z00_variants:
+              for z06_name, z06c in z06_variants:
+                  b64 = b''.join([z00c, *before, z06c, *after])
                   try:
                       raw = base64.b64decode(b64, validate=True)
-                  except Exception:
-                      continue
-                  try:
-                      with tarfile.open(fileobj=io.BytesIO(raw), mode='r:xz') as tf:
-                          names = tf.getnames()
+                      # lzma.decompress forces the XZ stream to be consumed through
+                      # the end marker and verifies its integrity checks. Do not use
+                      # tarfile r:xz alone as the acceptance criterion.
+                      tar_bytes = lzma.decompress(raw)
+                      with tarfile.open(fileobj=io.BytesIO(tar_bytes), mode='r:') as tf:
+                          members = tf.getmembers()
+                          names = [m.name for m in members]
                           if not any(n.endswith('/index.html') for n in names):
                               continue
+                          # Read all regular files so TAR payload truncation is also detected.
+                          for m in members:
+                              if m.isfile():
+                                  f = tf.extractfile(m)
+                                  if f is not None:
+                                      f.read()
                   except Exception:
                       continue
                   recovered = raw
+                  selected = (z00_name, z06_name)
                   break
               if recovered is not None:
                   break
 
           if recovered is None:
-              raise SystemExit('unable to recover a valid XZ/TAR archive from staged chunks')
+              raise SystemExit('no fully valid XZ/TAR archive found in boundary repair search')
 
           out = Path('/tmp/v147-bootstrap.tar.xz')
           out.write_bytes(recovered)
+          print('SELECTED_REPAIR=' + '/'.join(selected))
           print('RECOVERED_SHA256=' + hashlib.sha256(recovered).hexdigest())
           print('RECOVERED_BYTES=' + str(len(recovered)))
           PY
+          rm -rf /tmp/v147-unpack
           mkdir -p /tmp/v147-unpack
           tar -xJf /tmp/v147-bootstrap.tar.xz -C /tmp/v147-unpack
           test -f /tmp/v147-unpack/7fit-training-system-v14.7/index.html
