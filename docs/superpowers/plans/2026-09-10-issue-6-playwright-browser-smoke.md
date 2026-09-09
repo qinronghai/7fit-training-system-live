@@ -16,10 +16,11 @@
 - Playwright version is exactly `1.63.0`; never use `latest`.
 - No application runtime dependency or frontend framework is introduced.
 - No screenshot/visual-diff assertions.
-- No external network dependency.
+- No application-under-test external network dependency.
 - Test local `_site`, not live GitHub Pages.
 - Browser `pageerror` must fail smoke tests.
 - `deploy` must depend on Browser Smoke success.
+- Browser download uses `npx playwright install chromium`; `--with-deps` is deliberately excluded after an external apt mirror hash mismatch produced a false-red during TDD.
 
 ---
 
@@ -30,17 +31,17 @@
 
 **Produces:** Static assertions that the Playwright suite and both CI workflows preserve Issue #6 coverage and ordering.
 
-- [ ] **Step 1: Write failing contract tests**
+- [x] **Step 1: Write failing contract tests**
 
-Assert that `playwright.config.js` and `tests/browser_smoke.spec.js` exist; assert route strings `#/coach`, `#/coach/compose`, `single_leg_hinge`, `horizontal_push`, `level=L3`, viewport width `390`, `scrollWidth`, `clientWidth`, and `pageerror` are represented; assert both workflows contain a `browser-smoke` job and exact `@playwright/test@1.63.0`; assert master `deploy` depends on browser-smoke.
+Contract freezes `#/coach`, `#/coach/compose`, `single_leg_hinge`, `horizontal_push`, `level=L3`, `L3｜单腿拉 + 水平推`, viewport width `390`, `scrollWidth`, `clientWidth`, `pageerror`, actual Composer selectors, pinned Playwright version, browser-smoke jobs, and deploy dependency.
 
-- [ ] **Step 2: Push and confirm RED**
+- [x] **Step 2: Push and confirm RED**
 
-Expected: existing tests pass, new contract tests fail because Playwright files/job do not exist.
+The contract was introduced before Playwright files/workflow wiring, producing the expected RED while the pre-existing test suite remained healthy.
 
-- [ ] **Step 3: Commit RED evidence**
+- [x] **Step 3: Commit RED evidence**
 
-Commit only the contract test.
+Contract-only commit recorded before GREEN implementation.
 
 ---
 
@@ -52,21 +53,21 @@ Commit only the contract test.
 
 **Produces:** Chromium smoke suite served from `_site`.
 
-- [ ] **Step 1: Configure Playwright**
+- [x] **Step 1: Configure Playwright**
 
-Use `testDir: './tests'`, `testMatch: 'browser_smoke.spec.js'`, one worker in CI, retries `1` in CI and `0` locally, Chromium only, `baseURL: 'http://127.0.0.1:4173'`, and webServer command `python3 -m http.server 4173 --bind 127.0.0.1 --directory _site`.
+Uses `testDir: './tests'`, `testMatch: 'browser_smoke.spec.js'`, one worker, CI retry `1`, Chromium only, `baseURL: 'http://127.0.0.1:4173'`, and Python `http.server` serving `_site`.
 
-- [ ] **Step 2: Add route/runtime smoke cases**
+- [x] **Step 2: Add route/runtime smoke cases**
 
-Implement helper collection of `pageerror` messages before navigation. Verify `/` plus hash routes render expected Coach/Composer text. For the L3 single-leg-hinge × horizontal-push route, assert URL query state and six `.session-slot` elements. Trigger one existing `.session-swap` selection change when an alternate option exists and assert the page remains healthy.
+Captures `pageerror` before navigation. Verifies `#/coach`, `#/coach/compose`, and `#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3`. The key route asserts `L3｜单腿拉 + 水平推`, six `.composer-slot-card` elements, and one real `.composer-slot-select` replacement that survives the Composer rerender cycle.
 
-- [ ] **Step 3: Add 390px layout case**
+- [x] **Step 3: Add 390px layout case**
 
-Set viewport to 390×844, navigate to Composer, and assert document `scrollWidth === clientWidth` and no `pageerror`.
+Uses 390×844 and asserts `document.documentElement.scrollWidth === document.documentElement.clientWidth`, with no `pageerror`.
 
-- [ ] **Step 4: Keep assertions structural**
+- [x] **Step 4: Keep assertions structural**
 
-Do not assert pixels, animations, or exact card coordinates.
+No pixel, animation, screenshot, or visual-diff assertions were added.
 
 ---
 
@@ -77,13 +78,13 @@ Do not assert pixels, animations, or exact card coordinates.
 
 **Produces:** `browser-smoke` job gated by `verify`.
 
-- [ ] **Step 1: Add separate job**
+- [x] **Step 1: Add separate job**
 
-Checkout, setup Python 3.13 and Node 22, prepare `_site` using the same copy commands as Pages, run `npm install --no-save --no-package-lock @playwright/test@1.63.0`, run `npx playwright install --with-deps chromium`, then `npx playwright test`.
+Checkout, Python 3.13, Node 22, `_site` preparation, exact `@playwright/test@1.63.0`, `npx playwright install chromium`, then `npx playwright test`.
 
-- [ ] **Step 2: Push and confirm GREEN on branch CI**
+- [x] **Step 2: Push and confirm GREEN on branch CI**
 
-Expected: pytest contract tests and Playwright job both pass.
+Workflow `34384504452` on head `11cfe67bbfed197b5a662bb110898d58e3eba60c` verified **109 pytest passed**, build freshness PASS, V14.8 Schema PASS, Node runtime PASS, JS syntax PASS, and **4 Playwright Chromium tests passed**.
 
 ---
 
@@ -94,17 +95,17 @@ Expected: pytest contract tests and Playwright job both pass.
 
 **Produces:** browser failure blocks Pages deployment.
 
-- [ ] **Step 1: Add browser-smoke job after verify**
+- [x] **Step 1: Add browser-smoke job after verify**
 
-Use the same pinned install, local `_site`, and Playwright command as PR CI.
+Uses the same pinned install, local `_site`, and Playwright command as PR CI.
 
-- [ ] **Step 2: Change deploy dependency**
+- [x] **Step 2: Change deploy dependency**
 
-Set `deploy.needs` to `[verify, browser-smoke]`.
+`deploy.needs` is `[verify, browser-smoke]`.
 
-- [ ] **Step 3: Verify workflow contract tests**
+- [x] **Step 3: Verify workflow contract tests**
 
-Expected: master deployment cannot start if browser-smoke fails.
+The normal pytest suite statically verifies both workflow job/dependency contracts and fails if the browser gate is removed or weakened.
 
 ---
 
@@ -113,13 +114,13 @@ Expected: master deployment cannot start if browser-smoke fails.
 **Files:**
 - Update docs only if implementation materially differs from spec.
 
-- [ ] **Step 1: Run feature-branch full gate**
+- [x] **Step 1: Run feature-branch full gate**
 
-Expected: all pytest, build freshness, Schema, Node runtime, JS syntax, and Playwright Chromium smoke pass.
+Feature branch evidence: 109 pytest passed; build freshness PASS; V14.8 Schema PASS; Node runtime/JS syntax PASS; Chromium Browser Smoke 4/4 PASS.
 
 - [ ] **Step 2: Open PR closing #6**
 
-PR body records exact head SHA and CI evidence.
+PR body must record the final head SHA and CI evidence.
 
 - [ ] **Step 3: Independently review the PR**
 
