@@ -44,7 +44,7 @@ const payload={
 const member=api.formatMember(payload,{now:'2026-09-09T12:00:00+08:00'});
 assert(member.startsWith('2026年9月9日｜星期三\n7Fit｜今日训练'));
 assert(member.includes('\n腿部力量 × 上肢推 × 核心稳定\nL3｜负重进阶\n'));
-assert(member.includes('今天在已经掌握基础动作的前提下，继续提高腿部和上肢的负重能力，同时加强核心稳定和身体控制。'));
+assert(member.includes('今天以腿部力量和上肢推力为主，在增加负重的同时继续强化核心稳定，让力量、动作控制和身体稳定一起进阶。'));
 assert(member.includes('课前准备｜约 10–12 分钟'));
 assert(member.includes('泡沫轴放松：大腿内侧、手臂后侧、大腿前侧、臀部'));
 assert(member.includes('髋部活动：青蛙趴、90/90'));
@@ -68,7 +68,38 @@ const composer=api.formatMember({
 },{now:'2026-09-10T12:00:00+08:00'});
 assert(composer.includes('单腿后侧链 × 上肢推 × 核心稳定'));
 assert(composer.includes('L4｜完整能力'));
+assert(composer.includes('今天以单腿后侧链和上肢推力为主，在更高阶段的负重与动作控制下，进一步整合核心稳定和全身协调。'));
 assert(composer.includes('今日训练重点\n单腿后侧链 · 上肢推力 · 核心稳定'));
 assert(!composer.includes('内部 cardio'));
 
-console.log('session copy member v2: PASS');
+// V2.1: D1 / D2 purpose must prefer exact action anatomy instead of inheriting A/B theme.
+context.window.V14_DATA={actions:{
+  leg_extension:{name:'腿屈伸',pattern:'膝伸展'},
+  reverse_fly:{name:'反向飞鸟',pattern:'水平拉'}
+}};
+context.window.V14_ANATOMY={records:{
+  leg_extension:{roleType:'strength',primary:['股四头肌'],secondary:[],stabilizers:[],movementActions:['膝伸展']},
+  reverse_fly:{roleType:'strength',primary:['三角肌后束','中斜方肌','菱形肌'],secondary:[],stabilizers:[],movementActions:['肩水平外展']}
+}};
+const pullMember=api.formatMember({
+  brand:'7Fit',recipeName:'下肢推 + 水平拉 + 支撑',level:'L3',
+  foam:[
+    {name:'泡沫轴松解-大腿前侧'},
+    {name:'泡沫轴松解-肩部'},
+    {name:'泡沫轴松解-臀部'},
+    {name:'泡沫轴松解-背阔肌/背侧'}
+  ],
+  warmups:[],
+  slots:[
+    {slot:'D1｜下肢辅助',actionId:'leg_extension',name:'坐姿腿屈伸',prescription:'2组 × 12次'},
+    {slot:'D2｜肩胛 / 手臂',actionId:'reverse_fly',name:'哑铃俯身反向飞鸟',prescription:'2组 × 15次'}
+  ],
+  recovery:[]
+},{now:'2026-09-10T12:00:00+08:00'});
+assert(pullMember.includes('今天以腿部力量和背部拉力为主，在增加负重的同时继续强化核心稳定，让力量、动作控制和身体稳定一起进阶。'));
+assert(pullMember.includes('泡沫轴放松：大腿前侧、肩后侧、臀部、上背部'));
+assert(pullMember.includes('坐姿腿屈伸｜2 × 12\n   大腿前侧强化'));
+assert(pullMember.includes('哑铃俯身反向飞鸟｜2 × 15\n   肩后侧与上背强化'));
+assert(pullMember.endsWith('课后有氧｜约 30 分钟\n选择跑步机爬坡、爬楼梯机、快走或其他有氧，时间 30 分钟左右，平均心率 130 到 140 左右（燃烧脂肪心率）。'));
+
+console.log('session copy member v2.1: PASS');

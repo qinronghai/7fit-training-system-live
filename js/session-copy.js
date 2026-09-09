@@ -6,10 +6,10 @@
   const unique=items=>Array.from(new Set((items||[]).filter(Boolean)));
   const WEEKDAYS=['日','一','二','三','四','五','六'];
   const LEVEL_META={
-    L1:{label:'动作控制',reason:'今天以动作学习和身体控制为主，先建立稳定的发力顺序和基础动作质量。'},
-    L2:{label:'基础负重',reason:'今天在稳定动作质量的基础上增加基础负重，继续建立全身力量和核心控制。'},
-    L3:{label:'负重进阶',reason:'今天在已经掌握基础动作的前提下，继续提高腿部和上肢的负重能力，同时加强核心稳定和身体控制。'},
-    L4:{label:'完整能力',reason:'今天在稳定动作质量的基础上进一步整合力量、稳定和动作控制，完成更高阶段的训练能力。'}
+    L1:{label:'动作控制'},
+    L2:{label:'基础负重'},
+    L3:{label:'负重进阶'},
+    L4:{label:'完整能力'}
   };
   const LOWER_MEMBER_MODES=[
     {re:/单腿拉|单腿髋铰链/,title:'单腿后侧链',focus:'单腿后侧链'},
@@ -65,7 +65,16 @@
     const focus=[lower?.focus,upper?.focus,'核心稳定'].filter(Boolean).join(' · ')||'全身力量 · 核心稳定';
     return {raw,title,focus,lower,upper};
   }
-  function levelMeta(level){return LEVEL_META[clean(level)]||{label:'训练进阶',reason:'今天根据当前动作质量和训练目标完成力量、稳定与身体控制训练。'};}
+  function levelMeta(level){return LEVEL_META[clean(level)]||{label:'训练进阶'};}
+  function memberReason(theme,level){
+    const lower=theme?.lower?.title||theme?.lower?.focus||'下肢力量';
+    const upper=theme?.upper?.title==='上肢拉'?'背部拉力':theme?.upper?.title==='上肢推'?'上肢推力':theme?.upper?.focus||'上肢力量';
+    if(clean(level)==='L1')return `今天以${lower}和${upper}为主，先把动作做稳、找到正确发力，同时建立核心稳定，为后续负重打基础。`;
+    if(clean(level)==='L2')return `今天以${lower}和${upper}为主，在动作稳定的基础上加入基础负重，同时继续强化核心控制和身体协调。`;
+    if(clean(level)==='L3')return `今天以${lower}和${upper}为主，在增加负重的同时继续强化核心稳定，让力量、动作控制和身体稳定一起进阶。`;
+    if(clean(level)==='L4')return `今天以${lower}和${upper}为主，在更高阶段的负重与动作控制下，进一步整合核心稳定和全身协调。`;
+    return `今天以${lower}和${upper}为主，同时兼顾核心稳定和身体控制。`;
+  }
   function itemName(x){return clean(typeof x==='string'?x:x?.name);}
   function prepMeta(x){
     if(x&&typeof x==='object'&&(x.role||x.why||x.regions||x.targetPatterns||x.muscles))return x;
@@ -81,10 +90,44 @@
     if(!m||typeof m==='string')return '';
     return [m.role,m.why,m.category,m.target,m.goal,Array.isArray(m.targetPatterns)?m.targetPatterns.join(' '):m.targetPatterns,Array.isArray(m.regions)?m.regions.join(' '):m.regions,Array.isArray(m.muscles)?m.muscles.join(' '):m.muscles].map(clean).filter(Boolean).join(' ');
   }
-  function foamMemberName(x){
+  function anatomyForActionId(actionId){
+    if(!actionId)return {};
+    return window.V14Anatomy?.get?.(actionId)||window.V14_ANATOMY?.records?.[actionId]||{};
+  }
+  function actionMetaByName(name){
+    const target=clean(name);if(!target)return null;
+    const matches=Object.entries(D().actions||{}).filter(([,a])=>clean(a?.name)===target);
+    if(!matches.length)return null;
+    const [actionId,action]=matches[0];
+    return {actionId,action:action||{},anatomy:anatomyForActionId(actionId)};
+  }
+  function actionMeta(x){
+    const actionId=clean(x?.actionId);
+    if(actionId){
+      const action=D().actions?.[actionId];
+      if(action)return {actionId,action,anatomy:anatomyForActionId(actionId)};
+    }
+    return actionMetaByName(x?.name);
+  }
+  function slotMuscles(p,slotRe){
+    const out=[];
+    (p.slots||[]).filter(x=>slotRe.test(clean(x.slot))).forEach(x=>{
+      const meta=actionMeta(x),a=meta?.anatomy||{};
+      for(const key of ['primary','secondary'])for(const muscle of (Array.isArray(a[key])?a[key]:[]))if(muscle&&!out.includes(muscle))out.push(muscle);
+    });
+    return out;
+  }
+  function foamMemberName(x,p){
     let s=itemName(x).replace(/^泡沫轴(?:松解|放松)?\s*[-—–:：]?\s*/,'');
-    s=s.replace(/肱三头肌/g,'手臂后侧').replace(/臀大肌|臀肌/g,'臀部').replace(/胸大肌|胸肌/g,'胸部');
-    return s;
+    s=s.replace(/肱三头肌/g,'手臂后侧').replace(/肱二头肌/g,'手臂前侧').replace(/臀大肌|臀肌/g,'臀部').replace(/胸大肌|胸肌/g,'胸部');
+    s=s.replace(/背阔肌\s*[\/／]\s*背侧/g,'上背部').replace(/背阔肌/g,'背部');
+    if(/^肩部$/.test(s)){
+      const d2=slotMuscles(p,/^D2｜/);
+      const theme=memberTheme(p);
+      if(d2.some(m=>['三角肌后束','中斜方肌','菱形肌'].includes(m))||theme.upper?.title==='上肢拉')s='肩后侧';
+      else if(d2.includes('三角肌前束')||theme.upper?.title==='上肢推')s='肩前侧';
+    }
+    return s.replace(/[\/／]+/g,'、');
   }
   function warmupMemberName(x){
     const s=itemName(x);
@@ -106,7 +149,7 @@
     return 'dynamic';
   }
   function prepGroups(p){
-    const groups={foam:unique((p.foam||[]).map(foamMemberName)),hip:[],upper:[],dynamic:[],core:[]};
+    const groups={foam:unique((p.foam||[]).map(x=>foamMemberName(x,p))),hip:[],upper:[],dynamic:[],core:[]};
     (p.warmups||[]).forEach(x=>{
       const key=warmupCategory(x),name=warmupMemberName(x);
       if(name&&!groups[key].includes(name))groups[key].push(name);
@@ -123,16 +166,8 @@
     s=s.replace(/(\d+(?:[–-]\d+)?)\s*秒/g,'$1 秒');
     return s.replace(/\s{2,}/g,' ').trim();
   }
-  function actionMetaByName(name){
-    const target=clean(name);if(!target)return null;
-    const matches=Object.entries(D().actions||{}).filter(([,a])=>clean(a?.name)===target);
-    if(!matches.length)return null;
-    const [actionId,action]=matches[0];
-    const anatomy=window.V14Anatomy?.get?.(actionId)||window.V14_ANATOMY?.records?.[actionId]||{};
-    return {actionId,action:action||{},anatomy};
-  }
   function structuredMemberPurpose(x){
-    const meta=actionMetaByName(x?.name);if(!meta)return '';
+    const meta=actionMeta(x);if(!meta)return '';
     const {action,anatomy}=meta,slot=clean(x?.slot),pattern=clean(action.pattern);
     const primary=Array.isArray(anatomy.primary)?anatomy.primary:[],moves=Array.isArray(anatomy.movementActions)?anatomy.movementActions:[];
     const has=(items,re)=>items.some(v=>re.test(clean(v)));
@@ -145,17 +180,30 @@
       if(has(moves,/交替|对侧|单臂|抗旋转/))return '核心稳定与身体控制';
       return '核心稳定';
     }
+    if(/^D1｜/.test(slot)){
+      if(primary.includes('内收肌群'))return '大腿内侧强化';
+      if(primary.includes('股四头肌'))return '大腿前侧强化';
+      if(primary.includes('腘绳肌'))return '大腿后侧强化';
+      if(primary.some(v=>['臀中肌','臀小肌'].includes(v)))return '臀侧强化';
+      if(primary.includes('臀大肌'))return '臀部强化';
+      if(primary.some(v=>['腓肠肌','比目鱼肌'].includes(v)))return '小腿强化';
+    }
+    if(/^D2｜/.test(slot)){
+      if(primary.includes('三角肌后束')||has(moves,/肩水平外展/))return '肩后侧与上背强化';
+      if(primary.includes('肱三头肌'))return '手臂后侧强化';
+      if(primary.some(v=>['肱二头肌','肱肌'].includes(v)))return '手臂前侧强化';
+      if(primary.some(v=>['中斜方肌','斜方肌中束','斜方肌下束','菱形肌'].includes(v)))return '上背与肩胛强化';
+      if(primary.some(v=>/肩袖|冈下肌|小圆肌/.test(v)))return '肩部稳定强化';
+      if(primary.some(v=>['三角肌前束','三角肌中束'].includes(v)))return '肩部强化';
+    }
     if(primary.includes('内收肌群'))return '大腿内侧强化';
-    if(primary.includes('肱三头肌')&&/^D2｜/.test(slot))return '手臂后侧强化';
     if(/水平推|垂直推/.test(pattern))return '上肢推力';
     if(/水平拉|垂直拉/.test(pattern))return '上肢拉力';
     if(/单腿拉|单腿髋铰链/.test(pattern))return '单腿后侧链力量';
     if(/单腿蹲/.test(pattern))return '单腿力量';
     if(/蹲/.test(pattern)&&primary.some(v=>['股四头肌','臀大肌'].includes(v)))return '大腿与臀部力量';
-    if(/^D1｜/.test(slot)&&primary.includes('腘绳肌'))return '大腿后侧强化';
     if(/髋铰链/.test(pattern))return '后侧链力量';
     if(/髋伸展|臀伸|臀推/.test(pattern)||primary.includes('臀大肌'))return '臀部力量';
-    if(/^D2｜/.test(slot))return '上肢辅助强化';
     return '';
   }
   function memberPurpose(x,theme){
@@ -164,6 +212,8 @@
     const name=clean(x?.name),slot=clean(x?.slot);
     if(/Pallof|抗旋转/i.test(name))return '核心抗旋转';
     if(/交替触肩|触肩/.test(name))return '核心稳定与身体控制';
+    if(/腿屈伸/.test(name))return '大腿前侧强化';
+    if(/反向飞鸟|俯身飞鸟/.test(name))return '肩后侧与上背强化';
     if(/髋内收|内收/.test(name))return '大腿内侧强化';
     if(/三头|臂屈伸/.test(name))return '手臂后侧强化';
     if(/卧推|胸推|推胸|俯卧撑/.test(name))return '上肢推力';
@@ -174,7 +224,8 @@
     if(/平板|死虫|鸟狗|支撑/.test(name))return '核心稳定';
     if(/^C｜|^CORE/.test(slot))return '核心稳定';
     if(/^B｜/.test(slot))return theme?.upper?.focus||'上肢力量';
-    if(/^A｜|^D1｜/.test(slot))return theme?.lower?.focus||'下肢力量';
+    if(/^A｜/.test(slot))return theme?.lower?.focus||'下肢力量';
+    if(/^D1｜/.test(slot))return '下肢辅助强化';
     if(/^D2｜/.test(slot))return '上肢辅助强化';
     return '力量与身体控制';
   }
@@ -183,7 +234,7 @@
   }
   function formatMember(p,options={}){
     const theme=memberTheme(p),level=clean(p.level),meta=levelMeta(level),groups=prepGroups(p);
-    const lines=[formatDate(options.now),`${clean(p.brand)||'7Fit'}｜今日训练`,'',theme.title,`${level||'L'}｜${meta.label}`,'',meta.reason,'','课前准备｜约 10–12 分钟'];
+    const lines=[formatDate(options.now),`${clean(p.brand)||'7Fit'}｜今日训练`,'',theme.title,`${level||'L'}｜${meta.label}`,'',memberReason(theme,level),'','课前准备｜约 10–12 分钟'];
     if(groups.foam.length)lines.push(`泡沫轴放松：${lineList(groups.foam)}`);
     if(groups.hip.length)lines.push(`髋部活动：${lineList(groups.hip)}`);
     if(groups.upper.length)lines.push(`上肢活动：${lineList(groups.upper)}`);
@@ -201,5 +252,5 @@
   }
   function fallbackCopy(text,doc){if(!doc?.body||typeof doc.createElement!=='function'||typeof doc.execCommand!=='function')return false;const area=doc.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';area.style.pointerEvents='none';doc.body.appendChild(area);area.focus();area.select();let ok=false;try{ok=doc.execCommand('copy');}catch(_){ok=false;}area.remove();return !!ok;}
   async function copyText(text,env){if(window.V14ModuleCopy?.copyText)return window.V14ModuleCopy.copyText(text,env);const target=env||window,nav=target.navigator;if(nav?.clipboard?.writeText){try{await nav.clipboard.writeText(text);return true;}catch(_){}}const ok=fallbackCopy(text,target.document);if(!ok)throw new Error('COPY_UNAVAILABLE');return true;}
-  window.V14SessionCopy={formatCoach,formatMember,copyText,formatDate,memberTheme,prepGroups,memberPrescription,memberPurpose};
+  window.V14SessionCopy={formatCoach,formatMember,copyText,formatDate,memberTheme,prepGroups,memberPrescription,memberPurpose,memberReason};
 })();
