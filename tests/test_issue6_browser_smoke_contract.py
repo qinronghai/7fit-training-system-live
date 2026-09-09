@@ -21,12 +21,13 @@ def test_playwright_smoke_files_exist_and_freeze_critical_routes():
         "single_leg_hinge",
         "horizontal_push",
         "level=L3",
+        "L3｜单腿拉 + 水平推",
         "pageerror",
         "scrollWidth",
         "clientWidth",
         "390",
-        ".session-slot",
-        ".session-swap",
+        ".composer-slot-card",
+        ".composer-slot-select",
     ]:
         assert token in source, f"browser smoke must preserve {token!r} coverage"
 
