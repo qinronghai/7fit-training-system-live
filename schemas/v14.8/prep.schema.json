@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/prep.schema.json",
+  "title": "7Fit V14.8 PREP",
+  "type": "object"
+}
