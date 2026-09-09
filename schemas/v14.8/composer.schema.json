@@ -2,5 +2,49 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://7fit.local/schemas/v14.8/composer.schema.json",
   "title": "7Fit V14.8 Composer",
-  "type": "object"
+  "type": "object",
+  "required": ["lowerModes", "upperModes", "levelMap", "supportMap", "coreMap", "coreDemands", "auxiliaryRules", "officialPresetMap"],
+  "properties": {
+    "lowerModes": {
+      "type": "object",
+      "required": ["squat", "hinge", "hip_extension", "single_leg_squat", "single_leg_hinge"],
+      "additionalProperties": true
+    },
+    "upperModes": {
+      "type": "object",
+      "required": ["horizontal_pull", "vertical_pull", "horizontal_push", "vertical_push"],
+      "additionalProperties": true
+    },
+    "levelMap": {
+      "type": "object",
+      "required": ["L1", "L2", "L3", "L4"],
+      "additionalProperties": true
+    },
+    "supportMap": {
+      "type": "object",
+      "required": ["L1", "L2", "L3", "L4"],
+      "additionalProperties": true
+    },
+    "coreMap": {
+      "type": "object",
+      "required": ["L1", "L2", "L3", "L4"],
+      "additionalProperties": true
+    },
+    "coreDemands": {
+      "type": "object",
+      "required": ["anti_extension", "anti_rotation", "anti_lateral_flexion", "dynamic_rotation", "breathing_pressure", "loaded_integration"],
+      "additionalProperties": true
+    },
+    "auxiliaryRules": {
+      "type": "object",
+      "required": ["lower", "upper"],
+      "additionalProperties": true
+    },
+    "officialPresetMap": {
+      "type": "object",
+      "required": ["F111-01", "F111-02", "F111-03", "F111-04", "F111-05", "F111-06", "F111-07", "F111-08"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
 }
