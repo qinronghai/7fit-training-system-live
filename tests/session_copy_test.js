@@ -6,6 +6,7 @@ const source = fs.readFileSync('js/session-copy.js', 'utf8');
 const context = { window: {}, console };
 vm.createContext(context);
 vm.runInContext(source, context);
+vm.runInContext(fs.readFileSync('js/coach-copy.js','utf8'), context);
 
 const api = context.window.V14SessionCopy;
 assert(api, 'V14SessionCopy missing');
@@ -17,12 +18,12 @@ const payload = {
   foam: ['泡沫轴松解-臀部', '泡沫轴松解-背阔肌/背侧'],
   warmups: ['动态90/90髋旋转转换', '四足跪姿胸椎旋转'],
   slots: [
-    {slot: 'A｜下肢主项', name: '臀推机', meta: 'T2 · 髋伸展 · 臀推机'},
-    {slot: 'B｜上肢主项', name: '高位下拉', meta: 'T2 · 垂直拉 · 高位下拉机'},
-    {slot: 'C｜支撑', name: '侧平板', meta: 'SUP-S6 · 支撑模式'},
-    {slot: 'D1｜下肢辅助', name: '单腿臀桥', meta: 'T2 · 髋伸展'},
-    {slot: 'D2｜肩胛 / 手臂', name: '绳索面拉', meta: '肩胛控制'},
-    {slot: 'CORE', name: '死虫式', meta: 'CORE-L2 · 抗伸展'},
+    {slot: 'A｜下肢主项', name: '臀推机', tier:'T2', prescription:'3组 × 10–12次｜RIR 2–3'},
+    {slot: 'B｜上肢主项', name: '高位下拉', tier:'T2', prescription:'3组 × 10–12次｜RIR 2–3'},
+    {slot: 'C｜支撑', name: '侧平板', grade:'SUP-S6', prescription:'2组 × 20–30秒/侧'},
+    {slot: 'D1｜下肢辅助', name: '单腿臀桥', tier:'T2', prescription:'2组 × 12次/侧'},
+    {slot: 'D2｜肩胛 / 手臂', name: '绳索面拉', prescription:'2组 × 15次'},
+    {slot: 'CORE', name: '死虫式', grade:'CORE-L2', prescription:'2组 × 8–10次/侧'},
   ],
   muscles: {
     primary: ['臀大肌', '背阔肌'],
@@ -34,13 +35,19 @@ const payload = {
   conflicts: ['肌群刺激集中：臀大肌暴露增加，请确认符合本节目标。'],
 };
 
-const coach = api.formatCoach(payload);
-assert(coach.includes('7Fit｜教练训练单'));
-assert(coach.includes('F111-04｜臀伸 + 垂直拉 + 单侧支撑'));
-assert(coach.includes('A｜下肢主项｜臀推机'));
-assert(coach.includes('主要刺激：臀大肌 · 背阔肌'));
-assert(coach.includes('系统提醒'));
+const coach = api.formatCoach(payload,{now:'2026-09-10T12:00:00+08:00'});
+assert(coach.includes('2026年9月10日｜星期四'));
+assert(coach.includes('7Fit｜私教训练'));
+assert(coach.includes('F111-04｜L2 基础负重'));
+assert(coach.includes('臀伸 × 垂直拉 × 核心稳定'));
+assert(coach.includes('本节目标'));
+assert(coach.includes('A｜臀推机｜T2'));
+assert(coach.includes('目标：臀部力量'));
+assert(coach.includes('本节观察'));
+assert(coach.includes('注意事项'));
 assert(coach.includes('肌群刺激集中'));
+assert(!coach.includes('【本节主要训练肌群】'));
+assert(!coach.includes('【系统提醒】'));
 
 const member = api.formatMember(payload,{now:'2026-09-09T12:00:00+08:00'});
 assert(member.includes('7Fit｜今日训练'));
