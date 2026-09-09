@@ -3,6 +3,7 @@
   const clean=x=>String(x??'').trim();
   // Issue #5: D1/D2 are 1F strength-zone auxiliaries; FLEX is reserved for formal main slots.
   const AUXILIARY_ROUTE_POLICY=Object.freeze(['1F_ONLY']);
+  const MAIN_TIER_RANK=Object.freeze({T1:1,T2:2,T3:3,T4:4});
   function cfg(){return D().composer||{};}
   function auxiliaryRoutePolicy(){return [...AUXILIARY_ROUTE_POLICY];}
   function isAuxiliaryRouteAllowed(route){return AUXILIARY_ROUTE_POLICY.includes(route);}
@@ -18,22 +19,28 @@
     const a=D().actions?.[id]||{};
     return {id,name:a.name||id,tier:a.tier||'',grade:a.supportGrade||a.grade||a.coreGrade||'',coreDemand:a.coreDemand||'',pattern:a.pattern||'',route:a.route||'',status:a.status||''};
   }
-  function byTier(ids,level,includeExpanded=false,mode={}){
-    const w=mainTierWindow(level),allowed=new Set([...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])]),rec=w.recommended,tiers=['T1','T2','T3','T4'];
-    const ranked=(ids||[]).map((id,index)=>{
-      const x=actionView(id),effectiveTier=tiers[index]||x.tier;
+  function byTier(candidates,level,includeExpanded=false,mode={}){
+    const w=mainTierWindow(level),allowed=new Set([...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])]),rec=w.recommended;
+    const ranked=(candidates||[]).map(candidate=>{
+      const id=clean(candidate?.id),effectiveTier=clean(candidate?.tier),x=actionView(id);
       x.sourceTier=x.tier;x.tier=effectiveTier;
       x.prescriptionOverride=clean(mode.prescriptionByTier?.[effectiveTier]);
       x.tierNote=clean(mode.tierNoteByTier?.[effectiveTier]);
       return x;
     }).filter(x=>allowed.has(x.tier)&&x.status==='可自动编排'&&['1F_ONLY','FLEX_1F_2F'].includes(x.route))
-      .sort((a,b)=>(a.tier===rec?-1:0)-(b.tier===rec?-1:0));
+      .sort((a,b)=>{
+        const recOrder=(a.tier===rec?0:1)-(b.tier===rec?0:1);
+        if(recOrder)return recOrder;
+        const tierOrder=(MAIN_TIER_RANK[a.tier]||99)-(MAIN_TIER_RANK[b.tier]||99);
+        if(tierOrder)return tierOrder;
+        return String(a.id).localeCompare(String(b.id));
+      });
     const seen=new Set();
     return ranked.filter(x=>{if(seen.has(x.id))return false;seen.add(x.id);return true;});
   }
   function mainCandidates(kind,modeKey,level,includeExpanded=false){
     const mode=(kind==='lower'?cfg().lowerModes:cfg().upperModes)?.[modeKey];
-    return byTier(mode?.ids||[],level,includeExpanded,mode||{});
+    return byTier(mode?.candidates||[],level,includeExpanded,mode||{});
   }
   function supportCandidates(level,includeExpanded=false){
     const w=supportWindow(level),grades=[...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])],allowed=new Set(grades),rec=w.recommended;
