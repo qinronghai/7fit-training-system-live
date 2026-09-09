@@ -33,7 +33,15 @@
     "coreDemands": {
       "type": "object",
       "required": ["anti_extension", "anti_rotation", "anti_lateral_flexion", "dynamic_rotation", "breathing_pressure", "loaded_integration"],
-      "additionalProperties": true
+      "properties": {
+        "anti_extension": {},
+        "anti_rotation": {},
+        "anti_lateral_flexion": {},
+        "dynamic_rotation": {},
+        "breathing_pressure": {},
+        "loaded_integration": {}
+      },
+      "additionalProperties": false
     },
     "auxiliaryRules": {
       "type": "object",
@@ -43,7 +51,16 @@
     "officialPresetMap": {
       "type": "object",
       "required": ["F111-01", "F111-02", "F111-03", "F111-04", "F111-05", "F111-06", "F111-07", "F111-08"],
-      "additionalProperties": true
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "prefixItems": [
+          {"type": "string", "minLength": 1},
+          {"type": "string", "minLength": 1}
+        ],
+        "items": false
+      }
     }
   },
   "additionalProperties": true
