@@ -2,12 +2,15 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
+from tools import validate_v148_schema as schema_validator
 from tools.validate_v148_schema import load_runtime_data, validate_payload, validate_repository
 
 ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
 VALIDATOR = ROOT / "tools" / "validate_v148_schema.py"
 DATA_FILE = ROOT / "data" / "system-data.js"
+DEPLOY_WORKFLOW = ROOT / ".github" / "workflows" / "deploy-pages.yml"
+SCHEMA_WORKFLOW = ROOT / ".github" / "workflows" / "schema-check.yml"
 
 
 def load_schema_json(name):
@@ -226,3 +229,31 @@ def test_support_inventory_drift_is_rejected():
     data["supportIds"] = data["supportIds"][:-1]
     errors = validate_payload(data)
     assert has_error(errors, "support", "30")
+
+
+def test_schema_cli_success_output(monkeypatch, capsys):
+    monkeypatch.setattr(schema_validator, "validate_repository", lambda root=ROOT: [])
+    assert schema_validator.main() == 0
+    assert "V14.8 schema validation: PASS" in capsys.readouterr().out
+
+
+def test_schema_cli_failure_output(monkeypatch, capsys):
+    monkeypatch.setattr(
+        schema_validator,
+        "validate_repository",
+        lambda root=ROOT: ["actions.bad.route: invalid"],
+    )
+    assert schema_validator.main() == 1
+    output = capsys.readouterr().out
+    assert "V14.8 schema validation: FAIL" in output
+    assert "actions.bad.route: invalid" in output
+
+
+def test_release_workflows_gate_schema_validation():
+    deploy = DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+    schema_workflow = SCHEMA_WORKFLOW.read_text(encoding="utf-8")
+    assert "jsonschema" in deploy
+    assert "tools/validate_v148_schema.py" in deploy
+    assert "pull_request:" in schema_workflow
+    assert 'branches: ["feature/issue-3-v148-data-schema"]' not in schema_workflow
+    assert "tools/validate_v148_schema.py" in schema_workflow
