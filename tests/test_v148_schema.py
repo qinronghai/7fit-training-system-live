@@ -1,13 +1,26 @@
 import json
+from copy import deepcopy
 from pathlib import Path
+
+from tools.validate_v148_schema import load_runtime_data, validate_payload, validate_repository
 
 ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
 VALIDATOR = ROOT / "tools" / "validate_v148_schema.py"
+DATA_FILE = ROOT / "data" / "system-data.js"
 
 
 def load_schema_json(name):
     return json.loads((SCHEMA_DIR / f"{name}.schema.json").read_text(encoding="utf-8"))
+
+
+def payload():
+    return deepcopy(load_runtime_data(DATA_FILE))
+
+
+def has_error(errors, *needles):
+    text = "\n".join(errors)
+    return all(needle in text for needle in needles)
 
 
 def test_v148_schema_bundle_exists():
@@ -114,3 +127,70 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
 
 def test_repository_validator_entrypoint_exists():
     assert VALIDATOR.is_file(), "tools/validate_v148_schema.py must exist"
+
+
+def test_current_runtime_payload_passes_v148_schema():
+    assert validate_repository(ROOT) == []
+
+
+def test_unknown_action_route_is_rejected():
+    data = payload()
+    action_id, action = next(iter(data["actions"].items()))
+    action["route"] = "UNKNOWN_ROUTE"
+    errors = validate_payload(data)
+    assert has_error(errors, action_id, "route")
+
+
+def test_unknown_action_status_is_rejected():
+    data = payload()
+    action_id, action = next(iter(data["actions"].items()))
+    action["status"] = "UNKNOWN_STATUS"
+    errors = validate_payload(data)
+    assert has_error(errors, action_id, "status")
+
+
+def test_unknown_action_tier_is_rejected():
+    data = payload()
+    action_id, action = next((item for item in data["actions"].items() if "tier" in item[1]))
+    action["tier"] = "T99"
+    errors = validate_payload(data)
+    assert has_error(errors, action_id, "tier")
+
+
+def test_unknown_core_demand_is_rejected():
+    data = payload()
+    action_id, action = next((item for item in data["actions"].items() if item[1].get("coreDemand")))
+    action["coreDemand"] = "unknown_demand"
+    errors = validate_payload(data)
+    assert has_error(errors, action_id, "coreDemand")
+
+
+def test_missing_required_action_id_is_rejected():
+    data = payload()
+    action_key, action = next(iter(data["actions"].items()))
+    action.pop("id", None)
+    errors = validate_payload(data)
+    assert has_error(errors, action_key, "id")
+
+
+def test_unknown_session_baseline_reference_is_rejected():
+    data = payload()
+    session_id, session = next(iter(data["sessions"].items()))
+    session["slots"][0]["baselineId"] = "missing-action-id"
+    errors = validate_payload(data)
+    assert has_error(errors, session_id, "baselineId", "missing-action-id")
+
+
+def test_d1_d2_auxiliary_flex_route_is_rejected():
+    data = payload()
+    aux_id = data["composer"]["auxiliaryRules"]["lower"]["squat"][0]
+    data["actions"][aux_id]["route"] = "FLEX_1F_2F"
+    errors = validate_payload(data)
+    assert has_error(errors, aux_id, "auxiliary", "1F_ONLY")
+
+
+def test_support_inventory_drift_is_rejected():
+    data = payload()
+    data["supportIds"] = data["supportIds"][:-1]
+    errors = validate_payload(data)
+    assert has_error(errors, "support", "30")
