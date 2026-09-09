@@ -65,6 +65,7 @@ def test_action_schema_declares_runtime_enums():
         "CORE-L3",
         "CORE-L4",
     ]
+    assert schema["properties"]["coreDemand"] == {"type": "string", "minLength": 1}
 
 
 def test_session_schema_requires_six_formal_slots():
@@ -72,7 +73,10 @@ def test_session_schema_requires_six_formal_slots():
     slots = schema["properties"]["slots"]
     assert slots["minItems"] == 6
     assert slots["maxItems"] == 6
-    assert slots["items"]["properties"]["slotKey"]["enum"] == ["A", "B", "C", "D1", "D2", "CORE"]
+    slot_key = slots["items"]["properties"]["slotKey"]
+    assert slot_key["type"] == "string"
+    assert slot_key["minLength"] == 1
+    assert slot_key["pattern"] == r"^F111-\d{2}-L[1-4]__(A|B|SUPPORT|2|3|CORE)$"
 
 
 def test_composer_schema_freezes_core_structure():
@@ -100,7 +104,8 @@ def test_composer_schema_freezes_core_structure():
         "horizontal_push",
         "vertical_push",
     ]
-    assert schema["properties"]["coreDemands"]["required"] == [
+    core_demands = schema["properties"]["coreDemands"]
+    assert core_demands["required"] == [
         "anti_extension",
         "anti_rotation",
         "anti_lateral_flexion",
@@ -108,6 +113,11 @@ def test_composer_schema_freezes_core_structure():
         "breathing_pressure",
         "loaded_integration",
     ]
+    assert core_demands["additionalProperties"] is False
+    preset_items = schema["properties"]["officialPresetMap"]["additionalProperties"]
+    assert preset_items["type"] == "array"
+    assert preset_items["minItems"] == 2
+    assert preset_items["maxItems"] == 2
 
 
 def test_collection_schemas_freeze_inventory_and_minimum_fields():
@@ -157,10 +167,17 @@ def test_unknown_action_tier_is_rejected():
     assert has_error(errors, action_id, "tier")
 
 
-def test_unknown_core_demand_is_rejected():
+def test_unknown_composer_core_demand_key_is_rejected():
+    data = payload()
+    data["composer"]["coreDemands"]["unknown_demand"] = []
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "coreDemands", "unknown_demand")
+
+
+def test_empty_action_core_demand_is_rejected_when_present():
     data = payload()
     action_id, action = next((item for item in data["actions"].items() if item[1].get("coreDemand")))
-    action["coreDemand"] = "unknown_demand"
+    action["coreDemand"] = ""
     errors = validate_payload(data)
     assert has_error(errors, action_id, "coreDemand")
 
@@ -181,12 +198,27 @@ def test_unknown_session_baseline_reference_is_rejected():
     assert has_error(errors, session_id, "baselineId", "missing-action-id")
 
 
+def test_session_slot_key_prefix_drift_is_rejected():
+    data = payload()
+    session_id, session = next(iter(data["sessions"].items()))
+    session["slots"][0]["slotKey"] = "F111-99-L4__A"
+    errors = validate_payload(data)
+    assert has_error(errors, session_id, "slotKey")
+
+
 def test_d1_d2_auxiliary_flex_route_is_rejected():
     data = payload()
     aux_id = data["composer"]["auxiliaryRules"]["lower"]["squat"][0]
     data["actions"][aux_id]["route"] = "FLEX_1F_2F"
     errors = validate_payload(data)
     assert has_error(errors, aux_id, "auxiliary", "1F_ONLY")
+
+
+def test_official_preset_unknown_mode_is_rejected():
+    data = payload()
+    data["composer"]["officialPresetMap"]["F111-01"] = ["unknown_lower", "horizontal_pull"]
+    errors = validate_payload(data)
+    assert has_error(errors, "officialPresetMap", "F111-01", "unknown_lower")
 
 
 def test_support_inventory_drift_is_rejected():
