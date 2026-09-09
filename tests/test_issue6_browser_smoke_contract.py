@@ -45,7 +45,8 @@ def test_pr_ci_has_pinned_browser_smoke_job_after_verify():
     assert re.search(r"(?m)^  browser-smoke:\s*$", source)
     assert re.search(r"(?m)^    needs: verify\s*$", source)
     assert "@playwright/test@1.63.0" in source
-    assert "playwright install --with-deps chromium" in source
+    assert "playwright install chromium" in source
+    assert "--with-deps" not in source
     assert "npx playwright test" in source
 
 
@@ -54,6 +55,7 @@ def test_master_deploy_is_blocked_by_browser_smoke():
     assert re.search(r"(?m)^  browser-smoke:\s*$", source)
     assert re.search(r"(?m)^    needs: verify\s*$", source)
     assert "@playwright/test@1.63.0" in source
-    assert "playwright install --with-deps chromium" in source
+    assert "playwright install chromium" in source
+    assert "--with-deps" not in source
     assert "npx playwright test" in source
     assert re.search(r"(?m)^    needs: \[verify, browser-smoke\]\s*$", source)
