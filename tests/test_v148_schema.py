@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
+VALIDATOR = ROOT / "tools" / "validate_v148_schema.py"
 
 
 def load_schema_json(name):
@@ -94,3 +95,22 @@ def test_composer_schema_freezes_core_structure():
         "breathing_pressure",
         "loaded_integration",
     ]
+
+
+def test_collection_schemas_freeze_inventory_and_minimum_fields():
+    expected = {
+        "support": (30, ["ids", "details"]),
+        "core": (20, ["ids", "details"]),
+        "prep": (20, ["ids", "details", "matchByPattern"]),
+        "foam": (12, ["ids", "details", "matchByPattern"]),
+    }
+    for name, (count, required) in expected.items():
+        schema = load_schema_json(name)
+        assert schema["required"] == required
+        assert schema["properties"]["ids"]["minItems"] == count
+        assert schema["properties"]["ids"]["maxItems"] == count
+        assert schema["properties"]["ids"]["uniqueItems"] is True
+
+
+def test_repository_validator_entrypoint_exists():
+    assert VALIDATOR.is_file(), "tools/validate_v148_schema.py must exist"
