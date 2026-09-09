@@ -209,15 +209,20 @@ def validate_payload(data: dict) -> list[str]:
 
     preset_map = composer.get("officialPresetMap", {})
     for preset_id, preset in preset_map.items():
-        if not isinstance(preset, dict):
-            errors.append(f"composer.officialPresetMap.{preset_id}: preset must be an object")
+        if not isinstance(preset, list) or len(preset) != 2:
+            errors.append(
+                f"composer.officialPresetMap.{preset_id}: preset must be [lowerMode, upperMode]"
+            )
             continue
-        lower = preset.get("lowerMode")
-        upper = preset.get("upperMode")
+        lower, upper = preset
         if lower not in lower_modes:
-            errors.append(f"composer.officialPresetMap.{preset_id}.lowerMode: unknown mode {lower}")
+            errors.append(
+                f"composer.officialPresetMap.{preset_id}.0: unknown lower mode {lower}"
+            )
         if upper not in upper_modes:
-            errors.append(f"composer.officialPresetMap.{preset_id}.upperMode: unknown mode {upper}")
+            errors.append(
+                f"composer.officialPresetMap.{preset_id}.1: unknown upper mode {upper}"
+            )
 
     # PREP / Foam identity, details, action references and pattern mapping references.
     for label, ids_key, details_key, match_key, id_field in (
