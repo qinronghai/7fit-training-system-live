@@ -24,7 +24,7 @@ jobs:
       - name: Install schema test dependencies
         run: python -m pip install --quiet pytest jsonschema
 
-      - name: Inventory current runtime enums
+      - name: Inventory current runtime contract
         shell: bash
         run: |
           python - <<'PY'
@@ -33,11 +33,25 @@ jobs:
           text=Path('data/system-data.js').read_text(encoding='utf-8')
           m=re.search(r"window\.V14_DATA\s*=\s*(\{.*\});\s*$",text,re.S)
           data=json.loads(m.group(1))
-          actions=data['actions'].values()
-          print('ROUTES=',sorted({a.get('route') for a in actions if a.get('route') is not None}))
+          print('TOP_LEVEL_KEYS=',sorted(data.keys()))
+          print('ROUTES=',sorted({a.get('route') for a in data['actions'].values() if a.get('route') is not None}))
           print('STATUSES=',sorted({a.get('status') for a in data['actions'].values() if a.get('status') is not None}))
           print('TIERS=',sorted({a.get('tier') for a in data['actions'].values() if a.get('tier') is not None}))
+          for status in ['可自动编排','待人工验收','SUPPORT_CANON','CORE_CANON']:
+              hit=next((a for a in data['actions'].values() if a.get('status')==status),None)
+              print(f'ACTION_KEYS_{status}=',sorted(hit.keys()) if hit else None)
+          first_session=next(iter(data['sessions'].items()))
+          print('SESSION_SAMPLE_ID=',first_session[0])
+          print('SESSION_KEYS=',sorted(first_session[1].keys()))
+          print('SESSION_SLOT_KEYS=',sorted(first_session[1]['slots'][0].keys()))
+          print('COMPOSER_KEYS=',sorted(data.get('composer',{}).keys()))
           print('CORE_DEMANDS=',sorted(data.get('composer',{}).get('coreDemands',{}).keys()))
+          print('SUPPORT_COUNT=',len(data.get('supportIds',[])))
+          print('CORE_COUNT=',len(data.get('coreIds',[])))
+          print('WARMUP_COUNT=',len(data.get('warmupIds',[])))
+          print('WARMUP_DETAIL_KEYS=',sorted(next(iter(data.get('warmupDetails',{}).values())).keys()))
+          print('FOAM_COUNT=',len(data.get('foamRollIds',[])))
+          print('FOAM_DETAIL_KEYS=',sorted(next(iter(data.get('foamRollDetails',{}).values())).keys()))
           print('ACTION_COUNT=',len(data['actions']))
           print('SESSION_COUNT=',len(data['sessions']))
           PY
