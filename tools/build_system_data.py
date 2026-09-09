@@ -65,6 +65,18 @@ def load_manifest(src_dir: Path = DEFAULT_SRC) -> dict:
             f"manifest owners reference unknown source files: {unknown_owner_files}"
         )
 
+    top_level_order = manifest.get("topLevelOrder")
+    if not isinstance(top_level_order, list) or not top_level_order:
+        raise SourceContractError("manifest topLevelOrder must be a non-empty array")
+    if len(top_level_order) != len(set(top_level_order)):
+        raise SourceContractError("manifest topLevelOrder contains duplicates")
+    if set(top_level_order) != set(owners):
+        missing = sorted(set(owners) - set(top_level_order))
+        extra = sorted(set(top_level_order) - set(owners))
+        raise SourceContractError(
+            f"manifest topLevelOrder/owners mismatch: missing={missing}; extra={extra}"
+        )
+
     baseline_hash = manifest.get("baselinePayloadSha256")
     if not isinstance(baseline_hash, str) or not SHA256_RE.fullmatch(baseline_hash):
         raise SourceContractError("manifest baselinePayloadSha256 must be 64 lowercase hex chars")
@@ -101,10 +113,10 @@ def load_fragments(src_dir: Path, manifest: dict) -> dict[str, dict]:
 def build_payload(src_dir: Path = DEFAULT_SRC) -> dict:
     manifest = load_manifest(src_dir)
     fragments = load_fragments(src_dir, manifest)
-    payload: dict = {}
+    values: dict = {}
     for filename in manifest["sourceFiles"]:
-        payload.update(fragments[filename])
-    return payload
+        values.update(fragments[filename])
+    return {key: values[key] for key in manifest["topLevelOrder"]}
 
 
 def render_bundle(payload: dict) -> str:
