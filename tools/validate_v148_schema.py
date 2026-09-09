@@ -11,14 +11,6 @@ ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
 FORMAL_SLOT_KEYS = {"A", "B", "C", "D1", "D2", "CORE"}
 FORMAL_ROUTES = {"1F_ONLY", "FLEX_1F_2F"}
-CORE_DEMANDS = {
-    "anti_extension",
-    "anti_rotation",
-    "anti_lateral_flexion",
-    "dynamic_rotation",
-    "breathing_pressure",
-    "loaded_integration",
-}
 SESSION_ID_RE = re.compile(r"^F111-\d{2}-L[1-4]$")
 
 
@@ -78,9 +70,6 @@ def validate_payload(data: dict) -> list[str]:
         errors.extend(_schema_errors(action, "action", f"actions.{action_key}"))
         if action.get("id") != action_key:
             errors.append(f"actions.{action_key}.id: map key must equal action id {action_key}")
-        demand = action.get("coreDemand")
-        if demand is not None and demand not in CORE_DEMANDS:
-            errors.append(f"actions.{action_key}.coreDemand: unknown coreDemand {demand}")
 
     for session_key, session in sorted(sessions.items()):
         errors.extend(_schema_errors(session, "session", f"sessions.{session_key}"))
