@@ -49,7 +49,7 @@
           "additionalProperties": false
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     }
   },
   "required": ["lowerModes", "upperModes", "levelMap", "supportMap", "coreMap", "coreDemands", "auxiliaryRules", "officialPresetMap"],
