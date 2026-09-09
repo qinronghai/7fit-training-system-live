@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/session.schema.json",
+  "title": "7Fit V14.8 Session",
+  "type": "object",
+  "required": ["slots"],
+  "properties": {
+    "slots": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["slotKey", "baselineId"],
+        "properties": {
+          "slotKey": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^F111-\\d{2}-L[1-4]__(A|B|SUPPORT|2|3|CORE)$"
+          },
+          "baselineId": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

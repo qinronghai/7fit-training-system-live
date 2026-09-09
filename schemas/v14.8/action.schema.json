@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/action.schema.json",
+  "title": "7Fit V14.8 Action",
+  "type": "object",
+  "required": ["id", "name", "route", "status"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "route": {
+      "type": "string",
+      "enum": ["1F_ONLY", "2F_ONLY", "FLEX_1F_2F", "POST_CARDIO_ONLY", "CONDITIONING_2F", "RECOVERY_2F"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["可自动编排", "待人工验收", "SUPPORT_CANON", "CORE_CANON"]
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["", "T1", "T2", "T3", "T4", "SUP-S1", "SUP-S2", "SUP-S3", "SUP-S4", "SUP-S5", "SUP-S6", "CORE-L1", "CORE-L2", "CORE-L3", "CORE-L4"]
+    },
+    "coreDemand": {"type": "string", "minLength": 1},
+    "isSupport": {"type": "boolean"},
+    "isCore": {"type": "boolean"},
+    "pattern": {"type": ["string", "null"]},
+    "category": {"type": ["string", "null"]},
+    "zone": {"type": ["string", "null"]},
+    "equipmentId": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

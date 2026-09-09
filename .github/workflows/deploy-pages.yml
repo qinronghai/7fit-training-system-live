@@ -26,10 +26,11 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Python tests
+      - name: Python tests and V14.8 schema gate
         run: |
-          python -m pip install --quiet pytest beautifulsoup4
+          python -m pip install --quiet pytest beautifulsoup4 jsonschema
           python -m pytest -q
+          python tools/validate_v148_schema.py
 
       - name: Setup Node
         uses: actions/setup-node@v4
