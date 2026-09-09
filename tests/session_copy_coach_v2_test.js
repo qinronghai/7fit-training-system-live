@@ -68,7 +68,7 @@ assert(coach.includes('本节重点：下肢推 · 水平拉 · 核心稳定'));
 assert(coach.includes('PREP｜约 10–12 分钟'));
 assert(coach.includes('泡沫轴松解：大腿前侧 / 上背部'));
 assert(coach.includes('髋部活动：90/90'));
-assert(coach.includes('上肢活动：四足跪姿胸椎旋转'));
+assert(coach.includes('上肢活动：胸椎旋转'));
 assert(coach.includes('核心激活：平板支撑'));
 assert(coach.includes('STRENGTH'));
 assert(coach.includes('A｜哈克深蹲｜T3'));
