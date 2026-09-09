@@ -44,12 +44,60 @@
       "type": "object",
       "required": ["anti_extension", "anti_rotation", "anti_lateral_flexion", "dynamic_rotation", "breathing_pressure", "loaded_integration"],
       "properties": {
-        "anti_extension": {},
-        "anti_rotation": {},
-        "anti_lateral_flexion": {},
-        "dynamic_rotation": {},
-        "breathing_pressure": {},
-        "loaded_integration": {}
+        "anti_extension": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        },
+        "anti_rotation": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        },
+        "anti_lateral_flexion": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        },
+        "dynamic_rotation": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        },
+        "breathing_pressure": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        },
+        "loaded_integration": {
+          "type": "object",
+          "required": ["name", "keywords"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "keywords": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": true
+        }
       },
       "additionalProperties": false
     },
