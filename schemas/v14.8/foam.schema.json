@@ -1,6 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://7fit.local/schemas/v14.8/foam.schema.json",
-  "title": "7Fit V14.8 Foam",
-  "type": "object"
+  "title": "7Fit V14.8 Foam Collection",
+  "type": "object",
+  "required": ["ids", "details", "matchByPattern"],
+  "properties": {
+    "ids": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["foamId", "actionId", "name", "route"],
+        "additionalProperties": true
+      }
+    },
+    "matchByPattern": {"type": "object"}
+  },
+  "additionalProperties": false
 }
