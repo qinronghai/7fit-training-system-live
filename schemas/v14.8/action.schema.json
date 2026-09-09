@@ -19,6 +19,7 @@
       "type": "string",
       "enum": ["", "T1", "T2", "T3", "T4", "CORE-L1", "CORE-L2", "CORE-L3", "CORE-L4"]
     },
+    "coreDemand": {"type": "string", "minLength": 1},
     "isSupport": {"type": "boolean"},
     "isCore": {"type": "boolean"},
     "pattern": {"type": ["string", "null"]},
