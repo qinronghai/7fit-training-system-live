@@ -24,9 +24,12 @@ assert(!coach.includes('哈克深蹲机'));
 assert(!coach.includes('飞机拉背机'));
 assert(!coach.includes('水平拉 ·'));
 
-const member=api.formatMember(payload);
+const member=api.formatMember(payload,{now:'2026-09-09T12:00:00+08:00'});
 assert(member.includes('哈克深蹲'));
-assert(member.includes('3组 × 10次'));
+assert(member.includes('3 × 10'));
+assert(member.includes('腿部力量 × 上肢拉 × 核心稳定'));
+assert(member.includes('今日训练重点'));
+assert(member.includes('课后有氧｜约 30 分钟'));
 assert(!member.includes('RIR'));
 assert(!member.includes('T3'));
 assert(!member.includes('哈克深蹲机'));
