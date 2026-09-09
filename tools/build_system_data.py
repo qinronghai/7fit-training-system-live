@@ -31,9 +31,21 @@ class SourceContractError(ValueError):
     """Raised when split-source ownership or shape is invalid."""
 
 
+def _reject_duplicate_json_keys(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise SourceContractError(f"duplicate JSON key: {key}")
+        value[key] = item
+    return value
+
+
 def _load_json_object(path: Path) -> dict:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_json_keys,
+        )
     except FileNotFoundError as exc:
         raise SourceContractError(f"missing source file: {path.name}") from exc
     except json.JSONDecodeError as exc:
