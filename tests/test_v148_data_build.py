@@ -52,7 +52,7 @@ def test_domain_source_contract_exists():
         assert (SRC / name).is_file(), f"missing domain source: {name}"
 
 
-def test_manifest_owns_exact_runtime_top_level_inventory():
+def test_manifest_owns_exact_runtime_top_level_inventory_and_order():
     runtime = load_runtime_data()
     assert (SRC / "manifest.json").is_file(), "manifest missing"
     manifest = load_json(SRC / "manifest.json")
@@ -61,6 +61,7 @@ def test_manifest_owns_exact_runtime_top_level_inventory():
         f"manifest/runtime key mismatch: missing={sorted(set(runtime) - set(owners))}; "
         f"extra={sorted(set(owners) - set(runtime))}"
     )
+    assert manifest["topLevelOrder"] == list(runtime), "top-level runtime key order changed"
     assert manifest["sourceFiles"] == list(DOMAIN_FILES)
     assert set(owners.values()).issubset(set(DOMAIN_FILES))
     assert re.fullmatch(r"[0-9a-f]{64}", manifest["baselinePayloadSha256"]), (
@@ -72,7 +73,7 @@ def test_fragments_have_unique_declared_ownership_and_assemble_runtime():
     runtime = load_runtime_data()
     manifest = load_json(SRC / "manifest.json")
     owners = manifest["owners"]
-    assembled = {}
+    values = {}
     seen = {}
 
     for filename in manifest["sourceFiles"]:
@@ -82,12 +83,14 @@ def test_fragments_have_unique_declared_ownership_and_assemble_runtime():
             assert key not in seen, f"duplicate top-level key {key}: {seen.get(key)} and {filename}"
             seen[key] = filename
             assert owners.get(key) == filename, f"{key} owner mismatch: {owners.get(key)} != {filename}"
-            assembled[key] = value
+            values[key] = value
 
     assert set(seen) == set(owners), (
         f"fragment/manifest mismatch: missing={sorted(set(owners) - set(seen))}; "
         f"extra={sorted(set(seen) - set(owners))}"
     )
+    assembled = {key: values[key] for key in manifest["topLevelOrder"]}
+    assert list(assembled) == list(runtime)
     assert assembled == runtime
 
 
