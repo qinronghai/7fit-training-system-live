@@ -1,0 +1,204 @@
+name: Bootstrap V14.7 FINAL
+
+on:
+  push:
+    branches: [v147-bootstrap]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v4
+        with:
+          ref: v147-bootstrap
+          fetch-depth: 0
+
+      - name: Recover and validate XZ bootstrap archive
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, io, lzma, re, tarfile, hashlib
+
+          d = Path('.bootstrap20')
+          order = [
+              'z00.b64','z01.b64','z02.b64','z03.b64','z04.b64','z05.b64','z06.b64',
+              'z07a.b64','z07b.b64','z08.b64','z09.b64','z10.b64','z11.b64','z12.b64'
+          ]
+          chunks = {}
+          for name in order:
+              p = d / name
+              if not p.exists():
+                  raise SystemExit(f'missing bootstrap chunk: {name}')
+              chunks[name] = re.sub(rb'\s+', b'', p.read_bytes())
+              print(name, len(chunks[name]))
+
+          # z00 was uploaded with one extra byte in the first staging pass. In the
+          # common case it is whitespace and has already disappeared above. If not,
+          # try only the two boundary trims; never silently mutate the middle.
+          z00_variants = [chunks['z00.b64']]
+          if len(chunks['z00.b64']) == 20001:
+              z00_variants = [chunks['z00.b64'][:-1], chunks['z00.b64'][1:]]
+
+          z06 = chunks['z06.b64']
+          alphabet = b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+          z06_variants = []
+          if len(z06) == 19999:
+              # The failed upload lost one boundary character. Try both boundaries.
+              for c in alphabet:
+                  z06_variants.append(z06 + bytes([c]))
+                  z06_variants.append(bytes([c]) + z06)
+          else:
+              z06_variants = [z06]
+
+          before = [chunks[f'z0{i}.b64'] for i in range(1,6)]
+          after = [chunks['z07a.b64'],chunks['z07b.b64'],chunks['z08.b64'],chunks['z09.b64'],chunks['z10.b64'],chunks['z11.b64'],chunks['z12.b64']]
+
+          recovered = None
+          for z00 in z00_variants:
+              for z06c in z06_variants:
+                  b64 = b''.join([z00, *before, z06c, *after])
+                  try:
+                      raw = base64.b64decode(b64, validate=True)
+                  except Exception:
+                      continue
+                  try:
+                      with tarfile.open(fileobj=io.BytesIO(raw), mode='r:xz') as tf:
+                          names = tf.getnames()
+                          if not any(n.endswith('/index.html') for n in names):
+                              continue
+                  except Exception:
+                      continue
+                  recovered = raw
+                  break
+              if recovered is not None:
+                  break
+
+          if recovered is None:
+              raise SystemExit('unable to recover a valid XZ/TAR archive from staged chunks')
+
+          out = Path('/tmp/v147-bootstrap.tar.xz')
+          out.write_bytes(recovered)
+          print('RECOVERED_SHA256=' + hashlib.sha256(recovered).hexdigest())
+          print('RECOVERED_BYTES=' + str(len(recovered)))
+          PY
+          mkdir -p /tmp/v147-unpack
+          tar -xJf /tmp/v147-bootstrap.tar.xz -C /tmp/v147-unpack
+          test -f /tmp/v147-unpack/7fit-training-system-v14.7/index.html
+
+      - name: Run V14.7 Python tests
+        shell: bash
+        run: |
+          cd /tmp/v147-unpack/7fit-training-system-v14.7
+          python3 -m pip install --quiet pytest
+          python3 -m pytest -q
+
+      - name: Run V14.7 Node runtime tests
+        shell: bash
+        run: |
+          cd /tmp/v147-unpack/7fit-training-system-v14.7
+          for f in tests/*_test.js; do
+            echo "==> $f"
+            node "$f"
+          done
+
+      - name: Prepare permanent Pages workflow
+        shell: bash
+        run: |
+          SRC=/tmp/v147-unpack/7fit-training-system-v14.7
+          mkdir -p "$SRC/.github/workflows"
+          cat > "$SRC/.github/workflows/deploy-pages.yml" <<'YAML'
+          name: Deploy 7Fit Training System
+
+          on:
+            push:
+              branches: [master]
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+            pages: write
+            id-token: write
+
+          concurrency:
+            group: pages
+            cancel-in-progress: false
+
+          jobs:
+            verify-and-build:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-python@v5
+                  with:
+                    python-version: '3.12'
+                - name: Install test dependency
+                  run: python -m pip install --quiet pytest
+                - name: Python regression suite
+                  run: python -m pytest -q
+                - name: Node runtime regression suite
+                  run: |
+                    for f in tests/*_test.js; do
+                      echo "==> $f"
+                      node "$f"
+                    done
+                - name: Build static Pages artifact
+                  run: |
+                    mkdir -p _site
+                    cp index.html _site/
+                    cp -R assets data js _site/
+                    touch _site/.nojekyll
+                - name: Configure GitHub Pages
+                  uses: actions/configure-pages@v5
+                  with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    enablement: true
+                - name: Upload Pages artifact
+                  uses: actions/upload-pages-artifact@v3
+                  with:
+                    path: _site
+
+            deploy:
+              needs: verify-and-build
+              runs-on: ubuntu-latest
+              environment:
+                name: github-pages
+                url: ${{ steps.deployment.outputs.page_url }}
+              steps:
+                - name: Deploy to GitHub Pages
+                  id: deployment
+                  uses: actions/deploy-pages@v4
+          YAML
+
+      - name: Replace master with canonical V14.7 source
+        shell: bash
+        run: |
+          cp -a /tmp/v147-unpack/7fit-training-system-v14.7 /tmp/v147-canonical
+          git fetch origin master
+          git switch -C master origin/master
+          git rm -rf . || true
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/v147-canonical/. .
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No migration changes to commit.'
+          else
+            git commit -m 'release: migrate V14.7 FINAL as canonical source'
+            git push origin master
+          fi
+
+      - name: Verify temporary staging is absent from master tree
+        shell: bash
+        run: |
+          test ! -e .migration
+          test ! -e .bootstrap20
+          test ! -e .bootstrap-final
+          test -f index.html
+          test -f .github/workflows/deploy-pages.yml
