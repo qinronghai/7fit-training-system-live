@@ -11,6 +11,7 @@ VALIDATOR = ROOT / "tools" / "validate_v148_schema.py"
 DATA_FILE = ROOT / "data" / "system-data.js"
 DEPLOY_WORKFLOW = ROOT / ".github" / "workflows" / "deploy-pages.yml"
 SCHEMA_WORKFLOW = ROOT / ".github" / "workflows" / "schema-check.yml"
+PATTERN_KEYS = ["蹲", "髋铰链", "髋伸展", "单腿", "水平推", "垂直推", "水平拉", "垂直拉"]
 
 
 def load_schema_json(name):
@@ -63,6 +64,12 @@ def test_action_schema_declares_runtime_enums():
         "T2",
         "T3",
         "T4",
+        "SUP-S1",
+        "SUP-S2",
+        "SUP-S3",
+        "SUP-S4",
+        "SUP-S5",
+        "SUP-S6",
         "CORE-L1",
         "CORE-L2",
         "CORE-L3",
@@ -94,19 +101,28 @@ def test_composer_schema_freezes_core_structure():
         "auxiliaryRules",
         "officialPresetMap",
     ]
-    assert schema["properties"]["lowerModes"]["required"] == [
+    lower = schema["properties"]["lowerModes"]
+    upper = schema["properties"]["upperModes"]
+    assert lower["required"] == [
         "squat",
         "hinge",
         "hip_extension",
         "single_leg_squat",
         "single_leg_hinge",
     ]
-    assert schema["properties"]["upperModes"]["required"] == [
+    assert lower["minProperties"] == 5
+    assert lower["maxProperties"] == 5
+    assert upper["required"] == [
         "horizontal_pull",
         "vertical_pull",
         "horizontal_push",
         "vertical_push",
     ]
+    assert upper["minProperties"] == 4
+    assert upper["maxProperties"] == 4
+    for key in ("levelMap", "supportMap", "coreMap"):
+        assert schema["properties"][key]["minProperties"] == 4
+        assert schema["properties"][key]["maxProperties"] == 4
     core_demands = schema["properties"]["coreDemands"]
     assert core_demands["required"] == [
         "anti_extension",
@@ -117,7 +133,10 @@ def test_composer_schema_freezes_core_structure():
         "loaded_integration",
     ]
     assert core_demands["additionalProperties"] is False
-    preset_items = schema["properties"]["officialPresetMap"]["additionalProperties"]
+    presets = schema["properties"]["officialPresetMap"]
+    assert presets["minProperties"] == 8
+    assert presets["maxProperties"] == 8
+    preset_items = presets["additionalProperties"]
     assert preset_items["type"] == "array"
     assert preset_items["minItems"] == 2
     assert preset_items["maxItems"] == 2
@@ -136,6 +155,11 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
         assert schema["properties"]["ids"]["minItems"] == count
         assert schema["properties"]["ids"]["maxItems"] == count
         assert schema["properties"]["ids"]["uniqueItems"] is True
+    for name in ("prep", "foam"):
+        match_schema = load_schema_json(name)["properties"]["matchByPattern"]
+        assert match_schema["minProperties"] == 8
+        assert match_schema["maxProperties"] == 8
+        assert match_schema["propertyNames"]["enum"] == PATTERN_KEYS
 
 
 def test_repository_validator_entrypoint_exists():
@@ -170,11 +194,33 @@ def test_unknown_action_tier_is_rejected():
     assert has_error(errors, action_id, "tier")
 
 
+def test_support_tier_is_valid_when_present():
+    data = payload()
+    action_id = data["supportIds"][0]
+    data["actions"][action_id]["tier"] = "SUP-S3"
+    errors = validate_payload(data)
+    assert not has_error(errors, action_id, "tier")
+
+
 def test_unknown_composer_core_demand_key_is_rejected():
     data = payload()
     data["composer"]["coreDemands"]["unknown_demand"] = []
     errors = validate_payload(data)
     assert has_error(errors, "composer", "coreDemands", "unknown_demand")
+
+
+def test_extra_lower_mode_is_rejected():
+    data = payload()
+    data["composer"]["lowerModes"]["unexpected_lower"] = deepcopy(data["composer"]["lowerModes"]["squat"])
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "lowerModes")
+
+
+def test_extra_upper_mode_is_rejected():
+    data = payload()
+    data["composer"]["upperModes"]["unexpected_upper"] = deepcopy(data["composer"]["upperModes"]["horizontal_pull"])
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "upperModes")
 
 
 def test_empty_action_core_demand_is_rejected_when_present():
@@ -222,6 +268,27 @@ def test_official_preset_unknown_mode_is_rejected():
     data["composer"]["officialPresetMap"]["F111-01"] = ["unknown_lower", "horizontal_pull"]
     errors = validate_payload(data)
     assert has_error(errors, "officialPresetMap", "F111-01", "unknown_lower")
+
+
+def test_extra_official_preset_is_rejected():
+    data = payload()
+    data["composer"]["officialPresetMap"]["F111-09"] = ["squat", "horizontal_pull"]
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "officialPresetMap")
+
+
+def test_unknown_prep_pattern_key_is_rejected():
+    data = payload()
+    data["warmupMatchByPattern"]["unknown_pattern"] = []
+    errors = validate_payload(data)
+    assert has_error(errors, "prep", "matchByPattern", "unknown_pattern")
+
+
+def test_unknown_foam_pattern_key_is_rejected():
+    data = payload()
+    data["foamRollMatchByPattern"]["unknown_pattern"] = []
+    errors = validate_payload(data)
+    assert has_error(errors, "foam", "matchByPattern", "unknown_pattern")
 
 
 def test_support_inventory_drift_is_rejected():
