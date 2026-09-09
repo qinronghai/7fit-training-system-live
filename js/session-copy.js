@@ -14,6 +14,7 @@
   const LOWER_MEMBER_MODES=[
     {re:/单腿拉|单腿髋铰链/,title:'单腿后侧链',focus:'单腿后侧链'},
     {re:/单腿蹲/,title:'单腿力量',focus:'单腿力量'},
+    {re:/单腿/,title:'单腿力量',focus:'单腿力量'},
     {re:/臀伸|臀推/,title:'臀部力量',focus:'臀部力量'},
     {re:/下肢拉|髋铰链/,title:'后侧链力量',focus:'后侧链力量'},
     {re:/下肢推|蹲/,title:'腿部力量',focus:'下肢力量'}
