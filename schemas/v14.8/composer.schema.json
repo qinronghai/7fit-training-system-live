@@ -8,26 +8,36 @@
     "lowerModes": {
       "type": "object",
       "required": ["squat", "hinge", "hip_extension", "single_leg_squat", "single_leg_hinge"],
+      "minProperties": 5,
+      "maxProperties": 5,
       "additionalProperties": true
     },
     "upperModes": {
       "type": "object",
       "required": ["horizontal_pull", "vertical_pull", "horizontal_push", "vertical_push"],
+      "minProperties": 4,
+      "maxProperties": 4,
       "additionalProperties": true
     },
     "levelMap": {
       "type": "object",
       "required": ["L1", "L2", "L3", "L4"],
+      "minProperties": 4,
+      "maxProperties": 4,
       "additionalProperties": true
     },
     "supportMap": {
       "type": "object",
       "required": ["L1", "L2", "L3", "L4"],
+      "minProperties": 4,
+      "maxProperties": 4,
       "additionalProperties": true
     },
     "coreMap": {
       "type": "object",
       "required": ["L1", "L2", "L3", "L4"],
+      "minProperties": 4,
+      "maxProperties": 4,
       "additionalProperties": true
     },
     "coreDemands": {
@@ -51,6 +61,8 @@
     "officialPresetMap": {
       "type": "object",
       "required": ["F111-01", "F111-02", "F111-03", "F111-04", "F111-05", "F111-06", "F111-07", "F111-08"],
+      "minProperties": 8,
+      "maxProperties": 8,
       "additionalProperties": {
         "type": "array",
         "minItems": 2,
