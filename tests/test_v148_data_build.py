@@ -1,4 +1,3 @@
-import hashlib
 import importlib.util
 import json
 import re
@@ -36,11 +35,6 @@ def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def semantic_sha256(payload: dict) -> str:
-    canonical = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
 def load_builder_module():
     assert BUILDER.is_file(), "tools/build_system_data.py missing"
     spec = importlib.util.spec_from_file_location("build_system_data", BUILDER)
@@ -69,6 +63,9 @@ def test_manifest_owns_exact_runtime_top_level_inventory():
     )
     assert manifest["sourceFiles"] == list(DOMAIN_FILES)
     assert set(owners.values()).issubset(set(DOMAIN_FILES))
+    assert re.fullmatch(r"[0-9a-f]{64}", manifest["baselinePayloadSha256"]), (
+        "baselinePayloadSha256 must remain a migration provenance hash"
+    )
 
 
 def test_fragments_have_unique_declared_ownership_and_assemble_runtime():
@@ -92,7 +89,6 @@ def test_fragments_have_unique_declared_ownership_and_assemble_runtime():
         f"extra={sorted(set(seen) - set(owners))}"
     )
     assert assembled == runtime
-    assert semantic_sha256(assembled) == manifest["baselinePayloadSha256"]
 
 
 def test_builder_api_and_check_mode_contract():
