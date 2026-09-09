@@ -1,6 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://7fit.local/schemas/v14.8/prep.schema.json",
-  "title": "7Fit V14.8 PREP",
-  "type": "object"
+  "title": "7Fit V14.8 PREP Collection",
+  "type": "object",
+  "required": ["ids", "details", "matchByPattern"],
+  "properties": {
+    "ids": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["prepId", "actionId", "name", "route"],
+        "additionalProperties": true
+      }
+    },
+    "matchByPattern": {"type": "object"}
+  },
+  "additionalProperties": false
 }
