@@ -57,6 +57,22 @@ assert.strictEqual(hipL4.slots[0].prescriptionOverride,'3–4组 × 6–8次｜R
 assert.strictEqual(hipL4.slotOptions.A.filter(x=>x.id==='hipthrust_pause_main').length,1);
 assert.strictEqual(hipL4.slotOptions.A.find(x=>x.id==='hipthrust_pause_main').tier,'T4');
 
+// Issue #7 RED/GREEN contract: main Tier belongs to explicit mode-candidate metadata,
+// never to candidate declaration order.
+for(const mode of [...Object.values(D.composer.lowerModes),...Object.values(D.composer.upperModes)]){
+  assert(Array.isArray(mode.candidates),`${mode.name}: explicit candidates missing`);
+  assert(!Object.prototype.hasOwnProperty.call(mode,'ids'),`${mode.name}: legacy ids[] still present`);
+  assert(mode.candidates.every(x=>x&&typeof x.id==='string'&&/^T[1-4]$/.test(x.tier)),`${mode.name}: invalid explicit candidate tier metadata`);
+}
+const slhMode=D.composer.lowerModes.single_leg_hinge;
+const originalCandidates=slhMode.candidates.map(x=>({...x}));
+const tierMap=xs=>Object.fromEntries(xs.map(x=>[x.id,x.tier]));
+const beforePermutation=tierMap(C.mainCandidates('lower','single_leg_hinge','L4',true));
+slhMode.candidates=[...slhMode.candidates].reverse();
+const afterPermutation=tierMap(C.mainCandidates('lower','single_leg_hinge','L4',true));
+assert.deepStrictEqual(afterPermutation,beforePermutation,'reordering candidates changed effective Tier mapping');
+slhMode.candidates=originalCandidates;
+
 // Issue #5: FLEX is valid for formal main-strength slots, but D1/D2 remain 1F-only.
 assert.deepStrictEqual(Array.from(C.auxiliaryRoutePolicy()),['1F_ONLY']);
 assert.strictEqual(C.isAuxiliaryRouteAllowed('1F_ONLY'),true);
