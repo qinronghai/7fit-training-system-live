@@ -51,7 +51,7 @@
     if(typeof base().memberPurpose==='function')return base().memberPurpose(x,memberTheme(p))||'力量与身体控制';
     return '力量与身体控制';
   }
-  function trimAuxPurpose(text){return clean(text).replace(/强化$/,'').replace(/力量$/,'力量');}
+  function trimAuxPurpose(text){return clean(text).replace(/强化$/,'');}
   function coachReason(p,theme){
     const level=clean(p?.level),stage=LEVEL_LABELS[level]||'训练进阶';
     const a=(p?.slots||[]).find(x=>slotKey(x)==='A');
@@ -147,8 +147,7 @@
     });
     const observations=observationItems(p);
     if(observations.length)lines.push('本节观察',...observations,'');
-    lines.push('RECOVERY',joinSlash(p?.recovery)||'—','','...CARDIO_PLACEHOLDER');
-    lines.splice(lines.indexOf('...CARDIO_PLACEHOLDER'),1,...COACH_CARDIO_LINES);
+    lines.push('RECOVERY',joinSlash(p?.recovery)||'—','',...COACH_CARDIO_LINES);
     if((p?.conflicts||[]).length)lines.push('','注意事项',...(p.conflicts||[]).map(x=>`- ${clean(x)}`));
     return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
   }
