@@ -64,8 +64,42 @@ jobs:
         with:
           path: _site
 
-  deploy:
+  browser-smoke:
     needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp index.html _site/
+          cp -a assets data js _site/
+          touch _site/.nojekyll
+
+      - name: Install pinned Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.63.0
+          npx playwright install chromium
+
+      - name: Playwright browser smoke
+        run: npx playwright test
+
+  deploy:
+    needs: [verify, browser-smoke]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
