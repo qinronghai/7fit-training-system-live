@@ -1,0 +1,19 @@
+name: Verify Member Copy V2.1
+
+on:
+  push:
+    branches: ["codex/member-copy-v2-1-content"]
+
+permissions:
+  contents: read
+
+jobs:
+  member-copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Member copy regression
+        run: node tests/session_copy_member_v2_test.js
