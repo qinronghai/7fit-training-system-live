@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
-FORMAL_SLOT_KEYS = {"A", "B", "C", "D1", "D2", "CORE"}
+FORMAL_SLOT_SUFFIXES = {"A", "B", "SUPPORT", "2", "3", "CORE"}
 FORMAL_ROUTES = {"1F_ONLY", "FLEX_1F_2F"}
 SESSION_ID_RE = re.compile(r"^F111-\d{2}-L[1-4]$")
 
@@ -57,6 +57,15 @@ def _flatten_match_ids(value):
             out.extend(_flatten_match_ids(nested))
         return out
     return []
+
+
+def _session_slot_suffix(session_key: str, slot_key) -> str | None:
+    if not isinstance(slot_key, str):
+        return None
+    prefix = f"{session_key}__"
+    if not slot_key.startswith(prefix):
+        return None
+    return slot_key[len(prefix):]
 
 
 def validate_payload(data: dict) -> list[str]:
@@ -132,10 +141,21 @@ def validate_payload(data: dict) -> list[str]:
         if session.get("sessionId") != session_key:
             errors.append(f"sessions.{session_key}.sessionId: must equal map key {session_key}")
         slots = session.get("slots", [])
-        slot_keys = [slot.get("slotKey") for slot in slots if isinstance(slot, dict)]
-        if set(slot_keys) != FORMAL_SLOT_KEYS or len(slot_keys) != len(FORMAL_SLOT_KEYS):
-            errors.append(f"sessions.{session_key}.slots: must contain exactly A/B/C/D1/D2/CORE")
+        slot_suffixes = []
         for index, slot in enumerate(slots):
+            slot_key = slot.get("slotKey") if isinstance(slot, dict) else None
+            suffix = _session_slot_suffix(session_key, slot_key)
+            if suffix is None:
+                errors.append(
+                    f"sessions.{session_key}.slots.{index}.slotKey: must belong to {session_key}, got {slot_key}"
+                )
+            else:
+                slot_suffixes.append(suffix)
+                if suffix not in FORMAL_SLOT_SUFFIXES:
+                    errors.append(
+                        f"sessions.{session_key}.slots.{index}.slotKey: unknown formal slot suffix {suffix}"
+                    )
+
             action_id = slot.get("baselineId") if isinstance(slot, dict) else None
             if not action_id or action_id not in actions:
                 errors.append(
@@ -147,6 +167,11 @@ def validate_payload(data: dict) -> list[str]:
                 errors.append(
                     f"sessions.{session_key}.slots.{index}.baselineId: action {action_id} route {route} is not a formal F111 route"
                 )
+
+        if set(slot_suffixes) != FORMAL_SLOT_SUFFIXES or len(slot_suffixes) != len(FORMAL_SLOT_SUFFIXES):
+            errors.append(
+                f"sessions.{session_key}.slots: must contain exactly A/B/SUPPORT/2/3/CORE for this session"
+            )
 
     # SUPPORT / CORE identity and detail coverage.
     for label, ids_key, details_key in (
