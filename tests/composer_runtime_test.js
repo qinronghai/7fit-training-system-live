@@ -49,7 +49,10 @@ for(const level of ['L1','L2','L3','L4']){
 // FLEX_1F_2F T1 movements are valid formal-strength candidates in the venue route.
 assert.strictEqual(C.resolve({level:'L1',lowerMode:'squat',upperMode:'horizontal_pull'}).slots[0].actionId,'tushen_shendun');
 assert.strictEqual(C.resolve({level:'L1',lowerMode:'hip_extension',upperMode:'horizontal_pull'}).slots[0].actionId,'tunqiao');
-// Hip-extension T4 reuses the venue's T3 hip-thrust action with an explicit T4 effective tier + prescription.
+// Hip-extension T3/T4 intentionally reuse the same venue action with distinct effective Tier semantics.
+const hipL3=C.resolve({level:'L3',lowerMode:'hip_extension',upperMode:'horizontal_pull'});
+assert.strictEqual(hipL3.slots[0].actionId,'hipthrust_pause_main');
+assert.strictEqual(hipL3.slots[0].tier,'T3');
 const hipL4=C.resolve({level:'L4',lowerMode:'hip_extension',upperMode:'horizontal_pull'});
 assert.strictEqual(hipL4.slots[0].actionId,'hipthrust_pause_main');
 assert.strictEqual(hipL4.slots[0].tier,'T4');
@@ -66,12 +69,24 @@ for(const mode of [...Object.values(D.composer.lowerModes),...Object.values(D.co
 }
 const slhMode=D.composer.lowerModes.single_leg_hinge;
 const originalCandidates=slhMode.candidates.map(x=>({...x}));
-const tierMap=xs=>Object.fromEntries(xs.map(x=>[x.id,x.tier]));
-const beforePermutation=tierMap(C.mainCandidates('lower','single_leg_hinge','L4',true));
+const optionSignature=xs=>xs.map(x=>`${x.id}@${x.tier}`);
+const beforePermutation=optionSignature(C.mainCandidates('lower','single_leg_hinge','L4',true));
 slhMode.candidates=[...slhMode.candidates].reverse();
-const afterPermutation=tierMap(C.mainCandidates('lower','single_leg_hinge','L4',true));
-assert.deepStrictEqual(afterPermutation,beforePermutation,'reordering candidates changed effective Tier mapping');
+const afterPermutation=optionSignature(C.mainCandidates('lower','single_leg_hinge','L4',true));
+assert.deepStrictEqual(afterPermutation,beforePermutation,'reordering candidates changed effective Tier mapping/order');
 slhMode.candidates=originalCandidates;
+
+// Duplicate action reuse must also remain stable under declaration-order changes.
+const hipMode=D.composer.lowerModes.hip_extension;
+const originalHipCandidates=hipMode.candidates.map(x=>({...x}));
+const hipBefore={
+  L3:optionSignature(C.mainCandidates('lower','hip_extension','L3')),
+  L4:optionSignature(C.mainCandidates('lower','hip_extension','L4'))
+};
+hipMode.candidates=[...hipMode.candidates].reverse();
+assert.deepStrictEqual(optionSignature(C.mainCandidates('lower','hip_extension','L3')),hipBefore.L3,'hip L3 changed after reorder');
+assert.deepStrictEqual(optionSignature(C.mainCandidates('lower','hip_extension','L4')),hipBefore.L4,'hip L4 changed after reorder');
+hipMode.candidates=originalHipCandidates;
 
 // Issue #5: FLEX is valid for formal main-strength slots, but D1/D2 remain 1F-only.
 assert.deepStrictEqual(Array.from(C.auxiliaryRoutePolicy()),['1F_ONLY']);
