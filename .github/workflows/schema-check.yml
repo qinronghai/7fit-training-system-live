@@ -1,0 +1,28 @@
+name: V14.8 Schema Check
+
+on:
+  push:
+    branches: ["feature/issue-3-v148-data-schema"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install schema test dependencies
+        run: python -m pip install --quiet pytest jsonschema
+
+      - name: Run V14.8 schema tests
+        run: python -m pytest tests/test_v148_schema.py -q
