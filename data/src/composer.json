@@ -7,11 +7,23 @@
         "subtitle": "蹲 / 膝主导",
         "pattern": "蹲",
         "patternKey": "蹲模式",
-        "ids": [
-          "tushen_shendun",
-          "V13_SQ_DB_GOBLET",
-          "hake_shendun",
-          "gangling_shendun"
+        "candidates": [
+          {
+            "id": "tushen_shendun",
+            "tier": "T1"
+          },
+          {
+            "id": "V13_SQ_DB_GOBLET",
+            "tier": "T2"
+          },
+          {
+            "id": "hake_shendun",
+            "tier": "T3"
+          },
+          {
+            "id": "gangling_shendun",
+            "tier": "T4"
+          }
         ]
       },
       "hinge": {
@@ -20,11 +32,23 @@
         "subtitle": "髋铰链 / 后侧链",
         "pattern": "髋铰链",
         "patternKey": "髋铰链",
-        "ids": [
-          "movement_dowel_hip_hinge",
-          "yaling_luomaniya_yingla",
-          "liujiao_gantui_yingla",
-          "gangling_yingla"
+        "candidates": [
+          {
+            "id": "movement_dowel_hip_hinge",
+            "tier": "T1"
+          },
+          {
+            "id": "yaling_luomaniya_yingla",
+            "tier": "T2"
+          },
+          {
+            "id": "liujiao_gantui_yingla",
+            "tier": "T3"
+          },
+          {
+            "id": "gangling_yingla",
+            "tier": "T4"
+          }
         ]
       },
       "hip_extension": {
@@ -33,18 +57,30 @@
         "subtitle": "臀推 / 髋伸展",
         "pattern": "髋伸展",
         "patternKey": "臀推 / 髋伸展",
-        "ids": [
-          "tunqiao",
-          "tun_tui",
-          "hipthrust_pause_main",
-          "hipthrust_pause_main"
-        ],
         "prescriptionByTier": {
           "T4": "3–4组 × 6–8次｜RIR 1–2"
         },
         "tierNoteByTier": {
           "T4": "T4 复用臀推停顿主项，通过更高有效负荷、顶端控制与 RIR 1–2 区分高阶处方，不新增器械动作。"
-        }
+        },
+        "candidates": [
+          {
+            "id": "tunqiao",
+            "tier": "T1"
+          },
+          {
+            "id": "tun_tui",
+            "tier": "T2"
+          },
+          {
+            "id": "hipthrust_pause_main",
+            "tier": "T3"
+          },
+          {
+            "id": "hipthrust_pause_main",
+            "tier": "T4"
+          }
+        ]
       },
       "single_leg_squat": {
         "code": "SLSQ",
@@ -52,11 +88,23 @@
         "subtitle": "单侧膝主导",
         "pattern": "单腿",
         "patternKey": "单腿",
-        "ids": [
-          "movement_supported_split_squat",
-          "movement_bodyweight_split_squat",
-          "movement_dumbbell_reverse_lunge",
-          "baojiayali_fentundun"
+        "candidates": [
+          {
+            "id": "movement_supported_split_squat",
+            "tier": "T1"
+          },
+          {
+            "id": "movement_bodyweight_split_squat",
+            "tier": "T2"
+          },
+          {
+            "id": "movement_dumbbell_reverse_lunge",
+            "tier": "T3"
+          },
+          {
+            "id": "baojiayali_fentundun",
+            "tier": "T4"
+          }
         ]
       },
       "single_leg_hinge": {
@@ -65,11 +113,23 @@
         "subtitle": "单侧髋铰链",
         "pattern": "单腿拉",
         "patternKey": "单腿",
-        "ids": [
-          "movement_supported_single_leg_hinge",
-          "movement_supported_db_single_leg_rdl",
-          "movement_db_single_leg_rdl",
-          "movement_advanced_db_single_leg_rdl"
+        "candidates": [
+          {
+            "id": "movement_supported_single_leg_hinge",
+            "tier": "T1"
+          },
+          {
+            "id": "movement_supported_db_single_leg_rdl",
+            "tier": "T2"
+          },
+          {
+            "id": "movement_db_single_leg_rdl",
+            "tier": "T3"
+          },
+          {
+            "id": "movement_advanced_db_single_leg_rdl",
+            "tier": "T4"
+          }
         ]
       }
     },
@@ -79,11 +139,23 @@
         "name": "水平拉",
         "pattern": "水平拉",
         "patternKey": "水平拉",
-        "ids": [
-          "V13_HR_SCAP_ROW",
-          "feiji_labei_zhongba",
-          "zuozi_huachuan_bianshi",
-          "gangling_huachuan"
+        "candidates": [
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "tier": "T1"
+          },
+          {
+            "id": "feiji_labei_zhongba",
+            "tier": "T2"
+          },
+          {
+            "id": "zuozi_huachuan_bianshi",
+            "tier": "T3"
+          },
+          {
+            "id": "gangling_huachuan",
+            "tier": "T4"
+          }
         ]
       },
       "vertical_pull": {
@@ -91,11 +163,23 @@
         "name": "垂直拉",
         "pattern": "垂直拉",
         "patternKey": "垂直拉",
-        "ids": [
-          "fuzhu_yinti_jianjia_xiachen",
-          "gaowei_xiala_vba",
-          "fuzhu_yinti_xiangshang",
-          "movement_bodyweight_pullup"
+        "candidates": [
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "tier": "T1"
+          },
+          {
+            "id": "gaowei_xiala_vba",
+            "tier": "T2"
+          },
+          {
+            "id": "fuzhu_yinti_xiangshang",
+            "tier": "T3"
+          },
+          {
+            "id": "movement_bodyweight_pullup",
+            "tier": "T4"
+          }
         ]
       },
       "horizontal_push": {
@@ -103,11 +187,23 @@
         "name": "水平推",
         "pattern": "水平推",
         "patternKey": "水平推",
-        "ids": [
-          "movement_incline_pushup",
-          "qixie_xiongtui",
-          "wotu_xiong_tui",
-          "gangling_wotu"
+        "candidates": [
+          {
+            "id": "movement_incline_pushup",
+            "tier": "T1"
+          },
+          {
+            "id": "qixie_xiongtui",
+            "tier": "T2"
+          },
+          {
+            "id": "wotu_xiong_tui",
+            "tier": "T3"
+          },
+          {
+            "id": "gangling_wotu",
+            "tier": "T4"
+          }
         ]
       },
       "vertical_push": {
@@ -115,11 +211,23 @@
         "name": "垂直推",
         "pattern": "垂直推",
         "patternKey": "垂直推",
-        "ids": [
-          "V13_VP_SEATED_LIGHT_DB",
-          "qixie_jian_tui",
-          "movement_halfkneeling_landmine_press",
-          "movement_barbell_overhead_press"
+        "candidates": [
+          {
+            "id": "V13_VP_SEATED_LIGHT_DB",
+            "tier": "T1"
+          },
+          {
+            "id": "qixie_jian_tui",
+            "tier": "T2"
+          },
+          {
+            "id": "movement_halfkneeling_landmine_press",
+            "tier": "T3"
+          },
+          {
+            "id": "movement_barbell_overhead_press",
+            "tier": "T4"
+          }
         ]
       }
     },

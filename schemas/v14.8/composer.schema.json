@@ -3,6 +3,55 @@
   "$id": "https://7fit.local/schemas/v14.8/composer.schema.json",
   "title": "7Fit V14.8 Composer",
   "type": "object",
+  "$defs": {
+    "mainCandidate": {
+      "type": "object",
+      "required": ["id", "tier"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "tier": {"enum": ["T1", "T2", "T3", "T4"]}
+      },
+      "additionalProperties": false
+    },
+    "mainMode": {
+      "type": "object",
+      "required": ["code", "name", "pattern", "patternKey", "candidates"],
+      "properties": {
+        "code": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "subtitle": {"type": "string"},
+        "pattern": {"type": "string", "minLength": 1},
+        "patternKey": {"type": "string", "minLength": 1},
+        "candidates": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/mainCandidate"}
+        },
+        "prescriptionByTier": {
+          "type": "object",
+          "properties": {
+            "T1": {"type": "string"},
+            "T2": {"type": "string"},
+            "T3": {"type": "string"},
+            "T4": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "tierNoteByTier": {
+          "type": "object",
+          "properties": {
+            "T1": {"type": "string"},
+            "T2": {"type": "string"},
+            "T3": {"type": "string"},
+            "T4": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
   "required": ["lowerModes", "upperModes", "levelMap", "supportMap", "coreMap", "coreDemands", "auxiliaryRules", "officialPresetMap"],
   "properties": {
     "lowerModes": {
@@ -10,14 +59,14 @@
       "required": ["squat", "hinge", "hip_extension", "single_leg_squat", "single_leg_hinge"],
       "minProperties": 5,
       "maxProperties": 5,
-      "additionalProperties": true
+      "additionalProperties": {"$ref": "#/$defs/mainMode"}
     },
     "upperModes": {
       "type": "object",
       "required": ["horizontal_pull", "vertical_pull", "horizontal_push", "vertical_push"],
       "minProperties": 4,
       "maxProperties": 4,
-      "additionalProperties": true
+      "additionalProperties": {"$ref": "#/$defs/mainMode"}
     },
     "levelMap": {
       "type": "object",

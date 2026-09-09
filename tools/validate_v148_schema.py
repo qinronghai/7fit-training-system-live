@@ -11,6 +11,7 @@ ROOT = Path(__file__).parents[1]
 SCHEMA_DIR = ROOT / "schemas" / "v14.8"
 FORMAL_SLOT_SUFFIXES = {"A", "B", "SUPPORT", "2", "3", "CORE"}
 FORMAL_ROUTES = {"1F_ONLY", "FLEX_1F_2F"}
+MAIN_TIERS = {"T1", "T2", "T3", "T4"}
 SESSION_ID_RE = re.compile(r"^F111-\d{2}-L[1-4]$")
 
 
@@ -187,13 +188,31 @@ def validate_payload(data: dict) -> list[str]:
             if action_id not in details:
                 errors.append(f"{details_key}: missing details for {action_id}")
 
-    # Composer action references and frozen D1/D2 auxiliary route policy from Issue #5.
+    # Composer explicit main-candidate references/Tiers and frozen D1/D2 route policy.
     lower_modes = composer.get("lowerModes", {})
     upper_modes = composer.get("upperModes", {})
     for group_name, modes in (("lowerModes", lower_modes), ("upperModes", upper_modes)):
         for mode_key, mode in modes.items():
-            ids = mode.get("ids", []) if isinstance(mode, dict) else []
-            _check_action_refs(errors, actions, ids, f"composer.{group_name}.{mode_key}.ids")
+            prefix = f"composer.{group_name}.{mode_key}"
+            if not isinstance(mode, dict):
+                continue
+            if "ids" in mode:
+                errors.append(f"{prefix}.ids: legacy positional ids[] is not allowed")
+            candidates = mode.get("candidates", [])
+            candidate_ids = []
+            candidate_tiers = []
+            for candidate in candidates if isinstance(candidates, list) else []:
+                if not isinstance(candidate, dict):
+                    continue
+                action_id = candidate.get("id")
+                tier = candidate.get("tier")
+                if isinstance(action_id, str) and action_id:
+                    candidate_ids.append(action_id)
+                if isinstance(tier, str) and tier:
+                    candidate_tiers.append(tier)
+            _check_action_refs(errors, actions, candidate_ids, f"{prefix}.candidates")
+            if len(candidate_tiers) != 4 or set(candidate_tiers) != MAIN_TIERS:
+                errors.append(f"{prefix}.candidates: must define exactly one T1/T2/T3/T4")
 
     auxiliary_rules = composer.get("auxiliaryRules", {})
     for kind, pools in auxiliary_rules.items():
