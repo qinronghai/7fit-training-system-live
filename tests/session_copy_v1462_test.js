@@ -2,7 +2,7 @@ const fs=require('fs');
 const vm=require('vm');
 const assert=require('assert');
 const source=fs.readFileSync('js/session-copy.js','utf8');
-const context={window:{},console}; vm.createContext(context); vm.runInContext(source,context);
+const context={window:{},console}; vm.createContext(context); vm.runInContext(source,context); vm.runInContext(fs.readFileSync('js/coach-copy.js','utf8'),context);
 const api=context.window.V14SessionCopy;
 
 const payload={
@@ -16,13 +16,21 @@ const payload={
   muscles:{primary:['股四头肌','臀大肌','背阔肌'],secondary:['肱二头肌'],stabilizers:['腹壁']},
   recovery:['臀肌拉伸'], postCardio:'按需安排', conflicts:[]
 };
-const coach=api.formatCoach(payload);
-assert(coach.includes('A｜下肢主项｜哈克深蹲｜T3'));
-assert(coach.includes('3组 × 10次｜RIR≈3'));
-assert(coach.includes('C｜支撑模式｜侧平板'));
+const coach=api.formatCoach(payload,{now:'2026-09-10T12:00:00+08:00'});
+assert(coach.includes('2026年9月10日｜星期四'));
+assert(coach.includes('7Fit｜私教训练'));
+assert(coach.includes('F111-01｜L3 负重进阶'));
+assert(coach.includes('下肢推 × 水平拉 × 核心稳定'));
+assert(coach.includes('A｜哈克深蹲｜T3'));
+assert(coach.includes('3组 × 10次｜RIR≈3｜休息 90s'));
+assert(coach.includes('B｜胸托划船｜T2'));
+assert(coach.includes('C｜侧平板'));
+assert(coach.includes('本节观察'));
+assert(coach.includes('课后有氧｜约 30 分钟'));
 assert(!coach.includes('哈克深蹲机'));
 assert(!coach.includes('飞机拉背机'));
-assert(!coach.includes('水平拉 ·'));
+assert(!coach.includes('【本节主要训练肌群】'));
+assert(!coach.includes('【系统提醒】'));
 
 const member=api.formatMember(payload,{now:'2026-09-09T12:00:00+08:00'});
 assert(member.includes('哈克深蹲'));
