@@ -124,7 +124,7 @@ def test_composer_schema_freezes_core_structure():
         assert schema["properties"][key]["minProperties"] == 4
         assert schema["properties"][key]["maxProperties"] == 4
     core_demands = schema["properties"]["coreDemands"]
-    assert core_demands["required"] == [
+    demand_keys = [
         "anti_extension",
         "anti_rotation",
         "anti_lateral_flexion",
@@ -132,7 +132,17 @@ def test_composer_schema_freezes_core_structure():
         "breathing_pressure",
         "loaded_integration",
     ]
+    assert core_demands["required"] == demand_keys
     assert core_demands["additionalProperties"] is False
+    for key in demand_keys:
+        metadata = core_demands["properties"][key]
+        assert metadata["type"] == "object"
+        assert metadata["required"] == ["name", "keywords"]
+        assert metadata["properties"]["name"] == {"type": "string", "minLength": 1}
+        keywords = metadata["properties"]["keywords"]
+        assert keywords["type"] == "array"
+        assert keywords["minItems"] == 1
+        assert keywords["items"] == {"type": "string", "minLength": 1}
     presets = schema["properties"]["officialPresetMap"]
     assert presets["minProperties"] == 8
     assert presets["maxProperties"] == 8
@@ -160,6 +170,9 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
         assert match_schema["minProperties"] == 8
         assert match_schema["maxProperties"] == 8
         assert match_schema["propertyNames"]["enum"] == PATTERN_KEYS
+        values = match_schema["additionalProperties"]
+        assert values["type"] == "array"
+        assert values["items"] == {"type": "string", "minLength": 1}
 
 
 def test_repository_validator_entrypoint_exists():
@@ -207,6 +220,20 @@ def test_unknown_composer_core_demand_key_is_rejected():
     data["composer"]["coreDemands"]["unknown_demand"] = []
     errors = validate_payload(data)
     assert has_error(errors, "composer", "coreDemands", "unknown_demand")
+
+
+def test_core_demand_metadata_must_be_object():
+    data = payload()
+    data["composer"]["coreDemands"]["dynamic_rotation"] = None
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "coreDemands", "dynamic_rotation")
+
+
+def test_core_demand_keywords_must_be_string_array():
+    data = payload()
+    data["composer"]["coreDemands"]["anti_extension"]["keywords"] = "抗伸展"
+    errors = validate_payload(data)
+    assert has_error(errors, "composer", "coreDemands", "anti_extension", "keywords")
 
 
 def test_extra_lower_mode_is_rejected():
@@ -284,11 +311,25 @@ def test_unknown_prep_pattern_key_is_rejected():
     assert has_error(errors, "prep", "matchByPattern", "unknown_pattern")
 
 
+def test_prep_pattern_values_must_be_arrays():
+    data = payload()
+    data["warmupMatchByPattern"]["蹲"] = {"primary": "PREP-01"}
+    errors = validate_payload(data)
+    assert has_error(errors, "prep", "matchByPattern", "蹲")
+
+
 def test_unknown_foam_pattern_key_is_rejected():
     data = payload()
     data["foamRollMatchByPattern"]["unknown_pattern"] = []
     errors = validate_payload(data)
     assert has_error(errors, "foam", "matchByPattern", "unknown_pattern")
+
+
+def test_foam_pattern_values_must_be_arrays():
+    data = payload()
+    data["foamRollMatchByPattern"]["水平推"] = {"primary": "FOAM-01"}
+    errors = validate_payload(data)
+    assert has_error(errors, "foam", "matchByPattern", "水平推")
 
 
 def test_support_inventory_drift_is_rejected():
