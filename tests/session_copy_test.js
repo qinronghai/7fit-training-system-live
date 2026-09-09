@@ -44,8 +44,8 @@ assert(coach.includes('本节目标'));
 assert(coach.includes('A｜臀推机｜T2'));
 assert(coach.includes('目标：臀部力量'));
 assert(coach.includes('本节观察'));
-assert(coach.includes('注意事项'));
-assert(coach.includes('肌群刺激集中'));
+assert(!coach.includes('肌群刺激集中'));
+assert(!coach.includes('注意事项'));
 assert(!coach.includes('【本节主要训练肌群】'));
 assert(!coach.includes('【系统提醒】'));
 
