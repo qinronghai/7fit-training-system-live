@@ -56,4 +56,16 @@ assert.strictEqual(hipL4.slots[0].tier,'T4');
 assert.strictEqual(hipL4.slots[0].prescriptionOverride,'3–4组 × 6–8次｜RIR 1–2');
 assert.strictEqual(hipL4.slotOptions.A.filter(x=>x.id==='hipthrust_pause_main').length,1);
 assert.strictEqual(hipL4.slotOptions.A.find(x=>x.id==='hipthrust_pause_main').tier,'T4');
+
+// Issue #5: FLEX is valid for formal main-strength slots, but D1/D2 remain 1F-only.
+assert.deepStrictEqual(Array.from(C.auxiliaryRoutePolicy()),['1F_ONLY']);
+assert.strictEqual(C.isAuxiliaryRouteAllowed('1F_ONLY'),true);
+assert.strictEqual(C.isAuxiliaryRouteAllowed('FLEX_1F_2F'),false);
+assert(C.auxCandidates('lower','squat').every(x=>C.auxiliaryRoutePolicy().includes(x.route)));
+assert(C.auxCandidates('upper','horizontal_pull').every(x=>C.auxiliaryRoutePolicy().includes(x.route)));
+for(const pools of Object.values(D.composer.auxiliaryRules)){
+  for(const ids of Object.values(pools)){
+    assert(ids.every(id=>C.isAuxiliaryRouteAllowed(D.actions[id]?.route)),`auxiliary route: ${ids.join(',')}`);
+  }
+}
 console.log('composer runtime: PASS');

@@ -1,7 +1,11 @@
 (function(){
   const D=()=>window.V14_DATA;
   const clean=x=>String(x??'').trim();
+  // Issue #5: D1/D2 are 1F strength-zone auxiliaries; FLEX is reserved for formal main slots.
+  const AUXILIARY_ROUTE_POLICY=Object.freeze(['1F_ONLY']);
   function cfg(){return D().composer||{};}
+  function auxiliaryRoutePolicy(){return [...AUXILIARY_ROUTE_POLICY];}
+  function isAuxiliaryRouteAllowed(route){return AUXILIARY_ROUTE_POLICY.includes(route);}
   function mainTierWindow(level){return cfg().levelMap?.[level]||cfg().levelMap?.L1||{recommended:'T1',normal:['T1'],expanded:[]};}
   function supportWindow(level){return cfg().supportMap?.[level]||cfg().supportMap?.L1||{recommended:'SUP-S1',normal:['SUP-S1'],expanded:[]};}
   function coreWindow(level){return cfg().coreMap?.[level]||cfg().coreMap?.L1||{recommended:['CORE-L1'],normal:['CORE-L1'],expanded:[]};}
@@ -48,7 +52,7 @@
   }
   function auxCandidates(kind,modeKey,selectedIds=[]){
     const ids=cfg().auxiliaryRules?.[kind]?.[modeKey]||[],blocked=new Set(selectedIds||[]);
-    return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&x.route==='1F_ONLY');
+    return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
   }
   function chooseById(options,id){return options.find(x=>x.id===id)||options[0]||null;}
   function resolve(input={}){
@@ -72,5 +76,5 @@
       slotOptions:{A:Aopts,B:Bopts,C:Copts,D1:D1opts,D2:D2opts,CORE:COREopts}
     };
   }
-  window.V14Composer={combinations,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,coreCandidates,auxCandidates,resolve};
+  window.V14Composer={combinations,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,coreCandidates,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
 })();
