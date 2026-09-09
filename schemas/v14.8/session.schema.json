@@ -13,7 +13,11 @@
         "type": "object",
         "required": ["slotKey", "baselineId"],
         "properties": {
-          "slotKey": {"type": "string", "enum": ["A", "B", "C", "D1", "D2", "CORE"]},
+          "slotKey": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^F111-\\d{2}-L[1-4]__(A|B|SUPPORT|2|3|CORE)$"
+          },
           "baselineId": {"type": "string", "minLength": 1}
         },
         "additionalProperties": true
