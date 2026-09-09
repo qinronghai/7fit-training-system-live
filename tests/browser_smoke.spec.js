@@ -14,7 +14,7 @@ test('coach route loads in Chromium with no pageerror', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach');
   await expect(page.getByRole('heading', { name: '女性综合 1+1+1' })).toBeVisible();
-  await expect(page.getByRole('link', { name: '自由组合编课' })).toBeVisible();
+  await expect(page.getByRole('link', { name: '自由组合编课', exact: true })).toBeVisible();
   await expectNoPageErrors(errors);
 });
 
@@ -33,9 +33,10 @@ test('L3 single-leg hinge x horizontal push renders six slots and supports one s
   await expect(page).toHaveURL(/lower=single_leg_hinge/);
   await expect(page).toHaveURL(/upper=horizontal_push/);
   await expect(page).toHaveURL(/level=L3/);
-  await expect(page.locator('.session-slot')).toHaveCount(6);
+  await expect(page.getByText('L3｜单腿拉 + 水平推', { exact: false })).toBeVisible();
+  await expect(page.locator('.composer-slot-card')).toHaveCount(6);
 
-  const swaps = page.locator('.session-swap');
+  const swaps = page.locator('.composer-slot-select');
   const count = await swaps.count();
   let changed = false;
 
@@ -49,14 +50,16 @@ test('L3 single-leg hinge x horizontal push renders six slots and supports one s
     const target = values.find(value => value && value !== current);
     if (!target) continue;
 
+    const slotKey = await swap.getAttribute('data-slot-key');
     await swap.selectOption(target);
-    await expect(swap).toHaveValue(target);
+    const refreshed = page.locator(`.composer-slot-select[data-slot-key="${slotKey}"]`);
+    await expect(refreshed).toHaveValue(target);
     changed = true;
     break;
   }
 
   expect(changed, 'expected at least one Composer slot to expose a valid alternate option').toBeTruthy();
-  await expect(page.locator('.session-slot')).toHaveCount(6);
+  await expect(page.locator('.composer-slot-card')).toHaveCount(6);
   await expectNoPageErrors(errors);
 });
 
@@ -64,7 +67,7 @@ test('390px composer viewport has no horizontal overflow or pageerror', async ({
   const errors = capturePageErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
-  await expect(page.locator('.session-slot')).toHaveCount(6);
+  await expect(page.locator('.composer-slot-card')).toHaveCount(6);
 
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
