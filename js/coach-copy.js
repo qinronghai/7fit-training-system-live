@@ -148,7 +148,6 @@
     const observations=observationItems(p);
     if(observations.length)lines.push('本节观察',...observations,'');
     lines.push('RECOVERY',joinSlash(p?.recovery)||'—','',...COACH_CARDIO_LINES);
-    if((p?.conflicts||[]).length)lines.push('','注意事项',...(p.conflicts||[]).map(x=>`- ${clean(x)}`));
     return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
   }
 
