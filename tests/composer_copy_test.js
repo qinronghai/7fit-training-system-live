@@ -39,6 +39,10 @@ assert(presetMember.includes('4. 髋内收｜1 × 15\n   大腿内侧强化'));
 assert(presetMember.includes('5. 绳索三头下压｜3 × 12\n   手臂后侧强化'));
 assert(presetMember.includes('6. Pallof抗旋转推举｜2–3 × 6–10 / 侧\n   核心抗旋转'));
 assert(presetMember.includes('核心激活：平板支撑'));
+const singleLegPreset=H.buildCopyPayload('F111-05-L3','F111-05','L3');
+const singleLegMember=S.formatMember(singleLegPreset,{now:'2026-09-09T12:00:00+08:00'});
+assert(singleLegMember.includes('单腿力量 × 上肢拉 × 核心稳定'));
+assert(singleLegMember.includes('今日训练重点\n单腿力量 · 上肢拉力 · 核心稳定'));
 
 const hipL4=H.composerContext({page:'compose',query:{level:'L4',lower:'hip_extension',upper:'horizontal_pull',core:'anti_extension'}});
 const hipPayload=H.buildComposerCopyPayload(hipL4);
