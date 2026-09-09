@@ -22,6 +22,7 @@ context.window.V14_ANATOMY={records:{
 }};
 vm.createContext(context);
 vm.runInContext(source,context);
+vm.runInContext(fs.readFileSync('js/coach-copy.js','utf8'),context);
 const api=context.window.V14SessionCopy;
 
 const payload={
