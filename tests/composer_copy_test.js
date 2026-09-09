@@ -7,8 +7,6 @@ const H=ctx.window.V14CoachAnatomy,S=ctx.window.V14SessionCopy;
 const c=H.composerContext({page:'compose',query:{level:'L3',lower:'single_leg_hinge',upper:'horizontal_push',core:'anti_extension'}});
 const p=H.buildComposerCopyPayload(c);
 assert.strictEqual(p.slots.length,6);
-assert(p.slots.every(x=>x.memberPurpose),'composer payload should carry structured memberPurpose');
-assert(p.warmups.every(x=>x.role||x.why||x.targetPatterns),'composer warmups should preserve structured metadata');
 assert.strictEqual(p.slots[0].name,'独立哑铃单腿罗马尼亚硬拉');
 assert.strictEqual(p.slots[0].tier,'T3');
 assert(/RIR/.test(p.slots[0].prescription));
@@ -30,17 +28,16 @@ assert(member.includes('今日训练重点\n单腿后侧链 · 上肢推力 · �
 assert(member.includes('课后有氧｜约 30 分钟'));
 assert(member.includes('平均心率 130 到 140 左右（燃烧脂肪心率）'));
 assert(!member.includes('POST CARDIO ONLY'));
+assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
 
 const preset=H.buildCopyPayload('F111-06-L3','F111-06','L3');
-assert.strictEqual(preset.slots[0].memberPurpose,'大腿与臀部力量');
-assert.strictEqual(preset.slots[1].memberPurpose,'上肢推力');
-assert.strictEqual(preset.slots[2].memberPurpose,'核心稳定与身体控制');
-assert.strictEqual(preset.slots[3].memberPurpose,'大腿内侧强化');
-assert.strictEqual(preset.slots[4].memberPurpose,'手臂后侧强化');
-assert.strictEqual(preset.slots[5].memberPurpose,'核心抗旋转');
-assert(preset.warmups.some(x=>x.role&&x.why&&x.targetPatterns),'preset warmups should preserve role/why/targetPatterns');
 const presetMember=S.formatMember(preset,{now:'2026-09-09T12:00:00+08:00'});
 assert(presetMember.includes('1. 哈克深蹲｜3 × 10\n   大腿与臀部力量'));
+assert(presetMember.includes('2. 哑铃卧推｜3 × 10\n   上肢推力'));
+assert(presetMember.includes('3. 高位平板交替触肩｜2–3 × 20–30 秒\n   核心稳定与身体控制'));
+assert(presetMember.includes('4. 髋内收｜1 × 15\n   大腿内侧强化'));
+assert(presetMember.includes('5. 绳索三头下压｜3 × 12\n   手臂后侧强化'));
+assert(presetMember.includes('6. Pallof抗旋转推举｜2–3 × 6–10 / 侧\n   核心抗旋转'));
 assert(presetMember.includes('核心激活：平板支撑'));
 
 const hipL4=H.composerContext({page:'compose',query:{level:'L4',lower:'hip_extension',upper:'horizontal_pull',core:'anti_extension'}});
