@@ -1,3 +1,4 @@
+import json
 from copy import deepcopy
 from pathlib import Path
 
@@ -5,6 +6,7 @@ from tools.validate_v148_schema import load_runtime_data, validate_payload
 
 ROOT = Path(__file__).parents[1]
 DATA_FILE = ROOT / "data" / "system-data.js"
+SCHEMA_FILE = ROOT / "schemas" / "v14.8" / "composer.schema.json"
 MAIN_TIERS = {"T1", "T2", "T3", "T4"}
 
 
@@ -14,6 +16,14 @@ def payload():
 
 def error_text(errors):
     return "\n".join(errors)
+
+
+def test_composer_schema_closes_legacy_mode_shape():
+    schema = json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
+    main_mode = schema["$defs"]["mainMode"]
+    assert main_mode["required"] == ["code", "name", "pattern", "patternKey", "candidates"]
+    assert main_mode["additionalProperties"] is False
+    assert "ids" not in main_mode["properties"]
 
 
 def test_all_main_modes_use_explicit_tier_candidates():
