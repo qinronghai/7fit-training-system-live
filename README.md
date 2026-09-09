@@ -1,3 +1,11 @@
+## V14.8｜领域数据源与生成 Runtime
+
+- `data/src/*.json` 现为 `window.V14_DATA` 的维护 Source of Truth，按 actions / patterns / sessions / SUPPORT / CORE / PREP / Foam / Composer / Venue / system 领域拆分。
+- `data/src/manifest.json` 显式约束 26 个 Runtime 顶层 key 的唯一 owner 与原始 `topLevelOrder`。
+- `data/system-data.js` 仍保留为浏览器同步加载的正式 Runtime bundle，但它是 **GENERATED**，不得手工维护。
+- 数据修改后运行 `python tools/build_system_data.py`；CI 使用 `python tools/build_system_data.py --check` 阻止 source / bundle 漂移。
+- V14.8 Schema Gate 继续校验生成后的 `window.V14_DATA`，浏览器接口和训练语义不变。
+- 维护说明见 `docs/V14.8-DATA-SOURCES.md`。
 
 ## V14.7｜F111 自由组合编课矩阵
 

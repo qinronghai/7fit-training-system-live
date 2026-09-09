@@ -1,0 +1,445 @@
+{
+  "foamRollIds": [
+    "FOAM-01",
+    "FOAM-02",
+    "FOAM-03",
+    "FOAM-04",
+    "FOAM-05",
+    "FOAM-06",
+    "FOAM-07",
+    "FOAM-08",
+    "FOAM-09",
+    "FOAM-10",
+    "FOAM-11",
+    "FOAM-12"
+  ],
+  "foamRollDetails": {
+    "FOAM-01": {
+      "name": "泡沫轴松解-胸大肌",
+      "actionId": "paomozhou_xiongda",
+      "muscles": [
+        "胸大肌",
+        "胸前侧"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "侧身轻压胸大肌外侧，避开肩前骨点；找到紧张点后停留呼吸。",
+      "why": "水平推最直接使用胸大肌；垂直推也可在胸肩前侧紧张时作为辅助准备。",
+      "safety": "避开乳房组织、锁骨、肩前骨点和急性疼痛区域。",
+      "foamId": "FOAM-01",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-02": {
+      "name": "泡沫轴松解-肩部",
+      "actionId": "foamroll_shoulder",
+      "muscles": [
+        "肩部",
+        "三角肌",
+        "肩周软组织"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "用可控压力缓慢滚动肩部肌肉；避开肩峰、锁骨和肱骨头正面骨点。",
+      "why": "肩部参与四类上肢推拉，适合肩周肌肉紧张时作为通用上肢准备。",
+      "safety": "肩部急性疼痛、近期外伤或明显撞击痛时不做；出现锐痛、麻木或放射不适立即停止。",
+      "foamId": "FOAM-02",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-03": {
+      "name": "泡沫轴松解-肱三头肌",
+      "actionId": "foamroll_triceps",
+      "muscles": [
+        "肱三头肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "上臂后侧压在泡沫轴上，从肩下到肘上缓慢滚动；不要直接滚肘尖。",
+      "why": "肱三头肌承担肘伸，是水平推与垂直推的主要协同肌。",
+      "safety": "避开肘尖、腋窝和明显淤青区域；出现神经样麻木或刺痛立即停止。",
+      "foamId": "FOAM-03",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-04": {
+      "name": "泡沫轴松解-肱二头肌",
+      "actionId": "foamroll_biceps",
+      "muscles": [
+        "肱二头肌",
+        "上臂前侧"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平拉",
+        "垂直拉"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "上臂前侧轻压泡沫轴，从肩下到肘上滚肌腹；压力以可放松为准。",
+      "why": "肱二头肌和其他屈肘肌参与水平拉、垂直拉，是拉类训练的主要协同肌。",
+      "safety": "避开腋窝和肘窝神经血管区域；出现麻木、刺痛或锐痛停止。",
+      "foamId": "FOAM-04",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-05": {
+      "name": "泡沫轴松解-大腿内侧",
+      "actionId": "foamroll_adductors",
+      "muscles": [
+        "内收肌群"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿",
+        "髋伸展"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "俯卧屈髋屈膝，把大腿内侧放在泡沫轴上；从靠近膝上到腹股沟前方逐段滚动，别压腹股沟。",
+      "why": "内收肌参与深蹲、单腿稳定和部分髋伸展任务，尤其适合大腿内侧紧张或深蹲外展受限时。",
+      "safety": "避开腹股沟、膝内侧关节线及明显肿胀区域；出现锐痛停止。",
+      "foamId": "FOAM-05",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-06": {
+      "name": "泡沫轴松解-大腿外侧",
+      "actionId": "foamroll_lateral_thigh",
+      "muscles": [
+        "股外侧肌",
+        "阔筋膜张肌周围软组织"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿",
+        "髋伸展"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "重点找大腿外侧肌肉，不要死压髂胫束和膝外侧骨点；可轻微转动身体寻找肌腹。",
+      "why": "大腿外侧与髋外侧组织参与下肢稳定和膝髋控制，适合蹲、单腿与臀腿训练前按紧张程度选择。",
+      "safety": "不以“直接碾髂胫束”为目标；避免大转子和膝外侧骨点，出现锐痛/麻木立即停止。",
+      "foamId": "FOAM-06",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-07": {
+      "name": "泡沫轴松解-竖脊肌旁（胸腰段）",
+      "actionId": "foamroll_erector_spinae",
+      "muscles": [
+        "竖脊肌旁",
+        "胸腰段背伸肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "水平拉",
+        "蹲"
+      ],
+      "prescription": "1组 × 30–40秒",
+      "cue": "只滚脊柱两侧肌肉，不直接压棘突；以胸椎到上腰段为主，腹部保持轻张力。",
+      "why": "髋铰链、杠铃/坐姿划船和较高等级深蹲都需要躯干背侧稳定；只在背侧肌肉明显紧张时选用。",
+      "safety": "避免直接滚压腰椎正中和骨性突起；腰痛伴放射症状、急性腰部疼痛时不做。",
+      "foamId": "FOAM-07",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-08": {
+      "name": "泡沫轴松解-背阔肌/背侧",
+      "actionId": "paomozhou_kuanbei",
+      "muscles": [
+        "背阔肌",
+        "大圆肌周围背侧"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平拉",
+        "垂直拉"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "侧卧轻压腋后背侧肌肉，肩膀放松；避开肋骨和腋窝深处。",
+      "why": "背阔肌是垂直拉的主要肌群，也是水平拉的重要参与肌。",
+      "safety": "避开肋骨尖锐压痛、腋窝神经血管区域和急性肩背疼痛。",
+      "foamId": "FOAM-08",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-09": {
+      "name": "泡沫轴松解-大腿前侧",
+      "actionId": "paomozhou_tuibu",
+      "muscles": [
+        "股四头肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "prescription": "1组 × 30–45秒",
+      "cue": "从髋下到膝上滚股四头肌肌腹；不要压髌骨和膝关节。",
+      "why": "股四头肌是深蹲与多数单腿蹲/弓步动作的重要膝伸肌群。",
+      "safety": "避开髌骨、膝关节线和急性股四头肌拉伤区域。",
+      "foamId": "FOAM-09",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-10": {
+      "name": "泡沫轴松解-大腿后侧",
+      "actionId": "paomozhou_tuihou",
+      "muscles": [
+        "腘绳肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "从臀下到膝上缓慢滚腘绳肌；避开膝后腘窝。",
+      "why": "腘绳肌是髋铰链和髋伸展的重要后侧链肌群，也参与单腿控制。",
+      "safety": "避开膝后腘窝和坐骨附近明显神经样刺痛区域。",
+      "foamId": "FOAM-10",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-11": {
+      "name": "泡沫轴松解-臀部",
+      "actionId": "paomozhou_tunbu",
+      "muscles": [
+        "臀大肌",
+        "臀中肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋伸展",
+        "单腿",
+        "蹲",
+        "髋铰链"
+      ],
+      "prescription": "1组 × 30–45秒/侧",
+      "cue": "身体稍侧转寻找臀部肌肉紧张点，小范围滚动并停留呼吸。",
+      "why": "臀肌直接参与臀推/髋伸展，也是单腿、深蹲和髋铰链的重要发力与稳定肌群。",
+      "safety": "出现沿腿放射的麻痛时停止，不在坐骨神经明显刺激点上持续强压。",
+      "foamId": "FOAM-11",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    },
+    "FOAM-12": {
+      "name": "泡沫轴松解-小腿",
+      "actionId": "paomozhou_xiaotui",
+      "muscles": [
+        "腓肠肌",
+        "比目鱼肌"
+      ],
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "prescription": "1组 × 30–40秒/侧",
+      "cue": "只滚小腿肌腹，避开跟腱和膝后腘窝。",
+      "why": "小腿组织状态会影响踝背屈可用范围和单腿站立稳定，适合深蹲与单腿训练前按需选择。",
+      "safety": "避开跟腱、膝后腘窝、静脉曲张明显区域和急性小腿疼痛。",
+      "foamId": "FOAM-12",
+      "route": "2F PREP",
+      "role": "泡沫轴软组织准备"
+    }
+  },
+  "foamRollMatchByPattern": {
+    "蹲": [
+      "FOAM-09",
+      "FOAM-05",
+      "FOAM-12",
+      "FOAM-11",
+      "FOAM-06",
+      "FOAM-07"
+    ],
+    "髋铰链": [
+      "FOAM-10",
+      "FOAM-11",
+      "FOAM-07",
+      "FOAM-05"
+    ],
+    "髋伸展": [
+      "FOAM-11",
+      "FOAM-10",
+      "FOAM-06",
+      "FOAM-05"
+    ],
+    "单腿": [
+      "FOAM-11",
+      "FOAM-05",
+      "FOAM-06",
+      "FOAM-09",
+      "FOAM-12",
+      "FOAM-10"
+    ],
+    "水平推": [
+      "FOAM-01",
+      "FOAM-02",
+      "FOAM-03"
+    ],
+    "垂直推": [
+      "FOAM-02",
+      "FOAM-03",
+      "FOAM-01"
+    ],
+    "水平拉": [
+      "FOAM-08",
+      "FOAM-04",
+      "FOAM-02",
+      "FOAM-07"
+    ],
+    "垂直拉": [
+      "FOAM-08",
+      "FOAM-04",
+      "FOAM-02"
+    ]
+  }
+}

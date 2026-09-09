@@ -1,0 +1,392 @@
+{
+  "composer": {
+    "lowerModes": {
+      "squat": {
+        "code": "SQ",
+        "name": "下肢推",
+        "subtitle": "蹲 / 膝主导",
+        "pattern": "蹲",
+        "patternKey": "蹲模式",
+        "ids": [
+          "tushen_shendun",
+          "V13_SQ_DB_GOBLET",
+          "hake_shendun",
+          "gangling_shendun"
+        ]
+      },
+      "hinge": {
+        "code": "HINGE",
+        "name": "下肢拉",
+        "subtitle": "髋铰链 / 后侧链",
+        "pattern": "髋铰链",
+        "patternKey": "髋铰链",
+        "ids": [
+          "movement_dowel_hip_hinge",
+          "yaling_luomaniya_yingla",
+          "liujiao_gantui_yingla",
+          "gangling_yingla"
+        ]
+      },
+      "hip_extension": {
+        "code": "HIP",
+        "name": "臀伸",
+        "subtitle": "臀推 / 髋伸展",
+        "pattern": "髋伸展",
+        "patternKey": "臀推 / 髋伸展",
+        "ids": [
+          "tunqiao",
+          "tun_tui",
+          "hipthrust_pause_main",
+          "hipthrust_pause_main"
+        ],
+        "prescriptionByTier": {
+          "T4": "3–4组 × 6–8次｜RIR 1–2"
+        },
+        "tierNoteByTier": {
+          "T4": "T4 复用臀推停顿主项，通过更高有效负荷、顶端控制与 RIR 1–2 区分高阶处方，不新增器械动作。"
+        }
+      },
+      "single_leg_squat": {
+        "code": "SLSQ",
+        "name": "单腿蹲",
+        "subtitle": "单侧膝主导",
+        "pattern": "单腿",
+        "patternKey": "单腿",
+        "ids": [
+          "movement_supported_split_squat",
+          "movement_bodyweight_split_squat",
+          "movement_dumbbell_reverse_lunge",
+          "baojiayali_fentundun"
+        ]
+      },
+      "single_leg_hinge": {
+        "code": "SLH",
+        "name": "单腿拉",
+        "subtitle": "单侧髋铰链",
+        "pattern": "单腿拉",
+        "patternKey": "单腿",
+        "ids": [
+          "movement_supported_single_leg_hinge",
+          "movement_supported_db_single_leg_rdl",
+          "movement_db_single_leg_rdl",
+          "movement_advanced_db_single_leg_rdl"
+        ]
+      }
+    },
+    "upperModes": {
+      "horizontal_pull": {
+        "code": "HR",
+        "name": "水平拉",
+        "pattern": "水平拉",
+        "patternKey": "水平拉",
+        "ids": [
+          "V13_HR_SCAP_ROW",
+          "feiji_labei_zhongba",
+          "zuozi_huachuan_bianshi",
+          "gangling_huachuan"
+        ]
+      },
+      "vertical_pull": {
+        "code": "VR",
+        "name": "垂直拉",
+        "pattern": "垂直拉",
+        "patternKey": "垂直拉",
+        "ids": [
+          "fuzhu_yinti_jianjia_xiachen",
+          "gaowei_xiala_vba",
+          "fuzhu_yinti_xiangshang",
+          "movement_bodyweight_pullup"
+        ]
+      },
+      "horizontal_push": {
+        "code": "HP",
+        "name": "水平推",
+        "pattern": "水平推",
+        "patternKey": "水平推",
+        "ids": [
+          "movement_incline_pushup",
+          "qixie_xiongtui",
+          "wotu_xiong_tui",
+          "gangling_wotu"
+        ]
+      },
+      "vertical_push": {
+        "code": "VP",
+        "name": "垂直推",
+        "pattern": "垂直推",
+        "patternKey": "垂直推",
+        "ids": [
+          "V13_VP_SEATED_LIGHT_DB",
+          "qixie_jian_tui",
+          "movement_halfkneeling_landmine_press",
+          "movement_barbell_overhead_press"
+        ]
+      }
+    },
+    "levelMap": {
+      "L1": {
+        "recommended": "T1",
+        "normal": [
+          "T1"
+        ],
+        "expanded": []
+      },
+      "L2": {
+        "recommended": "T2",
+        "normal": [
+          "T1",
+          "T2"
+        ],
+        "expanded": []
+      },
+      "L3": {
+        "recommended": "T3",
+        "normal": [
+          "T2",
+          "T3"
+        ],
+        "expanded": [
+          "T1"
+        ]
+      },
+      "L4": {
+        "recommended": "T4",
+        "normal": [
+          "T3",
+          "T4"
+        ],
+        "expanded": [
+          "T1",
+          "T2"
+        ]
+      }
+    },
+    "supportMap": {
+      "L1": {
+        "recommended": "SUP-S1",
+        "normal": [
+          "SUP-S1",
+          "SUP-S2"
+        ],
+        "expanded": []
+      },
+      "L2": {
+        "recommended": "SUP-S2",
+        "normal": [
+          "SUP-S1",
+          "SUP-S2",
+          "SUP-S3"
+        ],
+        "expanded": []
+      },
+      "L3": {
+        "recommended": "SUP-S3",
+        "normal": [
+          "SUP-S2",
+          "SUP-S3",
+          "SUP-S4"
+        ],
+        "expanded": [
+          "SUP-S5"
+        ]
+      },
+      "L4": {
+        "recommended": "SUP-S4",
+        "normal": [
+          "SUP-S3",
+          "SUP-S4",
+          "SUP-S5"
+        ],
+        "expanded": [
+          "SUP-S6"
+        ]
+      }
+    },
+    "coreMap": {
+      "L1": {
+        "recommended": [
+          "CORE-L1"
+        ],
+        "normal": [
+          "CORE-L1"
+        ],
+        "expanded": []
+      },
+      "L2": {
+        "recommended": [
+          "CORE-L2"
+        ],
+        "normal": [
+          "CORE-L1",
+          "CORE-L2"
+        ],
+        "expanded": []
+      },
+      "L3": {
+        "recommended": [
+          "CORE-L2",
+          "CORE-L3"
+        ],
+        "normal": [
+          "CORE-L2",
+          "CORE-L3"
+        ],
+        "expanded": [
+          "CORE-L1"
+        ]
+      },
+      "L4": {
+        "recommended": [
+          "CORE-L3"
+        ],
+        "normal": [
+          "CORE-L2",
+          "CORE-L3",
+          "CORE-L4"
+        ],
+        "expanded": [
+          "CORE-L1"
+        ]
+      }
+    },
+    "coreDemands": {
+      "anti_extension": {
+        "name": "抗伸展",
+        "keywords": [
+          "抗伸展"
+        ]
+      },
+      "anti_rotation": {
+        "name": "抗旋转",
+        "keywords": [
+          "抗旋转"
+        ]
+      },
+      "anti_lateral_flexion": {
+        "name": "抗侧屈",
+        "keywords": [
+          "抗侧屈"
+        ]
+      },
+      "dynamic_rotation": {
+        "name": "动态旋转",
+        "keywords": [
+          "旋转 / 传力"
+        ]
+      },
+      "breathing_pressure": {
+        "name": "呼吸 / 腹压协调",
+        "keywords": [
+          "胸廓骨盆",
+          "骨盆控制",
+          "基础控制"
+        ]
+      },
+      "loaded_integration": {
+        "name": "负重整合",
+        "keywords": [
+          "负重整合",
+          "高负荷整合",
+          "负重核心屈曲",
+          "悬垂"
+        ]
+      }
+    },
+    "auxiliaryRules": {
+      "lower": {
+        "squat": [
+          "tui_qushen",
+          "kuangnei_shou",
+          "kuangwai_zhan",
+          "tunbu_houti"
+        ],
+        "hinge": [
+          "tui_wanju",
+          "tunbu_houti",
+          "kuangwai_zhan",
+          "kuangnei_shou"
+        ],
+        "hip_extension": [
+          "tui_wanju",
+          "kuangwai_zhan",
+          "kuangnei_shou",
+          "xiao_longmen_wai_zhan"
+        ],
+        "single_leg_squat": [
+          "kuangwai_zhan",
+          "kuangnei_shou",
+          "tui_qushen",
+          "tui_wanju",
+          "tunbu_houti"
+        ],
+        "single_leg_hinge": [
+          "tui_wanju",
+          "tunbu_houti",
+          "kuangwai_zhan",
+          "xiao_longmen_wai_zhan",
+          "kuangnei_shou"
+        ]
+      },
+      "upper": {
+        "horizontal_pull": [
+          "houzu_sanji",
+          "mianla",
+          "shengsuo_ertou_wanju",
+          "shengsuo_jianwai_xuanzhuan"
+        ],
+        "vertical_pull": [
+          "shengsuo_ertou_wanju",
+          "zhibi_xiala",
+          "mianla",
+          "houzu_sanji"
+        ],
+        "horizontal_push": [
+          "shengsuo_santou_xiaya",
+          "xiongjia_jiaxiong",
+          "shengsuo_jiaxiong_zhongwei",
+          "shengsuo_jianwai_xuanzhuan"
+        ],
+        "vertical_push": [
+          "shengsuo_cepingju",
+          "shengsuo_santou_xiaya",
+          "mianla",
+          "shengsuo_jianwai_xuanzhuan"
+        ]
+      }
+    },
+    "officialPresetMap": {
+      "F111-01": [
+        "squat",
+        "horizontal_pull"
+      ],
+      "F111-02": [
+        "squat",
+        "vertical_pull"
+      ],
+      "F111-03": [
+        "hinge",
+        "horizontal_pull"
+      ],
+      "F111-04": [
+        "hip_extension",
+        "vertical_pull"
+      ],
+      "F111-05": [
+        "single_leg_squat",
+        "horizontal_pull"
+      ],
+      "F111-06": [
+        "squat",
+        "horizontal_push"
+      ],
+      "F111-07": [
+        "hinge",
+        "vertical_push"
+      ],
+      "F111-08": [
+        "single_leg_squat",
+        "vertical_pull"
+      ]
+    }
+  }
+}

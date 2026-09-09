@@ -1,0 +1,448 @@
+{
+  "eightPatterns": {
+    "蹲模式": [
+      "tushen_shendun",
+      "V13_SQ_DB_GOBLET",
+      "hake_shendun",
+      "gangling_shendun"
+    ],
+    "髋铰链": [
+      "movement_dowel_hip_hinge",
+      "yaling_luomaniya_yingla",
+      "liujiao_gantui_yingla",
+      "gangling_yingla"
+    ],
+    "臀推 / 髋伸展": [
+      "tunqiao",
+      "tun_tui",
+      "hipthrust_pause_main",
+      "hipthrust_pause_main"
+    ],
+    "单腿": [
+      "movement_supported_split_squat",
+      "movement_bodyweight_split_squat",
+      "movement_dumbbell_reverse_lunge",
+      "baojiayali_fentundun"
+    ],
+    "水平推": [
+      "movement_incline_pushup",
+      "qixie_xiongtui",
+      "wotu_xiong_tui",
+      "gangling_wotu"
+    ],
+    "垂直推": [
+      "V13_VP_SEATED_LIGHT_DB",
+      "qixie_jian_tui",
+      "movement_halfkneeling_landmine_press",
+      "movement_barbell_overhead_press"
+    ],
+    "水平拉": [
+      "V13_HR_SCAP_ROW",
+      "feiji_labei_zhongba",
+      "zuozi_huachuan_bianshi",
+      "gangling_huachuan"
+    ],
+    "垂直拉": [
+      "fuzhu_yinti_jianjia_xiachen",
+      "gaowei_xiala_vba",
+      "fuzhu_yinti_xiangshang",
+      "movement_bodyweight_pullup"
+    ]
+  },
+  "eightPatternDetails": {
+    "蹲模式": {
+      "ids": [
+        "tushen_shendun",
+        "V13_SQ_DB_GOBLET",
+        "hake_shendun",
+        "gangling_shendun"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "tushen_shendun",
+          "name": "徒手深蹲",
+          "text": "T1 徒手深蹲 动作模式构建 徒手 / 场地 先建立足底、膝髋协同与基础深度。"
+        },
+        {
+          "tier": "T2",
+          "id": "V13_SQ_DB_GOBLET",
+          "name": "哑铃高脚杯深蹲",
+          "text": "T2 哑铃高脚杯深蹲 基础负重 哑铃 + 哑铃架 小重量即可进入负重学习，1F 动线可直接执行。"
+        },
+        {
+          "tier": "T3",
+          "id": "hake_shendun",
+          "name": "哈克深蹲",
+          "text": "T3 哈克深蹲 稳定高负荷进阶 哈克深蹲机 器械轨迹稳定，但负荷能力与完整深蹲训练要求提高。"
+        },
+        {
+          "tier": "T4",
+          "id": "gangling_shendun",
+          "name": "杠铃深蹲",
+          "text": "T4 杠铃深蹲 完整能力 杠铃杆 + 杠铃片 + 深蹲架 自主完成杠铃架位、腹压、轨迹和高负荷稳定。"
+        }
+      ]
+    },
+    "髋铰链": {
+      "ids": [
+        "movement_dowel_hip_hinge",
+        "yaling_luomaniya_yingla",
+        "liujiao_gantui_yingla",
+        "gangling_yingla"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "movement_dowel_hip_hinge",
+          "name": "三点杆 / 徒手髋铰链",
+          "text": "T1 三点杆 / 徒手髋铰链 动作模式构建 徒手 / 场地 先学会髋后移和脊柱稳定。"
+        },
+        {
+          "tier": "T2",
+          "id": "yaling_luomaniya_yingla",
+          "name": "轻重量哑铃 RDL",
+          "text": "T2 轻重量哑铃 RDL 低门槛基础负重 哑铃 + 哑铃架 重量可从很轻开始，比 20 kg 六角杠更适合刚建立模式的会员。"
+        },
+        {
+          "tier": "T3",
+          "id": "liujiao_gantui_yingla",
+          "name": "六角杠硬拉",
+          "text": "T3 六角杠硬拉 力量基础后的进阶 六角杠铃 本馆六角杠本体约 20 kg，需一定力量和地面起拉能力。"
+        },
+        {
+          "tier": "T4",
+          "id": "gangling_yingla",
+          "name": "杠铃硬拉",
+          "text": "T4 杠铃硬拉 完整能力 杠铃杆 + 杠铃片 + 硬拉台 整合地面起拉、腹压、杠铃路径和高负荷。"
+        }
+      ]
+    },
+    "臀推 / 髋伸展": {
+      "ids": [
+        "tunqiao",
+        "tun_tui",
+        "hipthrust_pause_main",
+        "hipthrust_pause_main"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "tunqiao",
+          "name": "臀桥",
+          "text": "T1 臀桥 模式学习 徒手 / 场地 低负荷学习骨盆控制和臀部发力。"
+        },
+        {
+          "tier": "T2",
+          "id": "tun_tui",
+          "name": "臀推机",
+          "text": "T2 臀推机 稳定基础负重 超程臀推机 利用超程臀推机建立可记录负荷。"
+        },
+        {
+          "tier": "T3",
+          "id": "hipthrust_pause_main",
+          "name": "臀推停顿主项 / 超程臀推",
+          "text": "T3 臀推停顿主项 / 超程臀推 高质量负重 超程臀推机 增加有效 ROM、顶峰控制和机械张力。"
+        },
+        {
+          "tier": "T4",
+          "id": "hipthrust_pause_main",
+          "name": "超程臀推机高阶处方",
+          "text": "T4 超程臀推机高阶处方 场馆上限 超程臀推机 不切换杠铃臀推；通过更高有效负荷、RIR 1–2、停顿 / 离心升级。 base exercise 不新增：使用 T3 超程臀推本体 + T4 prescriptionLevel。"
+        }
+      ]
+    },
+    "单腿": {
+      "ids": [
+        "movement_supported_split_squat",
+        "movement_bodyweight_split_squat",
+        "movement_dumbbell_reverse_lunge",
+        "baojiayali_fentundun"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "movement_supported_split_squat",
+          "name": "扶持分腿蹲",
+          "text": "T1 扶持分腿蹲 模式学习 深蹲架 外部支撑降低平衡要求。"
+        },
+        {
+          "tier": "T2",
+          "id": "movement_bodyweight_split_squat",
+          "name": "徒手分腿蹲",
+          "text": "T2 徒手分腿蹲 独立稳定 徒手 / 场地 去掉扶持后独立保持骨盆和下肢轨迹。"
+        },
+        {
+          "tier": "T3",
+          "id": "movement_dumbbell_reverse_lunge",
+          "name": "哑铃反向箭步蹲",
+          "text": "T3 哑铃反向箭步蹲 动态负重 哑铃 + 哑铃架 加入步伐、减速和自由负重。"
+        },
+        {
+          "tier": "T4",
+          "id": "baojiayali_fentundun",
+          "name": "保加利亚分腿蹲（可负重）",
+          "text": "T4 保加利亚分腿蹲（可负重） 完整单腿能力 平凳 后脚抬高，前腿承重、骨盆稳定和 ROM 要求显著提高。"
+        }
+      ],
+      "branches": {
+        "single_leg_squat": {
+          "name": "单腿蹲",
+          "description": "单侧膝主导",
+          "ids": [
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "baojiayali_fentundun"
+          ]
+        },
+        "single_leg_hinge": {
+          "name": "单腿拉",
+          "description": "单侧髋铰链 / 单腿髋主导",
+          "ids": [
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_db_single_leg_rdl",
+            "movement_advanced_db_single_leg_rdl"
+          ]
+        }
+      }
+    },
+    "水平推": {
+      "ids": [
+        "movement_incline_pushup",
+        "qixie_xiongtui",
+        "wotu_xiong_tui",
+        "gangling_wotu"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "movement_incline_pushup",
+          "name": "高位 / 墙斜俯卧撑",
+          "text": "T1 高位 / 墙斜俯卧撑 动作模式构建 平凳 降低自重比例，学习整体支撑与基本推力路径。"
+        },
+        {
+          "tier": "T2",
+          "id": "qixie_xiongtui",
+          "name": "器械推胸",
+          "text": "T2 器械推胸 稳定基础负重 推胸推肩一体机 器械轨迹与靠背提供高外部稳定。"
+        },
+        {
+          "tier": "T3",
+          "id": "wotu_xiong_tui",
+          "name": "哑铃卧推",
+          "text": "T3 哑铃卧推 自由重量控制 哑铃 + 哑铃架 + 平凳 左右独立，稳定性和腕肘轨迹要求明显提高。"
+        },
+        {
+          "tier": "T4",
+          "id": "gangling_wotu",
+          "name": "杠铃卧推",
+          "text": "T4 杠铃卧推 完整高负荷能力 杠铃杆 + 杠铃片 + 平凳 + 深蹲架 整合肩胛固定、杠铃路径、脚部支撑与全身张力。"
+        }
+      ]
+    },
+    "垂直推": {
+      "ids": [
+        "V13_VP_SEATED_LIGHT_DB",
+        "qixie_jian_tui",
+        "movement_halfkneeling_landmine_press",
+        "movement_barbell_overhead_press"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "V13_VP_SEATED_LIGHT_DB",
+          "name": "坐姿轻哑铃肩推",
+          "text": "T1 坐姿轻哑铃肩推 低重量动作构建 轻哑铃 + 靠背凳 本馆可从 2.5 kg 等轻重量开始，更符合女性新手准入门槛。"
+        },
+        {
+          "tier": "T2",
+          "id": "qixie_jian_tui",
+          "name": "器械推肩",
+          "text": "T2 器械推肩 稳定基础负重 推胸推肩一体机 固定器械稳定，但本馆最低档相对偏重，因此放在轻哑铃之后。"
+        },
+        {
+          "tier": "T3",
+          "id": "movement_halfkneeling_landmine_press",
+          "name": "半跪姿地雷杆推举",
+          "text": "T3 半跪姿地雷杆推举 核心 / 重心整合进阶 地雷杆 对核心、骨盆、单侧稳定和重心控制要求更高。"
+        },
+        {
+          "tier": "T4",
+          "id": "movement_barbell_overhead_press",
+          "name": "杠铃站姿推举",
+          "text": "T4 杠铃站姿推举 完整能力 杠铃杆 + 杠铃片 + 深蹲架 站姿自由杠铃下整合肩部、核心、骨盆与全身稳定。"
+        }
+      ]
+    },
+    "水平拉": {
+      "ids": [
+        "V13_HR_SCAP_ROW",
+        "feiji_labei_zhongba",
+        "zuozi_huachuan_bianshi",
+        "gangling_huachuan"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "V13_HR_SCAP_ROW",
+          "name": "基础肩胛划船（轻重量）",
+          "text": "T1 基础肩胛划船（轻重量） 动作模式构建 低位划船一体机（轻重量） 先学肩胛后缩、肘向后拉和胸廓稳定。"
+        },
+        {
+          "tier": "T2",
+          "id": "feiji_labei_zhongba",
+          "name": "胸托划船 / 飞机拉背",
+          "text": "T2 胸托划船 / 飞机拉背 高外部稳定基础负重 飞机拉背器械 胸托或器械支撑减少躯干稳定需求，让会员专注背部发力。"
+        },
+        {
+          "tier": "T3",
+          "id": "zuozi_huachuan_bianshi",
+          "name": "坐姿绳索 / 低位划船",
+          "text": "T3 坐姿绳索 / 低位划船 自主躯干稳定进阶 低位划船一体机 取消胸托后，需要自己抵抗绳索牵引与身体前后摆动。"
+        },
+        {
+          "tier": "T4",
+          "id": "gangling_huachuan",
+          "name": "杠铃俯身划船",
+          "text": "T4 杠铃俯身划船 完整能力 杠铃杆 + 杠铃片 同时要求髋铰链、腹压、躯干稳定和高负荷水平拉。"
+        }
+      ]
+    },
+    "垂直拉": {
+      "ids": [
+        "fuzhu_yinti_jianjia_xiachen",
+        "gaowei_xiala_vba",
+        "fuzhu_yinti_xiangshang",
+        "movement_bodyweight_pullup"
+      ],
+      "levels": [
+        {
+          "tier": "T1",
+          "id": "fuzhu_yinti_jianjia_xiachen",
+          "name": "辅助引体肩胛下沉",
+          "text": "T1 辅助引体肩胛下沉 动作模式构建 辅助引体器械 先建立肩胛下沉与垂直拉起始控制。"
+        },
+        {
+          "tier": "T2",
+          "id": "gaowei_xiala_vba",
+          "name": "高位下拉",
+          "text": "T2 高位下拉 稳定基础负重 高位下拉一体机 坐姿器械和可调重量建立基础背阔拉力。"
+        },
+        {
+          "tier": "T3",
+          "id": "fuzhu_yinti_xiangshang",
+          "name": "辅助引体向上",
+          "text": "T3 辅助引体向上 自身体重参与进阶 辅助引体器械 逐步减少辅助，提高肩胛与躯干稳定要求。"
+        },
+        {
+          "tier": "T4",
+          "id": "movement_bodyweight_pullup",
+          "name": "自重引体向上",
+          "text": "T4 自重引体向上 完整能力 辅助引体器械 无需外部辅助完成完整自重垂直拉。"
+        }
+      ]
+    }
+  },
+  "tenPatternCatalog": [
+    {
+      "id": "PATTERN-01",
+      "type": "main_pattern",
+      "key": "蹲模式",
+      "name": "蹲模式",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-02",
+      "type": "main_pattern",
+      "key": "髋铰链",
+      "name": "髋铰链",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-03",
+      "type": "main_pattern",
+      "key": "臀推 / 髋伸展",
+      "name": "臀推 / 髋伸展",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-04",
+      "type": "main_pattern",
+      "key": "单腿",
+      "name": "单腿",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-05",
+      "type": "main_pattern",
+      "key": "水平推",
+      "name": "水平推",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-06",
+      "type": "main_pattern",
+      "key": "垂直推",
+      "name": "垂直推",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-07",
+      "type": "main_pattern",
+      "key": "水平拉",
+      "name": "水平拉",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-08",
+      "type": "main_pattern",
+      "key": "垂直拉",
+      "name": "垂直拉",
+      "levelSystem": "T1-T4"
+    },
+    {
+      "id": "PATTERN-09",
+      "type": "support",
+      "key": "support",
+      "name": "支撑模式",
+      "levelSystem": "SUP-S1-S6"
+    },
+    {
+      "id": "PATTERN-10",
+      "type": "core",
+      "key": "core",
+      "name": "核心模式",
+      "levelSystem": "CORE-L1-L4+DEMAND"
+    }
+  ],
+  "singleLegHingeIds": [
+    "movement_supported_single_leg_hinge",
+    "movement_supported_db_single_leg_rdl",
+    "movement_db_single_leg_rdl",
+    "movement_advanced_db_single_leg_rdl"
+  ],
+  "singleLegBranches": {
+    "single_leg_squat": {
+      "name": "单腿蹲",
+      "description": "单侧膝主导",
+      "ids": [
+        "movement_supported_split_squat",
+        "movement_bodyweight_split_squat",
+        "movement_dumbbell_reverse_lunge",
+        "baojiayali_fentundun"
+      ]
+    },
+    "single_leg_hinge": {
+      "name": "单腿拉",
+      "description": "单侧髋铰链 / 单腿髋主导",
+      "ids": [
+        "movement_supported_single_leg_hinge",
+        "movement_supported_db_single_leg_rdl",
+        "movement_db_single_leg_rdl",
+        "movement_advanced_db_single_leg_rdl"
+      ]
+    }
+  }
+}
