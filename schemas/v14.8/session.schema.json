@@ -2,5 +2,23 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://7fit.local/schemas/v14.8/session.schema.json",
   "title": "7Fit V14.8 Session",
-  "type": "object"
+  "type": "object",
+  "required": ["slots"],
+  "properties": {
+    "slots": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["slotKey", "baselineId"],
+        "properties": {
+          "slotKey": {"type": "string", "enum": ["A", "B", "C", "D1", "D2", "CORE"]},
+          "baselineId": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
 }
