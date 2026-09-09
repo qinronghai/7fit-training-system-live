@@ -7,6 +7,8 @@ const H=ctx.window.V14CoachAnatomy,S=ctx.window.V14SessionCopy;
 const c=H.composerContext({page:'compose',query:{level:'L3',lower:'single_leg_hinge',upper:'horizontal_push',core:'anti_extension'}});
 const p=H.buildComposerCopyPayload(c);
 assert.strictEqual(p.slots.length,6);
+assert(p.slots.every(x=>x.actionId),'composer copy payload must preserve exact actionId');
+assert.strictEqual(p.slots[0].actionId,'movement_db_single_leg_rdl');
 assert.strictEqual(p.slots[0].name,'独立哑铃单腿罗马尼亚硬拉');
 assert.strictEqual(p.slots[0].tier,'T3');
 assert(/RIR/.test(p.slots[0].prescription));
@@ -31,6 +33,7 @@ assert(!member.includes('POST CARDIO ONLY'));
 assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
 
 const preset=H.buildCopyPayload('F111-06-L3','F111-06','L3');
+assert(preset.slots.every(x=>x.actionId),'preset copy payload must preserve exact actionId');
 const presetMember=S.formatMember(preset,{now:'2026-09-09T12:00:00+08:00'});
 assert(presetMember.includes('1. 哈克深蹲｜3 × 10\n   大腿与臀部力量'));
 assert(presetMember.includes('2. 哑铃卧推｜3 × 10\n   上肢推力'));
