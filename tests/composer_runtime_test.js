@@ -69,7 +69,7 @@ for(const mode of [...Object.values(D.composer.lowerModes),...Object.values(D.co
 }
 const slhMode=D.composer.lowerModes.single_leg_hinge;
 const originalCandidates=slhMode.candidates.map(x=>({...x}));
-const optionSignature=xs=>xs.map(x=>`${x.id}@${x.tier}`);
+const optionSignature=xs=>Array.from(xs,x=>`${x.id}@${x.tier}`);
 const beforePermutation=optionSignature(C.mainCandidates('lower','single_leg_hinge','L4',true));
 slhMode.candidates=[...slhMode.candidates].reverse();
 const afterPermutation=optionSignature(C.mainCandidates('lower','single_leg_hinge','L4',true));
