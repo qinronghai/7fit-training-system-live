@@ -25,7 +25,7 @@ const sessionId='F111-01-L3',recipeId='F111-01',level='L3';
 const session=D.sessions[sessionId];
 const selected=session.slots.map(slot=>slot.baselineId);
 let preset=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
-assert.deepStrictEqual(preset.slots.map(x=>x.slotKey),['MOB-L','MOB-U','PRIMER','CORE-ACT','INTEGRATED']);
+assert.deepStrictEqual(plain(preset.slots.map(x=>x.slotKey)),['MOB-L','MOB-U','PRIMER','CORE-ACT','INTEGRATED']);
 assert(preset.slots.every(x=>x.source==='auto'));
 let slot=firstReplaceableSlot(preset); assert(slot,'expected replaceable preset PREP slot');
 const manual=slot.candidates.find(c=>c.actionId!==slot.actionId); assert(manual);
