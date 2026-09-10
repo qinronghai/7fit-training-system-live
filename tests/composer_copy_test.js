@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const memory={}; const sessionStorage={getItem:k=>memory[k]??null,setItem:(k,v)=>memory[k]=String(v)};
 const ctx={window:{},sessionStorage,document:{body:{dataset:{}},querySelectorAll:()=>[],getElementById:()=>null},location:{hash:''},URLSearchParams,console,setTimeout:()=>{}};
 ctx.window.addEventListener=()=>{}; vm.createContext(ctx);
-for(const file of ['data/system-data.js','data/anatomy-data.js','js/state.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js','js/composer.js','js/conflict.js','js/module-copy.js','js/session-copy.js','js/coach-copy.js','js/coach/common.js','js/coach/home.js','js/coach/slot.js','js/coach/foam.js','js/coach/prep.js','js/coach/summary.js','js/coach/conflict-view.js','js/coach/session.js','js/coach/composer-view.js','js/views-coach.js']) vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+for(const file of ['data/system-data.js','data/anatomy-data.js','js/state.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js','js/composer.js','js/conflict.js','js/resolved-session.js','js/template-resolver.js','js/resolvers/f111.js','js/module-copy.js','js/session-copy.js','js/coach-copy.js','js/coach/common.js','js/coach/home.js','js/coach/slot.js','js/coach/foam.js','js/coach/prep.js','js/coach/summary.js','js/coach/conflict-view.js','js/coach/session.js','js/coach/composer-view.js','js/views-coach.js']) vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 const H=ctx.window.V14CoachAnatomy,S=ctx.window.V14SessionCopy;
 const c=H.composerContext({page:'compose',query:{level:'L3',lower:'single_leg_hinge',upper:'horizontal_push',core:'anti_extension'}});
 const p=H.buildComposerCopyPayload(c);
@@ -35,6 +35,19 @@ assert(member.includes('课后有氧｜约 30 分钟'));
 assert(member.includes('平均心率 130 到 140 左右（燃烧脂肪心率）'));
 assert(!member.includes('POST CARDIO ONLY'));
 assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
+
+// #30: once composerContext has resolved V15 public data, Copy must not run a second full-session V14 Anatomy/Conflict calculation.
+let fullAnatomyCalls=0,conflictCalls=0;
+const originalAggregate=ctx.window.V14Anatomy.aggregate.bind(ctx.window.V14Anatomy);
+const originalEvaluateComposer=ctx.window.V14Conflict.evaluateComposer.bind(ctx.window.V14Conflict);
+ctx.window.V14Anatomy.aggregate=ids=>{if(Array.isArray(ids)&&ids.length===6)fullAnatomyCalls++;return originalAggregate(ids);};
+ctx.window.V14Conflict.evaluateComposer=resolved=>{conflictCalls++;return originalEvaluateComposer(resolved);};
+const pFromResolved=H.buildComposerCopyPayload(c);
+assert.strictEqual(conflictCalls,0,'RED #30: Composer Copy must consume resolvedSession.conflictContext');
+assert.strictEqual(fullAnatomyCalls,0,'RED #30: Composer Copy must consume resolvedSession.anatomyContext for full-session anatomy');
+assert.deepStrictEqual(pFromResolved.muscles.primary,c.resolvedSession.anatomyContext.primary.slice(0,6));
+ctx.window.V14Anatomy.aggregate=originalAggregate;
+ctx.window.V14Conflict.evaluateComposer=originalEvaluateComposer;
 
 const preset=H.buildCopyPayload('F111-06-L3','F111-06','L3');
 const presetCoach=S.formatCoach(preset,{now:'2026-09-10T12:00:00+08:00'});
