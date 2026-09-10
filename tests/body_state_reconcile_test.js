@@ -65,6 +65,13 @@ assert.deepStrictEqual(
   'same Body State intent must resolve deterministically'
 );
 
+// Generic State may contain an auto entry, but Body only treats source=manual as user intent.
+S.setSelection('body',sessionKey,'PRIMARY',alternate,'auto');
+resolved=R.resolve('body',{familyId,level,selections:S.getSelections('body',sessionKey)});
+assert.strictEqual(resolved.main.content.find(slot=>slot.key==='PRIMARY').source,'auto');
+assert.strictEqual(resolved.main.content.find(slot=>slot.key==='PRIMARY').actionId,baselinePrimary);
+S.setSelection('body',sessionKey,'PRIMARY',alternate,'manual');
+
 // If Action status/route becomes illegal, reconcile drops the intent; next resolve falls back to auto.
 const originalRoute=D.actions[alternate].route;
 D.actions[alternate].route='POST_CARDIO_ONLY';
