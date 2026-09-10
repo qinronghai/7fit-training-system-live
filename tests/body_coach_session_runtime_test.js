@@ -9,7 +9,7 @@ for(const file of [
   'js/template-resolver.js','js/resolvers/body.js','js/coach/common.js','js/coach/template-ui.js'
 ]) load(file);
 
-for(const file of ['js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-session.js']){
+for(const file of ['js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-recovery.js','js/coach/body-session.js']){
   assert.strictEqual(fs.existsSync(file),true,`${file} must exist`);
   load(file);
 }
