@@ -304,17 +304,17 @@ Action 对 Session Level 的合法性必须由 `levels` 显式声明。
 
 Body eligibility 由 `bodyActionMeta` 中是否存在该 Action ID 决定；V1 不在 `actions.json` 再增加 `bodyEligible=true`，避免形成双 truth source。
 
-### 7.4 Main Role / Family Target Gate
-
-Body V1 冻结以下硬约束：只要 Candidate 的 `roles` 包含 `PRIMARY` 或 `SECONDARY`，其 `directTargets` 必须至少命中该 Candidate 所属**每一个** Family 的 `primaryTargets`。
-
-V1 的 `roles` 是 Candidate 在 `families` 中共享的合法 Role 集，不做按 Family 隐式角色推断。若同一动作在两个 Family 中的主项职责不同，V1 采用保守的 Family membership 拆分；未来只有真实需求证明必要时，才升级为显式 `rolesByFamily` contract。
-
 ### 7.3 Candidate whitelist
 
 V1 不给全部 243 个 Action 自动打 Body 标签。第一版建立约 **40–60 个经过人工审计的 Body Candidate 白名单**，优先覆盖膝主导、髋铰链/髋伸、单腿、水平/垂直推拉、腿屈伸/腿弯举、臀部孤立、髋外展/内收、后三角/侧平举、二头/三头及必要低疲劳胸背辅助。
 
 候选必须引用现有 `actions` 中真实存在的 Action ID。
+
+### 7.4 Main Role / Family Target Gate
+
+Body V1 冻结以下硬约束：只要 Candidate 的 `roles` 包含 `PRIMARY` 或 `SECONDARY`，其 `directTargets` 必须至少命中该 Candidate 所属**每一个** Family 的 `primaryTargets`。
+
+V1 的 `roles` 是 Candidate 在 `families` 中共享的合法 Role 集，不做按 Family 隐式角色推断。若同一动作在两个 Family 中的主项职责不同，V1 采用保守的 Family membership 拆分；未来只有真实需求证明必要时，才升级为显式 `rolesByFamily` contract。
 
 ---
 
