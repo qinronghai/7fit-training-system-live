@@ -1,0 +1,33 @@
+name: Issue 33 Body Generate
+
+on:
+  push:
+    branches:
+      - feature/issue-33-body-data-contract
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/issue-33-body-data-contract
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Generate committed runtime bundle
+        run: |
+          python tools/build_system_data.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/system-data.js
+          if git diff --cached --quiet; then
+            echo 'Bundle already fresh'
+          else
+            git commit -m 'build: refresh Body runtime bundle'
+            git push origin HEAD:feature/issue-33-body-data-contract
+          fi
