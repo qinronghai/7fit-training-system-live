@@ -3,11 +3,6 @@
   const M=window.V14CoachModules=window.V14CoachModules||{};
   const D=()=>window.V14_DATA||{};
   const Shared=()=>window.V14SessionCopy||{};
-  const RECOVERY={
-    title:'训练后恢复｜约 5–8 分钟',
-    note:'力量训练结束后进行低强度恢复与呼吸整理；如需拉伸，按当日训练肌群由教练人工选择。',
-    boundary:'恢复内容不计入 Direct Work Sets。',
-  };
 
   function clean(value){return String(value??'').trim();}
   function rangeText(values,suffix=''){
@@ -18,6 +13,10 @@
   function roleName(role){return D().bodyRoles?.[role]?.name||role||'动作';}
   function targetName(id){return D().bodyTargetCatalog?.[id]?.name||id;}
   function actionFields(actionId){return D().actionDetails?.[actionId]?.fields||{};}
+  function recovery(){
+    if(!M.BodyRecovery?.payload)throw new Error('Body Recovery presentation is unavailable');
+    return M.BodyRecovery.payload();
+  }
 
   function buildSlots(session){
     const domains=session?.domainContext?.slots||{};
@@ -59,7 +58,7 @@
       anatomy:session.anatomyContext||{},
       volume:session.domainContext?.volume||{},
       conflicts:session.conflictContext||{status:'PASS',hardCount:0,warnCount:0,issues:[]},
-      recovery:{...RECOVERY},
+      recovery:recovery(),
     };
   }
 
@@ -91,7 +90,7 @@
   }
 
   function formatCoach(payload){
-    const p=payload||{};
+    const p=payload||{},r=p.recovery||{};
     const lines=[
       '7Fit｜Body 教练训练单',
       clean(p.date),
@@ -116,9 +115,9 @@
       '【Conflict】',
       ...conflictLines(p.conflicts),
       '',
-      `【${clean(p.recovery?.title)||RECOVERY.title}】`,
-      clean(p.recovery?.note)||RECOVERY.note,
-      clean(p.recovery?.boundary)||RECOVERY.boundary,
+      `【${clean(r.title)}】`,
+      clean(r.note),
+      clean(r.boundary),
     );
     return lines.filter((line,index,array)=>line!==''||array[index-1]!=='').join('\n').trim();
   }
@@ -129,7 +128,7 @@
   }
 
   function formatMember(payload){
-    const p=payload||{};
+    const p=payload||{},r=p.recovery||{};
     const lines=[
       '7Fit｜今日训练安排',
       clean(p.date),
@@ -143,11 +142,11 @@
     });
     lines.push(
       '',
-      `【${clean(p.recovery?.title)||RECOVERY.title}】`,
-      clean(p.recovery?.note)||RECOVERY.note,
+      `【${clean(r.title)}】`,
+      clean(r.note),
     );
     return lines.filter((line,index,array)=>line!==''||array[index-1]!=='').join('\n').trim();
   }
 
-  M.BodyCopy={buildPayload,formatCoach,formatMember,recovery:{...RECOVERY}};
+  M.BodyCopy={buildPayload,formatCoach,formatMember};
 })();
