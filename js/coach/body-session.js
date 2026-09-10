@@ -71,7 +71,8 @@
     const sessionKey=sessionKeyFor(familyId,level);
     const session=resolveState(familyId,level);
     const selections=window.V15State?.getSelections?.('body',sessionKey)||{};
-    return {familyId,level,sessionKey,session,selections,family:D().bodyFamilies?.[familyId]||{}};
+    const prep=M.BodyPrep?.resolve?.(session,sessionKey)||null;
+    return {familyId,level,sessionKey,session,selections,prep,family:D().bodyFamilies?.[familyId]||{}};
   }
 
   function rangeText(values,suffix=''){
@@ -121,7 +122,8 @@
 
   function renderEditor(ctx){
     const session=ctx.session;
-    return `<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
+    const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
+    return `${prepHtml}<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
   }
 
   function render(route){
@@ -140,6 +142,10 @@
     const {familyId,level}=normalizeFamilyLevel(route);
     root.querySelectorAll('.body-slot-select').forEach(select=>select.addEventListener('change',()=>{
       setFormalSelection(familyId,level,select.dataset.bodySlot,select.value);
+      rerender();
+    }));
+    root.querySelectorAll('.body-prep-select').forEach(select=>select.addEventListener('change',()=>{
+      M.BodyPrep.setSelection(select.dataset.bodyPrepSession,select.dataset.bodyPrepSlot,select.value);
       rerender();
     }));
     root.querySelector('#reset-body-session')?.addEventListener('click',()=>{
