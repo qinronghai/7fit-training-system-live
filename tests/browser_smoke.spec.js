@@ -39,6 +39,39 @@ test('F111 template landing preserves legacy presets and composer entry', async 
   await expectNoPageErrors(errors);
 });
 
+test('F111 preset page keeps legacy UI while new dispatcher resolves the same public session', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.goto('/#/coach/f111-06/l3');
+  await expect(page.locator('h1')).toContainText('F111-06');
+  await expect(page.locator('.session-slot')).toHaveCount(6);
+
+  const result = await page.evaluate(() => {
+    const resolved = window.V15TemplateResolver.resolve('f111', {
+      mode: 'preset',
+      recipeId: 'F111-06',
+      level: 'L3',
+    });
+    return {
+      validation: window.V15ResolvedSession.validate(resolved),
+      templateId: resolved.templateId,
+      familyId: resolved.familyId,
+      level: resolved.level,
+      mainKind: resolved.main.kind,
+      slotCount: resolved.main.content.length,
+      actionIds: resolved.main.content.map(slot => slot.actionId),
+    };
+  });
+
+  expect(result.validation).toEqual({ ok: true, errors: [] });
+  expect(result.templateId).toBe('f111');
+  expect(result.familyId).toBe('F111-06');
+  expect(result.level).toBe('L3');
+  expect(result.mainKind).toBe('SLOT');
+  expect(result.slotCount).toBe(6);
+  expect(result.actionIds.every(Boolean)).toBeTruthy();
+  await expectNoPageErrors(errors);
+});
+
 test('Body, Conditioning and Posture template routes are safe generic landings', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body');
