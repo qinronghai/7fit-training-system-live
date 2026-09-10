@@ -1,6 +1,14 @@
 (function(){
   function labels(route){
-    const map={coach:['编课中心','F111 女性综合 1+1+1'],system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['动作库','搜索、筛选与动作详情'],maintenance:['系统维护','数据健康度与审计']};
+    if(route.area==='coach'){
+      if(route.page==='template'){
+        const record=window.V14_DATA?.templateRegistry?.[route.templateId];
+        return ['编课中心',record?.name||'训练模板'];
+      }
+      if(route.page==='compose'||route.recipeId)return ['编课中心','F111 女性综合 1+1+1'];
+      return ['编课中心','Multi-Template Coach Center'];
+    }
+    const map={system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['动作库','搜索、筛选与动作详情'],maintenance:['系统维护','数据健康度与审计']};
     return map[route.area]||['页面不存在',''];
   }
   function setActive(area){
@@ -12,7 +20,7 @@
       document.getElementById('page-title').textContent='页面不存在';
       document.getElementById('page-subtitle').textContent='请返回编课中心';
       setActive('');
-      main.innerHTML='<section class="empty-state"><b>页面不存在</b><span>这个地址不属于当前 V14 信息架构。</span><a href="#/coach">返回编课中心</a></section>';
+      main.innerHTML='<section class="empty-state"><b>页面不存在</b><span>这个地址不属于当前训练系统信息架构。</span><a href="#/coach">返回编课中心</a></section>';
       main.focus({preventScroll:true});
       return;
     }
@@ -23,7 +31,7 @@
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
     if(typeof fn==='function') main.innerHTML=fn(route);
-    else main.innerHTML='<section class="empty-state"><b>'+title+'</b><span>该模块将在后续任务中迁入 V14。</span></section>';
+    else main.innerHTML='<section class="empty-state"><b>'+title+'</b><span>该模块将在后续任务中迁入训练系统。</span></section>';
     const bind=window.V14Bind?.[route.area]; if(typeof bind==='function') bind(route);
     if(window.V14ModuleCopy?.bind) window.V14ModuleCopy.bind(main);
     main.focus({preventScroll:true});
