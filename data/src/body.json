@@ -1,13 +1,113 @@
 {
-  "bodyTargetIds": [],
-  "bodyTargetCatalog": {},
-  "bodyRoleIds": [],
-  "bodyRoles": {},
-  "bodyFamilyIds": [],
-  "bodyFamilies": {},
-  "bodyLevelPolicies": {},
-  "bodyPrescriptionProfiles": {},
+  "bodyTargetIds": [
+    "quadriceps",
+    "hamstrings",
+    "glute_max",
+    "glute_med",
+    "adductors",
+    "calves",
+    "lats",
+    "upper_back",
+    "rear_delts",
+    "lateral_delts",
+    "front_delts",
+    "chest",
+    "biceps",
+    "triceps"
+  ],
+  "bodyTargetCatalog": {
+    "quadriceps": {"id": "quadriceps", "name": "股四头肌", "region": "lower", "anatomyAliases": ["股四头肌"]},
+    "hamstrings": {"id": "hamstrings", "name": "腘绳肌", "region": "lower", "anatomyAliases": ["腘绳肌"]},
+    "glute_max": {"id": "glute_max", "name": "臀大肌", "region": "lower", "anatomyAliases": ["臀大肌"]},
+    "glute_med": {"id": "glute_med", "name": "臀中肌", "region": "lower", "anatomyAliases": ["臀中肌", "臀小肌"]},
+    "adductors": {"id": "adductors", "name": "内收肌群", "region": "lower", "anatomyAliases": ["内收肌群"]},
+    "calves": {"id": "calves", "name": "小腿后侧", "region": "lower", "anatomyAliases": ["腓肠肌", "比目鱼肌"]},
+    "lats": {"id": "lats", "name": "背阔肌", "region": "upper", "anatomyAliases": ["背阔肌"]},
+    "upper_back": {"id": "upper_back", "name": "上背", "region": "upper", "anatomyAliases": ["中斜方肌", "菱形肌", "斜方肌中束", "斜方肌下束", "斜方肌中下束"]},
+    "rear_delts": {"id": "rear_delts", "name": "三角肌后束", "region": "upper", "anatomyAliases": ["三角肌后束"]},
+    "lateral_delts": {"id": "lateral_delts", "name": "三角肌中束", "region": "upper", "anatomyAliases": ["三角肌中束"]},
+    "front_delts": {"id": "front_delts", "name": "三角肌前束", "region": "upper", "anatomyAliases": ["三角肌前束"]},
+    "chest": {"id": "chest", "name": "胸部", "region": "upper", "anatomyAliases": ["胸大肌"]},
+    "biceps": {"id": "biceps", "name": "肱二头肌", "region": "upper", "anatomyAliases": ["肱二头肌", "肱肌"]},
+    "triceps": {"id": "triceps", "name": "肱三头肌", "region": "upper", "anatomyAliases": ["肱三头肌"]}
+  },
+  "bodyRoleIds": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"],
+  "bodyRoles": {
+    "PRIMARY": {"id": "PRIMARY", "name": "主项", "description": "当日主要刺激目标的核心动作。"},
+    "SECONDARY": {"id": "SECONDARY", "name": "次主项", "description": "补充主要刺激方向并改变动作模式、角度或负重路径。"},
+    "ACCESSORY": {"id": "ACCESSORY", "name": "辅助", "description": "补齐目标肌群或训练结构，不承担当日主要负荷。"},
+    "ISOLATION": {"id": "ISOLATION", "name": "孤立", "description": "局部肌群导向、低全身疲劳的孤立或近孤立动作。"},
+    "OPTIONAL": {"id": "OPTIONAL", "name": "可选补充", "description": "在等级、时间预算或个体需求允许时追加。"}
+  },
+  "bodyFamilyIds": ["BODY-01", "BODY-02", "BODY-03", "BODY-04"],
+  "bodyFamilies": {
+    "BODY-01": {
+      "familyId": "BODY-01",
+      "name": "臀腿｜股四主导",
+      "primaryTargets": ["quadriceps"],
+      "secondaryTargets": ["glute_max", "glute_med", "hamstrings", "adductors"],
+      "slotPolicy": {"PRIMARY": "PRIMARY", "SECONDARY": "SECONDARY", "ACCESSORY": "ACCESSORY", "ISOLATION-1": "ISOLATION", "ISOLATION-2": "ISOLATION", "OPTIONAL": "OPTIONAL"},
+      "volumeTargets": ["quadriceps", "glute_max", "glute_med", "hamstrings", "adductors", "calves"],
+      "allowedRoles": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"]
+    },
+    "BODY-02": {
+      "familyId": "BODY-02",
+      "name": "臀腿｜臀后侧链",
+      "primaryTargets": ["glute_max", "hamstrings"],
+      "secondaryTargets": ["glute_med", "adductors"],
+      "slotPolicy": {"PRIMARY": "PRIMARY", "SECONDARY": "SECONDARY", "ACCESSORY": "ACCESSORY", "ISOLATION-1": "ISOLATION", "ISOLATION-2": "ISOLATION", "OPTIONAL": "OPTIONAL"},
+      "volumeTargets": ["glute_max", "hamstrings", "glute_med", "adductors", "quadriceps", "calves"],
+      "allowedRoles": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"]
+    },
+    "BODY-03": {
+      "familyId": "BODY-03",
+      "name": "背肩塑形",
+      "primaryTargets": ["lats", "upper_back", "rear_delts", "lateral_delts"],
+      "secondaryTargets": ["biceps"],
+      "slotPolicy": {"PRIMARY": "PRIMARY", "SECONDARY": "SECONDARY", "ACCESSORY": "ACCESSORY", "ISOLATION-1": "ISOLATION", "ISOLATION-2": "ISOLATION", "OPTIONAL": "OPTIONAL"},
+      "volumeTargets": ["lats", "upper_back", "rear_delts", "lateral_delts", "biceps"],
+      "allowedRoles": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"]
+    },
+    "BODY-04": {
+      "familyId": "BODY-04",
+      "name": "胸肩臂塑形",
+      "primaryTargets": ["chest", "lateral_delts", "triceps"],
+      "secondaryTargets": ["front_delts", "biceps"],
+      "slotPolicy": {"PRIMARY": "PRIMARY", "SECONDARY": "SECONDARY", "ACCESSORY": "ACCESSORY", "ISOLATION-1": "ISOLATION", "ISOLATION-2": "ISOLATION", "OPTIONAL": "OPTIONAL"},
+      "volumeTargets": ["chest", "lateral_delts", "front_delts", "triceps", "biceps"],
+      "allowedRoles": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"]
+    }
+  },
+  "bodyLevelPolicies": {
+    "L1": {"level": "L1", "sessionWorkingSetRange": [10, 12], "rirRange": [3, 4], "optionalDefault": false, "defaultWorkingSets": {"PRIMARY": 3, "SECONDARY": 2, "ACCESSORY": 2, "ISOLATION-1": 2, "ISOLATION-2": 1, "OPTIONAL": 0}},
+    "L2": {"level": "L2", "sessionWorkingSetRange": [12, 14], "rirRange": [2, 3], "optionalDefault": false, "defaultWorkingSets": {"PRIMARY": 3, "SECONDARY": 3, "ACCESSORY": 2, "ISOLATION-1": 2, "ISOLATION-2": 2, "OPTIONAL": 0}},
+    "L3": {"level": "L3", "sessionWorkingSetRange": [14, 16], "rirRange": [2, 2], "optionalDefault": true, "defaultWorkingSets": {"PRIMARY": 3, "SECONDARY": 3, "ACCESSORY": 3, "ISOLATION-1": 2, "ISOLATION-2": 2, "OPTIONAL": 1}},
+    "L4": {"level": "L4", "sessionWorkingSetRange": [16, 18], "rirRange": [1, 2], "optionalDefault": true, "defaultWorkingSets": {"PRIMARY": 4, "SECONDARY": 3, "ACCESSORY": 3, "ISOLATION-1": 3, "ISOLATION-2": 2, "OPTIONAL": 1}}
+  },
+  "bodyPrescriptionProfiles": {
+    "compound_machine": {"id": "compound_machine", "repRange": [8, 15], "restSecondsRange": [90, 150], "perSide": false},
+    "compound_freeweight": {"id": "compound_freeweight", "repRange": [6, 12], "restSecondsRange": [120, 180], "perSide": false},
+    "single_leg_compound": {"id": "single_leg_compound", "repRange": [8, 12], "restSecondsRange": [90, 150], "perSide": true},
+    "accessory_compound": {"id": "accessory_compound", "repRange": [10, 15], "restSecondsRange": [75, 120], "perSide": false},
+    "isolation_large": {"id": "isolation_large", "repRange": [10, 20], "restSecondsRange": [60, 90], "perSide": false},
+    "isolation_small": {"id": "isolation_small", "repRange": [12, 20], "restSecondsRange": [45, 75], "perSide": false}
+  },
   "bodyActionMeta": {},
-  "bodyVolumePolicy": {},
-  "bodyConflictPolicy": {}
+  "bodyVolumePolicy": {
+    "warmupSetsCountDirect": false,
+    "rampUpSetsCountDirect": false,
+    "prepSetsCountDirect": false,
+    "foamSetsCountDirect": false,
+    "secondaryExposureCountsDirect": false,
+    "fractionalEffectiveSets": false,
+    "unilateralSetCounting": "PER_SIDE_PRESCRIPTION_COUNTS_ONCE",
+    "sessionTotalCounting": "SUM_SLOT_WORKING_SETS_ONCE",
+    "directTargetCounting": "MULTI_LABEL_EACH_DIRECT_TARGET"
+  },
+  "bodyConflictPolicy": {
+    "maxHighFatigueCompounds": 2,
+    "maxSamePatternActions": 2,
+    "isolationRatioWarnAbove": 0.5,
+    "estimatedSessionMinutesRange": [35, 50]
+  }
 }
