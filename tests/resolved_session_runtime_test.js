@@ -12,8 +12,11 @@ load('js/prep-grade.js');
 load('js/anatomy.js');
 load('js/prep-resolver.js');
 load('js/composer.js');
-load('js/conflict.js');
 load('js/resolved-session.js');
+load('js/conflict-core.js');
+load('js/conflict-service.js');
+load('js/conflict-plugins/f111.js');
+load('js/conflict.js');
 load('js/template-resolver.js');
 
 const D=window.V14_DATA;
