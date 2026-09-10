@@ -35,6 +35,7 @@ assert(member.includes('课后有氧｜约 30 分钟'));
 assert(member.includes('平均心率 130 到 140 左右（燃烧脂肪心率）'));
 assert(!member.includes('POST CARDIO ONLY'));
 assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
+
 const preset=H.buildCopyPayload('F111-06-L3','F111-06','L3');
 const presetCoach=S.formatCoach(preset,{now:'2026-09-10T12:00:00+08:00'});
 assert(presetCoach.includes('F111-06｜L3 负重进阶'));
@@ -54,6 +55,7 @@ const singleLegPreset=H.buildCopyPayload('F111-05-L3','F111-05','L3');
 const singleLegMember=S.formatMember(singleLegPreset,{now:'2026-09-09T12:00:00+08:00'});
 assert(singleLegMember.includes('单腿力量 × 上肢拉 × 核心稳定'));
 assert(singleLegMember.includes('今日训练重点\n单腿力量 · 上肢拉力 · 核心稳定'));
+
 const hipL4=H.composerContext({page:'compose',query:{level:'L4',lower:'hip_extension',upper:'horizontal_pull',core:'anti_extension'}});
 const hipPayload=H.buildComposerCopyPayload(hipL4);
 assert.strictEqual(hipPayload.slots[0].name,'臀推停顿主项');
