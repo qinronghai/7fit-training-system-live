@@ -7,6 +7,8 @@ vm.createContext(sandbox);
 function load(path){vm.runInContext(fs.readFileSync(path,'utf8'),sandbox,{filename:path});}
 load('data/system-data.js');
 load('js/resolved-session.js');
+load('js/conflict-core.js');
+load('js/conflict-service.js');
 
 const W=sandbox.window;
 assert.ok(W.V15ConflictCore&&typeof W.V15ConflictCore.evaluate==='function','window.V15ConflictCore.evaluate must exist');
