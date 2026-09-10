@@ -63,6 +63,10 @@ for(const familyId of families){
     assert(session.main.content.every(slot=>slot.actionId&&slot.name&&slot.prescription));
     assert(session.main.content.every(slot=>['auto','manual'].includes(slot.source)));
     assert(['PASS','WARN','FAIL'].includes(session.conflictContext.status));
+    assert.notStrictEqual(
+      session.conflictContext.status,'FAIL',
+      `${familyId} ${level} auto baseline must not FAIL: ${JSON.stringify(session.conflictContext)}`
+    );
     assert.strictEqual(Contract.validate(session).ok,true,Contract.validate(session).errors.join(' | '));
     assert.deepStrictEqual(Dispatcher.resolve('body',input),session,`${familyId} ${level} must resolve deterministically`);
     signatures.push(signature(session));
