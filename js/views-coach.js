@@ -3,7 +3,7 @@
   function render(route){
     if(route.page==='compose')return ComposerView.render(route);
     if(route.recipeId)return Session.render(route);
-    if(route.page==='template')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
+    if(route.page==='template'||route.page==='template-compose')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
     return Home.render(route);
   }
   function bind(route){
