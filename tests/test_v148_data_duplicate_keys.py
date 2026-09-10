@@ -11,6 +11,7 @@ DOMAIN_FILES = (
     "patterns.json",
     "sessions.json",
     "templates.json",
+    "body.json",
     "support.json",
     "core.json",
     "prep.json",
