@@ -65,6 +65,30 @@ const adapter=M.TemplateUI.get('body');
 assert(adapter,'Body Template UI adapter must register');
 assert.strictEqual(adapter.canHandle({page:'template',templateId:'body'}),true);
 assert.strictEqual(adapter.canHandle({page:'template-session',templateId:'body'}),true);
+assert.strictEqual(adapter.canHandle({page:'template-compose',templateId:'body'}),true,'Body adapter must own template-compose');
 assert.strictEqual(adapter.canHandle({page:'template',templateId:'conditioning'}),false);
+
+// Composer must normalize query input and reuse the exact same logical editor/session key.
+const composeRoute={area:'coach',page:'template-compose',templateId:'body',query:{family:'BODY-02',level:'L3'}};
+const composeCtx=M.BodySession.context(composeRoute);
+const sessionCtx=M.BodySession.context({area:'coach',page:'template-session',templateId:'body',familyId:'BODY-02',level:'L3',query:{}});
+assert.strictEqual(composeCtx.familyId,'BODY-02');
+assert.strictEqual(composeCtx.level,'L3');
+assert.strictEqual(composeCtx.sessionKey,'BODY-02-L3');
+assert.deepStrictEqual(composeCtx.session,sessionCtx.session,'Composer and Session route must share one resolved logical session');
+
+const defaultCompose=M.BodySession.context({area:'coach',page:'template-compose',templateId:'body',query:{}});
+assert.strictEqual(defaultCompose.familyId,'BODY-01');
+assert.strictEqual(defaultCompose.level,'L1');
+const invalidCompose=M.BodySession.context({area:'coach',page:'template-compose',templateId:'body',query:{family:'BODY-99',level:'L9'}});
+assert.strictEqual(invalidCompose.familyId,'BODY-01','invalid Body composer family must fall back to BODY-01');
+assert.strictEqual(invalidCompose.level,'L1','invalid Body composer level must fall back to L1');
+
+const composeHtml=adapter.render(composeRoute);
+assert(composeHtml.includes('Body 自由编课'),'Body Composer heading missing');
+assert(composeHtml.includes('data-body-compose-family'),'Body Composer family selector missing');
+assert(composeHtml.includes('data-body-compose-level'),'Body Composer level selector missing');
+assert(composeHtml.includes('BODY-02-L3'),'Composer must render the shared Body session editor');
+for(const forbidden of ['5 × 4 主模式矩阵','lowerMode','upperMode','coreDemand','SUPPORT Grade'])assert(!composeHtml.includes(forbidden),`Body Composer must not leak F111 concept: ${forbidden}`);
 
 console.log('body_coach_session_runtime_test: PASS');
