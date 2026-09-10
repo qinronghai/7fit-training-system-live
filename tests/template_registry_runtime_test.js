@@ -6,7 +6,7 @@ function load(file){
   vm.runInThisContext(fs.readFileSync(`${root}/${file}`,'utf8'),{filename:file});
 }
 
-for(const file of ['data/system-data.js','js/router.js','js/coach/common.js','js/coach/home.js']) load(file);
+for(const file of ['data/system-data.js','js/router.js','js/coach/common.js','js/coach/home.js','js/coach/f111-home.js','js/coach/template-home.js']) load(file);
 
 const D=window.V14_DATA,R=window.V14Router,M=window.V14CoachModules;
 assert(D.templateRegistry,'templateRegistry runtime missing');
