@@ -2,6 +2,9 @@
   'use strict';
 
   const D=()=>window.V14_DATA||{};
+  const MAIN_ROUTES=new Set(['1F_ONLY','FLEX_1F_2F']);
+  const STABILITY_RANK=Object.freeze({low:0,medium:1,high:2});
+  const LEVEL_STABILITY_MAX=Object.freeze({L1:0,L2:1,L3:2,L4:2});
 
   function fail(code,message,details={}){
     const error=new Error(message);
@@ -10,19 +13,111 @@
     throw error;
   }
 
-  function validateInput(input={}){
+  function normalizeActionId(value){
+    if(typeof value==='string')return value;
+    return value&&typeof value.actionId==='string'?value.actionId:'';
+  }
+
+  function validateInput(input={},requireSlot=false){
+    const data=D();
     const familyId=typeof input.familyId==='string'?input.familyId:'';
     const level=/^L[1-4]$/.test(input.level||'')?input.level:'';
-    if(!familyId||!D().bodyFamilies?.[familyId]){
+    const family=data.bodyFamilies?.[familyId];
+    const levelPolicy=data.bodyLevelPolicies?.[level];
+    if(!familyId||!family){
       fail('BODY_INPUT_INVALID',`Unknown Body family: ${String(familyId||'')}`,{familyId});
     }
-    if(!level)fail('BODY_INPUT_INVALID','Body level must be L1-L4',{level:input.level});
-    return {familyId,level};
+    if(!level||!levelPolicy)fail('BODY_INPUT_INVALID','Body level must be L1-L4',{level:input.level});
+    if(!requireSlot)return {familyId,level,family,levelPolicy};
+    const slotKey=typeof input.slotKey==='string'?input.slotKey:'';
+    const role=family.slotPolicy?.[slotKey];
+    const workingSets=levelPolicy.defaultWorkingSets?.[slotKey];
+    if(!slotKey||!role||!Number.isInteger(workingSets)||workingSets<=0){
+      fail('BODY_INPUT_INVALID',`Inactive or unknown Body slot: ${String(slotKey||'')}`,{familyId,level,slotKey});
+    }
+    return {familyId,level,family,levelPolicy,slotKey,role};
+  }
+
+  function overlaps(a,b){
+    const wanted=new Set(Array.isArray(b)?b:[]);
+    return (Array.isArray(a)?a:[]).some(value=>wanted.has(value));
+  }
+
+  function isLegalCandidate({familyId,level,family,role,actionId}){
+    const data=D(),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
+    if(!meta||!action)return false;
+    if(!meta.families?.includes(familyId))return false;
+    if(!meta.levels?.includes(level))return false;
+    if(!meta.roles?.includes(role))return false;
+    if(action.status!=='可自动编排')return false;
+    if(!MAIN_ROUTES.has(action.route))return false;
+    if((role==='PRIMARY'||role==='SECONDARY')&&!overlaps(meta.directTargets,family.primaryTargets))return false;
+    return true;
+  }
+
+  function selectionContext(currentSelections={},currentSlotKey=''){
+    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set();
+    let highFatigueCompounds=0;
+    for(const [slotKey,value] of Object.entries(currentSelections||{})){
+      if(slotKey===currentSlotKey)continue;
+      const actionId=normalizeActionId(value),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
+      if(!actionId||!meta||!action)continue;
+      usedActionIds.add(actionId);
+      (meta.directTargets||[]).forEach(target=>coveredTargets.add(target));
+      if(action.pattern)patterns.add(action.pattern);
+      if(meta.exerciseClass==='compound'&&meta.fatigueCost==='high')highFatigueCompounds++;
+    }
+    return {coveredTargets,patterns,usedActionIds,highFatigueCompounds};
+  }
+
+  function candidateSortKey(candidate,{family,level,context}){
+    const primaryTargets=new Set(family.primaryTargets||[]);
+    const volumeTargets=new Set(family.volumeTargets||[]);
+    const direct=candidate.directTargets||[];
+    const primaryCoverage=direct.filter(target=>primaryTargets.has(target)).length;
+    const missingTargetBonus=direct.filter(target=>volumeTargets.has(target)&&!context.coveredTargets.has(target)).length;
+    const stability=STABILITY_RANK[candidate.stabilityDemand]??2;
+    const stabilityPenalty=Math.max(0,stability-(LEVEL_STABILITY_MAX[level]??2));
+    const fatiguePenalty=candidate.exerciseClass==='compound'&&candidate.fatigueCost==='high'&&context.highFatigueCompounds>=2?1:0;
+    const movementDiversity=candidate.pattern&&!context.patterns.has(candidate.pattern)?1:0;
+    const targetRedundancy=direct.filter(target=>context.coveredTargets.has(target)).length;
+    return {primaryCoverage,missingTargetBonus,stabilityPenalty,fatiguePenalty,movementDiversity,targetRedundancy};
+  }
+
+  function compareCandidates(a,b,ctx){
+    const A=candidateSortKey(a,ctx),B=candidateSortKey(b,ctx);
+    return B.primaryCoverage-A.primaryCoverage
+      ||B.missingTargetBonus-A.missingTargetBonus
+      ||A.stabilityPenalty-B.stabilityPenalty
+      ||A.fatiguePenalty-B.fatiguePenalty
+      ||B.movementDiversity-A.movementDiversity
+      ||A.targetRedundancy-B.targetRedundancy
+      ||a.actionId.localeCompare(b.actionId);
   }
 
   function candidates(input={}){
-    validateInput(input);
-    return {recommended:'',candidates:[]};
+    const {familyId,level,family,slotKey,role}=validateInput(input,true);
+    const data=D(),context=selectionContext(input.currentSelections||{},slotKey),items=[];
+    for(const actionId of Object.keys(data.bodyActionMeta||{})){
+      if(context.usedActionIds.has(actionId))continue;
+      if(!isLegalCandidate({familyId,level,family,role,actionId}))continue;
+      const meta=data.bodyActionMeta[actionId],action=data.actions[actionId];
+      items.push({
+        actionId,
+        name:String(action.name||actionId),
+        role,
+        directTargets:[...(meta.directTargets||[])],
+        secondaryTargets:[...(meta.secondaryTargets||[])],
+        exerciseClass:String(meta.exerciseClass||''),
+        fatigueCost:String(meta.fatigueCost||''),
+        stabilityDemand:String(meta.stabilityDemand||''),
+        repProfile:String(meta.repProfile||''),
+        laterality:String(meta.laterality||''),
+        pattern:String(action.pattern||''),
+      });
+    }
+    items.sort((a,b)=>compareCandidates(a,b,{family,level,context}));
+    return {recommended:items[0]?.actionId||'',candidates:items};
   }
 
   function resolve(input={}){
