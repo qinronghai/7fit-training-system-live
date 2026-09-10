@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const memory={};
 const sessionStorage={getItem:k=>memory[k]??null,setItem:(k,v)=>{memory[k]=String(v)},removeItem:k=>delete memory[k]};
 const ctx={window:{},location:{hash:''},sessionStorage,URLSearchParams,console};ctx.window.addEventListener=()=>{};vm.createContext(ctx);
-for(const file of ['data/system-data.js','js/router.js','js/state.js','js/composer.js','js/conflict.js']) vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+for(const file of ['data/system-data.js','js/router.js','js/state.js','js/composer.js','js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js']) vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
 const R=ctx.window.V14Router,S=ctx.window.V14State,C=ctx.window.V14Composer,F=ctx.window.V14Conflict;
 const route=R.parseHash('#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
 assert.strictEqual(route.area,'coach'); assert.strictEqual(route.page,'compose'); assert.strictEqual(route.query.lower,'single_leg_hinge'); assert(R.isValid(route));
