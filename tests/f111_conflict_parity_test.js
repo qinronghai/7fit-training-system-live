@@ -56,4 +56,5 @@ assert.strictEqual(signatures.filter(x=>x.kind==='composer').length,80);
 const payload=JSON.stringify(signatures);
 const hash=crypto.createHash('sha256').update(payload).digest('hex');
 console.log(`F111_CONFLICT_BASELINE_SHA=${hash}`);
-assert.strictEqual(hash,'__CAPTURE_F111_CONFLICT_BASELINE_SHA__','replace capture placeholder with the observed pre-migration baseline SHA');
+assert.strictEqual(hash,'af7d84bc1a1c34793cd81ea776690dfb450f3d13ea1a926be33abda590358465','F111 conflict behavior changed from the pre-migration baseline');
+console.log('f111_conflict_parity_test: legacy baseline GREEN');
