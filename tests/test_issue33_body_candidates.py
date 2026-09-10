@@ -61,6 +61,26 @@ def test_every_family_level_required_role_has_at_least_two_legal_candidates():
                 assert len(legal) >= 2, f"{family_id} {level} {role} needs >=2 candidates; got {legal}"
 
 
+def test_primary_and_secondary_candidates_hit_family_primary_targets():
+    body = load("body.json")
+    candidates = body["bodyActionMeta"]
+    families = body["bodyFamilies"]
+    main_roles = {"PRIMARY", "SECONDARY"}
+
+    for action_id, meta in candidates.items():
+        active_main_roles = main_roles & set(meta["roles"])
+        if not active_main_roles:
+            continue
+        direct_targets = set(meta["directTargets"])
+        for family_id in meta["families"]:
+            family_primary_targets = set(families[family_id]["primaryTargets"])
+            assert direct_targets & family_primary_targets, (
+                f"{action_id} cannot serve {sorted(active_main_roles)} in {family_id}: "
+                f"directTargets={sorted(direct_targets)} do not hit "
+                f"primaryTargets={sorted(family_primary_targets)}"
+            )
+
+
 def test_l4_preserves_stable_options_instead_of_forcing_complexity():
     body = load("body.json")
     candidates = body["bodyActionMeta"]
