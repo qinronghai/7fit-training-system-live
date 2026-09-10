@@ -26,7 +26,7 @@ assert(Contract&&typeof Contract.validate==='function');
 assert(Dispatcher&&typeof Dispatcher.register==='function');
 
 function slotSession(templateId='body'){
-  return {
+  const session={
     schemaVersion:1,
     resolverVersion:'synthetic-slot-v1',
     templateId,
@@ -46,6 +46,8 @@ function slotSession(templateId='body'){
     resolvedSelections:[{key:'A',actionId:'sample-a',source:'auto'}],
     source:{type:'GENERATED',id:'BODY-SAMPLE-L2'}
   };
+  if(templateId==='body')session.domainContext={kind:'BODY'};
+  return session;
 }
 
 function protocolSession(){

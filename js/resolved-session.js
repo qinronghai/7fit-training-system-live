@@ -5,7 +5,8 @@
     'schemaVersion','resolverVersion','templateId','familyId','level','title','summary','main',
     'prepContext','anatomyContext','conflictContext','copyContext','warnings','resolvedSelections','source'
   ]);
-  const TOP_LEVEL=new Set(REQUIRED);
+  const OPTIONAL=Object.freeze(['domainContext']);
+  const TOP_LEVEL=new Set([...REQUIRED,...OPTIONAL]);
   const SELECTION_SOURCES=new Set(['baseline','auto','manual']);
   const SOURCE_TYPES=new Set(['PRESET','COMPOSER','GENERATED']);
   const CONFLICT_STATUS=new Set(['PASS','WARN','FAIL']);
@@ -131,10 +132,18 @@
     Object.keys(value).forEach(key=>{if(!['type','id'].includes(key))push(errors,`source.${key}`,'is not allowed');});
   }
 
+  function validateDomainContext(value,templateId,errors){
+    const path='domainContext';
+    if(!isObject(value)){push(errors,path,'must be an object');return;}
+    if(!isNonEmpty(value.kind))push(errors,`${path}.kind`,'must be a non-empty string');
+    if(templateId==='body'&&value.kind!=='BODY')push(errors,`${path}.kind`,'must equal BODY for body template');
+  }
+
   function validate(session){
     const errors=[];
     if(!isObject(session))return {ok:false,errors:['session: must be an object']};
     REQUIRED.forEach(key=>{if(!(key in session))push(errors,key,'is required');});
+    if(session.templateId==='body'&&!('domainContext' in session))push(errors,'domainContext','is required for body template');
     Object.keys(session).forEach(key=>{if(!TOP_LEVEL.has(key))push(errors,key,'is not allowed');});
     if(session.schemaVersion!==1)push(errors,'schemaVersion','must equal 1');
     ['resolverVersion','templateId','familyId','title'].forEach(key=>{if(key in session&&!isNonEmpty(session[key]))push(errors,key,'must be a non-empty string');});
@@ -148,6 +157,7 @@
     if('warnings' in session&&(!Array.isArray(session.warnings)||!session.warnings.every(isString)))push(errors,'warnings','must be a string array');
     if('resolvedSelections' in session)validateSelections(session.resolvedSelections,errors);
     if('source' in session)validateSource(session.source,errors);
+    if('domainContext' in session)validateDomainContext(session.domainContext,session.templateId,errors);
     return {ok:errors.length===0,errors};
   }
 
