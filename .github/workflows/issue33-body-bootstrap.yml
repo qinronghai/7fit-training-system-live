@@ -1,0 +1,45 @@
+name: Issue 33 Body Bootstrap
+
+on:
+  push:
+    branches:
+      - feature/issue-33-body-data-contract
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/issue-33-body-data-contract
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Sync build fixtures and generated bundle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ('tests/test_v148_data_build.py','tests/test_v148_data_duplicate_keys.py'):
+              p=Path(name)
+              text=p.read_text(encoding='utf-8')
+              old='    "templates.json",\n    "support.json",'
+              new='    "templates.json",\n    "body.json",\n    "support.json",'
+              if old not in text and '    "body.json",' not in text:
+                  raise SystemExit(f'expected DOMAIN_FILES anchor missing in {name}')
+              if '    "body.json",' not in text:
+                  p.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+          python tools/build_system_data.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tests/test_v148_data_build.py tests/test_v148_data_duplicate_keys.py data/system-data.js
+          if git diff --cached --quiet; then
+            echo 'No generated changes'
+          else
+            git commit -m 'build: generate Body domain runtime bundle'
+            git push origin HEAD:feature/issue-33-body-data-contract
+          fi
