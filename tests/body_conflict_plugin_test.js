@@ -13,9 +13,9 @@ function baseSession({familyId='BODY-01',level='L1',items,volume}={}){
   const content=items||[
     slot('PRIMARY','tushen_shendun'),
     slot('SECONDARY','movement_supported_split_squat'),
-    slot('ACCESSORY','tui_qushen'),
+    slot('ACCESSORY','tui_wanju'),
     slot('ISOLATION-1','tui_qushen'),
-    slot('ISOLATION-2','tui_wanju'),
+    slot('ISOLATION-2','kuangwai_zhan'),
   ];
   return {
     templateId:'body',familyId,level,
