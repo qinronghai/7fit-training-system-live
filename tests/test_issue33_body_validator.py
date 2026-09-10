@@ -78,6 +78,17 @@ def test_body_direct_secondary_overlap_is_rejected():
     assert has_error(errors, "bodyActionMeta", action_id, "directTargets", "secondaryTargets", "overlap")
 
 
+def test_body_main_role_must_hit_family_primary_target():
+    data = payload()
+    action_id = "yaling_luomaniya_yingla"
+    meta = data["bodyActionMeta"][action_id]
+    meta["families"] = ["BODY-01"]
+    meta["roles"] = ["PRIMARY"]
+    assert meta["directTargets"] == ["hamstrings", "glute_max"]
+    errors = validate_payload(data)
+    assert has_error(errors, "bodyActionMeta", action_id, "BODY-01", "primaryTargets")
+
+
 def test_body_candidate_with_non_strength_route_is_rejected():
     data = payload()
     exemplar = deepcopy(next(iter(data["bodyActionMeta"].values())))
