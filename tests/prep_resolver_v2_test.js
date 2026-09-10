@@ -32,6 +32,34 @@ assert.strictEqual(R.isActionPrepEligible({route:'1F_ONLY',prepEligible:true}),f
 const session=D.sessions['F111-06-L3'];
 const mainActionIds=session.slots.filter(s=>/^A｜|^B｜/.test(s.slotName)).map(s=>s.baselineId);
 const f111=R.contextFromF111({level:'L3',recipeId:'F111-06',mainActionIds});
+
+// Each future template gets an explicit adapter into the shared PrepContext instead of constructing ad-hoc objects.
+const body=R.contextFromBody({
+  level:'L3',
+  targetMuscles:['臀大肌','背阔肌'],
+  firstCompoundId:mainActionIds[0],
+  secondCompoundId:mainActionIds[1],
+});
+assert.strictEqual(body.template,'body');
+assert.deepStrictEqual(body.mainActionIds,mainActionIds);
+assert(body.formalActionIds.includes(mainActionIds[0])&&body.formalActionIds.includes(mainActionIds[1]));
+assert.deepStrictEqual(body.targetMuscles,['臀大肌','背阔肌']);
+assert(body.mainPatterns.length>0,'Body adapter should infer movement patterns from compound actions');
+
+const conditioning=R.contextFromConditioning({
+  level:'L2',
+  modalities:['rower','sled'],
+  impactDemand:'low',
+  powerDemand:'moderate',
+  firstStationActionIds:mainActionIds,
+});
+assert.strictEqual(conditioning.template,'conditioning');
+assert.deepStrictEqual(conditioning.mainActionIds,mainActionIds);
+assert(conditioning.formalActionIds.includes(mainActionIds[0])&&conditioning.formalActionIds.includes(mainActionIds[1]));
+assert.deepStrictEqual(conditioning.modalities,['rower','sled']);
+assert.strictEqual(conditioning.impactDemand,'low');
+assert.strictEqual(conditioning.powerDemand,'moderate');
+
 const resolved=R.resolve(f111);
 assert.strictEqual(resolved.slots.length,5);
 assert.deepStrictEqual(resolved.slots.map(s=>s.slotKey),R.SLOT_ORDER);
@@ -48,6 +76,17 @@ for(const slot of resolved.slots){
     assert(slot.candidates.every(c=>R.CA_WINDOWS.L3.includes(c.caLevel)), 'CORE-ACT must obey CA window');
   }
 }
+
+// The resolver must enforce underlying action eligibility, not merely expose an unused helper.
+const gatedSlot=resolved.slots.find(slot=>slot.candidates.some(c=>R.isActionPrepEligible(D.actions[c.actionId])));
+assert(gatedSlot,'fixture must expose at least one action-level PREP eligible candidate');
+const gatedCandidate=gatedSlot.candidates.find(c=>R.isActionPrepEligible(D.actions[c.actionId]));
+const originalGatedAction=JSON.parse(JSON.stringify(D.actions[gatedCandidate.actionId]));
+D.actions[gatedCandidate.actionId]={...originalGatedAction,route:'1F_ONLY',prepEligible:true,warmupEligible:true,usageDomains:['PREP']};
+assert(!R.rankSlotCandidates(gatedSlot.slotKey,f111,{limit:99}).some(c=>c.actionId===gatedCandidate.actionId),'underlying 1F_ONLY action must be excluded from PREP candidates');
+D.actions[gatedCandidate.actionId]={...originalGatedAction,prepEligible:false,warmupEligible:false,usageDomains:[]};
+assert(!R.rankSlotCandidates(gatedSlot.slotKey,f111,{limit:99}).some(c=>c.actionId===gatedCandidate.actionId),'action without PREP eligibility signal must be excluded');
+D.actions[gatedCandidate.actionId]=originalGatedAction;
 
 // Manual selection is a contract only in Phase A: valid manual survives; invalid manual falls back to auto.
 const swappable=resolved.slots.find(s=>s.candidates.length>1);
