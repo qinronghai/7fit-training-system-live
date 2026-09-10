@@ -80,6 +80,22 @@
     });
   }
 
+  function contextFromBody(input={}){
+    return normalizeContext({
+      ...input,
+      template:'body',
+      mainActionIds:unique([input.firstCompoundId,input.secondCompoundId,...(input.mainActionIds||[])]),
+    });
+  }
+
+  function contextFromConditioning(input={}){
+    return normalizeContext({
+      ...input,
+      template:'conditioning',
+      mainActionIds:unique([...(input.firstStationActionIds||[]),...(input.mainActionIds||[])]),
+    });
+  }
+
   function normalizeSelections(input={}){
     const out={};
     SLOT_ORDER.forEach(slotKey=>{
@@ -163,6 +179,7 @@
     (data.warmupIds||[]).forEach(prepId=>{
       const raw=data.warmupDetails?.[prepId],candidate=candidateFromWarmup(raw);
       if(!candidate||!isPrepRouteAllowed(candidate.route))return;
+      if(!isActionPrepEligible(data.actions?.[candidate.actionId]))return;
       if(formal.has(candidate.actionId))return;
       if(gradeApi&&!gradeApi.isAllowed(ctx.level,candidate.prepGrade))return;
       const affinity=slotAffinity(candidate,slotKey,ctx);
@@ -243,7 +260,7 @@
   window.V14PrepResolver={
     SLOT_ORDER,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
     isPrepRouteAllowed,isActionPrepEligible,caLevelFor,
-    normalizeContext,contextFromF111,normalizeSelections,
+    normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,normalizeSelections,
     candidateFromWarmup,rankSlotCandidates,resolve,
   };
 })();
