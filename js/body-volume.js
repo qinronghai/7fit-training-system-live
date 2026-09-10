@@ -2,7 +2,6 @@
   'use strict';
 
   const D=()=>window.V14_DATA||{};
-  const midpoint=range=>(Number(range?.[0])||0+(Number(range?.[1])||0))/2;
 
   function fail(code,message,details={}){
     const error=new Error(message);
