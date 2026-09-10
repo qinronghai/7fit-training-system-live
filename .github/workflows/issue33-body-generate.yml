@@ -75,10 +75,10 @@ jobs:
           python tools/build_system_data.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/src/body.json docs/V15-BODY-CANDIDATE-AUDIT.md data/system-data.js tools/validate_v148_schema.py
+          git add data/src/body.json docs/V15-BODY-CANDIDATE-AUDIT.md data/system-data.js schemas/v14.8/body.schema.json tools/validate_v148_schema.py
           if git diff --cached --quiet; then
-            echo 'Body data, validator, and bundle already fresh'
+            echo 'Body data, schema, validator, and bundle already fresh'
           else
-            git commit -m 'feat: validate Body data cross-record contract'
+            git commit -m 'fix: finalize Body schema and validator'
             git push origin HEAD:feature/issue-33-body-data-contract
           fi
