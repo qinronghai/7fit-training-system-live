@@ -2,7 +2,10 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert'),crypto=require(
 const root=process.cwd();
 global.window=global;
 function load(file){vm.runInThisContext(fs.readFileSync(`${root}/${file}`,'utf8'),{filename:file});}
-for(const file of ['data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/composer.js','js/conflict.js']) load(file);
+for(const file of [
+  'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/composer.js',
+  'js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js'
+]) load(file);
 
 const D=window.V14_DATA,C=window.V14Composer,F=window.V14Conflict;
 const levels=['L1','L2','L3','L4'];
