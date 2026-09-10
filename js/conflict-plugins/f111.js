@@ -31,7 +31,7 @@
             : {severity:'hard',title:'楼层路由',text:name+' 当前路由为 '+(action?.routeLabel||action?.route||'未标')+'，不能进入 1F 正式训练块。',code:''};
         },
         status({actionId,action}){
-          return {severity:'hard',title:'编排状态',(text):(action?.name||actionId)+' 当前不是可自动编排节点。',code:''};
+          return {severity:'hard',title:'编排状态',text:(action?.name||actionId)+' 当前不是可自动编排节点。',code:''};
         }
       }
     };
