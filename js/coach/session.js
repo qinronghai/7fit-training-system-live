@@ -17,7 +17,8 @@
     const data=D(),s=data.sessions[sessionId],view=data.sessionViews[sessionId]||{},recipe=data.recipes[recipeId]||{};
     const selected=window.V14State.getSessionSelections(sessionId),groups=selectedTrainingIds(sessionId,selected),result=window.V14Conflict.evaluate(sessionId,selected);
     const foam=M.Foam.matchedFoamRolls(recipeId,level,groups.foam).map(x=>({name:x.name,prescription:x.prescription}));
-    const warmups=M.Prep.matchedWarmups(recipeId,level,groups.main).map(x=>({name:x.name,prescription:x.prescription}));
+    const prepResolved=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
+    const warmups=M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription}));
     const slots=(s?.slots||[]).map((slot,i)=>{
       const actionId=selected[i],a=data.actions[actionId]||{};
       const tier=window.V14ModuleCopy?.tierForAction?.(actionId)||(/^T[1-4]$/.test(a.tier||'')?a.tier:'');
