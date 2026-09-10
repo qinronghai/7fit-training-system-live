@@ -4,6 +4,7 @@
     '#/rules/venue','#/rules/replacement','#/rules/conflicts','#/library',
     '#/maintenance','#/maintenance/audit','#/maintenance/venue'
   ];
+  const templateRegistry=()=>window.V14_DATA?.templateRegistry||{};
   window.V14Router = {
     REQUIRED_ROUTES,
     parseHash(hash){
@@ -13,6 +14,9 @@
       const query=Object.fromEntries(new URLSearchParams(queryString));
       const area=parts[0]||'coach';
       if(area==='coach' && parts[1]==='compose') return {area:'coach',page:'compose',query,raw:'#/'+raw};
+      if(area==='coach' && parts[1] && templateRegistry()[parts[1]]){
+        return {area:'coach',page:'template',templateId:parts[1],query,raw:'#/'+raw};
+      }
       if(area==='coach' && parts[1]){
         return {area:'coach',page:'preset',recipeId:parts[1].toUpperCase(),level:(parts[2]||'l1').toUpperCase(),query,raw:'#/'+raw};
       }
@@ -21,6 +25,7 @@
     isValid(route){
       if(route.area==='coach'){
         if(route.page==='compose')return true;
+        if(route.page==='template')return !!templateRegistry()[route.templateId];
         if(!route.recipeId)return true;
         return /^F111-0[1-8]$/.test(route.recipeId) && /^L[1-4]$/.test(route.level);
       }
