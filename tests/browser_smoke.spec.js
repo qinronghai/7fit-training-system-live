@@ -10,6 +10,25 @@ async function expectNoPageErrors(errors) {
   expect(errors, `unexpected pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 }
 
+async function firstReplaceablePrep(page) {
+  const selects = page.locator('.prep-slot-select:not([disabled])');
+  const count = await selects.count();
+  for (let i = 0; i < count; i += 1) {
+    const select = selects.nth(i);
+    const current = await select.inputValue();
+    const values = await select.locator('option').evaluateAll(nodes => nodes.map(node => node.value).filter(Boolean));
+    const target = values.find(value => value !== current);
+    if (!target) continue;
+    return {
+      slotKey: await select.getAttribute('data-prep-slot'),
+      sessionKey: await select.getAttribute('data-prep-session'),
+      current,
+      target,
+    };
+  }
+  return null;
+}
+
 test('390px multi-template coach center renders four registry templates without overflow', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -164,6 +183,54 @@ test('L3 PREP matcher exposes P3 to P1 only, in downward order, at 390px', async
   for (let i = 1; i < grades.length; i += 1) {
     expect(rank[grades[i]]).toBeGreaterThanOrEqual(rank[grades[i - 1]]);
   }
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});
+
+test('390px F111 PREP replacement persists through rerender and reload for preset and composer', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto('/#/coach/f111-06/l3');
+  await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+  const preset = await firstReplaceablePrep(page);
+  expect(preset, 'expected a replaceable preset PREP slot').toBeTruthy();
+  await page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`).selectOption(preset.target);
+  let presetSelect = page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`);
+  await expect(presetSelect).toHaveValue(preset.target);
+  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('手动选择');
+
+  await page.reload();
+  presetSelect = page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`);
+  await expect(presetSelect).toHaveValue(preset.target);
+  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('手动选择');
+
+  const presetState = await page.evaluate(({ sessionKey, slotKey }) => window.V15State.getPrepSelections('f111', sessionKey)[slotKey], preset);
+  expect(presetState).toEqual({ actionId: preset.target, source: 'manual' });
+  await page.locator('#reset-session').click();
+  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('系统推荐');
+
+  await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
+  await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+  const composer = await firstReplaceablePrep(page);
+  expect(composer, 'expected a replaceable Composer PREP slot').toBeTruthy();
+  await page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`).selectOption(composer.target);
+  let composerSelect = page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`);
+  await expect(composerSelect).toHaveValue(composer.target);
+  await expect(page.locator(`[data-prep-slot-card="${composer.slotKey}"]`)).toContainText('手动选择');
+
+  await page.reload();
+  composerSelect = page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`);
+  await expect(composerSelect).toHaveValue(composer.target);
+  await expect(page.locator(`[data-prep-slot-card="${composer.slotKey}"]`)).toContainText('手动选择');
+  const composerState = await page.evaluate(({ sessionKey, slotKey }) => window.V15State.getPrepSelections('f111', sessionKey)[slotKey], composer);
+  expect(composerState).toEqual({ actionId: composer.target, source: 'manual' });
 
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
