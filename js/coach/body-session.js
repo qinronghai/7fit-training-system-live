@@ -5,7 +5,9 @@
   const RESOLVER_VERSION='body-v1';
 
   function normalizeFamilyLevel(route={}){
-    const familyId=String(route.familyId||route.query?.family||'BODY-01').toUpperCase();
+    const rawFamily=String(route.familyId||route.query?.family||'BODY-01').toUpperCase();
+    const familyIds=D().bodyFamilyIds||[];
+    const familyId=familyIds.includes(rawFamily)?rawFamily:'BODY-01';
     const rawLevel=String(route.level||route.query?.level||'').toUpperCase();
     const level=/^L[1-4]$/.test(rawLevel)?rawLevel:'L1';
     return {familyId,level};
@@ -133,13 +135,62 @@
       renderEditor(ctx);
   }
 
+  function renderComposer(route){
+    const ctx=context(route);
+    const familyOptions=(D().bodyFamilyIds||[]).map(familyId=>{
+      const family=D().bodyFamilies?.[familyId]||{};
+      return `<option value="${esc(familyId)}" ${familyId===ctx.familyId?'selected':''}>${esc(family.name||familyId)}</option>`;
+    }).join('');
+    const levelOptions=['L1','L2','L3','L4'].map(level=>`<option value="${level}" ${level===ctx.level?'selected':''}>${level}</option>`).join('');
+    return `<a class="back-link" href="#/coach/body">← 返回 Body</a>`+
+      `<section class="view-hero body-composer-hero"><span class="eyebrow">COACH CENTER / BODY COMPOSER</span><h1>Body 自由编课</h1><p>选择训练 Family 与等级；下方与正式 Body Session 共用同一个编辑器、状态和 ResolvedSession。</p><div class="body-compose-controls"><label><span>训练 Family</span><select data-body-compose-family>${familyOptions}</select></label><label><span>训练等级</span><select data-body-compose-level>${levelOptions}</select></label></div></section>`+
+      renderEditor(ctx);
+  }
+
   function canHandle(route={}){
-    return route.templateId==='body'&&(route.page==='template'||route.page==='template-session');
+    return route.templateId==='body'&&(route.page==='template'||route.page==='template-session'||route.page==='template-compose');
+  }
+
+  function composerHash(route,familyId,level){
+    const next={
+      ...route,
+      area:'coach',
+      page:'template-compose',
+      templateId:'body',
+      query:{family:familyId,level},
+    };
+    return window.V14Router?.canonicalHash?.(next)||`#/coach/body/compose?family=${encodeURIComponent(familyId)}&level=${encodeURIComponent(level)}`;
   }
 
   function bind(route,root,rerender){
-    if(route.page!=='template-session')return;
+    if(route.page!=='template-session'&&route.page!=='template-compose')return;
     const {familyId,level}=normalizeFamilyLevel(route);
+
+    if(route.page==='template-compose'){
+      const rawFamily=String(route.query?.family||'').toUpperCase();
+      const rawLevel=String(route.query?.level||'').toUpperCase();
+      const familyValid=(D().bodyFamilyIds||[]).includes(rawFamily);
+      const levelValid=/^L[1-4]$/.test(rawLevel);
+      const needsCanonicalQuery=!familyValid||!levelValid||route.query?.family!==familyId||route.query?.level!==level;
+      if(needsCanonicalQuery){
+        const hash=composerHash(route,familyId,level);
+        if(window.location?.hash!==hash){
+          if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
+          return;
+        }
+      }
+      root.querySelector('[data-body-compose-family]')?.addEventListener('change',event=>{
+        const nextFamily=String(event.currentTarget.value||'BODY-01').toUpperCase();
+        const hash=composerHash(route,nextFamily,level);
+        if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
+      });
+      root.querySelector('[data-body-compose-level]')?.addEventListener('change',event=>{
+        const nextLevel=String(event.currentTarget.value||'L1').toUpperCase();
+        const hash=composerHash(route,familyId,nextLevel);
+        if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
+      });
+    }
+
     root.querySelectorAll('.body-slot-select').forEach(select=>select.addEventListener('change',()=>{
       setFormalSelection(familyId,level,select.dataset.bodySlot,select.value);
       rerender();
@@ -156,7 +207,11 @@
 
   const adapter={
     canHandle,
-    render(route){return route.page==='template'?M.BodyHome.render(route):render(route);},
+    render(route){
+      if(route.page==='template')return M.BodyHome.render(route);
+      if(route.page==='template-compose')return renderComposer(route);
+      return render(route);
+    },
     bind,
   };
   M.BodySession={context,render,renderEditor,ensureState,resolveState,setFormalSelection,reset,adapter};
