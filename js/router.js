@@ -7,6 +7,7 @@
     '#/maintenance','#/maintenance/audit','#/maintenance/venue'
   ];
   const templateRegistry=()=>window.V14_DATA?.templateRegistry||{};
+  const bodyFamilyIds=()=>window.V14_DATA?.bodyFamilyIds||[];
   const querySuffix=query=>{
     const text=new URLSearchParams(query||{}).toString();
     return text?`?${text}`:'';
@@ -26,6 +27,12 @@
       if(second==='f111'){
         return {
           area:'coach',page:'preset',templateId:'f111',recipeId:third.toUpperCase(),
+          level:(parts[3]||'').toUpperCase(),query,raw:'#/'+raw
+        };
+      }
+      if(second==='body'){
+        return {
+          area:'coach',page:'template-session',templateId:'body',familyId:third.toUpperCase(),
           level:(parts[3]||'').toUpperCase(),query,raw:'#/'+raw
         };
       }
@@ -54,6 +61,12 @@
         if(route.page==='compose')return route.templateId==='f111';
         if(route.page==='template')return !!templateRegistry()[route.templateId];
         if(route.page==='template-compose')return templateRegistry()[route.templateId]?.status==='ACTIVE';
+        if(route.page==='template-session'){
+          return route.templateId==='body'
+            &&templateRegistry().body?.status==='ACTIVE'
+            &&bodyFamilyIds().includes(route.familyId)
+            &&/^L[1-4]$/.test(route.level||'');
+        }
         if(route.page==='preset')return route.templateId==='f111'&&/^F111-0[1-8]$/.test(route.recipeId)&&/^L[1-4]$/.test(route.level);
         return false;
       }
@@ -70,6 +83,7 @@
       if(route.page==='template')return `#/coach/${route.templateId}${suffix}`;
       if(route.page==='compose')return `#/coach/f111/compose${suffix}`;
       if(route.page==='template-compose')return `#/coach/${route.templateId}/compose${suffix}`;
+      if(route.page==='template-session')return `#/coach/${route.templateId}/${String(route.familyId||'').toLowerCase()}/${String(route.level||'').toLowerCase()}${suffix}`;
       if(route.page==='preset')return `#/coach/f111/${String(route.recipeId||'').toLowerCase()}/${String(route.level||'').toLowerCase()}${suffix}`;
       return route.raw||'#/coach';
     },
