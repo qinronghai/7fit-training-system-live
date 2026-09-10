@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/body.schema.json",
+  "title": "7Fit Body Data Contract V1",
+  "type": "object",
+  "required": [
+    "targetIds",
+    "targetCatalog",
+    "roleIds",
+    "roles",
+    "familyIds",
+    "families",
+    "levelPolicies",
+    "prescriptionProfiles",
+    "actionMeta",
+    "volumePolicy",
+    "conflictPolicy"
+  ],
+  "properties": {
+    "targetIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "targetCatalog": {"type": "object"},
+    "roleIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "roles": {"type": "object"},
+    "familyIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "families": {"type": "object"},
+    "levelPolicies": {"type": "object"},
+    "prescriptionProfiles": {"type": "object"},
+    "actionMeta": {"type": "object"},
+    "volumePolicy": {"type": "object"},
+    "conflictPolicy": {"type": "object"}
+  },
+  "additionalProperties": false
+}
