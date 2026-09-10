@@ -131,6 +131,23 @@ def validate_payload(data: dict) -> list[str]:
         )
     )
 
+    # Body aggregate schema. Keep the 11 real runtime keys visible in error paths.
+    body_keys = (
+        "bodyTargetIds",
+        "bodyTargetCatalog",
+        "bodyRoleIds",
+        "bodyRoles",
+        "bodyFamilyIds",
+        "bodyFamilies",
+        "bodyLevelPolicies",
+        "bodyPrescriptionProfiles",
+        "bodyActionMeta",
+        "bodyVolumePolicy",
+        "bodyConflictPolicy",
+    )
+    body = {key: data.get(key) for key in body_keys}
+    errors.extend(_schema_errors(body, "body", "body"))
+
     # Training Template Registry identity and routing contract.
     if len(template_ids) != len(set(template_ids)):
         errors.append("templateIds: duplicate template IDs are not allowed")
@@ -298,6 +315,98 @@ def validate_payload(data: dict) -> list[str]:
             for item_id in _flatten_match_ids(value):
                 if item_id not in known_ids:
                     errors.append(f"{match_key}.{pattern}: unknown {label} id {item_id}")
+
+    # Body cross-record identity, candidate references, and venue legality.
+    body_target_ids = data.get("bodyTargetIds", [])
+    body_role_ids = data.get("bodyRoleIds", [])
+    body_family_ids = data.get("bodyFamilyIds", [])
+    body_level_ids = {"L1", "L2", "L3", "L4"}
+    body_profile_ids = set(data.get("bodyPrescriptionProfiles", {}))
+    body_action_meta = data.get("bodyActionMeta", {})
+
+    for map_name, id_field, ids in (
+        ("bodyTargetCatalog", "id", body_target_ids),
+        ("bodyRoles", "id", body_role_ids),
+        ("bodyFamilies", "familyId", body_family_ids),
+        ("bodyLevelPolicies", "level", ["L1", "L2", "L3", "L4"]),
+        ("bodyPrescriptionProfiles", "id", list(body_profile_ids)),
+    ):
+        records = data.get(map_name, {})
+        if set(records) != set(ids):
+            errors.append(
+                f"{map_name}: keys must match declared IDs; declared={sorted(ids)}; actual={sorted(records)}"
+            )
+        for record_id, record in records.items():
+            if isinstance(record, dict) and record.get(id_field) != record_id:
+                errors.append(
+                    f"{map_name}.{record_id}.{id_field}: must equal map key {record_id}"
+                )
+
+    if not 40 <= len(body_action_meta) <= 60:
+        errors.append(
+            f"bodyActionMeta: expected 40-60 candidates, got {len(body_action_meta)}"
+        )
+
+    valid_targets = set(body_target_ids)
+    valid_roles = set(body_role_ids)
+    valid_families = set(body_family_ids)
+    for action_id, meta in sorted(body_action_meta.items()):
+        prefix = f"bodyActionMeta.{action_id}"
+        action = actions.get(action_id)
+        if action is None:
+            errors.append(f"{prefix}: unknown action {action_id}")
+        else:
+            route = action.get("route")
+            if route not in FORMAL_ROUTES:
+                errors.append(
+                    f"{prefix}.route: action {action_id} route {route} is not a formal Body strength route"
+                )
+            status = action.get("status")
+            if status != "可自动编排":
+                errors.append(
+                    f"{prefix}.status: action {action_id} status {status} is not 可自动编排"
+                )
+
+        if not isinstance(meta, dict):
+            continue
+        for family_id in meta.get("families", []):
+            if family_id not in valid_families:
+                errors.append(f"{prefix}.families: unknown family {family_id}")
+        for level in meta.get("levels", []):
+            if level not in body_level_ids:
+                errors.append(f"{prefix}.levels: unknown level {level}")
+        for role in meta.get("roles", []):
+            if role not in valid_roles:
+                errors.append(f"{prefix}.roles: unknown role {role}")
+        for field in ("directTargets", "secondaryTargets"):
+            for target in meta.get(field, []):
+                if target not in valid_targets:
+                    errors.append(f"{prefix}.{field}: unknown target {target}")
+        rep_profile = meta.get("repProfile")
+        if rep_profile not in body_profile_ids:
+            errors.append(f"{prefix}.repProfile: unknown repProfile {rep_profile}")
+        overlap = set(meta.get("directTargets", [])) & set(meta.get("secondaryTargets", []))
+        if overlap:
+            errors.append(
+                f"{prefix}: directTargets/secondaryTargets overlap: {sorted(overlap)}"
+            )
+
+        # Body main-role candidates must directly train the Family primary target.
+        main_roles = {"PRIMARY", "SECONDARY"} & set(meta.get("roles", []))
+        if main_roles:
+            direct_targets = set(meta.get("directTargets", []))
+            family_records = data.get("bodyFamilies", {})
+            for family_id in meta.get("families", []):
+                family = family_records.get(family_id)
+                if not isinstance(family, dict):
+                    continue
+                primary_targets = set(family.get("primaryTargets", []))
+                if primary_targets and not (direct_targets & primary_targets):
+                    errors.append(
+                        f"{prefix}.families: {family_id} cannot use roles {sorted(main_roles)} because "
+                        f"directTargets {sorted(direct_targets)} do not hit family primaryTargets "
+                        f"{sorted(primary_targets)}"
+                    )
 
     return sorted(set(errors))
 

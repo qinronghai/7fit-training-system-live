@@ -1,0 +1,2028 @@
+{
+  "bodyTargetIds": [
+    "quadriceps",
+    "hamstrings",
+    "glute_max",
+    "glute_med",
+    "adductors",
+    "calves",
+    "lats",
+    "upper_back",
+    "rear_delts",
+    "lateral_delts",
+    "front_delts",
+    "chest",
+    "biceps",
+    "triceps"
+  ],
+  "bodyTargetCatalog": {
+    "quadriceps": {
+      "id": "quadriceps",
+      "name": "股四头肌",
+      "region": "lower",
+      "anatomyAliases": [
+        "股四头肌"
+      ]
+    },
+    "hamstrings": {
+      "id": "hamstrings",
+      "name": "腘绳肌",
+      "region": "lower",
+      "anatomyAliases": [
+        "腘绳肌"
+      ]
+    },
+    "glute_max": {
+      "id": "glute_max",
+      "name": "臀大肌",
+      "region": "lower",
+      "anatomyAliases": [
+        "臀大肌"
+      ]
+    },
+    "glute_med": {
+      "id": "glute_med",
+      "name": "臀中肌",
+      "region": "lower",
+      "anatomyAliases": [
+        "臀中肌",
+        "臀小肌"
+      ]
+    },
+    "adductors": {
+      "id": "adductors",
+      "name": "内收肌群",
+      "region": "lower",
+      "anatomyAliases": [
+        "内收肌群"
+      ]
+    },
+    "calves": {
+      "id": "calves",
+      "name": "小腿后侧",
+      "region": "lower",
+      "anatomyAliases": [
+        "腓肠肌",
+        "比目鱼肌"
+      ]
+    },
+    "lats": {
+      "id": "lats",
+      "name": "背阔肌",
+      "region": "upper",
+      "anatomyAliases": [
+        "背阔肌"
+      ]
+    },
+    "upper_back": {
+      "id": "upper_back",
+      "name": "上背",
+      "region": "upper",
+      "anatomyAliases": [
+        "中斜方肌",
+        "菱形肌",
+        "斜方肌中束",
+        "斜方肌下束",
+        "斜方肌中下束"
+      ]
+    },
+    "rear_delts": {
+      "id": "rear_delts",
+      "name": "三角肌后束",
+      "region": "upper",
+      "anatomyAliases": [
+        "三角肌后束"
+      ]
+    },
+    "lateral_delts": {
+      "id": "lateral_delts",
+      "name": "三角肌中束",
+      "region": "upper",
+      "anatomyAliases": [
+        "三角肌中束"
+      ]
+    },
+    "front_delts": {
+      "id": "front_delts",
+      "name": "三角肌前束",
+      "region": "upper",
+      "anatomyAliases": [
+        "三角肌前束"
+      ]
+    },
+    "chest": {
+      "id": "chest",
+      "name": "胸部",
+      "region": "upper",
+      "anatomyAliases": [
+        "胸大肌"
+      ]
+    },
+    "biceps": {
+      "id": "biceps",
+      "name": "肱二头肌",
+      "region": "upper",
+      "anatomyAliases": [
+        "肱二头肌",
+        "肱肌"
+      ]
+    },
+    "triceps": {
+      "id": "triceps",
+      "name": "肱三头肌",
+      "region": "upper",
+      "anatomyAliases": [
+        "肱三头肌"
+      ]
+    }
+  },
+  "bodyRoleIds": [
+    "PRIMARY",
+    "SECONDARY",
+    "ACCESSORY",
+    "ISOLATION",
+    "OPTIONAL"
+  ],
+  "bodyRoles": {
+    "PRIMARY": {
+      "id": "PRIMARY",
+      "name": "主项",
+      "description": "当日主要刺激目标的核心动作。"
+    },
+    "SECONDARY": {
+      "id": "SECONDARY",
+      "name": "次主项",
+      "description": "补充主要刺激方向并改变动作模式、角度或负重路径。"
+    },
+    "ACCESSORY": {
+      "id": "ACCESSORY",
+      "name": "辅助",
+      "description": "补齐目标肌群或训练结构，不承担当日主要负荷。"
+    },
+    "ISOLATION": {
+      "id": "ISOLATION",
+      "name": "孤立",
+      "description": "局部肌群导向、低全身疲劳的孤立或近孤立动作。"
+    },
+    "OPTIONAL": {
+      "id": "OPTIONAL",
+      "name": "可选补充",
+      "description": "在等级、时间预算或个体需求允许时追加。"
+    }
+  },
+  "bodyFamilyIds": [
+    "BODY-01",
+    "BODY-02",
+    "BODY-03",
+    "BODY-04"
+  ],
+  "bodyFamilies": {
+    "BODY-01": {
+      "familyId": "BODY-01",
+      "name": "臀腿｜股四主导",
+      "primaryTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "glute_med",
+        "hamstrings",
+        "adductors"
+      ],
+      "slotPolicy": {
+        "PRIMARY": "PRIMARY",
+        "SECONDARY": "SECONDARY",
+        "ACCESSORY": "ACCESSORY",
+        "ISOLATION-1": "ISOLATION",
+        "ISOLATION-2": "ISOLATION",
+        "OPTIONAL": "OPTIONAL"
+      },
+      "volumeTargets": [
+        "quadriceps",
+        "glute_max",
+        "glute_med",
+        "hamstrings",
+        "adductors",
+        "calves"
+      ],
+      "allowedRoles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ]
+    },
+    "BODY-02": {
+      "familyId": "BODY-02",
+      "name": "臀腿｜臀后侧链",
+      "primaryTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [
+        "glute_med",
+        "adductors"
+      ],
+      "slotPolicy": {
+        "PRIMARY": "PRIMARY",
+        "SECONDARY": "SECONDARY",
+        "ACCESSORY": "ACCESSORY",
+        "ISOLATION-1": "ISOLATION",
+        "ISOLATION-2": "ISOLATION",
+        "OPTIONAL": "OPTIONAL"
+      },
+      "volumeTargets": [
+        "glute_max",
+        "hamstrings",
+        "glute_med",
+        "adductors",
+        "quadriceps",
+        "calves"
+      ],
+      "allowedRoles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ]
+    },
+    "BODY-03": {
+      "familyId": "BODY-03",
+      "name": "背肩塑形",
+      "primaryTargets": [
+        "lats",
+        "upper_back",
+        "rear_delts",
+        "lateral_delts"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "slotPolicy": {
+        "PRIMARY": "PRIMARY",
+        "SECONDARY": "SECONDARY",
+        "ACCESSORY": "ACCESSORY",
+        "ISOLATION-1": "ISOLATION",
+        "ISOLATION-2": "ISOLATION",
+        "OPTIONAL": "OPTIONAL"
+      },
+      "volumeTargets": [
+        "lats",
+        "upper_back",
+        "rear_delts",
+        "lateral_delts",
+        "biceps"
+      ],
+      "allowedRoles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ]
+    },
+    "BODY-04": {
+      "familyId": "BODY-04",
+      "name": "胸肩臂塑形",
+      "primaryTargets": [
+        "chest",
+        "lateral_delts",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts",
+        "biceps"
+      ],
+      "slotPolicy": {
+        "PRIMARY": "PRIMARY",
+        "SECONDARY": "SECONDARY",
+        "ACCESSORY": "ACCESSORY",
+        "ISOLATION-1": "ISOLATION",
+        "ISOLATION-2": "ISOLATION",
+        "OPTIONAL": "OPTIONAL"
+      },
+      "volumeTargets": [
+        "chest",
+        "lateral_delts",
+        "front_delts",
+        "triceps",
+        "biceps"
+      ],
+      "allowedRoles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ]
+    }
+  },
+  "bodyLevelPolicies": {
+    "L1": {
+      "level": "L1",
+      "sessionWorkingSetRange": [
+        10,
+        12
+      ],
+      "rirRange": [
+        3,
+        4
+      ],
+      "optionalDefault": false,
+      "defaultWorkingSets": {
+        "PRIMARY": 3,
+        "SECONDARY": 2,
+        "ACCESSORY": 2,
+        "ISOLATION-1": 2,
+        "ISOLATION-2": 1,
+        "OPTIONAL": 0
+      }
+    },
+    "L2": {
+      "level": "L2",
+      "sessionWorkingSetRange": [
+        12,
+        14
+      ],
+      "rirRange": [
+        2,
+        3
+      ],
+      "optionalDefault": false,
+      "defaultWorkingSets": {
+        "PRIMARY": 3,
+        "SECONDARY": 3,
+        "ACCESSORY": 2,
+        "ISOLATION-1": 2,
+        "ISOLATION-2": 2,
+        "OPTIONAL": 0
+      }
+    },
+    "L3": {
+      "level": "L3",
+      "sessionWorkingSetRange": [
+        14,
+        16
+      ],
+      "rirRange": [
+        2,
+        2
+      ],
+      "optionalDefault": true,
+      "defaultWorkingSets": {
+        "PRIMARY": 3,
+        "SECONDARY": 3,
+        "ACCESSORY": 3,
+        "ISOLATION-1": 2,
+        "ISOLATION-2": 2,
+        "OPTIONAL": 1
+      }
+    },
+    "L4": {
+      "level": "L4",
+      "sessionWorkingSetRange": [
+        16,
+        18
+      ],
+      "rirRange": [
+        1,
+        2
+      ],
+      "optionalDefault": true,
+      "defaultWorkingSets": {
+        "PRIMARY": 4,
+        "SECONDARY": 3,
+        "ACCESSORY": 3,
+        "ISOLATION-1": 3,
+        "ISOLATION-2": 2,
+        "OPTIONAL": 1
+      }
+    }
+  },
+  "bodyPrescriptionProfiles": {
+    "compound_machine": {
+      "id": "compound_machine",
+      "repRange": [
+        8,
+        15
+      ],
+      "restSecondsRange": [
+        90,
+        150
+      ],
+      "perSide": false
+    },
+    "compound_freeweight": {
+      "id": "compound_freeweight",
+      "repRange": [
+        6,
+        12
+      ],
+      "restSecondsRange": [
+        120,
+        180
+      ],
+      "perSide": false
+    },
+    "single_leg_compound": {
+      "id": "single_leg_compound",
+      "repRange": [
+        8,
+        12
+      ],
+      "restSecondsRange": [
+        90,
+        150
+      ],
+      "perSide": true
+    },
+    "accessory_compound": {
+      "id": "accessory_compound",
+      "repRange": [
+        10,
+        15
+      ],
+      "restSecondsRange": [
+        75,
+        120
+      ],
+      "perSide": false
+    },
+    "isolation_large": {
+      "id": "isolation_large",
+      "repRange": [
+        10,
+        20
+      ],
+      "restSecondsRange": [
+        60,
+        90
+      ],
+      "perSide": false
+    },
+    "isolation_small": {
+      "id": "isolation_small",
+      "repRange": [
+        12,
+        20
+      ],
+      "restSecondsRange": [
+        45,
+        75
+      ],
+      "perSide": false
+    }
+  },
+  "bodyActionMeta": {
+    "tushen_shendun": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral"
+    },
+    "movement_bench_box_squat": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "banjie_hake": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "hake_shendun": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "smith_shendun": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "movement_light_bar_box_squat": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "gangling_shendun": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [
+        "glute_max",
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "movement_supported_split_squat": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "movement_bodyweight_split_squat": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "movement_dumbbell_reverse_lunge": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "baojiayali_fentundun": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "tui_qushen": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "quadriceps"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    },
+    "tui_wanju": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    },
+    "kuangwai_zhan": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "glute_med"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    },
+    "xiao_longmen_wai_zhan": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "glute_med"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "unilateral"
+    },
+    "kuangnei_shou": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "adductors"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    },
+    "shengsuo_kuan_neishou": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "adductors"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "unilateral"
+    },
+    "tunbu_houti": {
+      "families": [
+        "BODY-01",
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "glute_max"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "unilateral"
+    },
+    "tunqiao": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "hamstrings"
+      ],
+      "exerciseClass": "accessory",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral"
+    },
+    "tun_tui": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "hamstrings"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "hipthrust_pause_main": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "hamstrings"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "movement_single_leg_hip_thrust": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "hamstrings"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "yaling_luomaniya_yingla": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "hamstrings",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "shanyan_tingshen": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "accessory",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral"
+    },
+    "backext_load_main": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "dileigan_hinge": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "liujiao_gantui_yingla": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [
+        "quadriceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "gangling_yingla": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "movement_supported_single_leg_hinge": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "movement_supported_db_single_leg_rdl": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "movement_db_single_leg_rdl": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "movement_advanced_db_single_leg_rdl": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "single_leg_compound",
+      "laterality": "unilateral"
+    },
+    "feiji_labei_zhongba": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "zuozi_huachuan_bianshi": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "diwei_huachuan": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "danbi_yaling_huachuan": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "unilateral"
+    },
+    "smith_huachuan": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "dileigan_huachuan": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "gangling_huachuan": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "gaowei_xiala_vba": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats"
+      ],
+      "secondaryTargets": [
+        "upper_back",
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "gaowei_xiala_kuanwo": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats"
+      ],
+      "secondaryTargets": [
+        "upper_back",
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "danbi_xiala": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "lats"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "accessory_compound",
+      "laterality": "unilateral"
+    },
+    "fuzhu_yinti_zhaiwo": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats",
+        "upper_back"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "fuzhu_yinti_kuanwo": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats",
+        "upper_back"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "zhibi_xiala": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "lats"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    },
+    "houzu_sanji": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "rear_delts"
+      ],
+      "secondaryTargets": [
+        "upper_back"
+      ],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "medium",
+      "repProfile": "isolation_small",
+      "laterality": "bilateral"
+    },
+    "mianla": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "accessory",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral"
+    },
+    "shengsuo_ertou_wanju": {
+      "families": [
+        "BODY-03",
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "biceps"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_small",
+      "laterality": "bilateral"
+    },
+    "shengsuo_cepingju": {
+      "families": [
+        "BODY-03",
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "lateral_delts"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_small",
+      "laterality": "bilateral"
+    },
+    "movement_incline_pushup": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "chest",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral"
+    },
+    "qixie_xiongtui": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "chest",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "smith_wotu": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "chest",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "wotu_xiong_tui": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "chest",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "gangling_wotu": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "chest",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "front_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "shangxie_yaling_wotu": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "chest",
+        "front_delts"
+      ],
+      "secondaryTargets": [
+        "triceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "qixie_jian_tui": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "front_delts",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "lateral_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "low",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral"
+    },
+    "yaling_jiantui": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "front_delts",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "lateral_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral"
+    },
+    "shengsuo_santou_xiaya": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "triceps"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_small",
+      "laterality": "bilateral"
+    },
+    "xiongjia_jiaxiong": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "directTargets": [
+        "chest"
+      ],
+      "secondaryTargets": [],
+      "exerciseClass": "isolation",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "isolation_large",
+      "laterality": "bilateral"
+    }
+  },
+  "bodyVolumePolicy": {
+    "warmupSetsCountDirect": false,
+    "rampUpSetsCountDirect": false,
+    "prepSetsCountDirect": false,
+    "foamSetsCountDirect": false,
+    "secondaryExposureCountsDirect": false,
+    "fractionalEffectiveSets": false,
+    "unilateralSetCounting": "PER_SIDE_PRESCRIPTION_COUNTS_ONCE",
+    "sessionTotalCounting": "SUM_SLOT_WORKING_SETS_ONCE",
+    "directTargetCounting": "MULTI_LABEL_EACH_DIRECT_TARGET"
+  },
+  "bodyConflictPolicy": {
+    "maxHighFatigueCompounds": 2,
+    "maxSamePatternActions": 2,
+    "isolationRatioWarnAbove": 0.5,
+    "estimatedSessionMinutesRange": [
+      35,
+      50
+    ]
+  }
+}
