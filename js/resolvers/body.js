@@ -3,6 +3,7 @@
 
   const D=()=>window.V14_DATA||{};
   const MAIN_ROUTES=new Set(['1F_ONLY','FLEX_1F_2F']);
+  const SLOT_ORDER=Object.freeze(['PRIMARY','SECONDARY','ACCESSORY','ISOLATION-1','ISOLATION-2','OPTIONAL']);
   const STABILITY_RANK=Object.freeze({low:0,medium:1,high:2});
   const LEVEL_STABILITY_MAX=Object.freeze({L1:0,L2:1,L3:2,L4:2});
 
@@ -12,6 +13,8 @@
     Object.assign(error,details);
     throw error;
   }
+
+  function unique(values){return [...new Set((Array.isArray(values)?values:[]).filter(Boolean))];}
 
   function normalizeActionId(value){
     if(typeof value==='string')return value;
@@ -24,9 +27,7 @@
     const level=/^L[1-4]$/.test(input.level||'')?input.level:'';
     const family=data.bodyFamilies?.[familyId];
     const levelPolicy=data.bodyLevelPolicies?.[level];
-    if(!familyId||!family){
-      fail('BODY_INPUT_INVALID',`Unknown Body family: ${String(familyId||'')}`,{familyId});
-    }
+    if(!familyId||!family)fail('BODY_INPUT_INVALID',`Unknown Body family: ${String(familyId||'')}`,{familyId});
     if(!level||!levelPolicy)fail('BODY_INPUT_INVALID','Body level must be L1-L4',{level:input.level});
     if(!requireSlot)return {familyId,level,family,levelPolicy};
     const slotKey=typeof input.slotKey==='string'?input.slotKey:'';
@@ -120,9 +121,108 @@
     return {recommended:items[0]?.actionId||'',candidates:items};
   }
 
+  function publicAnatomy(actionIds){
+    const summary=window.V14Anatomy?.aggregate?.(actionIds)||{};
+    return {
+      actionIds:unique(actionIds),
+      primary:unique(summary.primary),
+      secondary:unique(summary.secondary),
+      stabilizers:unique(summary.stabilizers),
+    };
+  }
+
+  function targetMuscleNames(targetIds){
+    const catalog=D().bodyTargetCatalog||{};
+    return unique((targetIds||[]).flatMap(id=>{
+      const item=catalog[id]||{};
+      return Array.isArray(item.anatomyAliases)&&item.anatomyAliases.length?item.anatomyAliases:[item.name||id];
+    }));
+  }
+
+  function activeSlotKeys(levelPolicy){
+    return SLOT_ORDER.filter(slotKey=>Number(levelPolicy.defaultWorkingSets?.[slotKey])>0);
+  }
+
+  function slotLabel(slotKey,role){
+    const roleName=D().bodyRoles?.[role]?.name||role;
+    return `${slotKey}｜${roleName}`;
+  }
+
   function resolve(input={}){
-    const normalized=validateInput(input);
-    fail('BODY_RESOLVER_NOT_IMPLEMENTED','Body Resolver V1 is registered but not implemented yet',normalized);
+    const {familyId,level,family,levelPolicy}=validateInput(input);
+    if(!window.V15BodyVolume?.buildSlot||!window.V15BodyVolume?.summarize){
+      fail('BODY_VOLUME_UNAVAILABLE','Body volume calculator is unavailable');
+    }
+    const requested=input.selections&&typeof input.selections==='object'?input.selections:{};
+    const chosen={},domainSlots={},publicSlots=[],warnings=[];
+
+    for(const slotKey of activeSlotKeys(levelPolicy)){
+      const role=family.slotPolicy[slotKey];
+      const requestedActionId=normalizeActionId(requested[slotKey]);
+      let actionId='',source='auto';
+      const used=new Set(Object.values(chosen));
+      if(requestedActionId&& !used.has(requestedActionId) && isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
+        actionId=requestedActionId;
+        source='manual';
+      }else{
+        if(requestedActionId)warnings.push(`BODY_STALE_SELECTION_FALLBACK:${slotKey}`);
+        const result=candidates({familyId,level,slotKey,currentSelections:chosen});
+        actionId=result.recommended;
+        if(!actionId)fail('BODY_NO_ELIGIBLE_CANDIDATE',`No eligible Body candidate for ${familyId} ${level} ${slotKey}`,{familyId,level,slotKey});
+      }
+      chosen[slotKey]=actionId;
+      const domainSlot=window.V15BodyVolume.buildSlot({level,slotKey,role,actionId});
+      domainSlots[slotKey]=domainSlot;
+      const action=D().actions[actionId]||{};
+      publicSlots.push({
+        key:slotKey,
+        label:slotLabel(slotKey,role),
+        actionId,
+        name:String(action.name||actionId),
+        tier:String(action.tier||''),
+        grade:'',
+        prescription:window.V15BodyVolume.formatPrescription(domainSlot),
+        source,
+      });
+    }
+
+    const actionIds=publicSlots.map(slot=>slot.actionId);
+    const primaryId=chosen.PRIMARY||'',secondaryId=chosen.SECONDARY||'';
+    const prepContext=window.V14PrepResolver?.contextFromBody?.({
+      level,
+      recipeId:familyId,
+      firstCompoundId:primaryId,
+      secondCompoundId:secondaryId,
+      mainActionIds:unique([primaryId,secondaryId]),
+      formalActionIds:actionIds,
+      targetMuscles:targetMuscleNames(family.primaryTargets),
+    })||{
+      template:'body',level,recipeId:familyId,mainPatterns:[],mainActionIds:unique([primaryId,secondaryId]),
+      formalActionIds:actionIds,targetMuscles:targetMuscleNames(family.primaryTargets),modalities:[],impactDemand:'',powerDemand:''
+    };
+    const title=`${family.name}｜${level}`;
+    const summary=`Body ${level}｜${targetMuscleNames(family.primaryTargets).join(' + ')}主导`; 
+    const session={
+      schemaVersion:1,
+      resolverVersion:'body-v1',
+      templateId:'body',
+      familyId,
+      level,
+      title,
+      summary,
+      main:{kind:'SLOT',content:publicSlots},
+      prepContext,
+      anatomyContext:publicAnatomy(actionIds),
+      conflictContext:{status:'PASS',hardCount:0,warnCount:0,issues:[]},
+      copyContext:{title,summary,actionIds:unique(actionIds)},
+      warnings,
+      resolvedSelections:publicSlots.map(slot=>({key:slot.key,actionId:slot.actionId,source:slot.source})),
+      source:{type:'GENERATED',id:`${familyId}-${level}`},
+      domainContext:{kind:'BODY',slots:domainSlots,volume:window.V15BodyVolume.summarize(domainSlots)},
+    };
+    const validation=window.V15ResolvedSession?.validate?.(session);
+    if(validation&&!validation.ok)fail('BODY_RESOLVED_SESSION_INVALID','Body Resolver produced invalid ResolvedSession',{validationErrors:validation.errors});
+    return session;
   }
 
   const api={resolve,candidates};
