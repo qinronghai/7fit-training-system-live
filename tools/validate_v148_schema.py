@@ -74,6 +74,8 @@ def validate_payload(data: dict) -> list[str]:
     actions = data.get("actions", {})
     sessions = data.get("sessions", {})
     composer = data.get("composer", {})
+    template_ids = data.get("templateIds", [])
+    template_registry = data.get("templateRegistry", {})
 
     # JSON Schema contracts.
     for action_key, action in sorted(actions.items()):
@@ -85,6 +87,13 @@ def validate_payload(data: dict) -> list[str]:
         errors.extend(_schema_errors(session, "session", f"sessions.{session_key}"))
 
     errors.extend(_schema_errors(composer, "composer", "composer"))
+    errors.extend(
+        _schema_errors(
+            {"ids": template_ids, "registry": template_registry},
+            "template-registry",
+            "templateRegistry",
+        )
+    )
     errors.extend(
         _schema_errors(
             {"ids": data.get("supportIds", []), "details": data.get("supportDetails", {})},
@@ -121,6 +130,28 @@ def validate_payload(data: dict) -> list[str]:
             "foam",
         )
     )
+
+    # Training Template Registry identity and routing contract.
+    if len(template_ids) != len(set(template_ids)):
+        errors.append("templateIds: duplicate template IDs are not allowed")
+    if set(template_ids) != set(template_registry):
+        missing = sorted(set(template_ids) - set(template_registry))
+        extra = sorted(set(template_registry) - set(template_ids))
+        errors.append(
+            f"templateIds/templateRegistry mismatch: missing={missing}; extra={extra}"
+        )
+    for template_id, record in sorted(template_registry.items()):
+        if not isinstance(record, dict):
+            continue
+        if record.get("templateId") != template_id:
+            errors.append(
+                f"templateRegistry.{template_id}.templateId: must equal map key {template_id}"
+            )
+        route_base = record.get("routeBase")
+        if not isinstance(route_base, str) or not route_base.startswith("#/coach/"):
+            errors.append(
+                f"templateRegistry.{template_id}.routeBase: must start with #/coach/"
+            )
 
     # Frozen inventory that defines the V14.8 contract surface.
     expected_counts = {
