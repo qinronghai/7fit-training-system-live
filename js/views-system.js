@@ -54,14 +54,14 @@
         `<section class="section-card"><div class="module-copy-row">${copy}</div><div class="detail-copy"><h3>为什么安排它</h3><p>${esc(f.why)}</p><h3>建议处方</h3><p>${esc(f.prescription)}</p><h3>教练口令</h3><p>${esc(f.cue)}</p><h3>安全边界</h3><p>${esc(f.safety)}</p><a class="text-link" href="#/library?focus=${encodeURIComponent(f.actionId)}">查看动作库记录 →</a></div></section>`;
     }
     if(focus&&data.warmupDetails?.[focus]){
-      const w=data.warmupDetails[focus],a=data.actions[w.actionId]||{};
+      const w=data.warmupDetails[focus],a=data.actions[w.actionId]||{},compatibleLevels=window.V14PrepGrade?.sessionLevelsForGrade(w.prepGrade)||w.sessionLevels;
       const copy=copyControl(`prep-${focus}`,'prep',{title:w.name,items:[{name:w.name,grade:w.prepGrade,prescription:w.prescription,why:w.why}]});
       return tabs('prep')+`<a class="back-link" href="#/system/prep">← 返回 PREP 热身体系</a>`+
         hero(w.name,`${w.prepGrade}｜${w.role}｜${w.route}`)+
         `<section class="detail-facts prep-facts">
           <div><small>热身等级</small><b>${esc(w.prepGrade)}</b></div>
-          <div><small>推荐课程等级</small><b>${esc(w.sessionLevels.join(' / '))}</b></div>
-          <div><small>推荐主训练层级</small><b>${esc(w.mainTiers.join(' / '))}</b></div>
+          <div><small>兼容课程等级</small><b>${esc(compatibleLevels.join(' / '))}</b></div>
+          <div><small>主训练 T 参考</small><b>${esc(w.mainTiers.join(' / '))}</b></div>
           <div><small>匹配主训练</small><b>${esc(w.targetPatterns.join(' · '))}</b></div>
           <div><small>主要区域</small><b>${esc(w.regions.join(' · '))}</b></div>
           <div><small>器械</small><b>${esc(w.equipment)}</b></div>
@@ -70,6 +70,7 @@
           <h3>为什么安排它</h3><p>${esc(w.why)}</p>
           <h3>建议处方</h3><p>${esc(w.prescription)}</p>
           <h3>教练口令</h3><p>${esc(w.cue)}</p>
+          <h3>等级规则</h3><p>正式准入只看 ${esc(w.prepGrade)} 与 Session L 的向下兼容窗口；主训练 T 仅作为动作匹配参考，不作为 PREP 准入门槛。</p>
           <h3>数据状态</h3><p>${esc(w.sourceStatus)}</p>
           <a class="text-link" href="#/library?focus=${encodeURIComponent(w.actionId)}">查看动作库记录 →</a>
         </div></section>`;
@@ -80,6 +81,7 @@
     const patternOptions=['蹲','髋铰链','髋伸展','单腿','水平推','垂直推','水平拉','垂直拉'];
     const levelOptions=['L1','L2','L3','L4'];
     const tierOptions=['T1','T2','T3','T4'];
+    const allowedGrades=window.V14PrepGrade?.allowedGrades(sessionLevel)||[];
     const tierIndex=Math.max(0,Math.min(3,parseInt(mainTier.slice(-1),10)-1));
     const representativeId=data.eightPatterns?.[pattern]?.[tierIndex]||'';
     const anatomyFoam=representativeId?(window.V14Anatomy?.rankFoam([representativeId],{limit:6})||[]):[];
@@ -91,12 +93,12 @@
     const foamCards=foamIds.map(id=>{const f=data.foamRollDetails[id];return `<a class="foam-roll-card" href="#/system/prep?foam=${encodeURIComponent(id)}"><div><span>ROLL</span><small>${esc(f.muscles.join(' · '))}</small></div><h3>${esc(f.name)}</h3><p>${esc(f.why)}</p><footer><b>${esc(f.prescription)}</b></footer></a>`;}).join('');
     const anatomyWarm=representativeId?(window.V14Anatomy?.rankWarmups([representativeId],{level:sessionLevel,tier:mainTier,limit:12})||[]):[];
     const warmFallback=data.warmupMatchByPattern?.[pattern]||[];
-    const warmSource=anatomyWarm.length?anatomyWarm:warmFallback;
+    const warmSource=anatomyWarm.length?anatomyWarm:(window.V14PrepGrade?.sortIds(warmFallback,sessionLevel,data.warmupDetails)||warmFallback);
     const ids=warmSource.filter(id=>{
-      const w=data.warmupDetails[id];return w&&w.sessionLevels.includes(sessionLevel)&&w.mainTiers.includes(mainTier);
+      const w=data.warmupDetails[id];return w&&(window.V14PrepGrade?window.V14PrepGrade.isAllowed(sessionLevel,w.prepGrade):w.sessionLevels.includes(sessionLevel));
     });
     const foamCopy=copyControl(`foam-match-${pattern}-${sessionLevel}-${mainTier}`,'foam',{title:`泡沫轴推荐｜${pattern} · ${sessionLevel} · ${mainTier}`,items:foamIds.map(id=>{const f=data.foamRollDetails[id];return {name:f.name,prescription:f.prescription,safety:f.safety};})});
-    const prepCopy=copyControl(`prep-match-${pattern}-${sessionLevel}-${mainTier}`,'prep',{title:`PREP｜${pattern} · ${sessionLevel} · ${mainTier}`,items:ids.map(id=>{const w=data.warmupDetails[id];return {name:w.name,grade:w.prepGrade,prescription:w.prescription,why:w.why};})});
+    const prepCopy=copyControl(`prep-match-${pattern}-${sessionLevel}-${mainTier}`,'prep',{title:`PREP｜${pattern} · ${sessionLevel} · ${allowedGrades.join(' → ')}`,items:ids.map(id=>{const w=data.warmupDetails[id];return {name:w.name,grade:w.prepGrade,prescription:w.prescription,why:w.why};})});
     const cards=ids.map(id=>{
       const w=data.warmupDetails[id];
       return `<a class="prep-action-card" data-prep-id="${esc(id)}" href="#/system/prep?focus=${encodeURIComponent(id)}">
@@ -106,21 +108,21 @@
         <footer><span>${esc(w.regions.join(' · '))}</span><b>${esc(w.prescription)}</b></footer>
       </a>`;
     }).join('');
-    const gradeCards=Object.entries(data.warmupGradeMeta||{}).map(([g,m])=>`<article class="prep-grade-card"><span>${esc(g)}</span><h3>${esc(m.name)}</h3><p>${esc(m.meaning)}</p><small>${esc(m.session)} · ${esc(m.mainTier)}</small></article>`).join('');
-    return tabs('prep')+hero('PREP 热身体系','热身等级 P1–P4 与主训练 T1–T4 分开：热身不是越难越好，而是越贴近当天主训练、关节需求和会员当前控制能力。')+
-      `<section class="section-card"><div class="section-head"><div><h2>热身匹配器</h2><p>选择当天主训练模式、课程 L 等级与主训练 T 层级；系统优先读取该层级代表动作的解剖数据，再用原模式规则兜底。</p></div></div>
+    const gradeCards=Object.entries(data.warmupGradeMeta||{}).map(([g,m])=>{const levels=window.V14PrepGrade?.sessionLevelsForGrade(g)||[];return `<article class="prep-grade-card"><span>${esc(g)}</span><h3>${esc(m.name)}</h3><p>${esc(m.meaning)}</p><small>兼容 ${esc(levels.join(' / ')||m.session)} · PREP 等级独立于主动作 T</small></article>`;}).join('');
+    return tabs('prep')+hero('PREP 热身体系','Session 使用 L1–L4，主动作使用 T1–T4，PREP 独立使用 P1–P4。P 等级按本级优先逐级向下兼容，禁止向上越级。')+
+      `<section class="section-card"><div class="section-head"><div><h2>热身匹配器</h2><p>选择主训练模式、Session L 与主动作 T。L 决定合法 PREP P 窗口；T 只决定代表主动作与 Anatomy 匹配上下文。</p></div></div>
         <div class="prep-filter-grid">
           <label>主训练模式<select id="prep-pattern">${patternOptions.map(x=>`<option value="${x}" ${x===pattern?'selected':''}>${x}</option>`).join('')}</select></label>
           <label>课程等级<select id="prep-session-level">${levelOptions.map(x=>`<option value="${x}" ${x===sessionLevel?'selected':''}>${x}</option>`).join('')}</select></label>
-          <label>主训练层级<select id="prep-main-tier">${tierOptions.map(x=>`<option value="${x}" ${x===mainTier?'selected':''}>${x}</option>`).join('')}</select></label>
+          <label>主训练层级（匹配上下文）<select id="prep-main-tier">${tierOptions.map(x=>`<option value="${x}" ${x===mainTier?'selected':''}>${x}</option>`).join('')}</select></label>
         </div>
-        <div class="prep-match-summary"><b>${esc(pattern)} · ${esc(sessionLevel)} · ${esc(mainTier)}</b><span>泡沫轴 ${foamIds.length} 个 · 动态热身 ${ids.length} 个</span></div>
+        <div class="prep-match-summary"><b>${esc(pattern)} · ${esc(sessionLevel)} · PREP ${esc(allowedGrades.join(' → ')||'—')}</b><span>主项上下文 ${esc(mainTier)} · 泡沫轴 ${foamIds.length} 个 · 动态热身 ${ids.length} 个</span></div>
         <div class="prep-subsection-head"><div><b>泡沫轴松解建议</b><span>解剖数据优先：按代表动作主要 / 辅助肌群排序；只选择当天明显紧张的 1–3 个部位即可。</span></div>${foamCopy}</div>
         <div class="foam-roll-grid">${foamCards||'<p class="no-results">当前组合暂无泡沫轴匹配。</p>'}</div>
-        <div class="prep-subsection-head"><div><b>动态热身 / 激活</b><span>解剖数据 + 关节需求 + 动作模式共同排序；P1–P4 继续服从课程等级和主训练层级。</span></div>${prepCopy}</div>
-        <div class="prep-action-grid">${cards||'<p class="no-results">当前组合暂无匹配动作，请降低主训练层级或扩大课程等级。</p>'}</div>
+        <div class="prep-subsection-head"><div><b>动态热身 / 激活</b><span>先按当前 Session 的 P Grade 窗口排序，再比较 Anatomy、关节需求与动作模式；主动作 T 不作为 PREP 准入门槛。</span></div>${prepCopy}</div>
+        <div class="prep-action-grid">${cards||'<p class="no-results">当前 Session Level 暂无合法 PREP 匹配动作。</p>'}</div>
       </section>`+
-      `<section class="section-card"><div class="section-head"><div><h2>PREP P1–P4 分级</h2><p>P 等级表示热身动作本身的协调和整合要求，不等同于 01–08 主动作模式 T 等级。</p></div></div><div class="prep-grade-grid">${gradeCards}</div></section>`;
+      `<section class="section-card"><div class="section-head"><div><h2>PREP P1–P4 分级</h2><p>L1→P1；L2→P2→P1；L3→P3→P2→P1；L4→P4→P3→P2→P1。本级优先，逐级向下，禁止向上越级。</p></div></div><div class="prep-grade-grid">${gradeCards}</div></section>`;
   }
   function support(route){
     const data=D(),focus=route.query?.focus;

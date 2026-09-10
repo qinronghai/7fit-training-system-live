@@ -78,3 +78,28 @@ test('390px composer viewport has no horizontal overflow or pageerror', async ({
   expect(widths.clientWidth).toBe(390);
   await expectNoPageErrors(errors);
 });
+
+test('L3 PREP matcher exposes P3 to P1 only, in downward order, at 390px', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/system/prep?pattern=%E8%B9%B2&level=L3&tier=T4');
+
+  await expect(page.locator('.prep-match-summary b')).toContainText('L3 · PREP P3 → P2 → P1');
+  const grades = await page.locator('.prep-action-card > div > span').allTextContents();
+  expect(grades.length).toBeGreaterThan(0);
+  expect(grades).not.toContain('P4');
+  expect(grades.every(grade => ['P3','P2','P1'].includes(grade))).toBeTruthy();
+
+  const rank = {P3:0,P2:1,P1:2};
+  for (let i = 1; i < grades.length; i += 1) {
+    expect(rank[grades[i]]).toBeGreaterThanOrEqual(rank[grades[i - 1]]);
+  }
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});

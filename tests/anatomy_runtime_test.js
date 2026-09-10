@@ -4,7 +4,7 @@ const assert = require('assert');
 
 const root = process.cwd();
 global.window = global;
-for (const file of ['data/system-data.js','data/anatomy-data.js','js/anatomy.js']) {
+for (const file of ['data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js']) {
   vm.runInThisContext(fs.readFileSync(`${root}/${file}`, 'utf8'), {filename:file});
 }
 
