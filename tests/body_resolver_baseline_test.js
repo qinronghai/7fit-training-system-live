@@ -5,7 +5,8 @@ global.window=global;
 function load(file){vm.runInThisContext(fs.readFileSync(`${root}/${file}`,'utf8'),{filename:file});}
 for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
-  'js/resolved-session.js','js/body-volume.js','js/template-resolver.js','js/resolvers/body.js'
+  'js/resolved-session.js','js/body-volume.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/body.js',
+  'js/template-resolver.js','js/resolvers/body.js'
 ]) load(file);
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
@@ -61,6 +62,7 @@ for(const familyId of families){
     assert.strictEqual(session.domainContext.volume.totalWorkingSets,expectedSets[level]);
     assert(session.main.content.every(slot=>slot.actionId&&slot.name&&slot.prescription));
     assert(session.main.content.every(slot=>['auto','manual'].includes(slot.source)));
+    assert(['PASS','WARN','FAIL'].includes(session.conflictContext.status));
     assert.strictEqual(Contract.validate(session).ok,true,Contract.validate(session).errors.join(' | '));
     assert.deepStrictEqual(Dispatcher.resolve('body',input),session,`${familyId} ${level} must resolve deterministically`);
     signatures.push(signature(session));
