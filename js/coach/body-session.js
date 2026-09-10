@@ -125,7 +125,7 @@
   function renderEditor(ctx){
     const session=ctx.session;
     const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
-    return `${prepHtml}<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
+    return `${prepHtml}<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
   }
 
   function render(route){
@@ -160,6 +160,22 @@
       query:{family:familyId,level},
     };
     return window.V14Router?.canonicalHash?.(next)||`#/coach/body/compose?family=${encodeURIComponent(familyId)}&level=${encodeURIComponent(level)}`;
+  }
+
+  async function copyCurrent(route,kind,button){
+    const Shared=window.V14SessionCopy;
+    if(!M.BodyCopy||!Shared?.copyText)return false;
+    const fresh=context(route);
+    const payload=M.BodyCopy.buildPayload(fresh.session,fresh.prep);
+    const text=kind==='member'?M.BodyCopy.formatMember(payload):M.BodyCopy.formatCoach(payload);
+    const original=button?.textContent||'';
+    try{
+      await Shared.copyText(text);
+      if(button)button.textContent='已复制';
+      return true;
+    }finally{
+      if(button&&original)setTimeout(()=>{button.textContent=original;},1200);
+    }
   }
 
   function bind(route,root,rerender){
@@ -199,6 +215,9 @@
       M.BodyPrep.setSelection(select.dataset.bodyPrepSession,select.dataset.bodyPrepSlot,select.value);
       rerender();
     }));
+    root.querySelectorAll('[data-body-copy]').forEach(button=>button.addEventListener('click',()=>{
+      copyCurrent(route,button.dataset.bodyCopy,button).catch(error=>console.error('Body copy failed',error));
+    }));
     root.querySelector('#reset-body-session')?.addEventListener('click',()=>{
       reset(familyId,level);
       rerender();
@@ -214,6 +233,6 @@
     },
     bind,
   };
-  M.BodySession={context,render,renderEditor,ensureState,resolveState,setFormalSelection,reset,adapter};
+  M.BodySession={context,render,renderEditor,ensureState,resolveState,setFormalSelection,reset,copyCurrent,adapter};
   M.TemplateUI.register('body',adapter);
 })();
