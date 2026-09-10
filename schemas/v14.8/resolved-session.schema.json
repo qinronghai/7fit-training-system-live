@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/resolved-session.schema.json",
+  "title": "7Fit ResolvedSession v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "resolverVersion",
+    "templateId",
+    "familyId",
+    "level",
+    "title",
+    "summary",
+    "main",
+    "prepContext",
+    "anatomyContext",
+    "conflictContext",
+    "copyContext",
+    "warnings",
+    "resolvedSelections",
+    "source"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "resolverVersion": {"type": "string", "minLength": 1},
+    "templateId": {"type": "string", "minLength": 1},
+    "familyId": {"type": "string", "minLength": 1},
+    "level": {"type": "string", "pattern": "^L[1-4]$"},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string"},
+    "main": {
+      "oneOf": [
+        {"$ref": "#/$defs/slotMain"},
+        {"$ref": "#/$defs/protocolMain"}
+      ]
+    },
+    "prepContext": {"$ref": "#/$defs/prepContext"},
+    "anatomyContext": {"$ref": "#/$defs/anatomyContext"},
+    "conflictContext": {"$ref": "#/$defs/conflictContext"},
+    "copyContext": {"$ref": "#/$defs/copyContext"},
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "resolvedSelections": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/resolvedSelection"}
+    },
+    "source": {"$ref": "#/$defs/source"}
+  },
+  "$defs": {
+    "selectionSource": {
+      "type": "string",
+      "enum": ["baseline", "auto", "manual"]
+    },
+    "slotItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label", "actionId", "name", "tier", "grade", "prescription", "source"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "actionId": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "tier": {"type": "string"},
+        "grade": {"type": "string"},
+        "prescription": {"type": "string"},
+        "source": {"$ref": "#/$defs/selectionSource"}
+      }
+    },
+    "slotMain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "content"],
+      "properties": {
+        "kind": {"const": "SLOT"},
+        "content": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/slotItem"}
+        }
+      }
+    },
+    "protocolItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actionId", "name", "prescription"],
+      "properties": {
+        "actionId": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "prescription": {"type": "string"}
+      }
+    },
+    "protocolBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label", "items"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/protocolItem"}
+        }
+      }
+    },
+    "protocolContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocolId", "name", "blocks", "metrics"],
+      "properties": {
+        "protocolId": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/protocolBlock"}
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "protocolMain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "content"],
+      "properties": {
+        "kind": {"const": "PROTOCOL"},
+        "content": {"$ref": "#/$defs/protocolContent"}
+      }
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "prepContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template",
+        "level",
+        "recipeId",
+        "mainPatterns",
+        "mainActionIds",
+        "formalActionIds",
+        "targetMuscles",
+        "modalities",
+        "impactDemand",
+        "powerDemand"
+      ],
+      "properties": {
+        "template": {"type": "string", "minLength": 1},
+        "level": {"type": "string", "pattern": "^L[1-4]$"},
+        "recipeId": {"type": "string"},
+        "mainPatterns": {"$ref": "#/$defs/stringArray"},
+        "mainActionIds": {"$ref": "#/$defs/stringArray"},
+        "formalActionIds": {"$ref": "#/$defs/stringArray"},
+        "targetMuscles": {"$ref": "#/$defs/stringArray"},
+        "modalities": {"$ref": "#/$defs/stringArray"},
+        "impactDemand": {"type": "string"},
+        "powerDemand": {"type": "string"}
+      }
+    },
+    "anatomyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actionIds", "primary", "secondary", "stabilizers"],
+      "properties": {
+        "actionIds": {"$ref": "#/$defs/stringArray"},
+        "primary": {"$ref": "#/$defs/stringArray"},
+        "secondary": {"$ref": "#/$defs/stringArray"},
+        "stabilizers": {"$ref": "#/$defs/stringArray"}
+      }
+    },
+    "conflictIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "title", "text", "code"],
+      "properties": {
+        "severity": {"type": "string", "enum": ["hard", "warn", "info"]},
+        "title": {"type": "string", "minLength": 1},
+        "text": {"type": "string"},
+        "code": {"type": "string"}
+      }
+    },
+    "conflictContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "hardCount", "warnCount", "issues"],
+      "properties": {
+        "status": {"type": "string", "enum": ["PASS", "WARN", "FAIL"]},
+        "hardCount": {"type": "integer", "minimum": 0},
+        "warnCount": {"type": "integer", "minimum": 0},
+        "issues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/conflictIssue"}
+        }
+      }
+    },
+    "copyContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary", "actionIds"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "summary": {"type": "string"},
+        "actionIds": {"$ref": "#/$defs/stringArray"}
+      }
+    },
+    "resolvedSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "actionId", "source"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1},
+        "actionId": {"type": "string", "minLength": 1},
+        "source": {"$ref": "#/$defs/selectionSource"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string", "enum": ["PRESET", "COMPOSER", "GENERATED"]},
+        "id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
