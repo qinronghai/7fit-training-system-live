@@ -42,7 +42,9 @@ assert.deepStrictEqual(comparison.increases, []);
 
 console.log('anatomy_runtime_test: PASS');
 
-vm.runInThisContext(fs.readFileSync(`${root}/js/conflict.js`, 'utf8'), {filename:'js/conflict.js'});
+for (const file of ['js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js']) {
+  vm.runInThisContext(fs.readFileSync(`${root}/${file}`, 'utf8'), {filename:file});
+}
 
 const concentrationIds = window.V14_DATA.sessions['F111-01-L1'].slots.map(s=>s.baselineId);
 concentrationIds[3] = 'hake_shendun';

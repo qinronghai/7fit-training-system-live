@@ -4,7 +4,7 @@ global.window=global;
 function load(file){vm.runInThisContext(fs.readFileSync(`${root}/${file}`,'utf8'),{filename:file});}
 for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
-  'js/composer.js','js/conflict.js','js/resolved-session.js','js/template-resolver.js','js/resolvers/f111.js',
+  'js/composer.js','js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js','js/template-resolver.js','js/resolvers/f111.js',
   'js/coach/common.js','js/coach/session.js','js/coach/composer-view.js'
 ]) load(file);
 
