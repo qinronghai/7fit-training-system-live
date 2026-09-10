@@ -29,15 +29,15 @@
 - Consumes: current `index.html`, current `V14CoachAnatomy` compatibility API.
 - Produces: an executable contract describing required module files and script order.
 
-- [ ] **Step 1: Write the failing structural test**
+- [x] **Step 1: Write the failing structural test**
 
 Require these files: `common.js`, `home.js`, `slot.js`, `prep.js`, `foam.js`, `summary.js`, `conflict-view.js`, `session.js`, `composer-view.js`. Assert all are loaded before `js/views-coach.js`; assert the facade no longer contains the monolithic rendering functions.
 
-- [ ] **Step 2: Update the Node copy test loader before production changes**
+- [x] **Step 2: Update the Node copy test loader before production changes**
 
 Load the new Coach module paths before `js/views-coach.js`, while retaining the same copy assertions.
 
-- [ ] **Step 3: Run CI and verify RED**
+- [x] **Step 3: Run CI and verify RED**
 
 Expected: structural test fails because the new module files do not yet exist.
 
@@ -55,10 +55,10 @@ Expected: structural test fails because the new module files do not yet exist.
 - Produces `V14CoachModules.Common`, `.Slot`, `.Summary`, `.ConflictView`.
 - No behavior changes; HTML strings and selectors stay byte-equivalent where practical.
 
-- [ ] **Step 1: Move shared escaping/data/hero/mode-switch/copy-toolbar helpers into `Common`.**
-- [ ] **Step 2: Move preset/Composer slot card rendering into `Slot`.**
-- [ ] **Step 3: Move muscle summary rendering into `Summary`.**
-- [ ] **Step 4: Move conflict box rendering into `ConflictView`.**
+- [x] **Step 1: Move shared escaping/data/hero/mode-switch/copy-toolbar helpers into `Common`.**
+- [x] **Step 2: Move preset/Composer slot card rendering into `Slot`.**
+- [x] **Step 3: Move muscle summary rendering into `Summary`.**
+- [x] **Step 4: Move conflict box rendering into `ConflictView`.**
 - [ ] **Step 5: Run syntax and regression checks.**
 
 ---
@@ -73,9 +73,9 @@ Expected: structural test fails because the new module files do not yet exist.
 - `Prep.matchedWarmups`, `Prep.warmupCards`, `Prep.composerPrepItems`, `Prep.composerPrepHtml`.
 - `Foam.matchedFoamRolls`, `Foam.foamRollCards`, `Foam.composerFoamItems`.
 
-- [ ] **Step 1: Move warmup matcher/fallback/render helpers unchanged into `Prep`.**
-- [ ] **Step 2: Move foam matcher/fallback/render helpers unchanged into `Foam`.**
-- [ ] **Step 3: Keep current Anatomy ranking and fallback semantics unchanged.**
+- [x] **Step 1: Move warmup matcher/fallback/render helpers unchanged into `Prep`.**
+- [x] **Step 2: Move foam matcher/fallback/render helpers unchanged into `Foam`.**
+- [x] **Step 3: Keep current Anatomy ranking and fallback semantics unchanged.**
 - [ ] **Step 4: Run Node regression and syntax checks.**
 
 ---
@@ -89,9 +89,9 @@ Expected: structural test fails because the new module files do not yet exist.
 - Produces `Session.selectedTrainingIds`, `Session.buildCopyPayload`, `Session.render`.
 - Consumes Common/Slot/PREP/Foam/Summary/Conflict modules.
 
-- [ ] **Step 1: Move selected-training grouping.**
-- [ ] **Step 2: Move preset copy-payload construction.**
-- [ ] **Step 3: Move preset Session rendering.**
+- [x] **Step 1: Move selected-training grouping.**
+- [x] **Step 2: Move preset copy-payload construction.**
+- [x] **Step 3: Move preset Session rendering.**
 - [ ] **Step 4: Verify preset copy output remains unchanged.**
 
 ---
@@ -105,9 +105,9 @@ Expected: structural test fails because the new module files do not yet exist.
 - Produces `ComposerView.composeHref`, `composerContext`, `buildComposerCopyPayload`, `render`.
 - Consumes existing `V14Composer`, State, PREP/Foam/Summary/Conflict/Slot modules.
 
-- [ ] **Step 1: Move Composer URL/context/window/render helpers.**
-- [ ] **Step 2: Move Composer copy-payload construction.**
-- [ ] **Step 3: Preserve all query flags and rerender semantics.**
+- [x] **Step 1: Move Composer URL/context/window/render helpers.**
+- [x] **Step 2: Move Composer copy-payload construction.**
+- [x] **Step 3: Preserve all query flags and rerender semantics.**
 - [ ] **Step 4: Verify existing Composer copy/runtime tests.**
 
 ---
@@ -121,9 +121,9 @@ Expected: structural test fails because the new module files do not yet exist.
 **Interfaces:**
 - Re-exports exactly the current `V14Views.coach`, `V14Bind.coach`, and `V14CoachAnatomy` compatibility API.
 
-- [ ] **Step 1: Add Coach module scripts to `index.html` in dependency order.**
-- [ ] **Step 2: Reduce `views-coach.js` to route delegation and event binding.**
-- [ ] **Step 3: Re-export `V14CoachAnatomy` functions from Session/ComposerView.**
+- [x] **Step 1: Add Coach module scripts to `index.html` in dependency order.**
+- [x] **Step 2: Reduce `views-coach.js` to route delegation and event binding.**
+- [x] **Step 3: Re-export `V14CoachAnatomy` functions from Session/ComposerView.**
 - [ ] **Step 4: Run the full verification suite.**
 
 Run:
