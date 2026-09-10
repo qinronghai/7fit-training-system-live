@@ -50,6 +50,16 @@ jobs:
           body['bodyActionMeta'] = candidates
           body_path.write_text(json.dumps(body, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
+          special_notes = {
+              'tunqiao': 'BODY-02 L1 保守主项；低疲劳基础髋伸。',
+              'tun_tui': 'BODY-02 L1–L4 稳定器械主项；符合 7Fit 臀推最高使用臀推机的场馆规则。',
+              'hake_shendun': '稳定膝主导主项；L4 继续合法，体现 L4 不等于复杂度升级。',
+              'smith_shendun': '稳定膝主导器械主项；L4 保留稳定负重选项。',
+              'feiji_labei_zhongba': '胸托稳定主拉；L4 继续保留低稳定需求主项。',
+              'qixie_xiongtui': '稳定器械主推；L4 继续合法，不强制升级到自由重量。',
+              'shanyan_tingshen': '后链辅助/近孤立用途；不作为高负荷主项。',
+          }
+          default_note = '人工准入；Action ID、route、status 与 Body 角色/目标已核对。'
           lines = [
               '# Body Candidate Audit｜#33',
               '',
@@ -59,15 +69,18 @@ jobs:
               '',
               '明确排除：`smith_tuntui`（7Fit 场馆规则：臀推最高使用臀推机，不采用史密斯/杠铃臀推）；三点杆髋铰链、肩袖外旋等教学/激活节点不计 Body 正式工作组。',
               '',
-              '| Action ID | 动作 | Family | Level | Role | Direct Targets | Route | 审核 |',
-              '|---|---|---|---|---|---|---|---|',
+              '| Action ID | 显示名 | Family | Level | Role | Direct Targets | Secondary Targets | Class | Fatigue | Stability | Profile | Laterality | Route | 审计备注 |',
+              '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
           ]
           for action_id, meta in candidates.items():
               action = actions[action_id]
+              note = special_notes.get(action_id, default_note)
               lines.append(
                   f'| {action_id} | {action.get("name", "")} | {" / ".join(meta["families"])} | '
                   f'{" / ".join(meta["levels"])} | {" / ".join(meta["roles"])} | '
-                  f'{" / ".join(meta["directTargets"])} | {action.get("route", "")} | PASS |'
+                  f'{" / ".join(meta["directTargets"])} | {" / ".join(meta["secondaryTargets"]) or "—"} | '
+                  f'{meta["exerciseClass"]} | {meta["fatigueCost"]} | {meta["stabilityDemand"]} | '
+                  f'{meta["repProfile"]} | {meta["laterality"]} | {action.get("route", "")} | {note} |'
               )
           ledger_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
           PY
@@ -77,8 +90,8 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/src/body.json docs/V15-BODY-CANDIDATE-AUDIT.md data/system-data.js schemas/v14.8/body.schema.json tools/validate_v148_schema.py
           if git diff --cached --quiet; then
-            echo 'Body data, schema, validator, and bundle already fresh'
+            echo 'Body data, schema, validator, audit, and bundle already fresh'
           else
-            git commit -m 'fix: finalize Body schema and validator'
+            git commit -m 'docs: complete Body candidate audit ledger'
             git push origin HEAD:feature/issue-33-body-data-contract
           fi
