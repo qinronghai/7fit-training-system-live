@@ -10,6 +10,7 @@ for(const file of [
 ]) load(file);
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
+const EXPECTED_SHA='c06f4ddd03bebce65c8875dd66a03d99d897e54adec0190ea50a72e47e5f8005';
 const families=['BODY-01','BODY-02','BODY-03','BODY-04'],levels=['L1','L2','L3','L4'];
 const expectedSlots={L1:5,L2:5,L3:6,L4:6};
 const expectedSets={L1:10,L2:12,L3:14,L4:16};
@@ -75,4 +76,5 @@ for(const familyId of families){
 
 const sha=crypto.createHash('sha256').update(JSON.stringify(signatures)).digest('hex');
 console.log(`BODY_RESOLVER_BASELINE_SHA=${sha}`);
-console.log('body_resolver_baseline_test: 16-state capture GREEN');
+assert.strictEqual(sha,EXPECTED_SHA,'Body Resolver V1 16-state baseline drifted');
+console.log('body_resolver_baseline_test: frozen 16-state baseline GREEN');
