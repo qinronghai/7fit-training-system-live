@@ -17,6 +17,7 @@
 - Body action eligibility is membership in `bodyActionMeta`; Level legality is the explicit `levels` field.
 - V1 Body candidate whitelist must contain 40–60 manually audited existing Action IDs.
 - Anatomy exposure must never be converted automatically into Body Direct Work Sets.
+- `PRIMARY` / `SECONDARY` candidates must have `directTargets` intersecting every declared Family `primaryTargets`; no cross-Family main-role leakage.
 - Secondary exposure never counts as direct sets in V1.
 - For unilateral exercises, `N` working sets per side count as `N` session working sets and `N` direct sets per declared direct target, not `2N`.
 - Session `totalWorkingSets` is the sum of slot working sets once; it is never the sum of `directSetsByTarget`.

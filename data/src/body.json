@@ -949,7 +949,6 @@
     },
     "tunqiao": {
       "families": [
-        "BODY-01",
         "BODY-02"
       ],
       "levels": [
@@ -977,7 +976,6 @@
     },
     "tun_tui": {
       "families": [
-        "BODY-01",
         "BODY-02"
       ],
       "levels": [
@@ -1005,7 +1003,6 @@
     },
     "hipthrust_pause_main": {
       "families": [
-        "BODY-01",
         "BODY-02"
       ],
       "levels": [
@@ -1031,7 +1028,6 @@
     },
     "movement_single_leg_hip_thrust": {
       "families": [
-        "BODY-01",
         "BODY-02"
       ],
       "levels": [

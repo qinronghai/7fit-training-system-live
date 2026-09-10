@@ -391,6 +391,23 @@ def validate_payload(data: dict) -> list[str]:
                 f"{prefix}: directTargets/secondaryTargets overlap: {sorted(overlap)}"
             )
 
+        # Body main-role candidates must directly train the Family primary target.
+        main_roles = {"PRIMARY", "SECONDARY"} & set(meta.get("roles", []))
+        if main_roles:
+            direct_targets = set(meta.get("directTargets", []))
+            family_records = data.get("bodyFamilies", {})
+            for family_id in meta.get("families", []):
+                family = family_records.get(family_id)
+                if not isinstance(family, dict):
+                    continue
+                primary_targets = set(family.get("primaryTargets", []))
+                if primary_targets and not (direct_targets & primary_targets):
+                    errors.append(
+                        f"{prefix}.families: {family_id} cannot use roles {sorted(main_roles)} because "
+                        f"directTargets {sorted(direct_targets)} do not hit family primaryTargets "
+                        f"{sorted(primary_targets)}"
+                    )
+
     return sorted(set(errors))
 
 
