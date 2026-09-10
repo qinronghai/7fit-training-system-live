@@ -56,6 +56,17 @@
     return true;
   }
 
+  function isSelectionValid(input={}){
+    let normalized;
+    try{normalized=validateInput(input,true);}catch(error){
+      if(error?.code==='BODY_INPUT_INVALID')return false;
+      throw error;
+    }
+    const actionId=normalizeActionId(input.actionId);
+    if(!actionId)return false;
+    return isLegalCandidate({...normalized,actionId});
+  }
+
   function selectionContext(currentSelections={},currentSlotKey=''){
     const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set();
     let highFatigueCompounds=0;
@@ -236,7 +247,7 @@
     return session;
   }
 
-  const api={resolve,candidates};
+  const api={resolve,candidates,isSelectionValid};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);
