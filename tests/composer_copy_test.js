@@ -36,6 +36,19 @@ assert(member.includes('平均心率 130 到 140 左右（燃烧脂肪心率）'
 assert(!member.includes('POST CARDIO ONLY'));
 assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
 
+// #30: once composerContext has resolved V15 public data, Copy must not run a second full-session V14 Anatomy/Conflict calculation.
+let fullAnatomyCalls=0,conflictCalls=0;
+const originalAggregate=ctx.window.V14Anatomy.aggregate.bind(ctx.window.V14Anatomy);
+const originalEvaluateComposer=ctx.window.V14Conflict.evaluateComposer.bind(ctx.window.V14Conflict);
+ctx.window.V14Anatomy.aggregate=ids=>{if(Array.isArray(ids)&&ids.length===6)fullAnatomyCalls++;return originalAggregate(ids);};
+ctx.window.V14Conflict.evaluateComposer=resolved=>{conflictCalls++;return originalEvaluateComposer(resolved);};
+const pFromResolved=H.buildComposerCopyPayload(c);
+assert.strictEqual(conflictCalls,0,'RED #30: Composer Copy must consume resolvedSession.conflictContext');
+assert.strictEqual(fullAnatomyCalls,0,'RED #30: Composer Copy must consume resolvedSession.anatomyContext for full-session anatomy');
+assert.deepStrictEqual(pFromResolved.muscles.primary,c.resolvedSession.anatomyContext.primary.slice(0,6));
+ctx.window.V14Anatomy.aggregate=originalAggregate;
+ctx.window.V14Conflict.evaluateComposer=originalEvaluateComposer;
+
 const preset=H.buildCopyPayload('F111-06-L3','F111-06','L3');
 const presetCoach=S.formatCoach(preset,{now:'2026-09-10T12:00:00+08:00'});
 assert(presetCoach.includes('F111-06｜L3 负重进阶'));
