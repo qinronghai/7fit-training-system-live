@@ -15,7 +15,7 @@ Parent Epic：#26
 V1 必须回答四类问题：
 
 1. 这个动作是否允许进入 Body 模板；
-2. 它在不同 Body Family 中可以承担什么 Role；
+2. 它在不同 Body Family / Level 中可以承担什么 Role；
 3. 它对哪些目标肌群计入 Direct Work Sets；
 4. 在不同 Session Level 下，组数、次数、RIR、休息与 Optional Slot 如何受到约束。
 
@@ -69,21 +69,17 @@ Body 专属语义
 data/src/body.json
 ```
 
-建议由 `body.json` 独占以下顶层 Runtime keys：
+由 `body.json` 独占以下顶层 Runtime keys：
 
 ```text
 bodyTargetIds
 bodyTargetCatalog
-
 bodyRoleIds
 bodyRoles
-
 bodyFamilyIds
 bodyFamilies
-
 bodyLevelPolicies
 bodyPrescriptionProfiles
-
 bodyActionMeta
 bodyVolumePolicy
 bodyConflictPolicy
@@ -106,7 +102,7 @@ bodyConflictPolicy
 
 Resolver、Volume、Conflict 逻辑不得直接以中文肌肉名称作为业务主键。
 
-V1 推荐 Target IDs：
+V1 Target IDs：
 
 ```text
 quadriceps
@@ -115,7 +111,6 @@ glute_max
 glute_med
 adductors
 calves
-
 lats
 upper_back
 rear_delts
@@ -135,25 +130,11 @@ region
 anatomyAliases
 ```
 
-示例语义：
-
-```text
-upper_back
-→ 中文显示：上背
-→ Anatomy aliases：中斜方肌、菱形肌、斜方肌中下束等
-```
-
 `anatomyAliases` 仅用于 UI 解释、审计和未来辅助匹配；**不能自动决定 Direct Work Sets**。
 
 ### 4.2 Target 扩展原则
 
-V1 不追求把所有肌肉拆到极细。只建立 Body 编课真正需要区分的目标层级。
-
-例如：
-
-- 肩部区分 `rear_delts / lateral_delts / front_delts` 有实际编排价值；
-- 股四头内部不拆股直肌 / 股外侧肌；
-- 胸部 V1 不拆上胸 / 中胸 / 下胸作为独立 volume target，除非后续真实编课需求证明必要。
+V1 只建立 Body 编课真正需要区分的目标层级：肩部保留前/中/后三角区分；股四头内部不细分；胸部 V1 不拆上胸/中胸/下胸独立 volume target。后续只有真实编课需求证明必要时才扩展。
 
 ---
 
@@ -169,9 +150,7 @@ ISOLATION
 OPTIONAL
 ```
 
-Role 表达动作在一节 Body Session 中的**编排职责**，不等于 movement pattern，也不等于 Anatomy primary muscle。
-
-定义：
+Role 表达动作在一节 Body Session 中的编排职责，不等于 movement pattern，也不等于 Anatomy primary muscle。
 
 - `PRIMARY`：当日主要刺激目标的核心动作，通常为稳定、可持续进阶的复合或高价值主训练动作；
 - `SECONDARY`：补充主要刺激方向，通常改变动作模式、角度或负重路径；
@@ -179,7 +158,7 @@ Role 表达动作在一节 Body Session 中的**编排职责**，不等于 movem
 - `ISOLATION`：局部肌群导向、低全身疲劳的孤立/近孤立动作；
 - `OPTIONAL`：在 Level、时间预算或个体需求允许时追加。
 
-Resolver 的具体 Slot 可以是：
+Resolver 的具体 Session Slot：
 
 ```text
 PRIMARY
@@ -190,34 +169,16 @@ ISOLATION-2
 OPTIONAL
 ```
 
-其中 `ISOLATION-1 / ISOLATION-2` 是 Session Slot key；它们在 Body 数据语义上都属于 `ISOLATION` Role。
-
-**Role 不得依赖数组位置。**
+`ISOLATION-1 / ISOLATION-2` 均映射到 `ISOLATION` Role。**Role 不得依赖数组位置。**
 
 ---
 
 ## 6｜Body Family V1
 
-正式 4 个 Family：
-
 ### BODY-01｜臀腿｜股四主导
 
-主要目标：
-
-```text
-quadriceps
-```
-
-协同目标：
-
-```text
-glute_max
-glute_med
-hamstrings
-adductors
-```
-
-推荐结构：
+主要目标：`quadriceps`  
+协同目标：`glute_max / glute_med / hamstrings / adductors`
 
 ```text
 PRIMARY       膝主导复合
@@ -230,21 +191,8 @@ OPTIONAL      臀中 / 内收 / 小腿等低疲劳补充
 
 ### BODY-02｜臀腿｜臀后侧链
 
-主要目标：
-
-```text
-glute_max
-hamstrings
-```
-
-协同目标：
-
-```text
-glute_med
-adductors
-```
-
-推荐结构：
+主要目标：`glute_max / hamstrings`  
+协同目标：`glute_med / adductors`
 
 ```text
 PRIMARY       髋伸 / 髋铰链主项
@@ -257,22 +205,8 @@ OPTIONAL      臀中 / 内收
 
 ### BODY-03｜背肩塑形
 
-主要目标：
-
-```text
-lats
-upper_back
-rear_delts
-lateral_delts
-```
-
-协同目标：
-
-```text
-biceps
-```
-
-推荐结构：
+主要目标：`lats / upper_back / rear_delts / lateral_delts`  
+协同目标：`biceps`
 
 ```text
 PRIMARY       主拉
@@ -285,22 +219,8 @@ OPTIONAL      二头 / 肩胛低疲劳补充
 
 ### BODY-04｜胸肩臂塑形
 
-主要目标：
-
-```text
-chest
-lateral_delts
-triceps
-```
-
-协同目标：
-
-```text
-front_delts
-biceps
-```
-
-推荐结构：
+主要目标：`chest / lateral_delts / triceps`  
+协同目标：`front_delts / biceps`
 
 ```text
 PRIMARY       主推
@@ -331,15 +251,16 @@ allowedRoles
 
 `bodyActionMeta` 是 Body Resolver 的正式候选事实源。
 
-示例结构：
+示例：
 
 ```json
 {
   "hake_shendun": {
     "families": ["BODY-01"],
+    "levels": ["L1", "L2", "L3", "L4"],
     "roles": ["PRIMARY", "SECONDARY"],
-    "directTargets": ["quadriceps", "glute_max"],
-    "secondaryTargets": ["adductors"],
+    "directTargets": ["quadriceps"],
+    "secondaryTargets": ["glute_max", "adductors"],
     "exerciseClass": "compound",
     "fatigueCost": "high",
     "stabilityDemand": "low",
@@ -349,10 +270,11 @@ allowedRoles
 }
 ```
 
-正式字段：
+正式必需字段：
 
 ```text
 families
+levels
 roles
 directTargets
 secondaryTargets
@@ -363,45 +285,28 @@ repProfile
 laterality
 ```
 
-V1 枚举建议：
+V1 枚举：
 
 ```text
-exerciseClass:
-compound | accessory | isolation
-
-fatigueCost:
-low | medium | high
-
-stabilityDemand:
-low | medium | high
-
-laterality:
-bilateral | unilateral
+exerciseClass: compound | accessory | isolation
+fatigueCost: low | medium | high
+stabilityDemand: low | medium | high
+laterality: bilateral | unilateral
 ```
 
-Body eligibility 由 `bodyActionMeta` 中是否存在该 Action ID 决定；V1 不需要再在 `actions.json` 新增 `bodyEligible=true` 形成第二个 truth source。
+### 7.1 Level eligibility
 
-### 7.1 Candidate whitelist
+Action 对 Session Level 的合法性必须由 `levels` 显式声明。
 
-V1 不给全部 243 个 Action 自动打 Body 标签。
+#34 不允许根据 `stabilityDemand`、Tier、动作名或器械类型自行推断“L1 能不能用”。`stabilityDemand` 只用于排序、解释和 Conflict policy，不是隐式 Level truth source。
 
-第一版目标：
+### 7.2 Body eligibility
 
-> 建立约 40–60 个经过人工审计的 Body Candidate 白名单。
+Body eligibility 由 `bodyActionMeta` 中是否存在该 Action ID 决定；V1 不在 `actions.json` 再增加 `bodyEligible=true`，避免形成双 truth source。
 
-优先覆盖：
+### 7.3 Candidate whitelist
 
-- 膝主导复合；
-- 髋铰链 / 髋伸；
-- 单腿动作；
-- 水平拉 / 垂直拉；
-- 水平推 / 垂直推；
-- 腿屈伸 / 腿弯举；
-- 臀部孤立；
-- 髋外展 / 内收；
-- 后三角 / 侧平举；
-- 二头 / 三头；
-- 必要胸部 / 背部低疲劳辅助。
+V1 不给全部 243 个 Action 自动打 Body 标签。第一版建立约 **40–60 个经过人工审计的 Body Candidate 白名单**，优先覆盖膝主导、髋铰链/髋伸、单腿、水平/垂直推拉、腿屈伸/腿弯举、臀部孤立、髋外展/内收、后三角/侧平举、二头/三头及必要低疲劳胸背辅助。
 
 候选必须引用现有 `actions` 中真实存在的 Action ID。
 
@@ -409,11 +314,9 @@ V1 不给全部 243 个 Action 自动打 Body 标签。
 
 ## 8｜Prescription Profile
 
-Body V1 不直接解析现有 `actionDetails['来源处方 / RPE']` 字符串来决定健美处方。
+Body V1 不解析现有 `actionDetails['来源处方 / RPE']` 字符串决定健美处方。
 
-建立 `bodyPrescriptionProfiles`，由动作 `repProfile` 引用。
-
-建议 Profile：
+正式 `repProfile`：
 
 ```text
 compound_machine
@@ -424,41 +327,32 @@ isolation_large
 isolation_small
 ```
 
-每个 Profile 可以定义：
+V1 默认 Profile：
+
+| Profile | Rep Range | Rest | 说明 |
+|---|---|---|---|
+| compound_machine | 8–15 | 90–150s | 稳定器械复合动作 |
+| compound_freeweight | 6–12 | 120–180s | 自由负重复合动作 |
+| single_leg_compound | 8–12/侧 | 90–150s | 单侧复合动作 |
+| accessory_compound | 10–15 | 75–120s | 中低疲劳辅助复合 |
+| isolation_large | 10–20 | 60–90s | 大肌群孤立/近孤立 |
+| isolation_small | 12–20 | 45–75s | 肩/手臂等小肌群孤立 |
+
+RIR 由 Session Level policy 提供。最终 prescription 由：
 
 ```text
-repRange
-restSecondsRange
-allowedRIRRange
-```
-
-最终 working sets 由：
-
-```text
-Family
-+ Level Policy
-+ Slot Role
-+ Prescription Profile
+Family + Level Policy + Slot Role + Prescription Profile
 ```
 
 共同决定。
+
+这些数值是 7Fit Body V1 的门店编课 policy，不宣称为普遍训练学唯一标准。
 
 ---
 
 ## 9｜L1–L4 Body Policy
 
-Body 保留平台统一 Session Level `L1–L4`，但 **不复制 F111 T1–T4**。
-
-Level 主要控制：
-
-- 总 Working Sets；
-- 稳定性要求；
-- Rep range 边界；
-- RIR；
-- Rest / density；
-- Optional Slot 是否默认开启。
-
-建议 V1 默认区间：
+Body 保留平台统一 `L1–L4`，但不复制 F111 T1–T4。
 
 | Level | Session Working Sets | RIR | Optional | 主要目标 |
 |---|---:|---:|---|---|
@@ -467,15 +361,22 @@ Level 主要控制：
 | L3 | 14–16 | 约 2 | 可开启 | 完整塑形训练量 |
 | L4 | 16–18 | 1–2 | 默认开启 | 更高训练量 / 密度与独立执行 |
 
-这些是 Resolver 的**目标窗口**，不是要求每节课机械达到上限。
+为避免 #34 自行发明工作组数，V1 冻结默认 Slot working-set skeleton：
+
+| Level | PRIMARY | SECONDARY | ACCESSORY | ISO-1 | ISO-2 | OPTIONAL | 默认总组数 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| L1 | 3 | 2 | 2 | 2 | 1 | 0 | 10 |
+| L2 | 3 | 3 | 2 | 2 | 2 | 0 | 12 |
+| L3 | 3 | 3 | 3 | 2 | 2 | 1 | 14 |
+| L4 | 4 | 3 | 3 | 3 | 2 | 1 | 16 |
+
+这些是默认骨架。Resolver 后续可在 `sessionWorkingSetRanges` 内按候选和 time policy 调整，但不能越过 Level 的合法范围。
 
 正式原则：
 
 > `L4 ≠ 最复杂动作`。
 
-稳定器械、哈克深蹲、胸托划船、器械臀推等都可以继续存在于 L4，只要它们符合目标、容量和进阶需要。
-
-Level Policy 必须是机器可读数据，不能仅存在文档中。
+稳定器械、哈克深蹲、胸托划船、器械臀推等都可以继续存在于 L4，只要符合目标、容量和进阶需要。
 
 ---
 
@@ -483,11 +384,7 @@ Level Policy 必须是机器可读数据，不能仅存在文档中。
 
 ### 10.1 定义
 
-Direct Work Sets 是 Body 模板独立的训练量指标。
-
-它只统计：
-
-> 按 Body policy 明确定义为对目标肌群构成“直接工作”的正式 working sets。
+Direct Work Sets 是 Body 模板独立的训练量指标，只统计 Body policy 明确定义为对目标肌群构成“直接工作”的正式 working sets。
 
 不统计：
 
@@ -503,44 +400,37 @@ Direct Work Sets 是 Body 模板独立的训练量指标。
 
 ```text
 workingSets = 3
-directTargets = [quadriceps, glute_max]
+directTargets = [glute_max, hamstrings]
 ```
 
 则：
 
 ```text
-quadriceps += 3 direct sets
 glute_max += 3 direct sets
+hamstrings += 3 direct sets
 ```
 
-若：
+`directSetsByTarget` 是**按目标肌群分别统计的多标签分布**。它不能用于反推 Session 总工作组数。
+
+正式定义：
 
 ```text
-secondaryTargets = [adductors]
+totalWorkingSets = 每个正式训练 Slot 的 workingSets 只求和一次
 ```
 
-则只增加 secondary exposure 记录，不转换成 direct sets。
+因此一个 3 组动作即使同时有两个 `directTargets`，Session 总工作组仍只增加 3，不增加 6。
 
-### 10.3 不做 fractional pseudo-precision
+若 `secondaryTargets = [adductors]`，只增加 secondary exposure 记录，不转换成 direct sets。
 
-V1 禁止：
+### 10.3 禁止 fractional pseudo-precision
 
-```text
-secondary muscle = 0.5 effective sets
-stabilizer = 0.25 effective sets
-```
-
-这种模型会产生没有足够依据的伪精确。
-
-如果未来要建立 weighted effective-volume 模型，应当作为独立版本设计，而不是偷偷混入 V1。
+V1 禁止把 secondary / stabilizer 自动换算为 `0.5 sets / 0.25 sets` 等所谓有效组。未来若建立 weighted effective-volume，必须独立版本设计。
 
 ### 10.4 Unilateral 组数
 
 正式口径：
 
-> `3 sets / side` 在 Direct Work Sets 中记为 **3 sets**，不是 6 sets。
-
-左右侧各自完成 3 个工作组；Body Session 对目标肌群的 volume 不因双侧分别执行而机械翻倍。
+> `3 sets / side` 在 Direct Work Sets 与 Session totalWorkingSets 中均记为 **3 sets**，不是 6 sets。
 
 此规则必须有 CI 单测。
 
@@ -552,21 +442,27 @@ stabilizer = 0.25 effective sets
 
 ```text
 sessionWorkingSetRangesByLevel
+slotWorkingSetDefaultsByLevel
 directSetTargetRangesByFamily
 maxHighFatigueCompounds
 isolationRatioRanges
 optionalSlotPolicy
 ```
 
-V1 的作用是给 #34 Resolver 和 Body Conflict Plugin 提供可审计阈值，而不是宣称这些数字是普遍医学/训练学真理。
+其中：
 
-阈值需要作为 7Fit 当前 Body 模板的门店训练政策维护。
+- `sessionWorkingSetRangesByLevel` 使用第 9 节的 10–12 / 12–14 / 14–16 / 16–18；
+- `slotWorkingSetDefaultsByLevel` 使用第 9 节冻结的默认 Slot skeleton；
+- `directSetTargetRangesByFamily` 描述 Family target 的合理直接刺激区间，但不与 `totalWorkingSets` 做相加等式；
+- 这些阈值属于 7Fit 当前 Body 模板 policy，可版本化维护。
+
+#33 必须把数据结构和首版阈值写成机器可读数据，不能只留文档说明。
 
 ---
 
 ## 12｜Body Conflict Policy Data
 
-`bodyConflictPolicy` 只保存**数据阈值与 policy 参数**；算法在 #34 / Body Conflict Plugin 实现。
+`bodyConflictPolicy` 只保存数据阈值与 policy 参数；算法在 #34 / Body Conflict Plugin 实现。
 
 至少为未来检查提供：
 
@@ -586,9 +482,9 @@ V1 的作用是给 #34 Resolver 和 Body Conflict Plugin 提供可审计阈值�
 
 #33 **不修改** `ResolvedSession v1`。
 
-但必须为 #34 记录一个明确的后续要求：当前 `SLOT` item 只有 action/prescription/source 等公共字段，且 Schema 使用 `additionalProperties:false`，没有正式承载 Body volume 的位置。
+当前 `SLOT` item 只有 action/prescription/source 等公共字段，并使用 `additionalProperties:false`，尚无 Body volume 正式承载位置。
 
-#34 实现时，优先采用向后兼容扩展：
+#34 实现时优先采用向后兼容扩展：
 
 ```text
 main.metrics.body
@@ -605,9 +501,7 @@ estimatedMinutes
 slotMetrics
 ```
 
-F111 可以不提供该字段。
-
-#33 只冻结这一方向，不在本 Issue 修改公共 Contract。
+F111 可以不提供。#33 只冻结这一方向，不在本 Issue 修改公共 Contract。
 
 ---
 
@@ -619,35 +513,27 @@ F111 可以不提供该字段。
 schemas/v14.8/body.schema.json
 ```
 
-Schema / validator 至少必须拒绝：
+Schema / validator 至少拒绝：
 
-- unknown Family ID；
-- unknown Role；
-- unknown Target；
-- unknown Action ref；
-- Body Action 没有 `families`；
-- Body Action 没有 `roles`；
-- Body Action 没有 `directTargets`；
+- unknown Family / Role / Target / Action ref；
+- Body Action 缺失 `families / levels / roles / directTargets`；
 - 非法 fatigue/stability/laterality/repProfile；
+- 非法 Level；
 - 4 Family 缺失；
 - L1–L4 policy 不完整；
 - Role/Target ID 重复；
 - Direct Work Set 所需 metadata 不完整。
 
-Builder 必须继续保持 strict ownership：新增 `body.json` 后，同时修改正式 ordered source list、manifest owners 与 topLevelOrder，不能采用 last-write-wins。
+Builder 必须继续 strict ownership：新增 `body.json` 后同时修改正式 ordered source list、manifest owners 与 topLevelOrder，不能采用 last-write-wins。
 
 ---
 
 ## 15｜CI / Test Contract
 
-#33 至少需要以下测试：
-
 ### 数据 Schema
 
 - body schema positive；
-- invalid role rejection；
-- invalid family rejection；
-- invalid target rejection；
+- invalid role / family / target / level rejection；
 - unknown action ref rejection；
 - missing direct-set metadata rejection。
 
@@ -656,18 +542,19 @@ Builder 必须继续保持 strict ownership：新增 `body.json` 后，同时修
 - 正好存在 BODY-01～BODY-04；
 - 每个 Family 有 primary/secondary targets；
 - 每个 Family 的必需 Role 至少有合法 candidate；
-- 每个 Level policy 完整。
+- L1–L4 policy 全部完整。
 
 ### Candidate coverage
 
-- Body whitelist 中每个 Action 在 `actions.json` 存在；
-- 每个候选至少有一个 Family / Role / directTarget；
-- 所有 direct/secondary target 都存在于 target catalog。
+- whitelist 每个 Action 在 `actions.json` 存在；
+- 每个候选至少一个 Family / Level / Role / directTarget；
+- 所有 direct/secondary target 存在于 target catalog。
 
 ### Volume semantics
 
 - bilateral direct sets；
-- unilateral `3 sets/side → 3 direct sets`；
+- multi-target action：target direct sets 可同时增加，但 `totalWorkingSets` 只增加一次；
+- unilateral `3 sets/side → 3`；
 - secondary exposure 不增加 direct sets；
 - ramp-up exclusion contract。
 
@@ -688,7 +575,7 @@ Builder 必须继续保持 strict ownership：新增 `body.json` 后，同时修
 - Body target / family / role / level / prescription / action metadata；
 - Body volume/conflict policy 数据；
 - manifest/build/schema/validator/tests；
-- 首批 Body Action whitelist 审计。
+- 首批 Body Action whitelist 人工审计。
 
 #33 不做：
 
@@ -706,7 +593,7 @@ Builder 必须继续保持 strict ownership：新增 `body.json` 后，同时修
 
 ## 17｜#34 的正式输入输出边界
 
-#33 完成后，#34 Body Resolver 的数据流必须是：
+#33 完成后，#34 Body Resolver 数据流必须是：
 
 ```text
 Body Family
@@ -728,21 +615,21 @@ Body Conflict Plugin
 ResolvedSession(main.kind = SLOT)
 ```
 
-#34 不允许再回头从中文名、F111 Composer 或 Anatomy primary/secondary 字段推断 Body 业务规则。
+#34 不允许回头从中文名、F111 Composer 或 Anatomy primary/secondary 字段推断 Body 业务规则。
 
 ---
 
 ## 18｜成功标准
 
-当 #33 完成时，应满足：
+#33 完成时必须满足：
 
 1. Body 拥有独立 Source of Truth；
 2. 4 Family 与 L1–L4 机器可读；
-3. 第一批 Body 候选动作全部经过人工审计；
-4. Resolver 可以仅依赖 Body Contract + 通用 Action facts 工作；
-5. Direct Work Sets 与 Anatomy exposure 已明确分离；
-6. 单侧、ramp-up、secondary exposure 的 volume 口径不会产生歧义；
-7. CI 可以阻止非法 Family / Role / Target / Action / metadata 进入 master；
+3. 第一批 Body 候选全部经过人工审计；
+4. Resolver 可以只依赖 Body Contract + 通用 Action facts；
+5. Direct Work Sets 与 Anatomy exposure 明确分离；
+6. multi-target、单侧、ramp-up、secondary exposure 的 volume 口径无歧义；
+7. CI 可阻止非法 Family / Role / Target / Level / Action / metadata 进入 master；
 8. 不改变 F111 已上线行为。
 
 达到以上条件后，#34 才允许开始实现 Body Resolver V1。
