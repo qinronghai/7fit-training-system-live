@@ -3,6 +3,7 @@
 
   const DATA=()=>window.V14_DATA||{};
   const ANAT=()=>window.V14_ANATOMY||{meta:{exposureWeights:{primary:1,secondary:.5,stabilizers:.25}},records:{}};
+  const PREP=()=>window.V14PrepGrade||null;
 
   const ROLE_LABELS={
     strength:['主要肌群','辅助肌群','稳定肌群'],
@@ -101,9 +102,10 @@
   }
 
   function rankWarmups(actionIds,{recipeId,level='L1',tier='T1',limit=6}={}){
-    const data=DATA(), target=aggregate(actionIds);
+    const data=DATA(), target=aggregate(actionIds),gradeApi=PREP();
     const targetMuscles=new Set([...target.primary,...target.secondary]);
     const targetJoints=new Set(target.joints);
+    const targetRegions=new Set([...target.primary,...target.secondary,...target.stabilizers,...target.joints]);
     const patterns=[];
     const recipe=data.recipes?.[recipeId];
     if(recipe){uniquePush(patterns,recipe.lower);uniquePush(patterns,recipe.upper);}
@@ -115,15 +117,12 @@
         if(!priority.has(prepId))priority.set(prepId,priorityIndex++);
       });
     });
-    (data.warmupIds||[]).forEach(prepId=>{
-      if(!priority.has(prepId))priority.set(prepId,priorityIndex++);
-    });
 
     const scored=[];
     (data.warmupIds||[]).forEach(prepId=>{
       const w=data.warmupDetails?.[prepId]; if(!w)return;
-      if(level&&!w.sessionLevels?.includes(level))return;
-      if(tier&&!w.mainTiers?.includes(tier))return;
+      const legal=gradeApi?gradeApi.isAllowed(level,w.prepGrade):w.sessionLevels?.includes(level);
+      if(level&&!legal)return;
       const rec=get(w.actionId);
       let score=0;
       if(rec){
@@ -132,11 +131,17 @@
         if(asArray(rec.joints).some(j=>targetJoints.has(j)))score+=1;
       }
       if((w.targetPatterns||[]).some(p=>patterns.includes(p)))score+=1;
-      scored.push({prepId,score,priority:priority.get(prepId)??9999});
+      if((w.regions||[]).some(region=>targetRegions.has(region)))score+=1;
+      scored.push({
+        prepId,
+        score,
+        gradeRank:gradeApi?gradeApi.gradeRank(level,w.prepGrade):0,
+        priority:priority.get(prepId)??9999,
+      });
     });
 
     return scored
-      .sort((a,b)=>b.score-a.score||a.priority-b.priority||a.prepId.localeCompare(b.prepId))
+      .sort((a,b)=>a.gradeRank-b.gradeRank||b.score-a.score||a.priority-b.priority||a.prepId.localeCompare(b.prepId))
       .slice(0,Math.max(0,limit))
       .map(x=>x.prepId);
   }
