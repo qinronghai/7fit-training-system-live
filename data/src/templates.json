@@ -1,0 +1,90 @@
+{
+  "templateIds": [
+    "f111",
+    "body",
+    "conditioning",
+    "posture"
+  ],
+  "templateRegistry": {
+    "f111": {
+      "templateId": "f111",
+      "name": "女性综合 1+1+1",
+      "shortName": "F111",
+      "engine": "f111",
+      "status": "ACTIVE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": true,
+        "composer": true,
+        "prep": true,
+        "anatomy": true,
+        "copy": true,
+        "save": false,
+        "volume": false,
+        "conditioningMetrics": false
+      },
+      "routeBase": "#/coach/f111",
+      "description": "女性长期塑形的一下肢 + 一上肢 + 一支撑训练体系。"
+    },
+    "body": {
+      "templateId": "body",
+      "name": "健美式塑形",
+      "shortName": "Body",
+      "engine": "body",
+      "status": "ACTIVE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": false,
+        "composer": false,
+        "prep": true,
+        "anatomy": true,
+        "copy": false,
+        "save": false,
+        "volume": true,
+        "conditioningMetrics": false
+      },
+      "routeBase": "#/coach/body",
+      "description": "以目标肌群、复合动作与训练量管理为核心的健美式塑形模板。"
+    },
+    "conditioning": {
+      "templateId": "conditioning",
+      "name": "体能训练",
+      "shortName": "Conditioning",
+      "engine": "conditioning",
+      "status": "ACTIVE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": false,
+        "composer": false,
+        "prep": true,
+        "anatomy": true,
+        "copy": false,
+        "save": false,
+        "volume": false,
+        "conditioningMetrics": true
+      },
+      "routeBase": "#/coach/conditioning",
+      "description": "围绕体能方式、冲击需求、功率需求与训练站点组织的体能模板。"
+    },
+    "posture": {
+      "templateId": "posture",
+      "name": "体态调整",
+      "shortName": "Posture",
+      "engine": "posture",
+      "status": "FUTURE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": false,
+        "composer": false,
+        "prep": false,
+        "anatomy": false,
+        "copy": false,
+        "save": false,
+        "volume": false,
+        "conditioningMetrics": false
+      },
+      "routeBase": "#/coach/posture",
+      "description": "未来用于体态评估、专项调整与阶段训练编排的模板入口。"
+    }
+  }
+}

@@ -1,6 +1,11 @@
 (function(){
-  const M=window.V14CoachModules||{},Home=M.Home,Session=M.Session,ComposerView=M.ComposerView;
-  function render(route){if(route.page==='compose')return ComposerView.render(route);return route.recipeId?Session.render(route):Home.render();}
+  const M=window.V14CoachModules||{},Home=M.Home,F111Home=M.F111Home,TemplateHome=M.TemplateHome,Session=M.Session,ComposerView=M.ComposerView;
+  function render(route){
+    if(route.page==='compose')return ComposerView.render(route);
+    if(route.recipeId)return Session.render(route);
+    if(route.page==='template')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
+    return Home.render(route);
+  }
   function bind(route){
     if(route.page==='compose'){
       const rerender=()=>{const current=window.V14Router.parseHash(location.hash);document.getElementById('app-main').innerHTML=render(current);bind(current);if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(document.getElementById('app-main'));};

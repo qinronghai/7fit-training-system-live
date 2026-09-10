@@ -8,10 +8,10 @@ def soup():
 
 def coach_source():
     paths = [
-        'js/coach/common.js', 'js/coach/home.js', 'js/coach/slot.js',
-        'js/coach/foam.js', 'js/coach/prep.js', 'js/coach/summary.js',
-        'js/coach/conflict-view.js', 'js/coach/session.js',
-        'js/coach/composer-view.js', 'js/views-coach.js'
+        'js/coach/common.js', 'js/coach/home.js', 'js/coach/f111-home.js',
+        'js/coach/template-home.js', 'js/coach/slot.js', 'js/coach/foam.js',
+        'js/coach/prep.js', 'js/coach/summary.js', 'js/coach/conflict-view.js',
+        'js/coach/session.js', 'js/coach/composer-view.js', 'js/views-coach.js'
     ]
     return '\n'.join((ROOT / path).read_text(encoding='utf-8') for path in paths)
 
@@ -89,7 +89,7 @@ def test_v141_readability_overrides_exist():
 
 def test_v142_uses_official_7fit_logo_asset():
     from bs4 import BeautifulSoup
-    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    html = (ROOT / "index.html").read_text(encoding='utf-8')
     soup = BeautifulSoup(html, "html.parser")
     logo = soup.select_one('.brand-mark img[data-brand-logo="official"]')
     assert logo is not None

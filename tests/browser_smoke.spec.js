@@ -10,11 +10,48 @@ async function expectNoPageErrors(errors) {
   expect(errors, `unexpected pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 }
 
-test('coach route loads in Chromium with no pageerror', async ({ page }) => {
+test('390px multi-template coach center renders four registry templates without overflow', async ({ page }) => {
   const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach');
+  await expect(page.getByRole('heading', { name: '7Fit Coach Center' })).toBeVisible();
+  await expect(page.locator('[data-template-id]')).toHaveCount(4);
+  await expect(page.locator('[data-template-id="f111"]')).toContainText('女性综合 1+1+1');
+  await expect(page.locator('[data-template-id="body"]')).toContainText('健美式塑形');
+  await expect(page.locator('[data-template-id="conditioning"]')).toContainText('体能训练');
+  await expect(page.locator('[data-template-id="posture"]')).toContainText('即将开放');
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});
+
+test('F111 template landing preserves legacy presets and composer entry', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.goto('/#/coach/f111');
   await expect(page.getByRole('heading', { name: '女性综合 1+1+1' })).toBeVisible();
+  await expect(page.getByText('8 个推荐预设', { exact: false })).toBeVisible();
+  await expect(page.getByText('20 种自由组合', { exact: false })).toBeVisible();
   await expect(page.getByRole('link', { name: '自由组合编课', exact: true })).toBeVisible();
+  await expectNoPageErrors(errors);
+});
+
+test('Body, Conditioning and Posture template routes are safe generic landings', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.goto('/#/coach/body');
+  await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
+  await expect(page.getByText('已启用', { exact: false }).first()).toBeVisible();
+
+  await page.goto('/#/coach/conditioning');
+  await expect(page.getByRole('heading', { name: '体能训练' })).toBeVisible();
+  await expect(page.getByText('已启用', { exact: false }).first()).toBeVisible();
+
+  await page.goto('/#/coach/posture');
+  await expect(page.getByRole('heading', { name: '体态调整' })).toBeVisible();
+  await expect(page.getByText('即将开放', { exact: false }).first()).toBeVisible();
   await expectNoPageErrors(errors);
 });
 

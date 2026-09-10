@@ -10,6 +10,7 @@ DOMAIN_FILES = (
     "actions.json",
     "patterns.json",
     "sessions.json",
+    "templates.json",
     "support.json",
     "core.json",
     "prep.json",
