@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/template-registry.schema.json",
+  "title": "7Fit Training Template Registry",
+  "type": "object",
+  "required": ["ids", "registry"],
+  "properties": {
+    "ids": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_-]*$"
+      }
+    },
+    "registry": {
+      "type": "object",
+      "minProperties": 4,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "templateId",
+          "name",
+          "shortName",
+          "engine",
+          "status",
+          "levelSystem",
+          "capabilities",
+          "routeBase",
+          "description"
+        ],
+        "properties": {
+          "templateId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "name": {"type": "string", "minLength": 1},
+          "shortName": {"type": "string", "minLength": 1},
+          "engine": {
+            "enum": ["f111", "body", "conditioning", "posture"]
+          },
+          "status": {
+            "enum": ["ACTIVE", "FUTURE"]
+          },
+          "levelSystem": {
+            "const": "L1-L4"
+          },
+          "capabilities": {
+            "type": "object",
+            "required": [
+              "preset",
+              "composer",
+              "prep",
+              "anatomy",
+              "copy",
+              "save",
+              "volume",
+              "conditioningMetrics"
+            ],
+            "properties": {
+              "preset": {"type": "boolean"},
+              "composer": {"type": "boolean"},
+              "prep": {"type": "boolean"},
+              "anatomy": {"type": "boolean"},
+              "copy": {"type": "boolean"},
+              "save": {"type": "boolean"},
+              "volume": {"type": "boolean"},
+              "conditioningMetrics": {"type": "boolean"}
+            },
+            "additionalProperties": false
+          },
+          "routeBase": {
+            "type": "string",
+            "pattern": "^#/coach/[a-z][a-z0-9_-]*$"
+          },
+          "description": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
