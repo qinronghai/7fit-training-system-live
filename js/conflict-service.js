@@ -51,7 +51,9 @@
       fail('CONFLICT_TEMPLATE_MISMATCH',`Conflict template mismatch: expected ${templateId}, got ${resolvedSession.templateId}.`,{templateId,actualTemplateId:resolvedSession.templateId});
     }
     const shared=window.V15ConflictCore?.evaluate?.(resolvedSession,context.sharedPolicy||{})||[];
-    const domain=plugin.evaluate(resolvedSession,context.pluginContext||{})||[];
+    const domain=(plugin.evaluate(resolvedSession,context.pluginContext||{})||[]).map((issue,index)=>
+      Number.isFinite(issue?._order)?issue:{...issue,_order:10000+index}
+    );
     return summarize([...shared,...domain]);
   }
 
