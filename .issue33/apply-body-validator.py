@@ -1,4 +1,15 @@
+import json
 from pathlib import Path
+
+schema_path = Path("schemas/v14.8/body.schema.json")
+schema_text = schema_path.read_text(encoding="utf-8")
+broken = '"allowedRoles":{"type":"array","minItems":5,"maxItems":5,"uniqueItems":true,"items":{"$ref":"#/$defs/roleId"}},"additionalProperties":false},"defaultWorkingSets"'
+fixed = '"allowedRoles":{"type":"array","minItems":5,"maxItems":5,"uniqueItems":true,"items":{"$ref":"#/$defs/roleId"}}},"additionalProperties":false},"defaultWorkingSets"'
+if broken in schema_text:
+    schema_text = schema_text.replace(broken, fixed, 1)
+# Fail closed: never let malformed schema be committed by the helper.
+json.loads(schema_text)
+schema_path.write_text(schema_text.rstrip() + "\n", encoding="utf-8")
 
 path = Path("tools/validate_v148_schema.py")
 text = path.read_text(encoding="utf-8")
