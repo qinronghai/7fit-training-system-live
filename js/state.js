@@ -201,6 +201,15 @@
     if(!isObject(metadata.input))fail('INVALID_SESSION_METADATA','input must be an object',{templateId});
   }
 
+  function guardResolverVersion(current,nextVersion,templateId,sessionKey){
+    if(typeof nextVersion!=='string'||!nextVersion||nextVersion===current.resolverVersion)return;
+    fail(
+      'RESOLVER_VERSION_CHANGE_REQUIRES_RECONCILE',
+      `Resolver version change requires reconcileSession: ${current.resolverVersion} → ${nextVersion}`,
+      {templateId,sessionKey,currentResolverVersion:current.resolverVersion,requestedResolverVersion:nextVersion}
+    );
+  }
+
   function ensureSession(templateId,sessionKey,metadata={}){
     const ns=namespace(templateId);
     if(typeof sessionKey!=='string'||!sessionKey)fail('INVALID_SESSION_KEY','sessionKey is required',{templateId});
@@ -212,10 +221,10 @@
       persist();
       return clone(current);
     }
+    guardResolverVersion(current,metadata.resolverVersion,templateId,sessionKey);
     let changed=false;
     if(typeof metadata.familyId==='string'&&metadata.familyId&&metadata.familyId!==current.familyId){current.familyId=metadata.familyId;changed=true;}
     if(/^L[1-4]$/.test(metadata.level||'')&&metadata.level!==current.level){current.level=metadata.level;changed=true;}
-    if(typeof metadata.resolverVersion==='string'&&metadata.resolverVersion&&metadata.resolverVersion!==current.resolverVersion){current.resolverVersion=metadata.resolverVersion;changed=true;}
     if(isObject(metadata.input)){
       const merged={...current.input,...clone(metadata.input)};
       if(JSON.stringify(merged)!==JSON.stringify(current.input)){current.input=merged;changed=true;}
@@ -227,9 +236,9 @@
   function patchSession(templateId,sessionKey,patch={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
+    guardResolverVersion(current,patch.resolverVersion,templateId,sessionKey);
     if(typeof patch.familyId==='string'&&patch.familyId)current.familyId=patch.familyId;
     if(/^L[1-4]$/.test(patch.level||''))current.level=patch.level;
-    if(typeof patch.resolverVersion==='string'&&patch.resolverVersion)current.resolverVersion=patch.resolverVersion;
     if(isObject(patch.input))current.input={...current.input,...clone(patch.input)};
     if(isObject(patch.selections))current.selections=normalizeSelectionMap(patch.selections,false);
     if(isObject(patch.prepSelections))current.prepSelections=normalizeSelectionMap(patch.prepSelections,true);
