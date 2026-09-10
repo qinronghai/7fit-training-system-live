@@ -8,7 +8,7 @@ ctx.window.addEventListener=()=>{};
 vm.createContext(ctx);
 for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/state.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
-  'js/composer.js','js/conflict.js','js/resolved-session.js','js/template-resolver.js','js/resolvers/f111.js','js/module-copy.js','js/coach/common.js','js/coach/slot.js','js/coach/foam.js','js/coach/prep.js',
+  'js/composer.js','js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js','js/template-resolver.js','js/resolvers/f111.js','js/module-copy.js','js/coach/common.js','js/coach/slot.js','js/coach/foam.js','js/coach/prep.js',
   'js/coach/summary.js','js/coach/conflict-view.js','js/coach/session.js','js/coach/composer-view.js'
 ]) vm.runInContext(fs.readFileSync(`${root}/${file}`,'utf8'),ctx,{filename:file});
 const D=ctx.window.V14_DATA,S=ctx.window.V15State,V14=ctx.window.V14State,M=ctx.window.V14CoachModules;
