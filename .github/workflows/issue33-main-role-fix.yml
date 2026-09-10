@@ -19,105 +19,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Apply Body main-role target invariant
+      - name: Normalize Body spec section order
         run: |
           python - <<'PY'
-          import json
           from pathlib import Path
 
-          body_path = Path('data/src/body.json')
-          body = json.loads(body_path.read_text(encoding='utf-8'))
-          candidates = body['bodyActionMeta']
-
-          # BODY-01 is quadriceps-dominant. These glute-dominant compounds remain
-          # valid BODY-02 main/secondary options but must not inherit those roles in BODY-01.
-          for action_id in (
-              'tunqiao',
-              'tun_tui',
-              'hipthrust_pause_main',
-              'movement_single_leg_hip_thrust',
-          ):
-              families = candidates[action_id]['families']
-              if 'BODY-01' in families:
-                  families.remove('BODY-01')
-              if not families:
-                  raise SystemExit(f'{action_id}: Body families became empty')
-
-          body_path.write_text(json.dumps(body, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-
-          validator_path = Path('tools/validate_v148_schema.py')
-          text = validator_path.read_text(encoding='utf-8')
-          marker = '        # Body main-role candidates must directly train the Family primary target.\n'
-          if marker not in text:
-              anchor = '''        overlap = set(meta.get("directTargets", [])) & set(meta.get("secondaryTargets", []))\n        if overlap:\n            errors.append(\n                f"{prefix}: directTargets/secondaryTargets overlap: {sorted(overlap)}"\n            )\n'''
-              addition = anchor + '''\n        # Body main-role candidates must directly train the Family primary target.\n        main_roles = {"PRIMARY", "SECONDARY"} & set(meta.get("roles", []))\n        if main_roles:\n            direct_targets = set(meta.get("directTargets", []))\n            family_records = data.get("bodyFamilies", {})\n            for family_id in meta.get("families", []):\n                family = family_records.get(family_id)\n                if not isinstance(family, dict):\n                    continue\n                primary_targets = set(family.get("primaryTargets", []))\n                if primary_targets and not (direct_targets & primary_targets):\n                    errors.append(\n                        f"{prefix}.families: {family_id} cannot use roles {sorted(main_roles)} because "\n                        f"directTargets {sorted(direct_targets)} do not hit family primaryTargets "\n                        f"{sorted(primary_targets)}"\n                    )\n'''
-              if anchor not in text:
-                  raise SystemExit('validator insertion anchor missing')
-              text = text.replace(anchor, addition, 1)
-              validator_path.write_text(text, encoding='utf-8')
-
-          # Keep the human audit ledger synchronized with the JSON source of truth.
-          actions = json.loads(Path('data/src/actions.json').read_text(encoding='utf-8'))['actions']
-          ledger_path = Path('docs/V15-BODY-CANDIDATE-AUDIT.md')
-          lines = [
-              '# Body Candidate Audit｜#33',
-              '',
-              '状态：人工准入白名单；`bodyActionMeta` 为唯一运行时候选事实源。',
-              '',
-              '审计原则：只纳入现有正式 Action ID；必须为 1F/FLEX 力量路径且可自动编排；不从 Anatomy 自动推断 Direct Work Sets；不为凑数纳入 PREP/体能/恢复节点。',
-              '',
-              '**主项语义 Gate：任何包含 `PRIMARY` / `SECONDARY` 的 Candidate，其 `directTargets` 必须至少命中所属每个 Family 的 `primaryTargets`。V1 的 `roles` 为 Candidate 在其全部 `families` 中共享的合法 Role 集，因此跨 Family 主项语义不一致时采用保守拆分 Family membership，不做隐式推断。**',
-              '',
-              '明确排除：`smith_tuntui`（7Fit 场馆规则：臀推最高使用臀推机，不采用史密斯/杠铃臀推）；三点杆髋铰链、肩袖外旋等教学/激活节点不计 Body 正式工作组。',
-              '',
-              '| Action ID | 动作 | Family | Level | Role | Direct Targets | Secondary Targets | Class | Fatigue | Stability | Profile | Laterality | Route | 审计备注 |',
-              '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
-          ]
-          for action_id, meta in candidates.items():
-              action = actions[action_id]
-              note = '人工准入；主项角色命中 Family primary target' if ({'PRIMARY','SECONDARY'} & set(meta['roles'])) else '人工准入；辅助/孤立/可选角色'
-              lines.append(
-                  f'| {action_id} | {action.get("name", "")} | {" / ".join(meta["families"])} | '
-                  f'{" / ".join(meta["levels"])} | {" / ".join(meta["roles"])} | '
-                  f'{" / ".join(meta["directTargets"])} | {" / ".join(meta["secondaryTargets"]) or "—"} | '
-                  f'{meta["exerciseClass"]} | {meta["fatigueCost"]} | {meta["stabilityDemand"]} | '
-                  f'{meta["repProfile"]} | {meta["laterality"]} | {action.get("route", "")} | {note} |'
-              )
-          ledger_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-
-          # Record the invariant in the frozen design spec and implementation plan.
-          spec_path = Path('docs/superpowers/specs/2026-09-10-body-data-contract-design.md')
-          spec = spec_path.read_text(encoding='utf-8')
-          spec_marker = '### 7.4 Main Role / Family Target Gate\n'
-          if spec_marker not in spec:
-              anchor = '### 7.3 Candidate whitelist\n'
-              if anchor not in spec:
-                  raise SystemExit('design spec insertion anchor missing')
-              block = '''### 7.4 Main Role / Family Target Gate\n\nBody V1 冻结以下硬约束：只要 Candidate 的 `roles` 包含 `PRIMARY` 或 `SECONDARY`，其 `directTargets` 必须至少命中该 Candidate 所属**每一个** Family 的 `primaryTargets`。\n\nV1 的 `roles` 是 Candidate 在 `families` 中共享的合法 Role 集，不做按 Family 隐式角色推断。若同一动作在两个 Family 中的主项职责不同，V1 采用保守的 Family membership 拆分；未来只有真实需求证明必要时，才升级为显式 `rolesByFamily` contract。\n\n'''
-              spec = spec.replace(anchor, block + anchor, 1)
-              spec_path.write_text(spec, encoding='utf-8')
-
-          plan_path = Path('docs/superpowers/plans/2026-09-10-body-data-contract.md')
-          plan = plan_path.read_text(encoding='utf-8')
-          sentence = '- `PRIMARY` / `SECONDARY` candidates must have `directTargets` intersecting every declared Family `primaryTargets`; no cross-Family main-role leakage.\n'
-          if sentence not in plan:
-              anchor = '- Anatomy exposure must never be converted automatically into Body Direct Work Sets.\n'
-              if anchor not in plan:
-                  raise SystemExit('implementation plan insertion anchor missing')
-              plan = plan.replace(anchor, anchor + sentence, 1)
-              plan_path.write_text(plan, encoding='utf-8')
+          path = Path('docs/superpowers/specs/2026-09-10-body-data-contract-design.md')
+          text = path.read_text(encoding='utf-8')
+          main = '''### 7.4 Main Role / Family Target Gate\n\nBody V1 冻结以下硬约束：只要 Candidate 的 `roles` 包含 `PRIMARY` 或 `SECONDARY`，其 `directTargets` 必须至少命中该 Candidate 所属**每一个** Family 的 `primaryTargets`。\n\nV1 的 `roles` 是 Candidate 在 `families` 中共享的合法 Role 集，不做按 Family 隐式角色推断。若同一动作在两个 Family 中的主项职责不同，V1 采用保守的 Family membership 拆分；未来只有真实需求证明必要时，才升级为显式 `rolesByFamily` contract。\n\n'''
+          candidate = '''### 7.3 Candidate whitelist\n\nV1 不给全部 243 个 Action 自动打 Body 标签。第一版建立约 **40–60 个经过人工审计的 Body Candidate 白名单**，优先覆盖膝主导、髋铰链/髋伸、单腿、水平/垂直推拉、腿屈伸/腿弯举、臀部孤立、髋外展/内收、后三角/侧平举、二头/三头及必要低疲劳胸背辅助。\n\n候选必须引用现有 `actions` 中真实存在的 Action ID。\n\n'''
+          wrong = main + candidate
+          right = candidate + main
+          if wrong in text:
+              text = text.replace(wrong, right, 1)
+          elif right not in text:
+              raise SystemExit('expected Body 7.3/7.4 blocks not found')
+          path.write_text(text, encoding='utf-8')
           PY
-          python tools/build_system_data.py
-          python -m pip install --quiet pytest beautifulsoup4 jsonschema
-          python -m pytest -q tests/test_issue33_body_candidates.py tests/test_issue33_body_validator.py
-          python tools/build_system_data.py --check
-          python tools/validate_v148_schema.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/src/body.json data/system-data.js tools/validate_v148_schema.py docs/V15-BODY-CANDIDATE-AUDIT.md docs/superpowers/specs/2026-09-10-body-data-contract-design.md docs/superpowers/plans/2026-09-10-body-data-contract.md
+          git add docs/superpowers/specs/2026-09-10-body-data-contract-design.md
           if git diff --cached --quiet; then
-            echo 'Body main-role invariant already applied'
+            echo 'Body spec section order already normalized'
           else
-            git commit -m 'fix: enforce Body family main-role targets'
+            git commit -m 'docs: order Body candidate and main-role sections'
             git push origin HEAD:feature/issue-33-body-data-contract
           fi
