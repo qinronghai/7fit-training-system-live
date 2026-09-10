@@ -4,6 +4,10 @@ ROOT=Path(__file__).parents[1]
 
 def text(path): return (ROOT/path).read_text(encoding='utf-8')
 
+def coach_source():
+    paths=['js/coach/common.js','js/coach/home.js','js/coach/slot.js','js/coach/composer-view.js','js/views-coach.js']
+    return '\n'.join(text(path) for path in paths)
+
 def test_composer_script_is_loaded_before_coach_view():
     html=text('index.html')
     assert 'js/composer.js' in html
@@ -11,14 +15,14 @@ def test_composer_script_is_loaded_before_coach_view():
 
 
 def test_coach_center_has_preset_and_free_composer_modes():
-    js=text('js/views-coach.js')
+    js=coach_source()
     for label in ['7Fit 推荐预设','自由组合编课','20 种基础组合','5 × 4 主模式矩阵']:
         assert label in js
     assert '#/coach/compose' in js
 
 
 def test_free_composer_ui_exposes_level_matrix_mobile_and_six_slots():
-    js=text('js/views-coach.js')
+    js=coach_source()
     composer=text('js/composer.js')
     for marker in ['composer-level-switch','composer-matrix','composer-mobile-selectors','composer-slot-select']:
         assert marker in js

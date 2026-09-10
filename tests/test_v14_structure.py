@@ -6,6 +6,15 @@ ROOT = Path(__file__).parents[1]
 def soup():
     return BeautifulSoup((ROOT / 'index.html').read_text(encoding='utf-8'), 'html.parser')
 
+def coach_source():
+    paths = [
+        'js/coach/common.js', 'js/coach/home.js', 'js/coach/slot.js',
+        'js/coach/foam.js', 'js/coach/prep.js', 'js/coach/summary.js',
+        'js/coach/conflict-view.js', 'js/coach/session.js',
+        'js/coach/composer-view.js', 'js/views-coach.js'
+    ]
+    return '\n'.join((ROOT / path).read_text(encoding='utf-8') for path in paths)
+
 def test_app_shell_has_single_main_outlet():
     s = soup()
     assert s.select_one('#app-sidebar')
@@ -52,7 +61,7 @@ def test_mobile_navigation_has_five_primary_destinations():
 
 
 def test_coach_home_contains_approved_f111_course_introduction():
-    text = (ROOT / 'js' / 'views-coach.js').read_text(encoding='utf-8')
+    text = coach_source()
     required = [
         '为什么是「1+1+1」',
         '一下肢 + 一上肢 + 一支撑',
@@ -101,14 +110,14 @@ def test_v143_prep_view_has_level_and_pattern_match_controls():
     assert 'data-prep-id' in text
 
 def test_v143_coach_session_renders_matched_warmup_recommendations():
-    text = (ROOT / 'js' / 'views-coach.js').read_text(encoding='utf-8')
+    text = coach_source()
     assert '当前课程热身匹配' in text
     assert 'warmupDetails' in text
     assert '#/system/prep?' in text
 
 def test_v144_prep_matcher_renders_foam_roll_recommendations():
     system = (ROOT / 'js' / 'views-system.js').read_text(encoding='utf-8')
-    coach = (ROOT / 'js' / 'views-coach.js').read_text(encoding='utf-8')
+    coach = coach_source()
     assert '泡沫轴松解建议' in system
     assert 'foamRollMatchByPattern' in system
     assert '当前课程泡沫轴匹配' in coach
@@ -117,7 +126,7 @@ def test_v144_prep_matcher_renders_foam_roll_recommendations():
 
 def test_v145_action_detail_and_coach_surface_anatomy():
     detail = (ROOT / 'js' / 'action-detail.js').read_text(encoding='utf-8')
-    coach = (ROOT / 'js' / 'views-coach.js').read_text(encoding='utf-8')
+    coach = coach_source()
     system = (ROOT / 'js' / 'views-system.js').read_text(encoding='utf-8')
     for label in ['肌群解剖', '解剖数据待补齐']:
         assert label in detail
@@ -148,7 +157,7 @@ def test_v146_conditioning_and_full_coverage_ui_contract():
     assert '安全边界' in detail
 
 def test_v1461_session_copy_controls_exist():
-    coach = (ROOT / 'js' / 'views-coach.js').read_text(encoding='utf-8')
+    coach = coach_source()
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
     assert '复制教练版' in coach
     assert '复制会员版' in coach

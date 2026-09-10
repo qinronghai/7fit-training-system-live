@@ -4,6 +4,10 @@ ROOT=Path(__file__).parents[1]
 
 def read(rel): return (ROOT/rel).read_text(encoding='utf-8')
 
+def coach_source():
+    paths=['js/coach/common.js','js/coach/foam.js','js/coach/prep.js','js/coach/session.js','js/coach/composer-view.js','js/views-coach.js']
+    return '\n'.join(read(path) for path in paths)
+
 def test_module_copy_script_loaded_before_views():
     html=read('index.html')
     assert 'js/module-copy.js' in html
@@ -19,12 +23,12 @@ def test_requested_modules_expose_copy_controls():
     assert 'V14ModuleCopy' in detail
 
 def test_coach_payload_uses_prescription_and_tier_not_equipment_meta():
-    coach=read('js/views-coach.js')
+    coach=read('js/coach/session.js')
     assert 'prescriptionForAction' in coach
     assert 'tierForAction' in coach
     assert 'prescription' in coach
     # the copy payload should no longer build meta from pattern/equipment
-    payload=coach[coach.index('function buildCopyPayload'):coach.index('function copyToolbar')]
+    payload=coach[coach.index('function buildCopyPayload'):coach.index('function render')]
     assert "a.equipment" not in payload
     assert "meta=" not in payload
 
@@ -34,7 +38,7 @@ def test_global_module_copy_binding_runs_after_route_render():
     assert '.bind(main)' in app or '.bind(document)' in app
 
 def test_f111_prep_submodules_have_generic_copy_buttons():
-    coach=read('js/views-coach.js')
+    coach=coach_source()
     assert 'coach-foam-' in coach
     assert 'coach-prep-' in coach
     assert '复制本模块' in coach
