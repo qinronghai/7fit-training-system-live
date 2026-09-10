@@ -26,10 +26,12 @@ expectTemplate('#/coach/posture','posture');
 
 const composer=R.parseHash('#/coach/compose');
 assert.strictEqual(composer.page,'compose');
+assert.strictEqual(composer.templateId,'f111');
 assert.strictEqual(R.isValid(composer),true);
 
 const legacy=R.parseHash('#/coach/f111-06/l3');
 assert.strictEqual(legacy.page,'preset');
+assert.strictEqual(legacy.templateId,'f111');
 assert.strictEqual(legacy.recipeId,'F111-06');
 assert.strictEqual(legacy.level,'L3');
 assert.strictEqual(R.isValid(legacy),true);
@@ -68,7 +70,8 @@ assert(f111.includes('女性综合 1+1+1'));
 assert(f111.includes('8 个推荐预设'));
 assert(f111.includes('20 种自由组合'));
 assert(f111.includes('32 套原课程兼容'));
-assert(f111.includes('#/coach/compose'));
+assert(f111.includes('#/coach/f111/compose'));
+assert(!f111.includes('href="#/coach/compose"'));
 
 const body=M.TemplateHome.render('body');
 assert(body.includes('健美式塑形'));
