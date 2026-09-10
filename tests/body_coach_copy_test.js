@@ -16,7 +16,7 @@ function boot(){
     'data/system-data.js','data/anatomy-data.js','js/state.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
     'js/resolved-session.js','js/body-volume.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/body.js',
     'js/template-resolver.js','js/resolvers/body.js','js/session-copy.js','js/coach/common.js','js/coach/template-ui.js',
-    'js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-prep.js'
+    'js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-prep.js','js/coach/body-recovery.js'
   ]) vm.runInContext(fs.readFileSync(`${root}/${file}`,'utf8'),ctx,{filename:file});
   assert.strictEqual(fs.existsSync(`${root}/js/coach/body-copy.js`),true,'Body Copy adapter module must exist');
   vm.runInContext(fs.readFileSync(`${root}/js/coach/body-copy.js`,'utf8'),ctx,{filename:'js/coach/body-copy.js'});
