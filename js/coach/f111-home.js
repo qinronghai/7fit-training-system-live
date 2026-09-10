@@ -1,7 +1,7 @@
 (function(){
   const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
   const {esc,D}=C;
-  function modeSwitch(){return `<nav class="coach-mode-switch"><a class="active" href="#/coach/f111">7Fit 推荐预设</a><a href="#/coach/compose">自由组合编课</a></nav>`;}
+  function modeSwitch(){return `<nav class="coach-mode-switch"><a class="active" href="#/coach/f111">7Fit 推荐预设</a><a href="#/coach/f111/compose">自由组合编课</a></nav>`;}
   function homeHero(){
     return `<section class="view-hero coach-home-hero">
       <div class="coach-home-hero-main">
@@ -25,11 +25,11 @@
     const data=D();
     const cards=data.recipeIds.map(id=>{
       const r=data.recipes[id];
-      const levels=[1,2,3,4].map(n=>`<a href="#/coach/${id.toLowerCase()}/l${n}">L${n}</a>`).join('');
+      const levels=[1,2,3,4].map(n=>`<a href="#/coach/f111/${id.toLowerCase()}/l${n}">L${n}</a>`).join('');
       return `<article class="recipe-card"><div class="recipe-code">${id}</div><h3>${esc(r.name)}</h3><div class="recipe-tags"><span>${esc(r.lower)}</span><span>${esc(r.upper)}</span><span>${esc(r.support)}</span></div><div class="level-links">${levels}</div></article>`;
     }).join('');
     return modeSwitch()+homeHero()+
-      `<section class="section-card"><div class="section-head"><div><h2>7Fit 推荐预设</h2><p>保留原 8 个 Recipe Family 和 32 套 L1–L4 课程；新教练可直接使用，熟悉体系后可进入自由组合。</p></div><a class="section-action-link" href="#/coach/compose">进入自由组合编课 →</a></div><div class="recipe-grid">${cards}</div></section>`;
+      `<section class="section-card"><div class="section-head"><div><h2>7Fit 推荐预设</h2><p>保留原 8 个 Recipe Family 和 32 套 L1–L4 课程；新教练可直接使用，熟悉体系后可进入自由组合。</p></div><a class="section-action-link" href="#/coach/f111/compose">进入自由组合编课 →</a></div><div class="recipe-grid">${cards}</div></section>`;
   }
   M.F111Home={render};
 })();

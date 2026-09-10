@@ -1,7 +1,7 @@
 (function(){
   function labels(route){
     if(route.area==='coach'){
-      if(route.page==='template'){
+      if(route.page==='template'||route.page==='template-compose'){
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
         return ['编课中心',record?.name||'训练模板'];
       }
