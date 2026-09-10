@@ -21,6 +21,10 @@
     return value&&typeof value.actionId==='string'?value.actionId:'';
   }
 
+  function normalizeManualActionId(value){
+    return value&&typeof value==='object'&&value.source==='manual'&&typeof value.actionId==='string'?value.actionId:'';
+  }
+
   function validateInput(input={},requireSlot=false){
     const data=D();
     const familyId=typeof input.familyId==='string'?input.familyId:'';
@@ -179,7 +183,7 @@
 
     for(const slotKey of activeSlotKeys(levelPolicy)){
       const role=family.slotPolicy[slotKey];
-      const requestedActionId=normalizeActionId(requested[slotKey]);
+      const requestedActionId=normalizeManualActionId(requested[slotKey]);
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
       if(requestedActionId&&!used.has(requestedActionId)&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
