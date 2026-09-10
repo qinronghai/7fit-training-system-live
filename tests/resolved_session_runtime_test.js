@@ -7,9 +7,16 @@ function load(file){
 }
 
 load('data/system-data.js');
+load('data/anatomy-data.js');
+load('js/prep-grade.js');
+load('js/anatomy.js');
+load('js/prep-resolver.js');
+load('js/composer.js');
+load('js/conflict.js');
 load('js/resolved-session.js');
 load('js/template-resolver.js');
 
+const D=window.V14_DATA;
 const Contract=window.V15ResolvedSession;
 const Dispatcher=window.V15TemplateResolver;
 assert(Contract&&typeof Contract.validate==='function');
@@ -98,5 +105,54 @@ expectCode(()=>Dispatcher.resolve('body',{}),'RESOLVER_NOT_REGISTERED');
 
 expectCode(()=>Dispatcher.register('not-a-template',()=>slotSession()),'UNKNOWN_TEMPLATE');
 expectCode(()=>Dispatcher.register('body',null),'INVALID_RESOLVER');
+
+// Real F111 adapter contract. It must be explicit-input and State-independent.
+load('js/resolvers/f111.js');
+assert.strictEqual(typeof window.V15F111Resolver,'function');
+assert.strictEqual(Dispatcher.has('f111'),true);
+
+window.V14State=new Proxy({}, {
+  get(){throw new Error('Issue #29 F111 resolver must not read V14State');}
+});
+
+const presetSource=D.sessions['F111-06-L3'];
+assert(presetSource,'F111-06-L3 fixture missing');
+const baselineIds=presetSource.slots.map(slot=>slot.baselineId);
+
+const preset=Dispatcher.resolve('f111',{mode:'preset',recipeId:'F111-06',level:'L3'});
+assert.strictEqual(preset.templateId,'f111');
+assert.strictEqual(preset.familyId,'F111-06');
+assert.strictEqual(preset.level,'L3');
+assert.strictEqual(preset.main.kind,'SLOT');
+assert.strictEqual(preset.main.content.length,6);
+assert.deepStrictEqual(preset.main.content.map(slot=>slot.actionId),baselineIds);
+assert(preset.main.content.every(slot=>slot.source==='baseline'));
+assert.deepStrictEqual(preset.resolvedSelections.map(x=>x.actionId),baselineIds);
+assert.strictEqual(preset.source.type,'PRESET');
+assert.strictEqual(preset.source.id,'F111-06-L3');
+assert.strictEqual(preset.prepContext.template,'f111');
+assert.strictEqual(preset.prepContext.level,'L3');
+assert(preset.prepContext.mainActionIds.length>=2);
+assert.strictEqual(Contract.validate(preset).ok,true,Contract.validate(preset).errors.join(' | '));
+for(const privateKey of ['lowerMode','upperMode','windows','coreDemand']) assert(!(privateKey in preset));
+
+const explicitPreset=Dispatcher.resolve('f111',{mode:'preset',recipeId:'F111-06',level:'L3',selections:baselineIds});
+assert.deepStrictEqual(explicitPreset,preset,'explicit baseline selections must preserve the same public result');
+
+const presetAgain=Dispatcher.resolve('f111',{mode:'preset',recipeId:'F111-06',level:'L3'});
+assert.deepStrictEqual(presetAgain,preset,'same explicit input must resolve deterministically');
+
+const composerInput={mode:'composer',level:'L3',lowerMode:'single_leg_hinge',upperMode:'horizontal_push',coreDemand:'anti_extension'};
+const composer=Dispatcher.resolve('f111',composerInput);
+assert.strictEqual(composer.templateId,'f111');
+assert.strictEqual(composer.main.kind,'SLOT');
+assert.strictEqual(composer.main.content.length,6);
+assert(composer.familyId.startsWith('F111-C-'));
+assert.strictEqual(composer.source.type,'COMPOSER');
+assert.strictEqual(composer.prepContext.level,'L3');
+assert.strictEqual(Contract.validate(composer).ok,true,Contract.validate(composer).errors.join(' | '));
+for(const privateKey of ['lowerMode','upperMode','windows','coreDemand']) assert(!(privateKey in composer));
+const composerAgain=Dispatcher.resolve('f111',composerInput);
+assert.deepStrictEqual(composerAgain,composer,'composer resolution must be deterministic');
 
 console.log('resolved_session_runtime_test: PASS');
