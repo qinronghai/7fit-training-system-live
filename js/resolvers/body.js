@@ -148,6 +148,16 @@
     return `${slotKey}｜${roleName}`;
   }
 
+  function evaluateConflict(session){
+    if(!window.V15Conflict?.evaluate)fail('BODY_CONFLICT_UNAVAILABLE','Body conflict service is unavailable');
+    return window.V15Conflict.evaluate('body',session,{
+      sharedPolicy:{
+        allowedRoutes:[...MAIN_ROUTES],
+        allowedStatuses:['可自动编排'],
+      }
+    });
+  }
+
   function resolve(input={}){
     const {familyId,level,family,levelPolicy}=validateInput(input);
     if(!window.V15BodyVolume?.buildSlot||!window.V15BodyVolume?.summarize){
@@ -161,7 +171,7 @@
       const requestedActionId=normalizeActionId(requested[slotKey]);
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
-      if(requestedActionId&& !used.has(requestedActionId) && isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
+      if(requestedActionId&&!used.has(requestedActionId)&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
         actionId=requestedActionId;
         source='manual';
       }else{
@@ -201,7 +211,7 @@
       formalActionIds:actionIds,targetMuscles:targetMuscleNames(family.primaryTargets),modalities:[],impactDemand:'',powerDemand:''
     };
     const title=`${family.name}｜${level}`;
-    const summary=`Body ${level}｜${targetMuscleNames(family.primaryTargets).join(' + ')}主导`; 
+    const summary=`Body ${level}｜${targetMuscleNames(family.primaryTargets).join(' + ')}主导`;
     const session={
       schemaVersion:1,
       resolverVersion:'body-v1',
@@ -220,6 +230,7 @@
       source:{type:'GENERATED',id:`${familyId}-${level}`},
       domainContext:{kind:'BODY',slots:domainSlots,volume:window.V15BodyVolume.summarize(domainSlots)},
     };
+    session.conflictContext=evaluateConflict(session);
     const validation=window.V15ResolvedSession?.validate?.(session);
     if(validation&&!validation.ok)fail('BODY_RESOLVED_SESSION_INVALID','Body Resolver produced invalid ResolvedSession',{validationErrors:validation.errors});
     return session;
