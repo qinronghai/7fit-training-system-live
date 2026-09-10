@@ -19,15 +19,64 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Generate committed runtime bundle
+      - name: Apply curated Body candidates and generate runtime bundle
         run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          body_path = Path('data/src/body.json')
+          candidate_path = Path('.issue33/body-candidates.json')
+          actions_path = Path('data/src/actions.json')
+          ledger_path = Path('docs/V15-BODY-CANDIDATE-AUDIT.md')
+
+          body = json.loads(body_path.read_text(encoding='utf-8'))
+          candidates = json.loads(candidate_path.read_text(encoding='utf-8'))
+          actions = json.loads(actions_path.read_text(encoding='utf-8'))['actions']
+
+          if not 40 <= len(candidates) <= 60:
+              raise SystemExit(f'Body candidate count must be 40-60; got {len(candidates)}')
+
+          for action_id in candidates:
+              if action_id not in actions:
+                  raise SystemExit(f'unknown Body Action ID: {action_id}')
+              action = actions[action_id]
+              if action.get('route') not in {'1F_ONLY', 'FLEX_1F_2F'}:
+                  raise SystemExit(f'invalid Body strength route: {action_id} -> {action.get("route")}')
+              if action.get('status') != '可自动编排':
+                  raise SystemExit(f'Body candidate not auto-programmable: {action_id} -> {action.get("status")}')
+
+          body['bodyActionMeta'] = candidates
+          body_path.write_text(json.dumps(body, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          lines = [
+              '# Body Candidate Audit｜#33',
+              '',
+              '状态：人工准入白名单；`bodyActionMeta` 为唯一运行时候选事实源。',
+              '',
+              '审计原则：只纳入现有正式 Action ID；必须为 1F/FLEX 力量路径且可自动编排；不从 Anatomy 自动推断 Direct Work Sets；不为凑数纳入 PREP/体能/恢复节点。',
+              '',
+              '明确排除：`smith_tuntui`（7Fit 场馆规则：臀推最高使用臀推机，不采用史密斯/杠铃臀推）；三点杆髋铰链、肩袖外旋等教学/激活节点不计 Body 正式工作组。',
+              '',
+              '| Action ID | 动作 | Family | Level | Role | Direct Targets | Route | 审核 |',
+              '|---|---|---|---|---|---|---|---|',
+          ]
+          for action_id, meta in candidates.items():
+              action = actions[action_id]
+              lines.append(
+                  f'| {action_id} | {action.get("name", "")} | {" / ".join(meta["families"])} | '
+                  f'{" / ".join(meta["levels"])} | {" / ".join(meta["roles"])} | '
+                  f'{" / ".join(meta["directTargets"])} | {action.get("route", "")} | PASS |'
+              )
+          ledger_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
           python tools/build_system_data.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/system-data.js
+          git add data/src/body.json docs/V15-BODY-CANDIDATE-AUDIT.md data/system-data.js
           if git diff --cached --quiet; then
-            echo 'Bundle already fresh'
+            echo 'Body candidates and bundle already fresh'
           else
-            git commit -m 'build: refresh Body runtime bundle'
+            git commit -m 'feat: add curated Body candidate whitelist'
             git push origin HEAD:feature/issue-33-body-data-contract
           fi
