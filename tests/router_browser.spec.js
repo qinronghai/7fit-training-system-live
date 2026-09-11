@@ -149,11 +149,14 @@ test('#30 canonical and legacy F111 URLs share formal and PREP state through rel
   await expectNoPageErrors(errors);
 });
 
-test('Body and Conditioning compose routes are safe non-F111 landings', async ({ page }) => {
+test('Body composer is active while Conditioning compose remains a safe placeholder', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body/compose');
-  await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
-  await expect(page.getByText('具体编排引擎将在对应模板任务中接入', { exact: false })).toBeVisible();
+  await expect(page).toHaveURL(/#\/coach\/body\/compose\?family=BODY-01&level=L1/);
+  await expect(page.getByRole('heading', { name: 'Body 自由编课' })).toBeVisible();
+  await expect(page.locator('[data-body-compose-family]')).toHaveValue('BODY-01');
+  await expect(page.locator('[data-body-compose-level]')).toHaveValue('L1');
+  await expect(page.locator('.body-slot-card')).toHaveCount(5);
   await expect(page.locator('.composer-slot-card')).toHaveCount(0);
 
   await page.goto('/#/coach/conditioning/compose');

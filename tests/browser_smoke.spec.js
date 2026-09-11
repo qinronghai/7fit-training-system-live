@@ -91,11 +91,13 @@ test('F111 preset page keeps legacy UI while new dispatcher resolves the same pu
   await expectNoPageErrors(errors);
 });
 
-test('Body, Conditioning and Posture template routes are safe generic landings', async ({ page }) => {
+test('Body home is active while Conditioning and Posture remain safe template landings', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body');
   await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
-  await expect(page.getByText('已启用', { exact: false }).first()).toBeVisible();
+  await expect(page.locator('.body-family-card')).toHaveCount(4);
+  await expect(page.getByText('推荐 Family / Level', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: '自由编课 →', exact: true })).toBeVisible();
 
   await page.goto('/#/coach/conditioning');
   await expect(page.getByRole('heading', { name: '体能训练' })).toBeVisible();

@@ -1,12 +1,26 @@
 (function(){
   const M=window.V14CoachModules||{},Home=M.Home,F111Home=M.F111Home,TemplateHome=M.TemplateHome,Session=M.Session,ComposerView=M.ComposerView;
+  function templateAdapter(route){
+    if(!route?.templateId||route.templateId==='f111')return null;
+    const adapter=M.TemplateUI?.get?.(route.templateId);
+    return adapter?.canHandle?.(route)?adapter:null;
+  }
   function render(route){
+    const adapter=templateAdapter(route);
+    if(adapter)return adapter.render(route);
     if(route.page==='compose')return ComposerView.render(route);
     if(route.recipeId)return Session.render(route);
     if(route.page==='template'||route.page==='template-compose')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
     return Home.render(route);
   }
   function bind(route){
+    const adapter=templateAdapter(route);
+    if(adapter){
+      const root=document.getElementById('app-main');
+      const rerender=()=>{const current=window.V14Router.parseHash(location.hash);root.innerHTML=render(current);bind(current);if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);};
+      adapter.bind(route,root,rerender);
+      return;
+    }
     if(route.page==='compose'){
       const rerender=()=>{const current=window.V14Router.parseHash(location.hash);document.getElementById('app-main').innerHTML=render(current);bind(current);if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(document.getElementById('app-main'));};
       const ctx=ComposerView.composerContext(route);
