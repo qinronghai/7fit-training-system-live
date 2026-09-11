@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/conditioning.schema.json",
+  "title": "7Fit Conditioning Data Contract V1",
+  "type": "object",
+  "required": [
+    "conditioningFamilyIds",
+    "conditioningFamilies",
+    "conditioningProtocolIds",
+    "conditioningProtocols",
+    "conditioningModalityIds",
+    "conditioningModalities",
+    "conditioningLevelPolicies",
+    "conditioningProtocolPolicies",
+    "conditioningActionMeta",
+    "conditioningTransitionPolicy",
+    "conditioningConflictPolicy"
+  ],
+  "properties": {
+    "conditioningFamilyIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conditioningFamilies": {
+      "type": "object"
+    },
+    "conditioningProtocolIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conditioningProtocols": {
+      "type": "object"
+    },
+    "conditioningModalityIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conditioningModalities": {
+      "type": "object"
+    },
+    "conditioningLevelPolicies": {
+      "type": "object"
+    },
+    "conditioningProtocolPolicies": {
+      "type": "object"
+    },
+    "conditioningActionMeta": {
+      "type": "object"
+    },
+    "conditioningTransitionPolicy": {
+      "type": "object"
+    },
+    "conditioningConflictPolicy": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

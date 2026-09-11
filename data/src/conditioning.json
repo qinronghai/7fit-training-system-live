@@ -1,0 +1,13 @@
+{
+  "conditioningFamilyIds": [],
+  "conditioningFamilies": {},
+  "conditioningProtocolIds": [],
+  "conditioningProtocols": {},
+  "conditioningModalityIds": [],
+  "conditioningModalities": {},
+  "conditioningLevelPolicies": {},
+  "conditioningProtocolPolicies": {},
+  "conditioningActionMeta": {},
+  "conditioningTransitionPolicy": {},
+  "conditioningConflictPolicy": {}
+}
