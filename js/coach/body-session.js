@@ -96,8 +96,11 @@
       slotKey:slot.key,
       currentSelections:resolvedSelectionMap(ctx.session),
     });
-    const options=(result.candidates||[]).map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
-    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>`;
+    const candidates=result.candidates||[];
+    const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
+    const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
+    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${quick}`;
   }
 
   function slotCard(ctx,slot){
@@ -214,7 +217,19 @@
     }
 
     root.querySelectorAll('.body-slot-select').forEach(select=>select.addEventListener('change',()=>{
-      setFormalSelection(familyId,level,select.dataset.bodySlot,select.value);
+      const slotKey=select.dataset.bodySlot,candidates=Array.from(select.options).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
+      const contextKey=window.V15RecentActions?.context?.body?.({familyId,level,slotKey});
+      window.V15RecentActions?.record?.({templateId:'body',contextKey,actionId:select.value,candidates});
+      setFormalSelection(familyId,level,slotKey,select.value);
+      rerender();
+    }));
+    root.querySelectorAll('.body-slot-card [data-recent-action]').forEach(button=>button.addEventListener('click',()=>{
+      const card=button.closest('.body-slot-card'),slotKey=card?.dataset.bodySlot,select=card?.querySelector('.body-slot-select');
+      const actionId=button.dataset.recentAction,candidates=Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
+      if(!select||!slotKey||!candidates.some(candidate=>candidate.actionId===actionId))return;
+      const contextKey=window.V15RecentActions?.context?.body?.({familyId,level,slotKey});
+      window.V15RecentActions?.record?.({templateId:'body',contextKey,actionId,candidates});
+      setFormalSelection(familyId,level,slotKey,actionId);
       rerender();
     }));
     root.querySelectorAll('.body-prep-select').forEach(select=>select.addEventListener('change',()=>{
