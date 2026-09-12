@@ -148,6 +148,23 @@ def validate_payload(data: dict) -> list[str]:
     body = {key: data.get(key) for key in body_keys}
     errors.extend(_schema_errors(body, "body", "body"))
 
+    # Conditioning aggregate schema. Keep the real runtime keys visible in error paths.
+    conditioning_keys = (
+        "conditioningFamilyIds",
+        "conditioningFamilies",
+        "conditioningProtocolIds",
+        "conditioningProtocols",
+        "conditioningModalityIds",
+        "conditioningModalities",
+        "conditioningLevelPolicies",
+        "conditioningProtocolPolicies",
+        "conditioningActionMeta",
+        "conditioningTransitionPolicy",
+        "conditioningConflictPolicy",
+    )
+    conditioning = {key: data.get(key) for key in conditioning_keys}
+    errors.extend(_schema_errors(conditioning, "conditioning", "conditioning"))
+
     # Training Template Registry identity and routing contract.
     if len(template_ids) != len(set(template_ids)):
         errors.append("templateIds: duplicate template IDs are not allowed")
@@ -407,6 +424,237 @@ def validate_payload(data: dict) -> list[str]:
                         f"directTargets {sorted(direct_targets)} do not hit family primaryTargets "
                         f"{sorted(primary_targets)}"
                     )
+
+    # Conditioning cross-record identity, candidate references, and V1 venue legality.
+    conditioning_family_ids = data.get("conditioningFamilyIds", [])
+    conditioning_protocol_ids = data.get("conditioningProtocolIds", [])
+    conditioning_modality_ids = data.get("conditioningModalityIds", [])
+    conditioning_level_ids = {"L1", "L2", "L3", "L4"}
+    conditioning_action_meta = data.get("conditioningActionMeta", {})
+    conditioning_families = data.get("conditioningFamilies", {})
+    conditioning_protocols = data.get("conditioningProtocols", {})
+    conditioning_modalities = data.get("conditioningModalities", {})
+    conditioning_level_policies = data.get("conditioningLevelPolicies", {})
+    conditioning_protocol_policies = data.get("conditioningProtocolPolicies", {})
+
+    for map_name, id_field, ids in (
+        ("conditioningFamilies", "familyId", conditioning_family_ids),
+        ("conditioningProtocols", "protocolId", conditioning_protocol_ids),
+        ("conditioningModalities", "modalityId", conditioning_modality_ids),
+        ("conditioningLevelPolicies", "level", ["L1", "L2", "L3", "L4"]),
+        ("conditioningProtocolPolicies", "protocolId", conditioning_protocol_ids),
+    ):
+        records = data.get(map_name, {})
+        if set(records) != set(ids):
+            errors.append(
+                f"{map_name}: keys must match declared IDs; declared={sorted(ids)}; actual={sorted(records)}"
+            )
+        for record_id, record in records.items():
+            if isinstance(record, dict) and record.get(id_field) != record_id:
+                errors.append(
+                    f"{map_name}.{record_id}.{id_field}: must equal map key {record_id}"
+                )
+
+    valid_conditioning_families = set(conditioning_family_ids)
+    valid_conditioning_protocols = set(conditioning_protocol_ids)
+    valid_conditioning_modalities = set(conditioning_modality_ids)
+    valid_work_metrics = {"time", "distance", "reps", "calories"}
+
+    for family_id, family in sorted(conditioning_families.items()):
+        if not isinstance(family, dict):
+            continue
+        for protocol_id in family.get("protocolEligibility", []):
+            if protocol_id not in valid_conditioning_protocols:
+                errors.append(
+                    f"conditioningFamilies.{family_id}.protocolEligibility: unknown protocol {protocol_id}"
+                )
+        for modality_id in family.get("preferredModalities", []):
+            if modality_id not in valid_conditioning_modalities:
+                errors.append(
+                    f"conditioningFamilies.{family_id}.preferredModalities: unknown modality {modality_id}"
+                )
+
+    if len(conditioning_action_meta) != 18:
+        errors.append(
+            f"conditioningActionMeta: expected 18 curated V1 candidates, got {len(conditioning_action_meta)}"
+        )
+
+    risk_order = {"low": 0, "medium": 1, "high": 2}
+    post_cardio_only_ids = {"venue_treadmill_zone2", "venue_stair_zone2"}
+
+    for action_id, meta in sorted(conditioning_action_meta.items()):
+        prefix = f"conditioningActionMeta.{action_id}"
+        action = actions.get(action_id)
+        if action is None:
+            errors.append(f"{prefix}: unknown action {action_id}")
+        else:
+            route = action.get("route")
+            if route != "CONDITIONING_2F":
+                errors.append(
+                    f"{prefix}.route: action {action_id} route {route} is not formal CONDITIONING_2F"
+                )
+            status = action.get("status")
+            if status != "可自动编排":
+                errors.append(
+                    f"{prefix}.status: action {action_id} status {status} is not 可自动编排"
+                )
+            if isinstance(meta, dict) and meta.get("route") != route:
+                errors.append(
+                    f"{prefix}.route: metadata route {meta.get('route')} must match Action route {route}"
+                )
+
+        if action_id in post_cardio_only_ids:
+            errors.append(
+                f"{prefix}: POST_CARDIO_ONLY action cannot become a formal Conditioning candidate"
+            )
+
+        if not isinstance(meta, dict):
+            continue
+
+        families = meta.get("families", [])
+        modalities = meta.get("modalities", [])
+        protocols = meta.get("protocolEligibility", [])
+        work_metrics = meta.get("workMetrics", [])
+        levels = meta.get("levels", [])
+
+        for family_id in families:
+            if family_id not in valid_conditioning_families:
+                errors.append(f"{prefix}.families: unknown family {family_id}")
+        for modality_id in modalities:
+            if modality_id not in valid_conditioning_modalities:
+                errors.append(f"{prefix}.modalities: unknown modality {modality_id}")
+        for protocol_id in protocols:
+            if protocol_id not in valid_conditioning_protocols:
+                errors.append(f"{prefix}.protocolEligibility: unknown protocol {protocol_id}")
+        for metric in work_metrics:
+            if metric not in valid_work_metrics:
+                errors.append(f"{prefix}.workMetrics: unknown work metric {metric}")
+        for level in levels:
+            if level not in conditioning_level_ids:
+                errors.append(f"{prefix}.levels: unknown level {level}")
+
+        for family_id in families:
+            family = conditioning_families.get(family_id, {})
+            allowed = set(family.get("protocolEligibility", [])) if isinstance(family, dict) else set()
+            if allowed and not (allowed & set(protocols)):
+                errors.append(
+                    f"{prefix}.families: {family_id} has no legal protocol overlap with {sorted(protocols)}"
+                )
+
+        for protocol_id in protocols:
+            protocol = conditioning_protocols.get(protocol_id, {})
+            allowed_metrics = set(protocol.get("allowedWorkMetrics", [])) if isinstance(protocol, dict) else set()
+            if allowed_metrics and not (allowed_metrics & set(work_metrics)):
+                errors.append(
+                    f"{prefix}.workMetrics: no metric compatible with protocol {protocol_id}"
+                )
+
+        if meta.get("powerEligible"):
+            if "POWER" not in modalities:
+                errors.append(f"{prefix}.modalities: powerEligible candidate must include POWER")
+            if not any(
+                isinstance(conditioning_protocols.get(protocol_id), dict)
+                and conditioning_protocols[protocol_id].get("allowsPower") is True
+                for protocol_id in protocols
+            ):
+                errors.append(
+                    f"{prefix}.protocolEligibility: powerEligible candidate needs a protocol that allows power"
+                )
+
+        for level in levels:
+            level_policy = conditioning_level_policies.get(level, {})
+            if not isinstance(level_policy, dict):
+                continue
+            for meta_field, ceiling_field in (
+                ("impact", "impactCeiling"),
+                ("coordinationDemand", "coordinationCeiling"),
+                ("fatigueRisk", "fatigueCeiling"),
+            ):
+                demand = meta.get(meta_field)
+                ceiling = level_policy.get(ceiling_field)
+                if demand in risk_order and ceiling in risk_order and risk_order[demand] > risk_order[ceiling]:
+                    errors.append(
+                        f"{prefix}.{meta_field}: {demand} exceeds {level} {ceiling_field} {ceiling}"
+                    )
+
+    for modality_id, modality in sorted(conditioning_modalities.items()):
+        if not isinstance(modality, dict):
+            continue
+        candidates = [
+            action_id
+            for action_id, meta in conditioning_action_meta.items()
+            if isinstance(meta, dict) and modality_id in meta.get("modalities", [])
+        ]
+        if modality.get("v1Status") == "ACTIVE" and not candidates:
+            errors.append(
+                f"conditioningModalities.{modality_id}: ACTIVE modality needs at least one formal candidate"
+            )
+        if modality.get("v1Status") == "RESERVED" and candidates:
+            errors.append(
+                f"conditioningModalities.{modality_id}: RESERVED modality must not have formal V1 candidates"
+            )
+
+    # Every Family × Level must be resolvable later by #37 without inventing candidates.
+    for family_id in conditioning_family_ids:
+        for level in ("L1", "L2", "L3", "L4"):
+            legal = [
+                action_id
+                for action_id, meta in conditioning_action_meta.items()
+                if isinstance(meta, dict)
+                and family_id in meta.get("families", [])
+                and level in meta.get("levels", [])
+            ]
+            if len(legal) < 2:
+                errors.append(
+                    f"conditioningActionMeta: {family_id} {level} needs >=2 formal candidates; got {legal}"
+                )
+
+    # Every declared Family/Protocol pair needs at least two candidates.
+    for family_id, family in sorted(conditioning_families.items()):
+        if not isinstance(family, dict):
+            continue
+        for protocol_id in family.get("protocolEligibility", []):
+            legal = [
+                action_id
+                for action_id, meta in conditioning_action_meta.items()
+                if isinstance(meta, dict)
+                and family_id in meta.get("families", [])
+                and protocol_id in meta.get("protocolEligibility", [])
+            ]
+            if len(legal) < 2:
+                errors.append(
+                    f"conditioningActionMeta: {family_id} {protocol_id} needs >=2 formal candidates; got {legal}"
+                )
+
+    # CON-04 must have at least two true power-capable candidates at every level.
+    for level in ("L1", "L2", "L3", "L4"):
+        legal_power = [
+            action_id
+            for action_id, meta in conditioning_action_meta.items()
+            if isinstance(meta, dict)
+            and "CON-04" in meta.get("families", [])
+            and level in meta.get("levels", [])
+            and meta.get("powerEligible") is True
+        ]
+        if len(legal_power) < 2:
+            errors.append(
+                f"conditioningActionMeta: CON-04 {level} needs >=2 powerEligible candidates; got {legal_power}"
+            )
+
+    transition_policy = data.get("conditioningTransitionPolicy", {})
+    if isinstance(transition_policy, dict):
+        if transition_policy.get("formalRoutes") != ["CONDITIONING_2F"]:
+            errors.append(
+                "conditioningTransitionPolicy.formalRoutes: V1 formal route must be CONDITIONING_2F only"
+            )
+        if "POST_CARDIO_ONLY" not in transition_policy.get("excludedRoutes", []):
+            errors.append(
+                "conditioningTransitionPolicy.excludedRoutes: POST_CARDIO_ONLY must remain excluded"
+            )
+        if transition_policy.get("floorChangeAllowed") is not False:
+            errors.append(
+                "conditioningTransitionPolicy.floorChangeAllowed: V1 Conditioning must remain on the 2F route"
+            )
 
     return sorted(set(errors))
 
