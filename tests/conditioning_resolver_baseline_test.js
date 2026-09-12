@@ -10,6 +10,7 @@ for(const file of [
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
 const families=['CON-01','CON-02','CON-03','CON-04'],levels=['L1','L2','L3','L4'];
+const EXPECTED_SHA='16a3234e77412aa9a2cd5364e430bdf1d620732a1cb169539e20ef11be07dd6f';
 const expectedProtocols={
   'CON-01':{L1:'STEADY',L2:'STEADY',L3:'INTERVAL',L4:'INTERVAL'},
   'CON-02':{L1:'INTERVAL',L2:'INTERVAL',L3:'INTERVAL',L4:'CIRCUIT'},
@@ -70,4 +71,5 @@ for(const familyId of families){
 
 const sha=crypto.createHash('sha256').update(JSON.stringify(signatures)).digest('hex');
 console.log(`CONDITIONING_RESOLVER_BASELINE_SHA=${sha}`);
-console.log('conditioning_resolver_baseline_test: 16-state deterministic baseline GREEN');
+assert.strictEqual(sha,EXPECTED_SHA,'Conditioning Resolver V1 16-state baseline drifted');
+console.log('conditioning_resolver_baseline_test: frozen 16-state baseline GREEN');
