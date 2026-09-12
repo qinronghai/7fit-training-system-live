@@ -108,7 +108,9 @@
       fail('CONDITIONING_STATION_CAPACITY',`Not enough legal stations for ${familyId} ${level} ${protocolId}`,{familyId,level,protocolId,available});
     }
     const desired=DESIRED_STATIONS[protocolId]?.[level]||bounds[0];
-    return Math.min(available,clamp(desired,bounds[0],bounds[1]));
+    const powerMax=familyId==='CON-04'?Number(data.conditioningConflictPolicy?.maxPowerStationsByLevel?.[level]):Infinity;
+    const effectiveMax=Number.isFinite(powerMax)?Math.min(bounds[1],powerMax):bounds[1];
+    return Math.min(available,clamp(desired,bounds[0],effectiveMax));
   }
 
   function timedPlan({familyId,level,protocolId,stationCount,targetBlockMinutes}){
