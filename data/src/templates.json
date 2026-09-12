@@ -55,10 +55,10 @@
       "levelSystem": "L1-L4",
       "capabilities": {
         "preset": false,
-        "composer": false,
+        "composer": true,
         "prep": true,
         "anatomy": true,
-        "copy": false,
+        "copy": true,
         "save": false,
         "volume": false,
         "conditioningMetrics": true
