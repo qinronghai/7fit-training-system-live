@@ -157,7 +157,13 @@
         const blockSeconds=rounds*densityWindowMinutes*60+betweenRounds+Math.max(0,stationCount-1)*transitionSeconds;
         const score=Math.abs(blockSeconds-targetBlockMinutes*60);
         const candidate={workSeconds:0,restSeconds:Math.round(midpoint(policy.restSecondsRange)),transitionSeconds,rounds,densityWindowMinutes,blockSeconds,score};
-        if(!best||score<best.score||(score===best.score&&rounds<best.rounds))best=candidate;
+        const targetSeconds=targetBlockMinutes*60;
+        const candidateAtOrAbove=candidate.blockSeconds>=targetSeconds;
+        const bestAtOrAbove=best?best.blockSeconds>=targetSeconds:false;
+        if(!best
+          ||score<best.score
+          ||(score===best.score&&candidateAtOrAbove&&!bestAtOrAbove)
+          ||(score===best.score&&candidateAtOrAbove===bestAtOrAbove&&rounds<best.rounds))best=candidate;
       }
     }
     return best;
