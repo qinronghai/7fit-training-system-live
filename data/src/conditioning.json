@@ -1,13 +1,1026 @@
 {
-  "conditioningFamilyIds": [],
-  "conditioningFamilies": {},
-  "conditioningProtocolIds": [],
-  "conditioningProtocols": {},
-  "conditioningModalityIds": [],
-  "conditioningModalities": {},
-  "conditioningLevelPolicies": {},
-  "conditioningProtocolPolicies": {},
-  "conditioningActionMeta": {},
-  "conditioningTransitionPolicy": {},
-  "conditioningConflictPolicy": {}
+  "conditioningFamilyIds": [
+    "CON-01",
+    "CON-02",
+    "CON-03",
+    "CON-04"
+  ],
+  "conditioningFamilies": {
+    "CON-01": {
+      "familyId": "CON-01",
+      "name": "基础有氧",
+      "goal": "建立持续输出、呼吸节奏与基础有氧耐力。",
+      "protocolEligibility": [
+        "STEADY",
+        "INTERVAL"
+      ],
+      "preferredModalities": [
+        "CYCLICAL"
+      ]
+    },
+    "CON-02": {
+      "familyId": "CON-02",
+      "name": "间歇体能",
+      "goal": "通过明确工作/休息结构提升心肺与重复输出能力。",
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "preferredModalities": [
+        "CYCLICAL",
+        "SLED",
+        "LOCOMOTION",
+        "CORE_INTEGRATION"
+      ]
+    },
+    "CON-03": {
+      "familyId": "CON-03",
+      "name": "混合体能",
+      "goal": "在可控技术要求下组合多种 Modality，提升全身体能与工作容量。",
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "preferredModalities": [
+        "CYCLICAL",
+        "SLED",
+        "LOCOMOTION",
+        "BALL",
+        "SIMPLE_STRENGTH",
+        "CORE_INTEGRATION"
+      ]
+    },
+    "CON-04": {
+      "familyId": "CON-04",
+      "name": "爆发功率",
+      "goal": "在疲劳前段保留高质量速度/功率输出，避免以动作复杂度冒充进阶。",
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "preferredModalities": [
+        "POWER",
+        "BALL",
+        "SLED"
+      ]
+    }
+  },
+  "conditioningProtocolIds": [
+    "STEADY",
+    "INTERVAL",
+    "CIRCUIT",
+    "DENSITY"
+  ],
+  "conditioningProtocols": {
+    "STEADY": {
+      "protocolId": "STEADY",
+      "name": "稳态",
+      "structure": "CONTINUOUS",
+      "allowedWorkMetrics": [
+        "time",
+        "distance",
+        "calories"
+      ],
+      "stationCountRange": [
+        1,
+        1
+      ],
+      "allowsPower": false,
+      "requiresRest": false
+    },
+    "INTERVAL": {
+      "protocolId": "INTERVAL",
+      "name": "间歇",
+      "structure": "WORK_REST",
+      "allowedWorkMetrics": [
+        "time",
+        "distance",
+        "reps",
+        "calories"
+      ],
+      "stationCountRange": [
+        1,
+        3
+      ],
+      "allowsPower": true,
+      "requiresRest": true
+    },
+    "CIRCUIT": {
+      "protocolId": "CIRCUIT",
+      "name": "循环",
+      "structure": "STATIONS",
+      "allowedWorkMetrics": [
+        "time",
+        "distance",
+        "reps",
+        "calories"
+      ],
+      "stationCountRange": [
+        3,
+        6
+      ],
+      "allowsPower": true,
+      "requiresRest": true
+    },
+    "DENSITY": {
+      "protocolId": "DENSITY",
+      "name": "密度",
+      "structure": "FIXED_WINDOW",
+      "allowedWorkMetrics": [
+        "time",
+        "distance",
+        "reps",
+        "calories"
+      ],
+      "stationCountRange": [
+        2,
+        5
+      ],
+      "allowsPower": false,
+      "requiresRest": false
+    }
+  },
+  "conditioningModalityIds": [
+    "CYCLICAL",
+    "SLED",
+    "CARRY",
+    "LOCOMOTION",
+    "BALL",
+    "SIMPLE_STRENGTH",
+    "POWER",
+    "CORE_INTEGRATION"
+  ],
+  "conditioningModalities": {
+    "CYCLICAL": {
+      "modalityId": "CYCLICAL",
+      "name": "周期性器械",
+      "description": "可持续重复输出的滑雪机、划船机等周期性体能形式。",
+      "v1Status": "ACTIVE"
+    },
+    "SLED": {
+      "modalityId": "SLED",
+      "name": "雪橇",
+      "description": "雪橇推、拖等低技术门槛的阻力移动。",
+      "v1Status": "ACTIVE"
+    },
+    "CARRY": {
+      "modalityId": "CARRY",
+      "name": "负重行走",
+      "description": "Carry 类负重移动；V1 暂不把 1F 农夫走强行改成 2F 正式 Conditioning 候选。",
+      "v1Status": "RESERVED"
+    },
+    "LOCOMOTION": {
+      "modalityId": "LOCOMOTION",
+      "name": "移动",
+      "description": "登阶、折返跑、开合跳等场地移动或全身位移。",
+      "v1Status": "ACTIVE"
+    },
+    "BALL": {
+      "modalityId": "BALL",
+      "name": "药球",
+      "description": "药球砸地、墙球、推掷等球类体能动作。",
+      "v1Status": "ACTIVE"
+    },
+    "SIMPLE_STRENGTH": {
+      "modalityId": "SIMPLE_STRENGTH",
+      "name": "简单力量",
+      "description": "低技术门槛、可在体能协议中安全组织的基础力量形式。",
+      "v1Status": "ACTIVE"
+    },
+    "POWER": {
+      "modalityId": "POWER",
+      "name": "爆发功率",
+      "description": "强调速度、爆发与质量控制的低复杂度功率动作。",
+      "v1Status": "ACTIVE"
+    },
+    "CORE_INTEGRATION": {
+      "modalityId": "CORE_INTEGRATION",
+      "name": "核心整合",
+      "description": "在动态输出中要求躯干稳定与全身协同的体能动作。",
+      "v1Status": "ACTIVE"
+    }
+  },
+  "conditioningLevelPolicies": {
+    "L1": {
+      "level": "L1",
+      "totalWorkMinutesRange": [
+        12,
+        18
+      ],
+      "estimatedSessionMinutesRange": [
+        20,
+        30
+      ],
+      "workSecondsRange": [
+        20,
+        40
+      ],
+      "restSecondsRange": [
+        40,
+        90
+      ],
+      "stationCountRange": [
+        1,
+        4
+      ],
+      "roundsRange": [
+        2,
+        4
+      ],
+      "targetRpeRange": [
+        5,
+        6
+      ],
+      "impactCeiling": "low",
+      "coordinationCeiling": "low",
+      "fatigueCeiling": "medium",
+      "powerExposure": "INTRO"
+    },
+    "L2": {
+      "level": "L2",
+      "totalWorkMinutesRange": [
+        16,
+        24
+      ],
+      "estimatedSessionMinutesRange": [
+        25,
+        40
+      ],
+      "workSecondsRange": [
+        20,
+        50
+      ],
+      "restSecondsRange": [
+        30,
+        75
+      ],
+      "stationCountRange": [
+        1,
+        5
+      ],
+      "roundsRange": [
+        3,
+        5
+      ],
+      "targetRpeRange": [
+        5,
+        7
+      ],
+      "impactCeiling": "medium",
+      "coordinationCeiling": "medium",
+      "fatigueCeiling": "medium",
+      "powerExposure": "CONTROLLED"
+    },
+    "L3": {
+      "level": "L3",
+      "totalWorkMinutesRange": [
+        20,
+        30
+      ],
+      "estimatedSessionMinutesRange": [
+        30,
+        45
+      ],
+      "workSecondsRange": [
+        25,
+        60
+      ],
+      "restSecondsRange": [
+        20,
+        60
+      ],
+      "stationCountRange": [
+        1,
+        6
+      ],
+      "roundsRange": [
+        3,
+        6
+      ],
+      "targetRpeRange": [
+        6,
+        8
+      ],
+      "impactCeiling": "medium",
+      "coordinationCeiling": "medium",
+      "fatigueCeiling": "high",
+      "powerExposure": "MODERATE"
+    },
+    "L4": {
+      "level": "L4",
+      "totalWorkMinutesRange": [
+        24,
+        36
+      ],
+      "estimatedSessionMinutesRange": [
+        35,
+        50
+      ],
+      "workSecondsRange": [
+        30,
+        75
+      ],
+      "restSecondsRange": [
+        15,
+        60
+      ],
+      "stationCountRange": [
+        1,
+        6
+      ],
+      "roundsRange": [
+        4,
+        8
+      ],
+      "targetRpeRange": [
+        7,
+        9
+      ],
+      "impactCeiling": "high",
+      "coordinationCeiling": "high",
+      "fatigueCeiling": "high",
+      "powerExposure": "FULL"
+    }
+  },
+  "conditioningProtocolPolicies": {
+    "STEADY": {
+      "protocolId": "STEADY",
+      "workSecondsRange": [
+        0,
+        0
+      ],
+      "restSecondsRange": [
+        0,
+        0
+      ],
+      "transitionSecondsRange": [
+        0,
+        0
+      ],
+      "roundsRange": [
+        1,
+        1
+      ],
+      "densityWindowMinutesRange": [
+        0,
+        0
+      ]
+    },
+    "INTERVAL": {
+      "protocolId": "INTERVAL",
+      "workSecondsRange": [
+        20,
+        60
+      ],
+      "restSecondsRange": [
+        30,
+        120
+      ],
+      "transitionSecondsRange": [
+        0,
+        20
+      ],
+      "roundsRange": [
+        4,
+        12
+      ],
+      "densityWindowMinutesRange": [
+        0,
+        0
+      ]
+    },
+    "CIRCUIT": {
+      "protocolId": "CIRCUIT",
+      "workSecondsRange": [
+        20,
+        60
+      ],
+      "restSecondsRange": [
+        15,
+        60
+      ],
+      "transitionSecondsRange": [
+        10,
+        30
+      ],
+      "roundsRange": [
+        2,
+        5
+      ],
+      "densityWindowMinutesRange": [
+        0,
+        0
+      ]
+    },
+    "DENSITY": {
+      "protocolId": "DENSITY",
+      "workSecondsRange": [
+        0,
+        0
+      ],
+      "restSecondsRange": [
+        0,
+        30
+      ],
+      "transitionSecondsRange": [
+        10,
+        30
+      ],
+      "roundsRange": [
+        1,
+        3
+      ],
+      "densityWindowMinutesRange": [
+        6,
+        15
+      ]
+    }
+  },
+  "conditioningActionMeta": {
+    "huaxueji_jiange": {
+      "families": [
+        "CON-01",
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "CYCLICAL"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance",
+        "calories"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "zhansheng_jiange": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "SIMPLE_STRENGTH",
+        "CORE_INTEGRATION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "huaxueji_wentai": {
+      "families": [
+        "CON-01"
+      ],
+      "modalities": [
+        "CYCLICAL"
+      ],
+      "protocolEligibility": [
+        "STEADY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance",
+        "calories"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "low",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "zhansheng_bolang": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "SIMPLE_STRENGTH",
+        "CORE_INTEGRATION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "paotong_baidong": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "SIMPLE_STRENGTH",
+        "CORE_INTEGRATION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "medium",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "yaoqiu_zaidi": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "BALL",
+        "POWER"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "tiaoxiang_dengjie": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "LOCOMOTION",
+        "SIMPLE_STRENGTH"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "dengshanpao": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "LOCOMOTION",
+        "CORE_INTEGRATION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "huachuanji_jiange": {
+      "families": [
+        "CON-01",
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "CYCLICAL"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance",
+        "calories"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "huachuanji_wentai": {
+      "families": [
+        "CON-01"
+      ],
+      "modalities": [
+        "CYCLICAL"
+      ],
+      "protocolEligibility": [
+        "STEADY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance",
+        "calories"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "low",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "xueqiao_tui": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "SLED",
+        "SIMPLE_STRENGTH",
+        "POWER"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "xueqiao_la": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "SLED",
+        "SIMPLE_STRENGTH"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "distance"
+      ],
+      "impact": "low",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "qiangqiu_toushe": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "BALL",
+        "POWER",
+        "SIMPLE_STRENGTH"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "reps"
+      ],
+      "impact": "medium",
+      "coordinationDemand": "medium",
+      "fatigueRisk": "high",
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "venue_jumping_jack_interval": {
+      "families": [
+        "CON-02",
+        "CON-03"
+      ],
+      "modalities": [
+        "LOCOMOTION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "medium",
+      "coordinationDemand": "low",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": false,
+      "route": "CONDITIONING_2F"
+    },
+    "venue_rocket_press_interval": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "BALL",
+        "POWER",
+        "SIMPLE_STRENGTH"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "medium",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "venue_kettlebell_swing_interval": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "POWER",
+        "SIMPLE_STRENGTH"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "time",
+        "reps"
+      ],
+      "impact": "low",
+      "coordinationDemand": "medium",
+      "fatigueRisk": "high",
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "venue_box_jump_interval": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "POWER",
+        "LOCOMOTION"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "reps"
+      ],
+      "impact": "high",
+      "coordinationDemand": "high",
+      "fatigueRisk": "medium",
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    },
+    "venue_shuttle_run_interval": {
+      "families": [
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "modalities": [
+        "LOCOMOTION",
+        "POWER"
+      ],
+      "protocolEligibility": [
+        "INTERVAL",
+        "CIRCUIT"
+      ],
+      "workMetrics": [
+        "time",
+        "distance",
+        "reps"
+      ],
+      "impact": "high",
+      "coordinationDemand": "medium",
+      "fatigueRisk": "high",
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "powerEligible": true,
+      "route": "CONDITIONING_2F"
+    }
+  },
+  "conditioningTransitionPolicy": {
+    "formalRoutes": [
+      "CONDITIONING_2F"
+    ],
+    "excludedRoutes": [
+      "POST_CARDIO_ONLY",
+      "RECOVERY_2F",
+      "1F_ONLY",
+      "FLEX_1F_2F",
+      "2F_ONLY"
+    ],
+    "sameStationSecondsRange": [
+      0,
+      15
+    ],
+    "stationChangeSecondsRange": [
+      15,
+      30
+    ],
+    "equipmentChangeSecondsRange": [
+      20,
+      45
+    ],
+    "floorChangeAllowed": false
+  },
+  "conditioningConflictPolicy": {
+    "maxHighImpactStationsByLevel": {
+      "L1": 0,
+      "L2": 1,
+      "L3": 2,
+      "L4": 2
+    },
+    "maxHighCoordinationStationsByLevel": {
+      "L1": 0,
+      "L2": 1,
+      "L3": 2,
+      "L4": 3
+    },
+    "maxHighFatigueStationsByLevel": {
+      "L1": 0,
+      "L2": 1,
+      "L3": 2,
+      "L4": 2
+    },
+    "maxPowerStationsByLevel": {
+      "L1": 2,
+      "L2": 2,
+      "L3": 3,
+      "L4": 3
+    },
+    "maxConsecutiveSameModality": 2,
+    "minDistinctModalitiesForCircuit": 2,
+    "maxEstimatedSessionMinutes": 50,
+    "powerMustPrecedeFatigue": true,
+    "duplicateActionAllowed": false,
+    "postCardioOnlyEligible": false
+  }
 }
