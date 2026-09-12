@@ -149,7 +149,7 @@ test('#30 canonical and legacy F111 URLs share formal and PREP state through rel
   await expectNoPageErrors(errors);
 });
 
-test('Body composer is active while Conditioning compose remains a safe placeholder', async ({ page }) => {
+test('Body and Conditioning composers are active template-owned workflows', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body/compose');
   await expect(page).toHaveURL(/#\/coach\/body\/compose\?family=BODY-01&level=L1/);
@@ -160,9 +160,13 @@ test('Body composer is active while Conditioning compose remains a safe placehol
   await expect(page.locator('.composer-slot-card')).toHaveCount(0);
 
   await page.goto('/#/coach/conditioning/compose');
-  await expect(page.getByRole('heading', { name: '体能训练' })).toBeVisible();
-  await expect(page.getByText('具体编排引擎将在对应模板任务中接入', { exact: false })).toBeVisible();
-  await expect(page.locator('.composer-slot-card')).toHaveCount(0);
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/compose\?family=CON-01&level=L1&protocol=STEADY/);
+  await expect(page.getByRole('heading', { name: 'Conditioning 自由编课' })).toBeVisible();
+  await expect(page.locator('[data-conditioning-compose-family]')).toHaveValue('CON-01');
+  await expect(page.locator('[data-conditioning-compose-level]')).toHaveValue('L1');
+  await expect(page.locator('[data-conditioning-compose-protocol]')).toHaveValue('STEADY');
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(1);
+  await expect(page.getByText('NO POST CARDIO', { exact: false }).first()).toBeVisible();
   await expectNoPageErrors(errors);
 });
 
