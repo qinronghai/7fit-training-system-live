@@ -75,6 +75,35 @@
     };
   }
 
+  function manualSelectionMap(value,prep=false){
+    const normalized=normalizeSelectionMap(value,prep),out={};
+    for(const [key,entry] of Object.entries(normalized)){
+      if(entry.source==='manual')out[key]=entry;
+    }
+    return out;
+  }
+
+  function normalizeSavedSession(savedId,value={}){
+    if(!isObject(value))return null;
+    const id=typeof value.id==='string'&&value.id?value.id:String(savedId||'');
+    if(!id)return null;
+    return {
+      id,
+      schemaVersion:Number.isInteger(value.schemaVersion)?value.schemaVersion:0,
+      resolverVersion:typeof value.resolverVersion==='string'?value.resolverVersion:'',
+      templateId:typeof value.templateId==='string'?value.templateId:'',
+      familyId:typeof value.familyId==='string'?value.familyId:'',
+      level:/^L[1-4]$/.test(value.level||'')?value.level:'',
+      input:isObject(value.input)?clone(value.input):{},
+      selections:manualSelectionMap(value.selections,false),
+      prepSelections:manualSelectionMap(value.prepSelections,true),
+      createdAt:typeof value.createdAt==='string'?value.createdAt:'',
+      updatedAt:typeof value.updatedAt==='string'?value.updatedAt:'',
+      name:typeof value.name==='string'?value.name.trim():'',
+      sessionKey:typeof value.sessionKey==='string'?value.sessionKey:'',
+    };
+  }
+
   function normalizeRoot(value){
     const next=freshStore();
     if(!isObject(value))return next;
@@ -86,7 +115,12 @@
         next.templates[templateId].sessions[sessionKey]=normalizeSession(templateId,sessionValue);
       }
     }
-    next.savedSessions=isObject(value.savedSessions)?clone(value.savedSessions):{};
+    if(isObject(value.savedSessions)){
+      for(const [savedId,savedValue] of Object.entries(value.savedSessions)){
+        const normalized=normalizeSavedSession(savedId,savedValue);
+        if(normalized)next.savedSessions[normalized.id]=normalized;
+      }
+    }
     next.recentActions=Array.isArray(value.recentActions)?clone(value.recentActions):[];
     next.favorites=isObject(value.favorites)?clone(value.favorites):{};
     return next;
@@ -314,6 +348,58 @@
     return {session:clone(current),reasons,droppedSelections,droppedPrepSelections};
   }
 
+  function savedSessionRef(savedId){
+    if(typeof savedId!=='string'||!savedId)fail('INVALID_SAVED_SESSION_ID','savedId is required',{savedId});
+    return store.savedSessions?.[savedId]||null;
+  }
+
+  function putSavedSession(record){
+    const normalized=normalizeSavedSession(record?.id,record);
+    if(!normalized)fail('INVALID_SAVED_SESSION','SavedSession record must be an object with id');
+    if(normalized.schemaVersion!==SCHEMA_VERSION)fail('INVALID_SAVED_SESSION_SCHEMA',`SavedSession schemaVersion must equal ${SCHEMA_VERSION}`,{observedVersion:normalized.schemaVersion});
+    if(!store.templates?.[normalized.templateId])fail('UNKNOWN_TEMPLATE',`Unknown active saved-session template: ${normalized.templateId}`,{templateId:normalized.templateId});
+    if(!normalized.familyId||!normalized.level||!normalized.resolverVersion||!normalized.sessionKey){
+      fail('INVALID_SAVED_SESSION','SavedSession identity fields are incomplete',{savedId:normalized.id});
+    }
+    if(!isObject(normalized.input))fail('INVALID_SAVED_SESSION','SavedSession input must be an object',{savedId:normalized.id});
+    if(!normalized.name)normalized.name='未命名 Session';
+    if(!normalized.createdAt)normalized.createdAt=normalized.updatedAt||new Date().toISOString();
+    if(!normalized.updatedAt)normalized.updatedAt=normalized.createdAt;
+    store.savedSessions[normalized.id]=normalized;
+    persist();
+    return clone(normalized);
+  }
+
+  function getSavedSession(savedId){
+    const current=savedSessionRef(savedId);
+    return current?clone(current):null;
+  }
+
+  function listSavedSessions(){
+    return Object.values(store.savedSessions||{})
+      .map(clone)
+      .sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||''))||String(a.id).localeCompare(String(b.id)));
+  }
+
+  function renameSavedSession(savedId,name,updatedAt){
+    const current=savedSessionRef(savedId);
+    if(!current)fail('SAVED_SESSION_NOT_FOUND',`Unknown saved session: ${savedId}`,{savedId});
+    const nextName=typeof name==='string'?name.trim():'';
+    if(!nextName)fail('INVALID_SAVED_SESSION_NAME','SavedSession name is required',{savedId});
+    current.name=nextName;
+    if(typeof updatedAt==='string'&&updatedAt)current.updatedAt=updatedAt;
+    persist();
+    return clone(current);
+  }
+
+  function deleteSavedSession(savedId){
+    const current=savedSessionRef(savedId);
+    if(!current)return false;
+    delete store.savedSessions[savedId];
+    persist();
+    return true;
+  }
+
   function clear(){
     store=freshStore();
     loadStatus={code:'CLEARED'};
@@ -329,7 +415,8 @@
     snapshot(){return clone(store);},
     serialize(){return JSON.stringify(store);},
     getSession,ensureSession,patchSession,setSelection,getSelections,
-    setPrepSelection,getPrepSelections,resetSession,reconcileSession,clear,
+    setPrepSelection,getPrepSelections,resetSession,reconcileSession,
+    putSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,clear,
   };
 
   function v14Session(sessionId){return D().sessions?.[sessionId];}
