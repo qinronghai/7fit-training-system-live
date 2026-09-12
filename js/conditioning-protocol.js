@@ -159,7 +159,6 @@
         const underTargetPenalty=blockSeconds<targetSeconds?120:0;
         const score=Math.abs(blockSeconds-targetSeconds)+underTargetPenalty;
         const candidate={workSeconds:0,restSeconds:Math.round(midpoint(policy.restSecondsRange)),transitionSeconds,rounds,densityWindowMinutes,blockSeconds,score};
-        const targetSeconds=targetBlockMinutes*60;
         const candidateAtOrAbove=candidate.blockSeconds>=targetSeconds;
         const bestAtOrAbove=best?best.blockSeconds>=targetSeconds:false;
         if(!best
