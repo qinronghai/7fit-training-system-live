@@ -32,6 +32,12 @@ def test_playwright_smoke_files_exist_and_freeze_critical_routes():
         assert token in source, f"browser smoke must preserve {token!r} coverage"
 
 
+def test_template_coach_browser_specs_are_in_release_gate():
+    source = text("playwright.config.js")
+    assert "body_coach_browser.spec.js" in source
+    assert "conditioning_coach_browser.spec.js" in source
+
+
 def test_playwright_config_is_local_chromium_only_and_serves_site_artifact():
     source = text("playwright.config.js")
     assert "127.0.0.1:4173" in source

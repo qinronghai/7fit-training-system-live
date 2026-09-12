@@ -78,7 +78,7 @@ test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',a
   await expect(manualCard.locator('.body-slot-select')).toHaveValue(replaceable.target);
 
   const resolved=await page.evaluate(()=>{
-    const route=window.V14Router.parse(window.location.hash);
+    const route=window.V14Router.parseHash(window.location.hash);
     const ctx=window.V14CoachModules.BodySession.context(route);
     return {
       totalWorkingSets:ctx.session.domainContext.volume.totalWorkingSets,
