@@ -138,7 +138,7 @@
     const ctx=context(route),family=ctx.family;
     return `<a class="back-link" href="#/coach/body">← 返回 Body</a>`+
       `<section class="view-hero body-session-hero"><span class="eyebrow">COACH CENTER / BODY</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${esc(ctx.session.domainContext.volume.totalWorkingSets)} 个工作组</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div></section>`+
-      renderEditor(ctx);
+      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function renderComposer(route){
@@ -150,7 +150,7 @@
     const levelOptions=['L1','L2','L3','L4'].map(level=>`<option value="${level}" ${level===ctx.level?'selected':''}>${level}</option>`).join('');
     return `<a class="back-link" href="#/coach/body">← 返回 Body</a>`+
       `<section class="view-hero body-composer-hero"><span class="eyebrow">COACH CENTER / BODY COMPOSER</span><h1>Body 自由编课</h1><p>选择训练 Family 与等级；下方与正式 Body Session 共用同一个编辑器、状态和 ResolvedSession。</p><div class="body-compose-controls"><label><span>训练 Family</span><select data-body-compose-family>${familyOptions}</select></label><label><span>训练等级</span><select data-body-compose-level>${levelOptions}</select></label></div></section>`+
-      renderEditor(ctx);
+      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function canHandle(route={}){
