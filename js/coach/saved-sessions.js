@@ -80,6 +80,7 @@
     root.querySelectorAll('[data-saved-restore]').forEach(button=>button.addEventListener('click',()=>{
       const result=Service().restore(button.dataset.savedRestore);
       if(!result.ok){setStatus(root,result.message||'恢复失败','error');return;}
+      if(window.location?.hash===result.hash){rerender();return;}
       if(window.V14Router?.navigate)window.V14Router.navigate(result.hash);else window.location.hash=result.hash;
     }));
     root.querySelectorAll('[data-saved-rename]').forEach(button=>button.addEventListener('click',()=>{
