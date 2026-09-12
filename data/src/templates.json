@@ -19,7 +19,7 @@
         "prep": true,
         "anatomy": true,
         "copy": true,
-        "save": false,
+        "save": true,
         "volume": false,
         "conditioningMetrics": false
       },
@@ -39,7 +39,7 @@
         "prep": true,
         "anatomy": true,
         "copy": false,
-        "save": false,
+        "save": true,
         "volume": true,
         "conditioningMetrics": false
       },
@@ -59,7 +59,7 @@
         "prep": true,
         "anatomy": true,
         "copy": true,
-        "save": false,
+        "save": true,
         "volume": false,
         "conditioningMetrics": true
       },
