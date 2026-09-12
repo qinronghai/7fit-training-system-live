@@ -108,8 +108,13 @@
       stationKey:station.key,
       currentSelections:resolvedSelectionMap(ctx.session),
     });
-    const options=(result.candidates||[]).map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===station.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
-    return `<label class="conditioning-station-swap"><span>替换 Station 动作</span><select class="conditioning-station-select" data-conditioning-session="${esc(ctx.sessionKey)}" data-conditioning-station="${esc(station.key)}">${options}</select></label>`;
+    const desc=window.V15RecentActions?.conditioning?.(ctx.familyId,ctx.level,ctx.protocolId,station.key);
+    const candidates=desc?window.V15RecentActions.rank(desc,result.candidates||[]):(result.candidates||[]);
+    const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===station.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const recent=desc&&M.Slot?.recentButtons
+      ?M.Slot.recentButtons(desc,candidates,station.actionId,`data-recent-conditioning data-conditioning-station="${esc(station.key)}"`)
+      :'';
+    return `<div class="conditioning-station-swap-wrap"><label class="conditioning-station-swap"><span>替换 Station 动作</span><select class="conditioning-station-select" data-conditioning-session="${esc(ctx.sessionKey)}" data-conditioning-station="${esc(station.key)}">${options}</select></label>${recent}</div>`;
   }
 
   function stationCard(ctx,station,index){
@@ -314,7 +319,17 @@
     }
 
     root.querySelectorAll('.conditioning-station-select').forEach(select=>select.addEventListener('change',()=>{
-      setFormalSelection(familyId,level,protocolId,select.dataset.conditioningStation,select.value);
+      const stationKey=select.dataset.conditioningStation;
+      setFormalSelection(familyId,level,protocolId,stationKey,select.value);
+      const desc=window.V15RecentActions?.conditioning?.(familyId,level,protocolId,stationKey);
+      if(desc)window.V15RecentActions.record(desc,select.value);
+      rerender();
+    }));
+    root.querySelectorAll('[data-recent-conditioning]').forEach(button=>button.addEventListener('click',()=>{
+      const stationKey=button.dataset.conditioningStation,actionId=button.dataset.recentAction;
+      setFormalSelection(familyId,level,protocolId,stationKey,actionId);
+      const desc=window.V15RecentActions?.conditioning?.(familyId,level,protocolId,stationKey);
+      if(desc)window.V15RecentActions.record(desc,actionId);
       rerender();
     }));
     root.querySelectorAll('.conditioning-prep-select').forEach(select=>select.addEventListener('change',()=>{
