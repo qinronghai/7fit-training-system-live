@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests',
-  testMatch: ['browser_smoke.spec.js', 'conflict_browser.spec.js', 'router_browser.spec.js', 'body_coach_browser.spec.js', 'body_recovery_browser.spec.js', 'conditioning_coach_browser.spec.js', 'saved_sessions_browser.spec.js', 'v15_release_gate_browser.spec.js', 'template_search_browser.spec.js', 'recent_actions_browser.spec.js'],
+  testMatch: ['browser_smoke.spec.js', 'conflict_browser.spec.js', 'router_browser.spec.js', 'body_coach_browser.spec.js', 'body_recovery_browser.spec.js', 'conditioning_coach_browser.spec.js', 'saved_sessions_browser.spec.js', 'v15_release_gate_browser.spec.js', 'template_search_browser.spec.js', 'recent_actions_browser.spec.js', 'favorites_browser.spec.js'],
   timeout: 30_000,
   expect: { timeout: 5_000 },
   fullyParallel: false,
