@@ -5,6 +5,7 @@
   const LEGACY_KEY='7fit-v14-state';
   const MODE_KEY='7fit-v14-mode';
   const SCHEMA_VERSION=1;
+  const SAVED_SESSION_SCHEMA_VERSION=1;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
@@ -14,6 +15,7 @@
   let memoryMode='coach';
   let store;
   let loadStatus={code:'FRESH'};
+  let saveSequence=0;
 
   function fail(code,message,details={}){
     const error=new Error(message);
@@ -75,6 +77,31 @@
     };
   }
 
+  function normalizeSavedSession(savedId,value={}){
+    if(!isObject(value))return null;
+    const templateId=typeof value.templateId==='string'?value.templateId:'';
+    const familyId=typeof value.familyId==='string'?value.familyId:'';
+    const level=/^L[1-4]$/.test(value.level||'')?value.level:'';
+    const resolverVersion=typeof value.resolverVersion==='string'?value.resolverVersion:'';
+    if(!templateId||!familyId||!level||!resolverVersion)return null;
+    const createdAt=typeof value.createdAt==='string'&&value.createdAt?value.createdAt:'';
+    const updatedAt=typeof value.updatedAt==='string'&&value.updatedAt?value.updatedAt:createdAt;
+    return {
+      savedId,
+      schemaVersion:Number.isInteger(value.schemaVersion)?value.schemaVersion:SAVED_SESSION_SCHEMA_VERSION,
+      resolverVersion,
+      templateId,
+      familyId,
+      level,
+      input:isObject(value.input)?clone(value.input):{},
+      selections:normalizeSelectionMap(value.selections,false),
+      prepSelections:normalizeSelectionMap(value.prepSelections,true),
+      createdAt,
+      updatedAt,
+      name:typeof value.name==='string'&&value.name.trim()?value.name.trim():`${familyId} · ${level}`,
+    };
+  }
+
   function normalizeRoot(value){
     const next=freshStore();
     if(!isObject(value))return next;
@@ -86,7 +113,12 @@
         next.templates[templateId].sessions[sessionKey]=normalizeSession(templateId,sessionValue);
       }
     }
-    next.savedSessions=isObject(value.savedSessions)?clone(value.savedSessions):{};
+    if(isObject(value.savedSessions)){
+      for(const [savedId,savedValue] of Object.entries(value.savedSessions)){
+        const normalized=normalizeSavedSession(savedId,savedValue);
+        if(normalized)next.savedSessions[savedId]=normalized;
+      }
+    }
     next.recentActions=Array.isArray(value.recentActions)?clone(value.recentActions):[];
     next.favorites=isObject(value.favorites)?clone(value.favorites):{};
     return next;
@@ -280,6 +312,81 @@
     persist();
   }
 
+  function nowIso(value){
+    if(typeof value==='string'&&value)return value;
+    if(value instanceof Date&&!Number.isNaN(value.getTime()))return value.toISOString();
+    return new Date().toISOString();
+  }
+
+  function savedSessionId(now){
+    const stamp=String(Date.parse(now)||Date.now()).toString(36);
+    let id;
+    do{
+      saveSequence+=1;
+      id=`saved-${stamp}-${saveSequence.toString(36)}`;
+    }while(store.savedSessions[id]);
+    return id;
+  }
+
+  function createSavedSession(templateId,sessionKey,options={}){
+    const current=sessionRef(templateId,sessionKey);
+    if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
+    const now=nowIso(options.now);
+    const savedId=typeof options.savedId==='string'&&options.savedId.trim()
+      ?options.savedId.trim()
+      :savedSessionId(now);
+    if(store.savedSessions[savedId])fail('SAVED_SESSION_EXISTS',`Saved session already exists: ${savedId}`,{savedId});
+    const name=typeof options.name==='string'&&options.name.trim()
+      ?options.name.trim()
+      :`${current.familyId} · ${current.level}`;
+    const record={
+      savedId,
+      schemaVersion:SAVED_SESSION_SCHEMA_VERSION,
+      resolverVersion:current.resolverVersion,
+      templateId,
+      familyId:current.familyId,
+      level:current.level,
+      input:isObject(options.input)?clone(options.input):clone(current.input),
+      selections:normalizeSelectionMap(current.selections,false),
+      prepSelections:normalizeSelectionMap(current.prepSelections,true),
+      createdAt:now,
+      updatedAt:now,
+      name,
+    };
+    store.savedSessions[savedId]=record;
+    persist();
+    return clone(record);
+  }
+
+  function getSavedSession(savedId){
+    const record=store.savedSessions?.[savedId];
+    return record?clone(record):null;
+  }
+
+  function listSavedSessions(){
+    return Object.values(store.savedSessions||{})
+      .map(clone)
+      .sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||''))||String(a.savedId).localeCompare(String(b.savedId)));
+  }
+
+  function renameSavedSession(savedId,name,options={}){
+    const record=store.savedSessions?.[savedId];
+    if(!record)fail('SAVED_SESSION_NOT_FOUND',`Unknown saved session: ${savedId}`,{savedId});
+    const next=typeof name==='string'?name.trim():'';
+    if(!next)fail('INVALID_SAVED_SESSION_NAME','Saved session name is required',{savedId});
+    record.name=next;
+    record.updatedAt=nowIso(options.now);
+    persist();
+    return clone(record);
+  }
+
+  function deleteSavedSession(savedId){
+    if(!store.savedSessions?.[savedId])return false;
+    delete store.savedSessions[savedId];
+    persist();
+    return true;
+  }
+
   function reconcileSession(templateId,sessionKey,options={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
@@ -325,11 +432,14 @@
 
   window.V15State={
     getSchemaVersion(){return SCHEMA_VERSION;},
+    getSavedSessionSchemaVersion(){return SAVED_SESSION_SCHEMA_VERSION;},
     getLoadStatus(){return clone(loadStatus);},
     snapshot(){return clone(store);},
     serialize(){return JSON.stringify(store);},
     getSession,ensureSession,patchSession,setSelection,getSelections,
-    setPrepSelection,getPrepSelections,resetSession,reconcileSession,clear,
+    setPrepSelection,getPrepSelections,resetSession,reconcileSession,
+    createSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,
+    clear,
   };
 
   function v14Session(sessionId){return D().sessions?.[sessionId];}

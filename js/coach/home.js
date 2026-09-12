@@ -27,7 +27,8 @@
         <div class="chips"><span class="chip">统一 PREP</span><span class="chip">统一动作库</span><span class="chip">统一解剖层</span><span class="chip">模板独立编排</span></div>
       </div>
     </section>`+
-      `<section class="section-card"><div class="section-head"><div><h2>训练模板</h2><p>模板身份、状态、能力与入口全部来自 Training Template Registry；新增模板不再修改 Coach Center 的业务分支。</p></div></div><div class="recipe-grid template-grid">${cards}</div></section>`;
+      `<section class="section-card"><div class="section-head"><div><h2>训练模板</h2><p>模板身份、状态、能力与入口全部来自 Training Template Registry；新增模板不再修改 Coach Center 的业务分支。</p></div></div><div class="recipe-grid template-grid">${cards}</div></section>`+
+      (M.SavedSessionsUI?.librarySection?.()||'');
   }
   M.Home={render};
 })();

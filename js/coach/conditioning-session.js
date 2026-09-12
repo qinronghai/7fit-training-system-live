@@ -212,7 +212,7 @@
     const ctx=context(route),family=ctx.family;
     return `<a class="back-link" href="#/coach/conditioning">← 返回 Conditioning</a>`+
       `<section class="view-hero conditioning-session-hero"><span class="eyebrow">COACH CENTER / CONDITIONING</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(family.goal||ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${esc(ctx.session.domainContext.protocolName)}</span><span class="chip">${esc(ctx.session.domainContext.metrics.stationCount)} Stations</span><span class="chip">RPE ${esc(ctx.session.domainContext.metrics.targetRpe)}</span><span class="chip">约 ${esc(ctx.session.domainContext.metrics.estimatedMinutes)} 分钟</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div></section>`+
-      renderEditor(ctx);
+      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function legalProtocolOptions(familyId,level,selected){
@@ -236,7 +236,7 @@
         <label><span>训练等级</span><select data-conditioning-compose-level>${levelOptions}</select></label>
         <label><span>Protocol</span><select data-conditioning-compose-protocol>${legalProtocolOptions(ctx.familyId,ctx.level,ctx.protocolId)}</select></label>
       </div></section>`+
-      renderEditor(ctx);
+      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function canHandle(route={}){

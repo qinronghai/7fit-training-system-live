@@ -36,6 +36,7 @@ def test_template_coach_browser_specs_are_in_release_gate():
     source = text("playwright.config.js")
     assert "body_coach_browser.spec.js" in source
     assert "conditioning_coach_browser.spec.js" in source
+    assert "saved_sessions_browser.spec.js" in source
 
 
 def test_playwright_config_is_local_chromium_only_and_serves_site_artifact():
