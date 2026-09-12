@@ -11,6 +11,8 @@ for(const file of ['data/system-data.js','js/router.js','js/coach/common.js','js
 const D=window.V14_DATA,R=window.V14Router,M=window.V14CoachModules;
 assert(D.templateRegistry,'templateRegistry runtime missing');
 assert.deepStrictEqual(D.templateIds,['f111','body','conditioning','posture']);
+assert.strictEqual(D.templateRegistry.conditioning.capabilities.composer,true,'Conditioning composer capability must be ACTIVE after #38');
+assert.strictEqual(D.templateRegistry.conditioning.capabilities.copy,true,'Conditioning copy capability must be ACTIVE after #38');
 
 function expectTemplate(hash,id){
   const route=R.parseHash(hash);

@@ -18,6 +18,13 @@ const bodyCompose=R.parseHash('#/coach/body/compose');
 assert.strictEqual(bodyCompose.area,'coach');assert.strictEqual(bodyCompose.page,'template-compose');assert.strictEqual(bodyCompose.templateId,'body');assert(R.isValid(bodyCompose));
 const conditioningCompose=R.parseHash('#/coach/conditioning/compose');
 assert.strictEqual(conditioningCompose.page,'template-compose');assert.strictEqual(conditioningCompose.templateId,'conditioning');assert(R.isValid(conditioningCompose));
+const conditioningSession=R.parseHash('#/coach/conditioning/con-03/l2');
+assert.deepStrictEqual(pick(conditioningSession),{area:'coach',page:'template-session',templateId:'conditioning',recipeId:'',level:'L2',query:{}});
+assert.strictEqual(conditioningSession.familyId,'CON-03');
+assert(R.isValid(conditioningSession));
+assert.strictEqual(R.canonicalHash(conditioningSession),'#/coach/conditioning/con-03/l2');
+assert.strictEqual(R.isValid(R.parseHash('#/coach/conditioning/con-99/l2')),false);
+assert.strictEqual(R.isValid(R.parseHash('#/coach/conditioning/con-03/l9')),false);
 
 assert.strictEqual(R.isValid(R.parseHash('#/coach/f111/f111-99/l3')),false);
 assert.strictEqual(R.isValid(R.parseHash('#/coach/f111/f111-06/l5')),false);
