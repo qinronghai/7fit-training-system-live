@@ -102,6 +102,24 @@
     };
   }
 
+  function normalizeRecentActions(value){
+    if(!Array.isArray(value))return [];
+    const active=new Set(activeTemplateIds()),seen=new Set(),out=[];
+    for(const item of value){
+      if(!isObject(item))continue;
+      const templateId=typeof item.templateId==='string'?item.templateId:'';
+      const contextKey=typeof item.contextKey==='string'?item.contextKey:'';
+      const actionId=typeof item.actionId==='string'?item.actionId:'';
+      const usedAt=typeof item.usedAt==='string'?item.usedAt:'';
+      if(!active.has(templateId)||!contextKey||!D().actions?.[actionId]||!usedAt)continue;
+      const key=`${templateId}\n${contextKey}\n${actionId}`;
+      if(seen.has(key))continue;
+      seen.add(key);
+      out.push({templateId,contextKey,actionId,usedAt});
+    }
+    return out.sort((a,b)=>String(b.usedAt).localeCompare(String(a.usedAt))).slice(0,120);
+  }
+
   function normalizeRoot(value){
     const next=freshStore();
     if(!isObject(value))return next;
@@ -119,7 +137,7 @@
         if(normalized)next.savedSessions[savedId]=normalized;
       }
     }
-    next.recentActions=Array.isArray(value.recentActions)?clone(value.recentActions):[];
+    next.recentActions=normalizeRecentActions(value.recentActions);
     next.favorites=isObject(value.favorites)?clone(value.favorites):{};
     return next;
   }
@@ -387,6 +405,42 @@
     return true;
   }
 
+  function recordRecentAction(templateId,contextKey,actionId,options={}){
+    namespace(templateId);
+    if(typeof contextKey!=='string'||!contextKey)fail('INVALID_RECENT_CONTEXT','contextKey is required',{templateId,contextKey});
+    if(typeof actionId!=='string'||!D().actions?.[actionId])fail('INVALID_RECENT_ACTION','Known actionId is required',{templateId,contextKey,actionId});
+    const usedAt=nowIso(options.now);
+    store.recentActions=(store.recentActions||[]).filter(item=>!(
+      item.templateId===templateId&&item.contextKey===contextKey&&item.actionId===actionId
+    ));
+    store.recentActions.unshift({templateId,contextKey,actionId,usedAt});
+    store.recentActions=normalizeRecentActions(store.recentActions);
+    persist();
+    return clone(store.recentActions.find(item=>item.templateId===templateId&&item.contextKey===contextKey&&item.actionId===actionId));
+  }
+
+  function listRecentActions(templateId,contextKey,options={}){
+    namespace(templateId);
+    if(typeof contextKey!=='string'||!contextKey)return [];
+    const limit=Number.isInteger(options.limit)&&options.limit>0?options.limit:20;
+    return (store.recentActions||[])
+      .filter(item=>item.templateId===templateId&&item.contextKey===contextKey)
+      .slice(0,limit)
+      .map(clone);
+  }
+
+  function clearRecentActions(templateId,contextKey){
+    if(templateId!==undefined)namespace(templateId);
+    const before=(store.recentActions||[]).length;
+    store.recentActions=(store.recentActions||[]).filter(item=>{
+      if(templateId!==undefined&&item.templateId!==templateId)return true;
+      if(contextKey!==undefined&&item.contextKey!==contextKey)return true;
+      return false;
+    });
+    if(store.recentActions.length!==before)persist();
+    return before-store.recentActions.length;
+  }
+
   function reconcileSession(templateId,sessionKey,options={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
@@ -439,6 +493,7 @@
     getSession,ensureSession,patchSession,setSelection,getSelections,
     setPrepSelection,getPrepSelections,resetSession,reconcileSession,
     createSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,
+    recordRecentAction,listRecentActions,clearRecentActions,
     clear,
   };
 
