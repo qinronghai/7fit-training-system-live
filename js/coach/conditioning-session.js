@@ -18,7 +18,7 @@
     const rawLevel=String(route.level||route.query?.level||'').toUpperCase();
     const level=/^L[1-4]$/.test(rawLevel)?rawLevel:'L1';
     const family=D().conditioningFamilies?.[familyId]||{};
-    const rawProtocol=String(route.query?.protocol||'').toUpperCase();
+    const rawProtocol=route.page==='template-compose'?String(route.query?.protocol||'').toUpperCase():'';
     const legalProtocols=family.protocolEligibility||[];
     const protocolId=rawProtocol&&legalProtocols.includes(rawProtocol)?rawProtocol:defaultProtocol(familyId,level);
     return {familyId,level,protocolId};
