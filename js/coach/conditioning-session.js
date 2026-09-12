@@ -108,8 +108,13 @@
       stationKey:station.key,
       currentSelections:resolvedSelectionMap(ctx.session),
     });
-    const options=(result.candidates||[]).map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===station.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
-    return `<label class="conditioning-station-swap"><span>替换 Station 动作</span><select class="conditioning-station-select" data-conditioning-session="${esc(ctx.sessionKey)}" data-conditioning-station="${esc(station.key)}">${options}</select></label>`;
+    const candidates=result.candidates||[];
+    const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===station.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const Recent=window.V15RecentActions,contextKey=Recent?.context?.conditioning?.({
+      familyId:ctx.familyId,level:ctx.level,protocolId:ctx.protocolId,stationKey:station.key,
+    })||'';
+    const quick=Recent?.renderButtons?.({templateId:'conditioning',contextKey,candidates,currentActionId:station.actionId})||'';
+    return `<label class="conditioning-station-swap"><span>替换 Station 动作</span><select class="conditioning-station-select" data-conditioning-session="${esc(ctx.sessionKey)}" data-conditioning-station="${esc(station.key)}">${options}</select></label>${quick}`;
   }
 
   function stationCard(ctx,station,index){
@@ -314,7 +319,19 @@
     }
 
     root.querySelectorAll('.conditioning-station-select').forEach(select=>select.addEventListener('change',()=>{
-      setFormalSelection(familyId,level,protocolId,select.dataset.conditioningStation,select.value);
+      const stationKey=select.dataset.conditioningStation,candidates=Array.from(select.options).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
+      const contextKey=window.V15RecentActions?.context?.conditioning?.({familyId,level,protocolId,stationKey});
+      window.V15RecentActions?.record?.({templateId:'conditioning',contextKey,actionId:select.value,candidates});
+      setFormalSelection(familyId,level,protocolId,stationKey,select.value);
+      rerender();
+    }));
+    root.querySelectorAll('.conditioning-station-card [data-recent-action]').forEach(button=>button.addEventListener('click',()=>{
+      const card=button.closest('.conditioning-station-card'),stationKey=card?.dataset.conditioningStationCard,select=card?.querySelector('.conditioning-station-select');
+      const actionId=button.dataset.recentAction,candidates=Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
+      if(!select||!stationKey||!candidates.some(candidate=>candidate.actionId===actionId))return;
+      const contextKey=window.V15RecentActions?.context?.conditioning?.({familyId,level,protocolId,stationKey});
+      window.V15RecentActions?.record?.({templateId:'conditioning',contextKey,actionId,candidates});
+      setFormalSelection(familyId,level,protocolId,stationKey,actionId);
       rerender();
     }));
     root.querySelectorAll('.conditioning-prep-select').forEach(select=>select.addEventListener('change',()=>{
