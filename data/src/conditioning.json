@@ -269,7 +269,7 @@
       ],
       "impactCeiling": "medium",
       "coordinationCeiling": "medium",
-      "fatigueCeiling": "medium",
+      "fatigueCeiling": "high",
       "powerExposure": "CONTROLLED"
     },
     "L3": {
@@ -302,8 +302,8 @@
         6,
         8
       ],
-      "impactCeiling": "medium",
-      "coordinationCeiling": "medium",
+      "impactCeiling": "high",
+      "coordinationCeiling": "high",
       "fatigueCeiling": "high",
       "powerExposure": "MODERATE"
     },
@@ -842,7 +842,6 @@
       "coordinationDemand": "low",
       "fatigueRisk": "medium",
       "levels": [
-        "L1",
         "L2",
         "L3",
         "L4"
