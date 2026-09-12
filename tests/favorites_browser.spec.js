@@ -14,19 +14,19 @@ test('favorites persist, restore through current routes, and expose stale handli
   await page.locator('#action-search').fill('BODY-02');
   await page.locator('[data-filter="templateId"]').selectOption('body');
   await page.locator('[data-filter="kind"]').selectOption('session');
-  const bodyFavorite=page.locator('[data-favorite-toggle]').first();
+  const bodyFavorite=page.locator('[data-favorite-toggle][data-favorite-entry-id="body:BODY-02"]');
   await expect(bodyFavorite).toBeVisible();
   await bodyFavorite.click();
   await expect(bodyFavorite).toHaveAttribute('aria-pressed','true');
 
   await page.reload();
-  await expect(page.locator('[data-favorite-toggle]').first()).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('[data-favorite-toggle][data-favorite-entry-id="body:BODY-02"]')).toHaveAttribute('aria-pressed','true');
 
   await page.goto('/#/library');
   await page.locator('#action-search').fill('滑雪机');
   await page.locator('[data-filter="templateId"]').selectOption('conditioning');
   await page.locator('[data-filter="kind"]').selectOption('action');
-  const actionFavorite=page.locator('[data-favorite-toggle]').first();
+  const actionFavorite=page.locator('[data-favorite-toggle][data-favorite-entry-id="huaxueji_jiange"]');
   await actionFavorite.click();
   await expect(actionFavorite).toHaveAttribute('aria-pressed','true');
 
