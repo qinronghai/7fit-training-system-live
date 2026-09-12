@@ -161,6 +161,19 @@ const migratedVersion=Save.restore(oldVersion.id);
 assert(migratedVersion.reasons.includes('RESOLVER_VERSION_MIGRATED'));
 assert.strictEqual(migratedVersion.state.resolverVersion,'body-v1');
 
+// Unsupported SavedSession schema fails closed instead of injecting old intent.
+const badRoot=plain(S.snapshot());
+badRoot.savedSessions['future-schema']={
+  id:'future-schema',schemaVersion:99,resolverVersion:'body-v99',templateId:'body',
+  familyId:'BODY-01',level:'L1',input:{familyId:'BODY-01',level:'L1'},
+  selections:{},prepSelections:{},createdAt:'x',updatedAt:'x',name:'Future',sessionKey:'BODY-01-L1'
+};
+const badEnv=boot({'7fit-v15-state':JSON.stringify(badRoot)});
+let schemaError=null;
+try{badEnv.Save.restore('future-schema');}catch(error){schemaError=error;}
+assert(schemaError,'future SavedSession schema must fail closed');
+assert.strictEqual(schemaError.code,'SAVED_SESSION_SCHEMA_UNSUPPORTED');
+
 // Saved records persist after service/state reload.
 const reloaded=boot(env.memory);
 assert(reloaded.Save.list().length>=6);
