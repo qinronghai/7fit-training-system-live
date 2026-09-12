@@ -533,3 +533,14 @@ body{font-size:14px;line-height:1.55}
   .search-result-group-list .action-row span,
   .search-result-group-list .action-row small{overflow-wrap:anywhere}
 }
+
+/* Recent actions / quick swap */
+.recent-action-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:7px;min-width:0}
+.recent-action-row>small{font-size:8px;font-weight:900;color:var(--muted);margin-right:1px}
+.recent-action-chip{max-width:100%;border:1px solid #ded3fb;background:var(--purple-pale);color:var(--purple-dark);border-radius:999px;padding:5px 8px;font-size:8px;font-weight:850;cursor:pointer;white-space:normal;text-align:left;line-height:1.25}
+.recent-action-chip:hover{background:var(--purple-soft)}
+.body-slot-swap-wrap,.conditioning-station-swap-wrap{min-width:0}
+@media(max-width:620px){
+  .recent-action-row{gap:4px}
+  .recent-action-chip{padding:6px 8px;overflow-wrap:anywhere}
+}
