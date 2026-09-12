@@ -8,7 +8,7 @@
       if(route.page==='compose'||route.recipeId)return ['编课中心','F111 女性综合 1+1+1'];
       return ['编课中心','Multi-Template Coach Center'];
     }
-    const map={system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['动作库','搜索、筛选与动作详情'],maintenance:['系统维护','数据健康度与审计']};
+    const map={system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['搜索','动作、模板与编课入口'],maintenance:['系统维护','数据健康度与审计']};
     return map[route.area]||['页面不存在',''];
   }
   function setActive(area){
