@@ -131,7 +131,7 @@ test('CON-03 L2 Circuit survives Station swap, Copy, reload and reset at 390px',
     'CORE_INTEGRATION','COND_','resolverVersion','conditioning-v1','hardCount','warnCount','powerEligible'
   ])expect(memberCopy,`member copy leaked ${forbidden}`).not.toContain(forbidden);
 
-  const state=await page.evaluate(({sessionKey,stationKey})=>window.V15State.getSelections('conditioning',sessionKey)[stationKey],replaceable);
+  const state=await page.evaluate(({sessionKey,stationKey})=>window.V15State.getSelections('conditioning',sessionKey)[stationKey],{sessionKey:replaceable.sessionKey,stationKey:replaceable.stationKey});
   expect(state).toEqual({actionId:replaceable.target,source:'manual'});
 
   await page.reload();
