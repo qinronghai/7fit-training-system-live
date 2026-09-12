@@ -25,10 +25,12 @@
       if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);
     };
     const bindSaved=()=>M.SavedSessionsUI?.bind?.(route,root,rerender);
+    const bindFavorites=()=>M.FavoritesUI?.bind?.(root,rerender);
     const adapter=templateAdapter(route);
     if(adapter){
       adapter.bind(route,root,rerender);
       bindSaved();
+      bindFavorites();
       return;
     }
     if(route.page==='compose'){
@@ -60,10 +62,12 @@
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindSaved();
+      bindFavorites();
       return;
     }
     if(!route.recipeId){
       bindSaved();
+      bindFavorites();
       return;
     }
     const sessionId=`${route.recipeId}-${route.level}`;
@@ -89,6 +93,7 @@
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
     bindSaved();
+    bindFavorites();
   }
   window.V14CoachAnatomy={selectedTrainingIds:Session.selectedTrainingIds,buildCopyPayload:Session.buildCopyPayload,buildComposerCopyPayload:ComposerView.buildComposerCopyPayload,composerContext:ComposerView.composerContext};
   window.V14Views=window.V14Views||{};window.V14Views.coach=render;
