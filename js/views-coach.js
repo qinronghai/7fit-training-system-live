@@ -30,7 +30,19 @@
     }
     if(route.page==='compose'){
       const ctx=ComposerView.composerContext(route);
-      document.querySelectorAll('.composer-slot-select').forEach(sel=>sel.addEventListener('change',()=>{window.V14State.setComposerSelection(sel.dataset.composerKey,sel.dataset.slotKey,sel.value);rerender();}));
+      document.querySelectorAll('.composer-slot-select').forEach(sel=>sel.addEventListener('change',()=>{
+        window.V14State.setComposerSelection(sel.dataset.composerKey,sel.dataset.slotKey,sel.value);
+        const desc=window.V15RecentActions?.f111Composer?.(ctx,sel.dataset.slotKey);
+        if(desc)window.V15RecentActions.record(desc,sel.value);
+        rerender();
+      }));
+      document.querySelectorAll('[data-recent-f111-composer]').forEach(button=>button.addEventListener('click',()=>{
+        const actionId=button.dataset.recentAction,slotKey=button.dataset.slotKey;
+        window.V14State.setComposerSelection(button.dataset.composerKey,slotKey,actionId);
+        const desc=window.V15RecentActions?.f111Composer?.(ctx,slotKey);
+        if(desc)window.V15RecentActions.record(desc,actionId);
+        rerender();
+      }));
       document.querySelectorAll('.prep-slot-select').forEach(sel=>sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
       const status=document.getElementById('copy-session-status');
@@ -46,7 +58,19 @@
       return;
     }
     const sessionId=`${route.recipeId}-${route.level}`;
-    document.querySelectorAll('.session-swap').forEach(sel=>sel.addEventListener('change',()=>{window.V14State.setSelection(sel.dataset.session,sel.dataset.slotKey,sel.value);rerender();}));
+    document.querySelectorAll('.session-swap').forEach(sel=>sel.addEventListener('change',()=>{
+      window.V14State.setSelection(sel.dataset.session,sel.dataset.slotKey,sel.value);
+      const desc=window.V15RecentActions?.f111Preset?.(sel.dataset.session,sel.dataset.slotKey);
+      if(desc)window.V15RecentActions.record(desc,sel.value);
+      rerender();
+    }));
+    document.querySelectorAll('[data-recent-f111-preset]').forEach(button=>button.addEventListener('click',()=>{
+      const actionId=button.dataset.recentAction;
+      window.V14State.setSelection(button.dataset.session,button.dataset.slotKey,actionId);
+      const desc=window.V15RecentActions?.f111Preset?.(button.dataset.session,button.dataset.slotKey);
+      if(desc)window.V15RecentActions.record(desc,actionId);
+      rerender();
+    }));
     document.querySelectorAll('.prep-slot-select').forEach(sel=>sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
     const status=document.getElementById('copy-session-status');
     const doCopy=async audience=>{const payload=Session.buildCopyPayload(sessionId,route.recipeId,route.level),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function'||typeof window.V14SessionCopy?.copyText!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';setTimeout(()=>{if(status.textContent==='已复制，可直接发送'){status.textContent='';status.className='';}},1800);}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};

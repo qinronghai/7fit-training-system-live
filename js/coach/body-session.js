@@ -96,8 +96,13 @@
       slotKey:slot.key,
       currentSelections:resolvedSelectionMap(ctx.session),
     });
-    const options=(result.candidates||[]).map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
-    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>`;
+    const desc=window.V15RecentActions?.body?.(ctx.familyId,ctx.level,slot.key);
+    const candidates=desc?window.V15RecentActions.rank(desc,result.candidates||[]):(result.candidates||[]);
+    const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const recent=desc&&M.Slot?.recentButtons
+      ?M.Slot.recentButtons(desc,candidates,slot.actionId,`data-recent-body data-body-slot="${esc(slot.key)}"`)
+      :'';
+    return `<div class="body-slot-swap-wrap"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${recent}</div>`;
   }
 
   function slotCard(ctx,slot){
@@ -214,7 +219,17 @@
     }
 
     root.querySelectorAll('.body-slot-select').forEach(select=>select.addEventListener('change',()=>{
-      setFormalSelection(familyId,level,select.dataset.bodySlot,select.value);
+      const slotKey=select.dataset.bodySlot;
+      setFormalSelection(familyId,level,slotKey,select.value);
+      const desc=window.V15RecentActions?.body?.(familyId,level,slotKey);
+      if(desc)window.V15RecentActions.record(desc,select.value);
+      rerender();
+    }));
+    root.querySelectorAll('[data-recent-body]').forEach(button=>button.addEventListener('click',()=>{
+      const slotKey=button.dataset.bodySlot,actionId=button.dataset.recentAction;
+      setFormalSelection(familyId,level,slotKey,actionId);
+      const desc=window.V15RecentActions?.body?.(familyId,level,slotKey);
+      if(desc)window.V15RecentActions.record(desc,actionId);
       rerender();
     }));
     root.querySelectorAll('.body-prep-select').forEach(select=>select.addEventListener('change',()=>{

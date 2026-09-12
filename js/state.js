@@ -9,6 +9,7 @@
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
+  const RECENT_ACTION_LIMIT=80;
   const D=()=>window.V14_DATA||{};
   const isObject=value=>!!value&&typeof value==='object'&&!Array.isArray(value);
   const clone=value=>JSON.parse(JSON.stringify(value));
@@ -102,6 +103,22 @@
     };
   }
 
+  function normalizeRecentAction(value){
+    if(!isObject(value))return null;
+    const templateId=typeof value.templateId==='string'?value.templateId:'';
+    const actionId=typeof value.actionId==='string'?value.actionId:'';
+    const contextKey=typeof value.contextKey==='string'?value.contextKey:'';
+    if(!templateId||!activeTemplateIds().includes(templateId)||!actionId||!D().actions?.[actionId]||!contextKey)return null;
+    return {
+      templateId,
+      actionId,
+      contextKey,
+      context:isObject(value.context)?clone(value.context):{},
+      usedAt:typeof value.usedAt==='string'?value.usedAt:'',
+      useCount:Number.isInteger(value.useCount)&&value.useCount>0?value.useCount:1,
+    };
+  }
+
   function normalizeRoot(value){
     const next=freshStore();
     if(!isObject(value))return next;
@@ -119,7 +136,18 @@
         if(normalized)next.savedSessions[savedId]=normalized;
       }
     }
-    next.recentActions=Array.isArray(value.recentActions)?clone(value.recentActions):[];
+    if(Array.isArray(value.recentActions)){
+      const seen=new Set();
+      for(const recentValue of value.recentActions){
+        const normalized=normalizeRecentAction(recentValue);
+        if(!normalized)continue;
+        const key=`${normalized.templateId}::${normalized.contextKey}::${normalized.actionId}`;
+        if(seen.has(key))continue;
+        seen.add(key);
+        next.recentActions.push(normalized);
+        if(next.recentActions.length>=RECENT_ACTION_LIMIT)break;
+      }
+    }
     next.favorites=isObject(value.favorites)?clone(value.favorites):{};
     return next;
   }
@@ -387,6 +415,57 @@
     return true;
   }
 
+  function recordRecentAction(templateId,actionId,contextKey,context={},options={}){
+    namespace(templateId);
+    if(typeof actionId!=='string'||!D().actions?.[actionId])fail('INVALID_RECENT_ACTION','Recent actionId must exist',{templateId,actionId});
+    if(typeof contextKey!=='string'||!contextKey.trim())fail('INVALID_RECENT_CONTEXT','Recent contextKey is required',{templateId,actionId});
+    if(!isObject(context))fail('INVALID_RECENT_CONTEXT','Recent context must be an object',{templateId,actionId,contextKey});
+    const key=contextKey.trim(),index=store.recentActions.findIndex(item=>
+      item.templateId===templateId&&item.contextKey===key&&item.actionId===actionId
+    );
+    const previous=index>=0?store.recentActions.splice(index,1)[0]:null;
+    const usedAt=nowIso(options.now);
+    const entry={
+      templateId,
+      actionId,
+      contextKey:key,
+      context:clone(context),
+      usedAt,
+      useCount:(previous?.useCount||0)+1,
+    };
+    store.recentActions.unshift(entry);
+    if(store.recentActions.length>RECENT_ACTION_LIMIT)store.recentActions.length=RECENT_ACTION_LIMIT;
+    persist();
+    return clone(entry);
+  }
+
+  function listRecentActions(options={}){
+    const templateId=typeof options.templateId==='string'?options.templateId:'';
+    const contextKey=typeof options.contextKey==='string'?options.contextKey:'';
+    const limit=Number.isInteger(options.limit)&&options.limit>0?options.limit:RECENT_ACTION_LIMIT;
+    return store.recentActions
+      .filter(item=>(!templateId||item.templateId===templateId)&&(!contextKey||item.contextKey===contextKey))
+      .slice(0,limit)
+      .map(clone);
+  }
+
+  function clearRecentActions(options={}){
+    const templateId=typeof options.templateId==='string'?options.templateId:'';
+    const contextKey=typeof options.contextKey==='string'?options.contextKey:'';
+    if(!templateId&&!contextKey){
+      const count=store.recentActions.length;
+      store.recentActions=[];
+      persist();
+      return count;
+    }
+    const before=store.recentActions.length;
+    store.recentActions=store.recentActions.filter(item=>
+      !((!templateId||item.templateId===templateId)&&(!contextKey||item.contextKey===contextKey))
+    );
+    if(store.recentActions.length!==before)persist();
+    return before-store.recentActions.length;
+  }
+
   function reconcileSession(templateId,sessionKey,options={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
@@ -439,6 +518,7 @@
     getSession,ensureSession,patchSession,setSelection,getSelections,
     setPrepSelection,getPrepSelections,resetSession,reconcileSession,
     createSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,
+    recordRecentAction,listRecentActions,clearRecentActions,
     clear,
   };
 
