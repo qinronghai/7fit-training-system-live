@@ -6,6 +6,7 @@
   const MODE_KEY='7fit-v14-mode';
   const SCHEMA_VERSION=1;
   const SAVED_SESSION_SCHEMA_VERSION=1;
+  const FAVORITE_SCHEMA_VERSION=1;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
@@ -120,6 +121,29 @@
     return out.sort((a,b)=>String(b.usedAt).localeCompare(String(a.usedAt))).slice(0,120);
   }
 
+  function normalizeFavorite(favoriteId,value={}){
+    if(!isObject(value))return null;
+    const active=new Set(activeTemplateIds());
+    const templateId=typeof value.templateId==='string'?value.templateId:'';
+    const entryKind=typeof value.entryKind==='string'?value.entryKind:'';
+    const entryId=typeof value.entryId==='string'?value.entryId:'';
+    const createdAt=typeof value.createdAt==='string'?value.createdAt:'';
+    const schemaVersion=Number.isInteger(value.schemaVersion)?value.schemaVersion:FAVORITE_SCHEMA_VERSION;
+    if(schemaVersion!==FAVORITE_SCHEMA_VERSION)return null;
+    if(!favoriteId||(!active.has(templateId)&&templateId!=='shared')||!entryKind||!entryId||!createdAt)return null;
+    return {favoriteId,schemaVersion:FAVORITE_SCHEMA_VERSION,templateId,entryKind,entryId,createdAt};
+  }
+
+  function normalizeFavorites(value){
+    const out={};
+    if(!isObject(value))return out;
+    for(const [favoriteId,item] of Object.entries(value)){
+      const normalized=normalizeFavorite(favoriteId,item);
+      if(normalized)out[favoriteId]=normalized;
+    }
+    return out;
+  }
+
   function normalizeRoot(value){
     const next=freshStore();
     if(!isObject(value))return next;
@@ -138,7 +162,7 @@
       }
     }
     next.recentActions=normalizeRecentActions(value.recentActions);
-    next.favorites=isObject(value.favorites)?clone(value.favorites):{};
+    next.favorites=normalizeFavorites(value.favorites);
     return next;
   }
 
@@ -441,6 +465,39 @@
     return before-store.recentActions.length;
   }
 
+  function setFavorite(record={}){
+    if(!isObject(record))fail('INVALID_FAVORITE','Favorite record must be an object');
+    const favoriteId=typeof record.favoriteId==='string'?record.favoriteId.trim():'';
+    if(!favoriteId)fail('INVALID_FAVORITE','favoriteId is required');
+    const normalized=normalizeFavorite(favoriteId,{...record,schemaVersion:FAVORITE_SCHEMA_VERSION,createdAt:record.createdAt||nowIso()});
+    if(!normalized)fail('INVALID_FAVORITE','Favorite record is invalid',{favoriteId});
+    store.favorites[favoriteId]=normalized;
+    persist();
+    return clone(normalized);
+  }
+
+  function getFavorite(favoriteId){
+    const value=store.favorites?.[favoriteId];
+    return value?clone(value):null;
+  }
+
+  function listFavorites(templateId){
+    if(templateId!==undefined&&templateId!=='shared')namespace(templateId);
+    return Object.values(store.favorites||{})
+      .filter(item=>templateId===undefined||item.templateId===templateId)
+      .sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))||String(a.favoriteId).localeCompare(String(b.favoriteId)))
+      .map(clone);
+  }
+
+  function hasFavorite(favoriteId){return !!store.favorites?.[favoriteId];}
+
+  function removeFavorite(favoriteId){
+    if(!store.favorites?.[favoriteId])return false;
+    delete store.favorites[favoriteId];
+    persist();
+    return true;
+  }
+
   function reconcileSession(templateId,sessionKey,options={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
@@ -487,6 +544,7 @@
   window.V15State={
     getSchemaVersion(){return SCHEMA_VERSION;},
     getSavedSessionSchemaVersion(){return SAVED_SESSION_SCHEMA_VERSION;},
+    getFavoriteSchemaVersion(){return FAVORITE_SCHEMA_VERSION;},
     getLoadStatus(){return clone(loadStatus);},
     snapshot(){return clone(store);},
     serialize(){return JSON.stringify(store);},
@@ -494,6 +552,7 @@
     setPrepSelection,getPrepSelections,resetSession,reconcileSession,
     createSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,
     recordRecentAction,listRecentActions,clearRecentActions,
+    setFavorite,getFavorite,listFavorites,hasFavorite,removeFavorite,
     clear,
   };
 
