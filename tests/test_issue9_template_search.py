@@ -21,9 +21,6 @@ def test_library_exposes_template_aware_controls_and_results():
         'data-filter="templateId"',
         'data-filter="kind"',
         'data-search-result-kind',
-        'body-family',
-        'conditioning-protocol',
-        'f111-combination',
     ]:
         assert token in source
 
@@ -36,6 +33,8 @@ def test_template_search_browser_spec_is_in_real_playwright_discovery():
 
 def test_search_service_uses_formal_template_membership_sources():
     source = text("js/template-search.js")
+    for kind in ["body-family", "conditioning-protocol", "f111-combination"]:
+        assert kind in source
     assert "bodyActionMeta" in source
     assert "conditioningActionMeta" in source
     assert "V14Composer.combinations" in source
