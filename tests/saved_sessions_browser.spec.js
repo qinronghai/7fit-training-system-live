@@ -29,13 +29,17 @@ async function firstReplaceable(page,selector){
   }
   return null;
 }
+function savedCard(page,name){
+  return page.locator(`.saved-session-card:has([data-saved-rename-input][value="${name}"])`);
+}
 async function saveNamed(page,name){
   const panel=page.locator('.saved-sessions-section');
   await expect(panel).toBeVisible();
   await panel.locator('[data-saved-name]').fill(name);
   await panel.locator('[data-save-current-session]').click();
-  const card=panel.locator('.saved-session-card').filter({has:page.locator(`input[value="${name}"]`)});
-  await expect(panel.locator('.saved-session-card')).toContainText(name);
+  const card=savedCard(page,name);
+  await expect(card).toHaveCount(1);
+  await expect(card.locator('[data-saved-rename-input]')).toHaveValue(name);
   return card;
 }
 
@@ -58,7 +62,7 @@ test('F111 preset SavedSession restores formal + PREP intent after reset at 390p
   await page.locator('#reset-session').click();
   await expect(page.locator(`.session-swap[data-slot-key="${formalSlot}"]`)).not.toHaveValue(formal.target);
 
-  await page.locator('.saved-session-card').filter({hasText:'F111 保存测试'}).locator('[data-saved-restore]').click();
+  await savedCard(page,'F111 保存测试').locator('[data-saved-restore]').click();
   await expect(page.locator(`.session-swap[data-slot-key="${formalSlot}"]`)).toHaveValue(formal.target);
   await expect(page.locator(`.prep-slot-select[data-prep-slot="${prepSlot}"]`)).toHaveValue(prep.target);
   await expect(page.locator('.saved-session-notice')).toContainText('已恢复');
@@ -79,20 +83,20 @@ test('Body SavedSession supports save, restore, rename and delete at 390px',asyn
   await page.locator('#reset-body-session').click();
   await expect(page.locator(`.body-slot-select[data-body-slot="${slotKey}"]`)).not.toHaveValue(formal.target);
 
-  let card=page.locator('.saved-session-card').filter({hasText:'Body 保存测试'});
+  let card=savedCard(page,'Body 保存测试');
   await card.locator('[data-saved-restore]').click();
   await expect(page.locator(`.body-slot-select[data-body-slot="${slotKey}"]`)).toHaveValue(formal.target);
 
-  card=page.locator('.saved-session-card').filter({hasText:'Body 保存测试'});
+  card=savedCard(page,'Body 保存测试');
   await card.locator('[data-saved-rename-input]').fill('Body 已重命名');
   await card.locator('[data-saved-rename]').click();
   await expect(page.locator('.saved-session-card')).toContainText('Body 已重命名');
 
   await page.reload();
-  card=page.locator('.saved-session-card').filter({hasText:'Body 已重命名'});
+  card=savedCard(page,'Body 已重命名');
   await expect(card).toHaveCount(1);
   await card.locator('[data-saved-delete]').click();
-  await expect(page.locator('.saved-session-card').filter({hasText:'Body 已重命名'})).toHaveCount(0);
+  await expect(savedCard(page,'Body 已重命名')).toHaveCount(0);
 
   await expect390NoOverflow(page);
   expect(errors,`unexpected Body SavedSession pageerror(s): ${errors.join(' | ')}`).toEqual([]);
@@ -103,7 +107,7 @@ test('Conditioning SavedSession restores Station + PREP intent and protocol cont
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/conditioning/con-03/l2');
 
-  await expect(page.locator('[data-conditioning-session="CON-03-L2-CIRCUIT"]')).toBeVisible();
+  await expect(page.locator('.conditioning-editor[data-conditioning-session="CON-03-L2-CIRCUIT"]')).toBeVisible();
   const station=await firstReplaceable(page,'.conditioning-station-select');
   expect(station,'Conditioning requires replaceable Station').toBeTruthy();
   const stationKey=await station.select.getAttribute('data-conditioning-station');
@@ -115,7 +119,7 @@ test('Conditioning SavedSession restores Station + PREP intent and protocol cont
   await page.locator('#reset-conditioning-session').click();
   await expect(page.locator(`.conditioning-station-select[data-conditioning-station="${stationKey}"]`)).not.toHaveValue(station.target);
 
-  await page.locator('.saved-session-card').filter({hasText:'Conditioning 保存测试'}).locator('[data-saved-restore]').click();
+  await savedCard(page,'Conditioning 保存测试').locator('[data-saved-restore]').click();
   await expect(page.locator(`.conditioning-station-select[data-conditioning-station="${stationKey}"]`)).toHaveValue(station.target);
   await expect(page.locator(`.conditioning-prep-select[data-conditioning-prep-slot="${prepSlot}"]`)).toHaveValue(prep.target);
   await expect(page.locator('.conditioning-protocol-panel')).toContainText('循环');
