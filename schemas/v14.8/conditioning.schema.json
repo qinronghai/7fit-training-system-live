@@ -1,0 +1,640 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/conditioning.schema.json",
+  "title": "7Fit Conditioning Data Contract V1",
+  "type": "object",
+  "required": [
+    "conditioningFamilyIds",
+    "conditioningFamilies",
+    "conditioningProtocolIds",
+    "conditioningProtocols",
+    "conditioningModalityIds",
+    "conditioningModalities",
+    "conditioningLevelPolicies",
+    "conditioningProtocolPolicies",
+    "conditioningActionMeta",
+    "conditioningTransitionPolicy",
+    "conditioningConflictPolicy"
+  ],
+  "properties": {
+    "conditioningFamilyIds": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/familyId"
+      }
+    },
+    "conditioningFamilies": {
+      "type": "object",
+      "minProperties": 4,
+      "maxProperties": 4,
+      "propertyNames": {
+        "$ref": "#/$defs/familyId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/familyRecord"
+      }
+    },
+    "conditioningProtocolIds": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/protocolId"
+      }
+    },
+    "conditioningProtocols": {
+      "type": "object",
+      "minProperties": 4,
+      "maxProperties": 4,
+      "propertyNames": {
+        "$ref": "#/$defs/protocolId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/protocolRecord"
+      }
+    },
+    "conditioningModalityIds": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/modalityId"
+      }
+    },
+    "conditioningModalities": {
+      "type": "object",
+      "minProperties": 8,
+      "maxProperties": 8,
+      "propertyNames": {
+        "$ref": "#/$defs/modalityId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/modalityRecord"
+      }
+    },
+    "conditioningLevelPolicies": {
+      "type": "object",
+      "required": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "minProperties": 4,
+      "maxProperties": 4,
+      "properties": {
+        "L1": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L2": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L3": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L4": {
+          "$ref": "#/$defs/levelPolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "conditioningProtocolPolicies": {
+      "type": "object",
+      "required": [
+        "STEADY",
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ],
+      "minProperties": 4,
+      "maxProperties": 4,
+      "properties": {
+        "STEADY": {
+          "$ref": "#/$defs/protocolPolicy"
+        },
+        "INTERVAL": {
+          "$ref": "#/$defs/protocolPolicy"
+        },
+        "CIRCUIT": {
+          "$ref": "#/$defs/protocolPolicy"
+        },
+        "DENSITY": {
+          "$ref": "#/$defs/protocolPolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "conditioningActionMeta": {
+      "type": "object",
+      "minProperties": 18,
+      "maxProperties": 18,
+      "additionalProperties": {
+        "$ref": "#/$defs/actionMeta"
+      }
+    },
+    "conditioningTransitionPolicy": {
+      "$ref": "#/$defs/transitionPolicy"
+    },
+    "conditioningConflictPolicy": {
+      "$ref": "#/$defs/conflictPolicy"
+    }
+  },
+  "$defs": {
+    "familyId": {
+      "type": "string",
+      "enum": [
+        "CON-01",
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ]
+    },
+    "protocolId": {
+      "type": "string",
+      "enum": [
+        "STEADY",
+        "INTERVAL",
+        "CIRCUIT",
+        "DENSITY"
+      ]
+    },
+    "modalityId": {
+      "type": "string",
+      "enum": [
+        "CYCLICAL",
+        "SLED",
+        "CARRY",
+        "LOCOMOTION",
+        "BALL",
+        "SIMPLE_STRENGTH",
+        "POWER",
+        "CORE_INTEGRATION"
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ]
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "workMetric": {
+      "type": "string",
+      "enum": [
+        "time",
+        "distance",
+        "reps",
+        "calories"
+      ]
+    },
+    "range2": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "rpeRange2": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10
+      }
+    },
+    "familyRecord": {
+      "type": "object",
+      "required": [
+        "familyId",
+        "name",
+        "goal",
+        "protocolEligibility",
+        "preferredModalities"
+      ],
+      "properties": {
+        "familyId": {
+          "$ref": "#/$defs/familyId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protocolEligibility": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/protocolId"
+          }
+        },
+        "preferredModalities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modalityId"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "protocolRecord": {
+      "type": "object",
+      "required": [
+        "protocolId",
+        "name",
+        "structure",
+        "allowedWorkMetrics",
+        "stationCountRange",
+        "allowsPower",
+        "requiresRest"
+      ],
+      "properties": {
+        "protocolId": {
+          "$ref": "#/$defs/protocolId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structure": {
+          "type": "string",
+          "enum": [
+            "CONTINUOUS",
+            "WORK_REST",
+            "STATIONS",
+            "FIXED_WINDOW"
+          ]
+        },
+        "allowedWorkMetrics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/workMetric"
+          }
+        },
+        "stationCountRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "allowsPower": {
+          "type": "boolean"
+        },
+        "requiresRest": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "modalityRecord": {
+      "type": "object",
+      "required": [
+        "modalityId",
+        "name",
+        "description",
+        "v1Status"
+      ],
+      "properties": {
+        "modalityId": {
+          "$ref": "#/$defs/modalityId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v1Status": {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "RESERVED"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "levelPolicy": {
+      "type": "object",
+      "required": [
+        "level",
+        "totalWorkMinutesRange",
+        "estimatedSessionMinutesRange",
+        "workSecondsRange",
+        "restSecondsRange",
+        "stationCountRange",
+        "roundsRange",
+        "targetRpeRange",
+        "impactCeiling",
+        "coordinationCeiling",
+        "fatigueCeiling",
+        "powerExposure"
+      ],
+      "properties": {
+        "level": {
+          "$ref": "#/$defs/level"
+        },
+        "totalWorkMinutesRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "estimatedSessionMinutesRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "workSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "restSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "stationCountRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "roundsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "targetRpeRange": {
+          "$ref": "#/$defs/rpeRange2"
+        },
+        "impactCeiling": {
+          "$ref": "#/$defs/risk"
+        },
+        "coordinationCeiling": {
+          "$ref": "#/$defs/risk"
+        },
+        "fatigueCeiling": {
+          "$ref": "#/$defs/risk"
+        },
+        "powerExposure": {
+          "type": "string",
+          "enum": [
+            "INTRO",
+            "CONTROLLED",
+            "MODERATE",
+            "FULL"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "protocolPolicy": {
+      "type": "object",
+      "required": [
+        "protocolId",
+        "workSecondsRange",
+        "restSecondsRange",
+        "transitionSecondsRange",
+        "roundsRange",
+        "densityWindowMinutesRange"
+      ],
+      "properties": {
+        "protocolId": {
+          "$ref": "#/$defs/protocolId"
+        },
+        "workSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "restSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "transitionSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "roundsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "densityWindowMinutesRange": {
+          "$ref": "#/$defs/range2"
+        }
+      },
+      "additionalProperties": false
+    },
+    "actionMeta": {
+      "type": "object",
+      "required": [
+        "families",
+        "modalities",
+        "protocolEligibility",
+        "workMetrics",
+        "impact",
+        "coordinationDemand",
+        "fatigueRisk",
+        "levels",
+        "powerEligible",
+        "route"
+      ],
+      "properties": {
+        "families": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/familyId"
+          }
+        },
+        "modalities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modalityId"
+          }
+        },
+        "protocolEligibility": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/protocolId"
+          }
+        },
+        "workMetrics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/workMetric"
+          }
+        },
+        "impact": {
+          "$ref": "#/$defs/risk"
+        },
+        "coordinationDemand": {
+          "$ref": "#/$defs/risk"
+        },
+        "fatigueRisk": {
+          "$ref": "#/$defs/risk"
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/level"
+          }
+        },
+        "powerEligible": {
+          "type": "boolean"
+        },
+        "route": {
+          "const": "CONDITIONING_2F"
+        }
+      },
+      "additionalProperties": false
+    },
+    "transitionPolicy": {
+      "type": "object",
+      "required": [
+        "formalRoutes",
+        "excludedRoutes",
+        "sameStationSecondsRange",
+        "stationChangeSecondsRange",
+        "equipmentChangeSecondsRange",
+        "floorChangeAllowed"
+      ],
+      "properties": {
+        "formalRoutes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "const": "CONDITIONING_2F"
+          }
+        },
+        "excludedRoutes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "POST_CARDIO_ONLY",
+              "RECOVERY_2F",
+              "1F_ONLY",
+              "FLEX_1F_2F",
+              "2F_ONLY"
+            ]
+          }
+        },
+        "sameStationSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "stationChangeSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "equipmentChangeSecondsRange": {
+          "$ref": "#/$defs/range2"
+        },
+        "floorChangeAllowed": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "levelCountMap": {
+      "type": "object",
+      "required": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "properties": {
+        "L1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "L2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "L3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "L4": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "conflictPolicy": {
+      "type": "object",
+      "required": [
+        "maxHighImpactStationsByLevel",
+        "maxHighCoordinationStationsByLevel",
+        "maxHighFatigueStationsByLevel",
+        "maxPowerStationsByLevel",
+        "maxConsecutiveSameModality",
+        "minDistinctModalitiesForCircuit",
+        "maxEstimatedSessionMinutes",
+        "powerMustPrecedeFatigue",
+        "duplicateActionAllowed",
+        "postCardioOnlyEligible"
+      ],
+      "properties": {
+        "maxHighImpactStationsByLevel": {
+          "$ref": "#/$defs/levelCountMap"
+        },
+        "maxHighCoordinationStationsByLevel": {
+          "$ref": "#/$defs/levelCountMap"
+        },
+        "maxHighFatigueStationsByLevel": {
+          "$ref": "#/$defs/levelCountMap"
+        },
+        "maxPowerStationsByLevel": {
+          "$ref": "#/$defs/levelCountMap"
+        },
+        "maxConsecutiveSameModality": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minDistinctModalitiesForCircuit": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "maxEstimatedSessionMinutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "powerMustPrecedeFatigue": {
+          "const": true
+        },
+        "duplicateActionAllowed": {
+          "const": false
+        },
+        "postCardioOnlyEligible": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

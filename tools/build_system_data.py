@@ -18,6 +18,7 @@ REQUIRED_SOURCE_FILES = (
     "sessions.json",
     "templates.json",
     "body.json",
+    "conditioning.json",
     "support.json",
     "core.json",
     "prep.json",
