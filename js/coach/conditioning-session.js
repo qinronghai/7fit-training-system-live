@@ -205,7 +205,12 @@
       <div class="conditioning-station-grid">${stations.map((station,index)=>stationCard(ctx,station,index)).join('')}</div>
       <div class="session-toolbar"><div class="conditioning-no-post-cardio-inline">完整 Conditioning：NO POST CARDIO</div><div class="session-toolbar-actions"><button data-conditioning-copy="coach" type="button">复制教练版</button><button data-conditioning-copy="member" type="button">复制会员版</button><button id="reset-conditioning-session" type="button">恢复系统推荐</button></div></div>
     </section>`;
-    return `${prepHtml}${protocolPanel(session)}${main}${recovery()}`;
+    const saved=M.SavedSessions?.render?.({
+      templateId:'conditioning',
+      sessionKey:ctx.sessionKey,
+      defaultName:`${ctx.family?.name||ctx.familyId}｜${ctx.level}｜${session.domainContext?.protocolName||ctx.protocolId}`,
+    })||'';
+    return `${prepHtml}${protocolPanel(session)}${main}${recovery()}${saved}`;
   }
 
   function render(route){

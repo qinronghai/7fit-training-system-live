@@ -19,6 +19,7 @@
       const root=document.getElementById('app-main');
       const rerender=()=>{const current=window.V14Router.parseHash(location.hash);root.innerHTML=render(current);bind(current);if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);};
       adapter.bind(route,root,rerender);
+      M.SavedSessions?.bind?.(root,{rerender});
       return;
     }
     if(route.page==='compose'){
@@ -31,6 +32,7 @@
       const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
       document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
+      M.SavedSessions?.bind?.(document.getElementById('app-main'),{rerender});
       return;
     }
     if(!route.recipeId)return;
@@ -43,6 +45,7 @@
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
+    M.SavedSessions?.bind?.(document.getElementById('app-main'),{rerender});
   }
   window.V14CoachAnatomy={selectedTrainingIds:Session.selectedTrainingIds,buildCopyPayload:Session.buildCopyPayload,buildComposerCopyPayload:ComposerView.buildComposerCopyPayload,composerContext:ComposerView.composerContext};
   window.V14Views=window.V14Views||{};window.V14Views.coach=render;
