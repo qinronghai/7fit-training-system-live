@@ -375,6 +375,40 @@
     };
   }
 
+  function hyroxRestore(record,reasons){
+    const data=D(),saved=clone(record.input||{}),sessionType=String(saved.sessionType||'').toUpperCase();
+    if(!(data.hyroxSessionTypeIds||[]).includes(sessionType))return failResult('UNRESTORABLE_HYROX_SESSION','Saved HYROX session type is no longer available',record);
+    let level=LEVELS.has(record.level)?record.level:String(saved.level||'').toUpperCase();
+    let protocolId='';
+    if(sessionType==='BENCHMARK'){
+      protocolId=String(saved.benchmarkProtocolId||'').toUpperCase();
+      const protocol=data.hyroxBenchmarkProtocols?.[protocolId];
+      if(!protocol)return failResult('UNRESTORABLE_HYROX_SESSION','Saved HYROX Benchmark protocol is no longer available',record);
+      level=protocol.level;
+    }
+    if(!LEVELS.has(level))return failResult('UNRESTORABLE_HYROX_SESSION','Saved HYROX level is no longer available',record);
+    let capacityFocus='';
+    if(sessionType==='CAPACITY'){
+      capacityFocus=String(saved.capacityFocus||'ENGINE').toUpperCase();
+      if(!(data.hyroxCapacityGroupIds||[]).includes(capacityFocus)){capacityFocus='ENGINE';addReason(reasons,'STALE_INPUT');}
+    }
+    const input={...saved,sessionType,level,...(capacityFocus?{capacityFocus}:{}),...(protocolId?{benchmarkProtocolId:protocolId}:{}),surface:'session'};
+    let resolved;
+    try{resolved=window.V15TemplateResolver.resolve('hyrox',input);}
+    catch(error){
+      const fallback={...input};delete fallback.selections;delete fallback.workOverrides;delete fallback.scaledVariants;
+      try{resolved=window.V15TemplateResolver.resolve('hyrox',fallback);Object.assign(input,fallback);addReason(reasons,'STALE_INPUT');}
+      catch(_){return failResult('UNRESTORABLE_HYROX_SESSION',error?.message||'Saved HYROX session is no longer restorable',record);}
+    }
+    if(record.resolverVersion!==resolved.resolverVersion)addReason(reasons,'RESOLVER_VERSION_MISMATCH');
+    const prepContext=window.V14PrepResolver?.contextFromHyrox?.({level,recipeId:resolved.familyId,stationIds:resolved.domainContext?.orderedStations||[],modalities:Object.values(resolved.domainContext?.stations||{}).map(item=>item.modality)})||resolved.prepContext;
+    const prep=validatePrep(prepContext,record.prepSelections);if(prep.dropped.length)addReason(reasons,'STALE_PREP_SELECTION');
+    const sessionKey=sessionType==='BENCHMARK'?'BENCHMARK-'+protocolId:sessionType==='CAPACITY'?'CAPACITY-'+capacityFocus+'-'+level:sessionType+'-'+level;
+    applyRestoredState({templateId:'hyrox',sessionKey,familyId:resolved.familyId,level,resolverVersion:resolved.resolverVersion,input,selections:{},prepSelections:prep.accepted});
+    const hash=sessionType==='BENCHMARK'?'#/coach/hyrox/benchmark/'+protocolId.toLowerCase():sessionType==='CAPACITY'?'#/coach/hyrox/capacity/'+level.toLowerCase()+'?focus='+encodeURIComponent(capacityFocus):'#/coach/hyrox/'+sessionType.toLowerCase()+'/'+level.toLowerCase();
+    return {ok:true,code:reasons.length?'RESTORED_WITH_MIGRATION':'RESTORED',hash,templateId:'hyrox',sessionKey,reasons,droppedSelections:[],droppedPrepSelections:prep.dropped};
+  }
+
   function restore(savedId){
     const state=S(),record=state?.getSavedSession?.(savedId);
     if(!record)return failResult('SAVED_SESSION_NOT_FOUND','Saved session does not exist');
@@ -391,6 +425,8 @@
       result=bodyRestore(record,reasons);
     }else if(record.templateId==='conditioning'){
       result=conditioningRestore(record,reasons);
+    }else if(record.templateId==='hyrox'){
+      result=hyroxRestore(record,reasons);
     }else{
       result=failResult('UNRESTORABLE_TEMPLATE','Saved template is not supported',record);
     }
