@@ -134,7 +134,11 @@ const changedLoad=Dispatcher.resolve('hyrox',{
   sessionType:'BENCHMARK',level:'L3',benchmarkProtocolId:'B3',sledCalibration,
   explicitLoads:{H6:14},
 });
-assert.notStrictEqual(changedLoad.domainContext.benchmarkContext.comparisonKey,b3.domainContext.benchmarkContext.comparisonKey);\n\nconst changedDensity=Dispatcher.resolve('hyrox',{sessionType:'BENCHMARK',level:'L3',benchmarkProtocolId:'B3',sledCalibration,restSecondsOverride:30});\nassert.notStrictEqual(changedDensity.domainContext.benchmarkContext.comparisonKey,b3.domainContext.benchmarkContext.comparisonKey);\nassert.strictEqual(changedDensity.domainContext.benchmarkContext.newBaselineRequired,true);
+assert.notStrictEqual(changedLoad.domainContext.benchmarkContext.comparisonKey,b3.domainContext.benchmarkContext.comparisonKey);
+
+const changedDensity=Dispatcher.resolve('hyrox',{sessionType:'BENCHMARK',level:'L3',benchmarkProtocolId:'B3',sledCalibration,restSecondsOverride:30});
+assert.notStrictEqual(changedDensity.domainContext.benchmarkContext.comparisonKey,b3.domainContext.benchmarkContext.comparisonKey);
+assert.strictEqual(changedDensity.domainContext.benchmarkContext.newBaselineRequired,true);
 
 expectCode(()=>Dispatcher.resolve('hyrox',{sessionType:'BENCHMARK',level:'L3'}),'HYROX_SLED_CALIBRATION_REQUIRED');
 expectCode(()=>Dispatcher.resolve('hyrox',{sessionType:'CAPACITY',level:'L2',capacityFocus:'SLED'}),'HYROX_SLED_CALIBRATION_REQUIRED');
