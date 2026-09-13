@@ -32,6 +32,9 @@
         level:state.level,
         slotKey,
         actionId:entry.actionId,
+        currentSelections:Object.fromEntries(
+          Object.entries(state.selections||{}).map(([key,value])=>[key,value?.actionId||''])
+        ),
       }),
     };
     if(current.resolverVersion!==RESOLVER_VERSION)return S.reconcileSession('body',sessionKey,options).session;
@@ -54,7 +57,11 @@
     const S=window.V15State;
     if(!S)throw new Error('Body coach State service is unavailable');
     ensureState(familyId,level);
-    if(!window.V15BodyResolver.isSelectionValid({familyId,level,slotKey,actionId})){
+    const currentSelections=Object.fromEntries(
+      Object.entries(S.getSelections('body',sessionKeyFor(familyId,level))||{})
+        .map(([key,value])=>[key,value?.actionId||value||''])
+    );
+    if(!window.V15BodyResolver.isSelectionValid({familyId,level,slotKey,actionId,currentSelections})){
       throw new Error(`Invalid Body selection: ${familyId} ${level} ${slotKey} ${actionId}`);
     }
     return S.setSelection('body',sessionKeyFor(familyId,level),slotKey,actionId,'manual');
