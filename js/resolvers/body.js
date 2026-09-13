@@ -48,27 +48,18 @@
     return (Array.isArray(a)?a:[]).some(value=>wanted.has(value));
   }
 
-  function isLegalCandidate({familyId,level,family,role,actionId}){
-    const data=D(),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
-    if(!meta||!action)return false;
-    if(!meta.families?.includes(familyId))return false;
-    if(!meta.levels?.includes(level))return false;
-    if(!meta.roles?.includes(role))return false;
-    if(action.status!=='可自动编排')return false;
-    if(!MAIN_ROUTES.has(action.route))return false;
-    if((role==='PRIMARY'||role==='SECONDARY')&&!overlaps(meta.directTargets,family.primaryTargets))return false;
-    return true;
+  function overlapRatio(a,b){
+    const left=new Set(Array.isArray(a)?a:[]),right=new Set(Array.isArray(b)?b:[]);
+    const union=new Set([...left,...right]);
+    if(!union.size)return 0;
+    let intersection=0;
+    left.forEach(value=>{if(right.has(value))intersection++;});
+    return intersection/union.size;
   }
 
-  function isSelectionValid(input={}){
-    let normalized;
-    try{normalized=validateInput(input,true);}catch(error){
-      if(error?.code==='BODY_INPUT_INVALID')return false;
-      throw error;
-    }
-    const actionId=normalizeActionId(input.actionId);
-    if(!actionId)return false;
-    return isLegalCandidate({...normalized,actionId});
+  function slotIntentFor(family,slotKey){
+    const intent=family?.slotIntents?.[slotKey];
+    return intent&&typeof intent==='object'?intent:null;
   }
 
   function exerciseFamilyOf(actionId){
@@ -76,8 +67,136 @@
     return String(meta.exerciseFamily||actionId||'');
   }
 
+  function baseIntentAssessment({familyId,level,family,slotKey,role,actionId}){
+    const data=D(),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId],reasons=[];
+    const intent=slotIntentFor(family,slotKey);
+    if(!meta||!action)reasons.push('BODY_ACTION_UNKNOWN');
+    if(!intent)reasons.push('BODY_SLOT_INTENT_MISSING');
+    if(reasons.length)return {ok:false,reasons,intent,meta,action};
+
+    if(!meta.families?.includes(familyId))reasons.push('BODY_FAMILY_DEVIATION');
+    if(!meta.levels?.includes(level))reasons.push('BODY_LEVEL_DEVIATION');
+    if(!meta.roles?.includes(role))reasons.push('BODY_ROLE_DEVIATION');
+    if(intent.role!==role||intent.slotKey!==slotKey)reasons.push('BODY_SLOT_INTENT_MISMATCH');
+    if(action.status!=='可自动编排')reasons.push('BODY_STATUS_INVALID');
+    if(!MAIN_ROUTES.has(action.route))reasons.push('BODY_ROUTE_INVALID');
+    if((role==='PRIMARY'||role==='SECONDARY')&&!overlaps(meta.directTargets,family.primaryTargets)){
+      reasons.push('BODY_PRIMARY_TARGET_MISMATCH');
+    }
+
+    const allowedClasses=Array.isArray(intent.allowedExerciseClasses)?intent.allowedExerciseClasses:[];
+    if(allowedClasses.length&&!allowedClasses.includes(meta.exerciseClass)){
+      reasons.push('BODY_SLOT_INTENT_EXERCISE_CLASS');
+    }
+    const requiredPatterns=Array.isArray(intent.requiredPatterns)?intent.requiredPatterns:[];
+    if(requiredPatterns.length&&!requiredPatterns.includes(action.pattern)){
+      reasons.push('BODY_SLOT_INTENT_PATTERN');
+    }
+    const requiredTargets=Array.isArray(intent.requiredDirectTargets)?intent.requiredDirectTargets:[];
+    if(requiredTargets.length&&!overlaps(meta.directTargets,requiredTargets)){
+      reasons.push('BODY_SLOT_INTENT_TARGET');
+    }
+    const disallowed=intent.disallowedCharacteristics||{};
+    if((disallowed.fatigueCost||[]).includes(meta.fatigueCost)){
+      reasons.push('BODY_SLOT_INTENT_FATIGUE');
+    }
+    if((disallowed.stabilityDemand||[]).includes(meta.stabilityDemand)){
+      reasons.push('BODY_SLOT_INTENT_STABILITY');
+    }
+    return {ok:reasons.length===0,reasons,intent,meta,action};
+  }
+
+  function pairSimilarity(actionId,otherActionId){
+    const data=D(),meta=data.bodyActionMeta?.[actionId]||{},otherMeta=data.bodyActionMeta?.[otherActionId]||{};
+    const action=data.actions?.[actionId]||{},otherAction=data.actions?.[otherActionId]||{};
+    return {
+      sameExerciseFamily:exerciseFamilyOf(actionId)===exerciseFamilyOf(otherActionId),
+      samePattern:!!action.pattern&&action.pattern===otherAction.pattern,
+      sameLaterality:!!meta.laterality&&meta.laterality===otherMeta.laterality,
+      directTargetOverlap:overlapRatio(meta.directTargets,otherMeta.directTargets),
+    };
+  }
+
+  function pairIntentReasons({slotKey,intent,actionId,currentSelections={}}){
+    const relation=intent?.pairRelationship;
+    if(!relation||typeof relation!=='object')return [];
+    const data=D(),meta=data.bodyActionMeta?.[actionId]||{},action=data.actions?.[actionId]||{},reasons=[];
+    const threshold=Number.isFinite(Number(relation.minDirectTargetOverlap))
+      ?Number(relation.minDirectTargetOverlap):0.75;
+
+    for(const against of relation.against||[]){
+      const otherId=normalizeActionId(currentSelections?.[against]);
+      if(!otherId||otherId===actionId)continue;
+      const similarity=pairSimilarity(actionId,otherId);
+      if(relation.requireEffectiveDifference){
+        if(relation.blockSamePattern&&similarity.samePattern){
+          reasons.push('BODY_PRIMARY_SECONDARY_TOO_SIMILAR');
+          continue;
+        }
+        if(similarity.samePattern&&similarity.sameLaterality&&similarity.directTargetOverlap>=threshold){
+          reasons.push('BODY_PRIMARY_SECONDARY_TOO_SIMILAR');
+          continue;
+        }
+      }
+      if(
+        relation.blockCompoundPatternRepeat
+        &&meta.exerciseClass==='compound'
+        &&similarity.samePattern
+      ){
+        reasons.push(slotKey==='ACCESSORY'?'BODY_ACCESSORY_ROLE_COLLAPSE':'BODY_SLOT_PAIR_REDUNDANCY');
+      }
+      if(
+        slotKey==='ACCESSORY'
+        &&meta.exerciseClass==='compound'
+        &&similarity.samePattern
+        &&similarity.directTargetOverlap>=threshold
+      ){
+        reasons.push('BODY_ACCESSORY_ROLE_COLLAPSE');
+      }
+      if(!action.pattern)reasons.push('BODY_SLOT_INTENT_PATTERN');
+    }
+    return [...new Set(reasons)];
+  }
+
+  function assessSlotIntent(input={}){
+    let normalized;
+    try{normalized=validateInput(input,true);}catch(error){
+      if(error?.code==='BODY_INPUT_INVALID'){
+        return {ok:false,reasons:['BODY_INPUT_INVALID'],intentId:'',slotKey:String(input.slotKey||''),actionId:normalizeActionId(input.actionId)};
+      }
+      throw error;
+    }
+    const actionId=normalizeActionId(input.actionId);
+    if(!actionId)return {ok:false,reasons:['BODY_ACTION_UNKNOWN'],intentId:'',slotKey:normalized.slotKey,actionId:''};
+    const base=baseIntentAssessment({...normalized,actionId});
+    const pairReasons=base.ok?pairIntentReasons({
+      slotKey:normalized.slotKey,
+      intent:base.intent,
+      actionId,
+      currentSelections:input.currentSelections||{},
+    }):[];
+    const reasons=[...new Set([...base.reasons,...pairReasons])];
+    return {
+      ok:reasons.length===0,
+      reasons,
+      intentId:String(base.intent?.intentId||''),
+      slotKey:normalized.slotKey,
+      role:normalized.role,
+      actionId,
+      pairSimilarity:pairReasons.length?pairReasons.map(code=>({code})):[],
+    };
+  }
+
+  function isLegalCandidate(input={}){
+    return assessSlotIntent(input).ok;
+  }
+
+  function isSelectionValid(input={}){
+    return assessSlotIntent(input).ok;
+  }
+
   function selectionContext(currentSelections={},currentSlotKey=''){
-    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set(),usedExerciseFamilies=new Set();
+    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set(),usedExerciseFamilies=new Set(),selected=[];
     let highFatigueCompounds=0;
     for(const [slotKey,value] of Object.entries(currentSelections||{})){
       if(slotKey===currentSlotKey)continue;
@@ -88,14 +207,26 @@
       (meta.directTargets||[]).forEach(target=>coveredTargets.add(target));
       if(action.pattern)patterns.add(action.pattern);
       if(meta.exerciseClass==='compound'&&meta.fatigueCost==='high')highFatigueCompounds++;
+      selected.push({slotKey,actionId,meta,action});
     }
-    return {coveredTargets,patterns,usedActionIds,usedExerciseFamilies,highFatigueCompounds};
+    return {coveredTargets,patterns,usedActionIds,usedExerciseFamilies,highFatigueCompounds,selected};
   }
 
-  function candidateSortKey(candidate,{family,level,context}){
+  function fatiguePreferenceScore(preference,cost){
+    if(preference==='low')return cost==='low'?2:cost==='medium'?1:0;
+    if(preference==='moderate')return cost==='medium'?2:cost==='low'?1:0;
+    return 0;
+  }
+
+  function candidateSortKey(candidate,{family,level,context,intent}){
     const primaryTargets=new Set(family.primaryTargets||[]);
     const volumeTargets=new Set(family.volumeTargets||[]);
     const direct=candidate.directTargets||[];
+    const preferredPatterns=Array.isArray(intent?.preferredPatterns)?intent.preferredPatterns:[];
+    const preferredTargets=new Set(Array.isArray(intent?.preferredDirectTargets)?intent.preferredDirectTargets:[]);
+    const intentPatternPreference=preferredPatterns.includes(candidate.pattern)?1:0;
+    const intentTargetPreference=direct.filter(target=>preferredTargets.has(target)).length;
+    const fatiguePreference=fatiguePreferenceScore(intent?.fatiguePreference,candidate.fatigueCost);
     const primaryCoverage=direct.filter(target=>primaryTargets.has(target)).length;
     const missingTargetBonus=direct.filter(target=>volumeTargets.has(target)&&!context.coveredTargets.has(target)).length;
     const stability=STABILITY_RANK[candidate.stabilityDemand]??2;
@@ -103,33 +234,48 @@
     const fatiguePenalty=candidate.exerciseClass==='compound'&&candidate.fatigueCost==='high'&&context.highFatigueCompounds>=2?1:0;
     const movementDiversity=candidate.pattern&&!context.patterns.has(candidate.pattern)?1:0;
     const targetRedundancy=direct.filter(target=>context.coveredTargets.has(target)).length;
-    return {primaryCoverage,missingTargetBonus,stabilityPenalty,fatiguePenalty,movementDiversity,targetRedundancy};
+    const similarityPenalty=context.selected.reduce((sum,item)=>{
+      const similarity=pairSimilarity(candidate.actionId,item.actionId);
+      return sum+(similarity.samePattern?1:0)+similarity.directTargetOverlap;
+    },0);
+    return {
+      intentPatternPreference,intentTargetPreference,fatiguePreference,
+      primaryCoverage,missingTargetBonus,stabilityPenalty,fatiguePenalty,
+      movementDiversity,targetRedundancy,similarityPenalty
+    };
   }
 
   function compareCandidates(a,b,ctx){
     const A=candidateSortKey(a,ctx),B=candidateSortKey(b,ctx);
-    return B.primaryCoverage-A.primaryCoverage
+    return B.intentPatternPreference-A.intentPatternPreference
+      ||B.intentTargetPreference-A.intentTargetPreference
+      ||B.fatiguePreference-A.fatiguePreference
+      ||B.primaryCoverage-A.primaryCoverage
       ||B.missingTargetBonus-A.missingTargetBonus
       ||A.stabilityPenalty-B.stabilityPenalty
       ||A.fatiguePenalty-B.fatiguePenalty
       ||B.movementDiversity-A.movementDiversity
       ||A.targetRedundancy-B.targetRedundancy
+      ||A.similarityPenalty-B.similarityPenalty
       ||a.actionId.localeCompare(b.actionId);
   }
 
   function candidates(input={}){
     const {familyId,level,family,slotKey,role}=validateInput(input,true);
-    const data=D(),context=selectionContext(input.currentSelections||{},slotKey),items=[];
+    const data=D(),currentSelections=input.currentSelections||{},context=selectionContext(currentSelections,slotKey);
+    const intent=slotIntentFor(family,slotKey),items=[];
     for(const actionId of Object.keys(data.bodyActionMeta||{})){
       if(context.usedActionIds.has(actionId))continue;
       const meta=data.bodyActionMeta[actionId],exerciseFamily=exerciseFamilyOf(actionId);
       if(context.usedExerciseFamilies.has(exerciseFamily))continue;
-      if(!isLegalCandidate({familyId,level,family,role,actionId}))continue;
+      const assessment=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections});
+      if(!assessment.ok)continue;
       const action=data.actions[actionId];
       items.push({
         actionId,
         name:String(action.name||actionId),
         role,
+        intentId:String(intent?.intentId||''),
         directTargets:[...(meta.directTargets||[])],
         secondaryTargets:[...(meta.secondaryTargets||[])],
         exerciseClass:String(meta.exerciseClass||''),
@@ -141,8 +287,12 @@
         pattern:String(action.pattern||''),
       });
     }
-    items.sort((a,b)=>compareCandidates(a,b,{family,level,context}));
-    return {recommended:items[0]?.actionId||'',candidates:items};
+    items.sort((a,b)=>compareCandidates(a,b,{family,level,context,intent}));
+    return {
+      recommended:items[0]?.actionId||'',
+      slotIntent:intent?{slotKey,intentId:intent.intentId,role:intent.role}:null,
+      candidates:items
+    };
   }
 
   function publicAnatomy(actionIds){
@@ -196,7 +346,7 @@
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
       const usedExerciseFamilies=new Set(Object.values(chosen).map(exerciseFamilyOf));
-      if(requestedActionId&&!used.has(requestedActionId)&&!usedExerciseFamilies.has(exerciseFamilyOf(requestedActionId))&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
+      if(requestedActionId&&!used.has(requestedActionId)&&!usedExerciseFamilies.has(exerciseFamilyOf(requestedActionId))&&isLegalCandidate({familyId,level,slotKey,actionId:requestedActionId,currentSelections:chosen})){
         actionId=requestedActionId;
         source='manual';
       }else{
@@ -261,7 +411,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,pairSimilarity};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);
