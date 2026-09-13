@@ -67,26 +67,6 @@
       "routeBase": "#/coach/conditioning",
       "description": "围绕体能方式、冲击需求、功率需求与训练站点组织的体能模板。"
     },
-    "posture": {
-      "templateId": "posture",
-      "name": "体态调整",
-      "shortName": "Posture",
-      "engine": "posture",
-      "status": "FUTURE",
-      "levelSystem": "L1-L4",
-      "capabilities": {
-        "preset": false,
-        "composer": false,
-        "prep": false,
-        "anatomy": false,
-        "copy": false,
-        "save": false,
-        "volume": false,
-        "conditioningMetrics": false
-      },
-      "routeBase": "#/coach/posture",
-      "description": "未来用于体态评估、专项调整与阶段训练编排的模板入口。"
-    },
     "hyrox": {
       "templateId": "hyrox",
       "name": "HYROX 训练",
@@ -106,6 +86,26 @@
       },
       "routeBase": "#/coach/hyrox",
       "description": "适配 7Fit 二楼器械与 8 米草坪的固定 Station 混合体能训练模板；数据契约已就绪，功能待接入。"
+    },
+    "posture": {
+      "templateId": "posture",
+      "name": "体态调整",
+      "shortName": "Posture",
+      "engine": "posture",
+      "status": "FUTURE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": false,
+        "composer": false,
+        "prep": false,
+        "anatomy": false,
+        "copy": false,
+        "save": false,
+        "volume": false,
+        "conditioningMetrics": false
+      },
+      "routeBase": "#/coach/posture",
+      "description": "未来用于体态评估、专项调整与阶段训练编排的模板入口。"
     }
   }
 }
