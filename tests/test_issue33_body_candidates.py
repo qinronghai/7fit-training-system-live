@@ -7,6 +7,7 @@ REQUIRED_FIELDS = {
     "families", "levels", "roles", "directTargets", "secondaryTargets",
     "exerciseClass", "fatigueCost", "stabilityDemand", "repProfile", "laterality",
 }
+OPTIONAL_FIELDS = {"redundancyGroup"}
 REQUIRED_ROLES = ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION"]
 LEVELS = ["L1", "L2", "L3", "L4"]
 FAMILIES = ["BODY-01", "BODY-02", "BODY-03", "BODY-04"]
@@ -32,7 +33,10 @@ def test_body_candidate_whitelist_is_curated_and_reference_safe():
         action = actions[action_id]
         assert action["route"] in {"1F_ONLY", "FLEX_1F_2F"}, f"invalid Body strength route: {action_id}"
         assert action["status"] == "可自动编排", f"Body candidate not auto-programmable: {action_id}"
-        assert set(meta) == REQUIRED_FIELDS, f"Body metadata fields drifted: {action_id}"
+        assert REQUIRED_FIELDS <= set(meta), f"Body metadata fields missing: {action_id}"
+        assert set(meta) <= REQUIRED_FIELDS | OPTIONAL_FIELDS, f"Body metadata fields drifted: {action_id}"
+        if "redundancyGroup" in meta:
+            assert isinstance(meta["redundancyGroup"], str) and meta["redundancyGroup"].strip(), f"invalid redundancyGroup: {action_id}"
         for field in ("families", "levels", "roles", "directTargets", "secondaryTargets"):
             assert len(meta[field]) == len(set(meta[field])), f"duplicate {field}: {action_id}"
         assert meta["families"] and set(meta["families"]) <= valid_families
