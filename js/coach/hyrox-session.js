@@ -248,7 +248,7 @@
       '<section class="view-hero hyrox-session-hero"><span class="eyebrow">HYROX / '+esc(ctx.sessionType)+'</span><h1>'+esc(TYPE_LABEL[ctx.sessionType])+'</h1><p>当前训练身份已经确定，但 Resolver 在生成正式处方前需要补齐场馆条件。</p></section>'+
       controlPanel(ctx)+calibrationPanel(ctx)+
       '<section class="empty-state hyrox-resolver-block"><b>暂未生成正式 Session</b><span>'+esc(ctx.error?.message||'请补齐所需条件。')+'</span></section>'+
-      (M.SavedSessionsUI?.controls?.(ctx.route)||'');
+      (M.SavedSessionsUI?.librarySection?.()||'');
   }
 
   function renderSession(route){
