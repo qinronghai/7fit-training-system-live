@@ -205,7 +205,7 @@
     // Keep downward-compatibility visible inside the capped UI list:
     // first reserve the best legal candidate from each allowed grade,
     // then fill remaining positions from the normal deterministic ranking.
-    const picked=new Set(),gradeApi=G();
+    const picked=new Set();
     for(const grade of (gradeApi?.allowedGrades?.(ctx.level)||[])){
       const item=all.find(candidate=>candidate.prepGrade===grade);
       if(item){
