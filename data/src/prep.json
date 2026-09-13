@@ -29,7 +29,29 @@
     "PREP-25",
     "PREP-26",
     "PREP-27",
-    "PREP-28"
+    "PREP-28",
+    "PREP-29",
+    "PREP-30",
+    "PREP-31",
+    "PREP-32",
+    "PREP-33",
+    "PREP-34",
+    "PREP-35",
+    "PREP-36",
+    "PREP-37",
+    "PREP-38",
+    "PREP-39",
+    "PREP-40",
+    "PREP-41",
+    "PREP-42",
+    "PREP-43",
+    "PREP-44",
+    "PREP-45",
+    "PREP-46",
+    "PREP-47",
+    "PREP-48",
+    "PREP-49",
+    "PREP-50"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -1129,6 +1151,799 @@
       "why": "在单侧支撑中叠加髋外展，显著增加侧链、臀中肌和骨盆稳定需求，作为 L4 高阶核心准备。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S6-05",
       "route": "FLEX_1F_2F"
+    },
+    "PREP-29": {
+      "prepId": "PREP-29",
+      "name": "猫牛式",
+      "alias": "Cat-Cow",
+      "actionId": "mao_niu",
+      "prepGrade": "P1",
+      "role": "脊柱 / 胸椎动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "胸椎",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "吸气延展、呼气屈曲，动作从胸椎和骨盆协同完成，不甩头。",
+      "why": "用低门槛屈伸活动唤醒脊柱与肩胛，适合多数课程开场。",
+      "sourceStatus": "复用现有热身动作节点",
+      "route": "2F_ONLY"
+    },
+    "PREP-30": {
+      "prepId": "PREP-30",
+      "name": "泡沫轴胸椎伸展",
+      "alias": "泡沫轴胸椎伸展",
+      "actionId": "xiongzhui_shenzhan",
+      "prepGrade": "P2",
+      "role": "胸椎伸展活动",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "胸椎",
+        "胸廓",
+        "背阔肌"
+      ],
+      "equipment": "泡沫轴",
+      "prescription": "1–2组 × 5–8次",
+      "cue": "泡沫轴横放上背，支撑头颈，胸椎轻柔伸展；不要把幅度压到腰椎。",
+      "why": "提高胸椎伸展可用范围，为推举、拉背与肩胛上旋准备。",
+      "sourceStatus": "复用现有 REVIEW 热身节点",
+      "route": "2F_ONLY"
+    },
+    "PREP-31": {
+      "prepId": "PREP-31",
+      "name": "泡沫轴仰卧肩屈上举",
+      "alias": "泡沫轴肩屈上举",
+      "actionId": "warmup_foamroller_overhead_reach",
+      "prepGrade": "P2",
+      "role": "肩屈 + 胸椎活动",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩关节",
+        "胸椎",
+        "背阔肌",
+        "胸廓"
+      ],
+      "equipment": "泡沫轴 / 垫子",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "肋骨保持稳定，双臂沿头顶方向上举；幅度服从肩和胸椎，不用腰椎补。",
+      "why": "同时准备肩屈、背阔肌长度与胸椎伸展，适合上肢推拉。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-32": {
+      "prepId": "PREP-32",
+      "name": "跪姿背阔肌动态拉伸",
+      "alias": "跪姿背阔肌拉伸动态版",
+      "actionId": "warmup_kneeling_lat_dynamic",
+      "prepGrade": "P1",
+      "role": "背阔肌 / 肩屈动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "背阔肌",
+        "肩关节",
+        "胸椎"
+      ],
+      "equipment": "训练垫 / 长凳",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "双手支撑，臀部向后坐，腋后侧拉长；回程主动控制，不塌腰。",
+      "why": "低门槛改善背阔肌和肩屈可用范围，适合垂直推拉前。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-33": {
+      "prepId": "PREP-33",
+      "name": "墙面肩胛上旋滑墙离墙",
+      "alias": "滑墙离墙",
+      "actionId": "warmup_wall_slide_liftoff",
+      "prepGrade": "P3",
+      "role": "肩胛上旋 / 肩屈整合活动",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩胛",
+        "肩关节",
+        "胸椎",
+        "前锯肌"
+      ],
+      "equipment": "固定墙面",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "前臂沿墙上滑，顶端轻离墙；肋骨保持回收，不耸肩。",
+      "why": "把肩屈、肩胛上旋和胸廓控制整合起来，适合较高等级上肢训练。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-34": {
+      "prepId": "PREP-34",
+      "name": "鸟狗式",
+      "alias": "Bird Dog",
+      "actionId": "diaoweng_shi",
+      "prepGrade": "P2",
+      "role": "核心抗旋转 / 对侧协调",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "肩胛",
+        "臀部"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–8次/侧",
+      "cue": "对侧手腿伸长，骨盆保持正，腰椎不过伸；每次回到稳定四足位。",
+      "why": "增加对侧肢体协调和抗旋转控制，是死虫与平板之外的重要核心准备。",
+      "sourceStatus": "复用现有核心动作节点",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-35": {
+      "prepId": "PREP-35",
+      "name": "半跪姿踝背屈前移",
+      "alias": "踝背屈前移",
+      "actionId": "warmup_ankle_dorsiflexion_rock",
+      "prepGrade": "P1",
+      "role": "踝关节动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "踝",
+        "小腿",
+        "足部"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 8–10次/侧",
+      "cue": "脚跟压地，膝盖沿第二脚趾方向向前移动，不塌足弓。",
+      "why": "补足当前下肢热身最缺的踝背屈准备，直接服务深蹲和单腿动作。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-36": {
+      "prepId": "PREP-36",
+      "name": "四足跪姿内收肌后坐",
+      "alias": "内收肌后坐",
+      "actionId": "warmup_adductor_rockback",
+      "prepGrade": "P1",
+      "role": "髋内收肌动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋内收肌",
+        "髋关节",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 8次/侧",
+      "cue": "一腿侧伸，臀部向后坐，脊柱保持自然；不靠骨盆旋转换幅度。",
+      "why": "比静态青蛙趴更动态，适合深蹲、单腿与髋伸前准备内收肌。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-37": {
+      "prepId": "PREP-37",
+      "name": "深蹲底位动态活动",
+      "alias": "深蹲底位活动",
+      "actionId": "warmup_squat_pry",
+      "prepGrade": "P2",
+      "role": "深蹲底位髋踝活动",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "踝",
+        "内收肌",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "进入可控底位后轻微左右移重心，膝盖跟随脚尖，脚掌完整着地。",
+      "why": "把髋踝活动度直接放进深蹲姿势中，提高动作专项性。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-38": {
+      "prepId": "PREP-38",
+      "name": "反向弓步配合上举伸展",
+      "alias": "反向弓步+上举",
+      "actionId": "warmup_reverse_lunge_overhead_reach",
+      "prepGrade": "P3",
+      "role": "单腿 + 髋伸展 + 上举整合",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "髋屈肌",
+        "胸椎",
+        "肩关节",
+        "核心"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "后撤弓步同时双臂上举，骨盆保持正，站起回位后换侧。",
+      "why": "把下肢单腿、髋伸和上肢上举连接起来，适合作为全身动态准备。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-39": {
+      "prepId": "PREP-39",
+      "name": "动态哥萨克侧蹲",
+      "alias": "Cossack 动态侧蹲",
+      "actionId": "warmup_dynamic_cossack",
+      "prepGrade": "P3",
+      "role": "侧向髋活动 / 单腿控制",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "内收肌",
+        "踝",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "左右换边时控制重心，支撑脚完整着地，膝盖与脚尖方向一致。",
+      "why": "补充额状面下肢活动，增加髋内收肌和单腿控制选择。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-40": {
+      "prepId": "PREP-40",
+      "name": "单腿髋飞机动态控制",
+      "alias": "Hip Airplane",
+      "actionId": "warmup_single_leg_hip_airplane",
+      "prepGrade": "P4",
+      "role": "高阶单腿髋稳定 / 骨盆旋转控制",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "臀中肌",
+        "骨盆",
+        "核心",
+        "足踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–6次/侧",
+      "cue": "支撑腿微屈，髋铰链后骨盆小幅开合；平衡失控就缩小幅度。",
+      "why": "作为 L4 高阶单腿准备，训练髋稳定、骨盆控制与足踝平衡。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-41": {
+      "prepId": "PREP-41",
+      "name": "臀桥",
+      "alias": "双腿臀桥",
+      "actionId": "tunqiao",
+      "prepGrade": "P1",
+      "role": "臀大肌 / 髋伸基础激活",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "髋伸展",
+        "髋铰链",
+        "单腿",
+        "蹲"
+      ],
+      "regions": [
+        "臀大肌",
+        "骨盆",
+        "核心"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 10–12次",
+      "cue": "脚掌压地，收肋后顶髋，顶端夹臀但不要用腰继续顶高。",
+      "why": "提供最低门槛的臀大肌和髋伸激活，与单腿臀桥形成清晰进阶。",
+      "sourceStatus": "复用现有 T1 臀桥节点",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-42": {
+      "prepId": "PREP-42",
+      "name": "侧卧蚌式开合",
+      "alias": "蚌式开合",
+      "actionId": "warmup_side_lying_clamshell",
+      "prepGrade": "P1",
+      "role": "臀中肌 / 髋外旋激活",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "臀中肌",
+        "臀小肌",
+        "髋关节"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 10–12次/侧",
+      "cue": "双脚并拢，骨盆不后滚，膝盖小幅打开后控制回落。",
+      "why": "给臀中肌和髋外旋提供低门槛激活，适合初级下肢课程。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-43": {
+      "prepId": "PREP-43",
+      "name": "四足跪姿髋伸展",
+      "alias": "四足后踢腿",
+      "actionId": "warmup_quadruped_hip_extension",
+      "prepGrade": "P2",
+      "role": "臀大肌 / 骨盆稳定激活",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "髋伸展",
+        "髋铰链",
+        "单腿"
+      ],
+      "regions": [
+        "臀大肌",
+        "骨盆",
+        "核心"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 8–10次/侧",
+      "cue": "骨盆保持正，腿向后延伸或屈膝后抬，幅度不要超过腰盆稳定。",
+      "why": "把臀部激活与四足核心稳定结合，作为臀桥之后的动态选择。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-44": {
+      "prepId": "PREP-44",
+      "name": "弹力带臀桥外展",
+      "alias": "臀桥+外展",
+      "actionId": "warmup_banded_glute_bridge_abduction",
+      "prepGrade": "P2",
+      "role": "臀伸 + 髋外展激活",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "臀大肌",
+        "臀中肌",
+        "骨盆",
+        "核心"
+      ],
+      "equipment": "弹力带 / 垫子",
+      "prescription": "1–2组 × 10–12次",
+      "cue": "桥顶保持，双膝轻向外推弹力带；不要让骨盆下沉或腰椎过伸。",
+      "why": "同时激活臀大肌和臀中肌，适合臀腿课前提高髋稳定。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-45": {
+      "prepId": "PREP-45",
+      "name": "弹力带单腿臀桥",
+      "alias": "单腿臀桥+弹力带",
+      "actionId": "warmup_banded_single_leg_glute_bridge",
+      "prepGrade": "P4",
+      "role": "高阶单侧臀伸 / 髋稳定激活",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋伸展",
+        "髋铰链",
+        "单腿"
+      ],
+      "regions": [
+        "臀大肌",
+        "臀中肌",
+        "骨盆",
+        "核心"
+      ],
+      "equipment": "弹力带 / 垫子",
+      "prescription": "1–2组 × 6–8次/侧",
+      "cue": "单脚压地顶髋，同时保持弹力带外展张力，骨盆始终水平。",
+      "why": "在单腿臀桥上叠加外展阻力，作为 L4 高阶臀部激活。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-46": {
+      "prepId": "PREP-46",
+      "name": "划船机低强度热身",
+      "alias": "划船机轻松划",
+      "actionId": "huachuanji_wentai",
+      "prepGrade": "P1",
+      "role": "全身整合 / 周期性器械热身",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "下肢",
+        "髋",
+        "上背",
+        "肩胛",
+        "核心"
+      ],
+      "equipment": "划船机",
+      "prescription": "2–4分钟｜RPE 3–4",
+      "cue": "节奏轻松，先腿后髋再拉手；回程顺序相反，不追求功率。",
+      "why": "利用二楼划船机提高全身温度和动作节奏，作为低疲劳整合准备。",
+      "sourceStatus": "复用 Conditioning 稳态节点，仅开放 PREP 用途",
+      "route": "CONDITIONING_2F"
+    },
+    "PREP-47": {
+      "prepId": "PREP-47",
+      "name": "滑雪机低强度热身",
+      "alias": "滑雪机轻松滑",
+      "actionId": "huaxueji_wentai",
+      "prepGrade": "P2",
+      "role": "全身整合 / 周期性器械热身",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩带",
+        "背阔肌",
+        "核心",
+        "髋"
+      ],
+      "equipment": "滑雪机",
+      "prescription": "2–3分钟｜RPE 3–4",
+      "cue": "手臂下压配合轻微髋屈伸，保持呼吸，不做冲刺。",
+      "why": "利用滑雪机完成上肢—核心—髋的连续低强度整合热身。",
+      "sourceStatus": "复用 Conditioning 稳态节点，仅开放 PREP 用途",
+      "route": "CONDITIONING_2F"
+    },
+    "PREP-48": {
+      "prepId": "PREP-48",
+      "name": "轻量火箭推节奏",
+      "alias": "火箭推热身版",
+      "actionId": "warmup_rocket_press_light",
+      "prepGrade": "P3",
+      "role": "全身动态整合 / 伸髋推举",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "肩关节",
+        "核心"
+      ],
+      "equipment": "药球",
+      "prescription": "1–2组 × 6–8次",
+      "cue": "轻量药球，从半蹲到站立推举；连续但不追求速度和疲劳。",
+      "why": "用低负荷把下肢伸展、核心传力和上肢推举连接起来。",
+      "sourceStatus": "新增 PREP 动作，不复用间歇版",
+      "route": "2F_ONLY"
+    },
+    "PREP-49": {
+      "prepId": "PREP-49",
+      "name": "壶铃高脚杯深蹲到推举",
+      "alias": "壶铃蹲推",
+      "actionId": "warmup_kb_goblet_squat_press",
+      "prepGrade": "P3",
+      "role": "全身动态整合 / 蹲推",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝",
+        "肩关节",
+        "核心"
+      ],
+      "equipment": "壶铃",
+      "prescription": "1–2组 × 6次",
+      "cue": "轻壶铃高脚杯下蹲，站起后完成轻量推举；保持收肋。",
+      "why": "用二楼壶铃整合蹲、核心稳定和推举，适合中高等级全身准备。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-50": {
+      "prepId": "PREP-50",
+      "name": "药球深蹲推举",
+      "alias": "药球蹲推",
+      "actionId": "warmup_medicine_ball_squat_press",
+      "prepGrade": "P4",
+      "role": "高阶全身动态整合 / 蹲推协调",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝",
+        "肩关节",
+        "胸椎",
+        "核心"
+      ],
+      "equipment": "药球",
+      "prescription": "1–2组 × 6次",
+      "cue": "轻药球抱胸下蹲，站起后上举；保持动作流畅，不做爆发投掷。",
+      "why": "作为 L4 高阶全身整合热身，强调多关节协调而不是疲劳。",
+      "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
     }
   },
   "warmupGradeMeta": {
@@ -1151,8 +1966,8 @@
       "mainTier": "T2–T4"
     },
     "P4": {
-      "name": "高阶专项准备",
-      "meaning": "高协调、高稳定或不稳定表面专项准备；可包含减少支点、单侧高控制、爆发、跳跃或投掷等。",
+      "name": "专项准备",
+      "meaning": "高阶专项准备；可包含不稳定表面、减少支点、单侧高控制、多平面整合、爆发或投掷等更高协调要求。",
       "session": "L4",
       "mainTier": "T3–T4"
     }
@@ -1181,7 +1996,22 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-29",
+      "PREP-34",
+      "PREP-35",
+      "PREP-36",
+      "PREP-37",
+      "PREP-38",
+      "PREP-39",
+      "PREP-41",
+      "PREP-42",
+      "PREP-44",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "髋铰链": [
       "PREP-01",
@@ -1204,7 +2034,19 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-34",
+      "PREP-36",
+      "PREP-38",
+      "PREP-40",
+      "PREP-41",
+      "PREP-43",
+      "PREP-45",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "髋伸展": [
       "PREP-01",
@@ -1228,7 +2070,20 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-34",
+      "PREP-36",
+      "PREP-38",
+      "PREP-41",
+      "PREP-42",
+      "PREP-43",
+      "PREP-44",
+      "PREP-45",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "单腿": [
       "PREP-01",
@@ -1253,7 +2108,24 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-34",
+      "PREP-35",
+      "PREP-36",
+      "PREP-37",
+      "PREP-38",
+      "PREP-39",
+      "PREP-40",
+      "PREP-41",
+      "PREP-42",
+      "PREP-43",
+      "PREP-44",
+      "PREP-45",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "水平推": [
       "PREP-01",
@@ -1275,7 +2147,19 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-29",
+      "PREP-30",
+      "PREP-31",
+      "PREP-32",
+      "PREP-33",
+      "PREP-34",
+      "PREP-38",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "垂直推": [
       "PREP-01",
@@ -1297,7 +2181,19 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-29",
+      "PREP-30",
+      "PREP-31",
+      "PREP-32",
+      "PREP-33",
+      "PREP-34",
+      "PREP-38",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "水平拉": [
       "PREP-01",
@@ -1320,7 +2216,19 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-29",
+      "PREP-30",
+      "PREP-31",
+      "PREP-32",
+      "PREP-33",
+      "PREP-34",
+      "PREP-38",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ],
     "垂直拉": [
       "PREP-01",
@@ -1342,7 +2250,19 @@
       "PREP-25",
       "PREP-26",
       "PREP-27",
-      "PREP-28"
+      "PREP-28",
+      "PREP-29",
+      "PREP-30",
+      "PREP-31",
+      "PREP-32",
+      "PREP-33",
+      "PREP-34",
+      "PREP-38",
+      "PREP-46",
+      "PREP-47",
+      "PREP-48",
+      "PREP-49",
+      "PREP-50"
     ]
   }
 }
