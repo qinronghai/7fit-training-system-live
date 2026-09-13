@@ -1,0 +1,993 @@
+{
+  "hyroxSessionTypeIds": [
+    "SKILL",
+    "CAPACITY",
+    "MIXED",
+    "BENCHMARK"
+  ],
+  "hyroxSessionTypes": {
+    "SKILL": {
+      "sessionTypeId": "SKILL",
+      "name": "技术学习",
+      "goal": "学习与巩固 HYROX 固定 Station 的技术、器械使用与节奏控制。",
+      "stationCountRange": [
+        3,
+        4
+      ],
+      "wholeSessionTimed": false
+    },
+    "CAPACITY": {
+      "sessionTypeId": "CAPACITY",
+      "name": "专项能力",
+      "goal": "围绕单一能力组提升专项工作容量。",
+      "stationCountRange": [
+        2,
+        4
+      ],
+      "wholeSessionTimed": false
+    },
+    "MIXED": {
+      "sessionTypeId": "MIXED",
+      "name": "综合训练",
+      "goal": "组合多个固定 Station，训练 HYROX 风格的综合工作容量。",
+      "stationCountByLevel": {
+        "L1": [
+          3,
+          4
+        ],
+        "L2": [
+          4,
+          5
+        ],
+        "L3": [
+          5,
+          6
+        ],
+        "L4": [
+          5,
+          6
+        ]
+      },
+      "wholeSessionTimed": true
+    },
+    "BENCHMARK": {
+      "sessionTypeId": "BENCHMARK",
+      "name": "基准测试",
+      "goal": "使用固定协议与固定 Station 顺序建立可重复比较的个人基准。",
+      "stationCountRange": [
+        8,
+        8
+      ],
+      "wholeSessionTimed": true
+    }
+  },
+  "hyroxStationIds": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "H8"
+  ],
+  "hyroxStations": {
+    "H1": {
+      "stationId": "H1",
+      "canonicalOrder": 1,
+      "name": "SkiErg",
+      "zhName": "滑雪机",
+      "workMetric": "METER",
+      "equipment": [
+        "滑雪机"
+      ],
+      "zone": "2F_ENGINE",
+      "route": "HYROX_2F",
+      "modality": "ENGINE",
+      "loadable": false,
+      "defaultLoadUnit": null,
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "先建立稳定节奏，再提高输出。",
+        "保持躯干控制，避免只用手臂拉。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "动作节奏明显失控",
+        "出现异常疼痛或眩晕"
+      ],
+      "status": "ACTIVE"
+    },
+    "H2": {
+      "stationId": "H2",
+      "canonicalOrder": 2,
+      "name": "Sled Push",
+      "zhName": "雪橇推",
+      "workMetric": "TURF_LENGTH",
+      "equipment": [
+        "雪橇车"
+      ],
+      "zone": "2F_TURF",
+      "route": "HYROX_2F",
+      "modality": "SLED",
+      "loadable": true,
+      "defaultLoadUnit": "KG",
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "保持躯干刚性与持续腿部驱动。",
+        "优先稳定步频，不以塌腰换速度。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "LOAD",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "躯干位置无法维持",
+        "步态明显失控",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    },
+    "H3": {
+      "stationId": "H3",
+      "canonicalOrder": 3,
+      "name": "Sled Pull",
+      "zhName": "雪橇拉",
+      "workMetric": "TURF_LENGTH",
+      "equipment": [
+        "雪橇车",
+        "拉绳"
+      ],
+      "zone": "2F_TURF",
+      "route": "HYROX_2F",
+      "modality": "SLED",
+      "loadable": true,
+      "defaultLoadUnit": "KG",
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "维持稳定躯干与连续后移节奏。",
+        "避免只靠手臂快速拉拽。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "LOAD",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "握力或躯干控制明显失效",
+        "后移步态失控",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    },
+    "H4": {
+      "stationId": "H4",
+      "canonicalOrder": 4,
+      "name": "Burpee Broad Jump",
+      "zhName": "波比跳远",
+      "workMetric": "TURF_LENGTH",
+      "equipment": [
+        "8米草坪"
+      ],
+      "zone": "2F_TURF",
+      "route": "HYROX_2F",
+      "modality": "LOCOMOTION",
+      "loadable": false,
+      "defaultLoadUnit": null,
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "落地稳定后再进入下一次。",
+        "保持连续但可控的呼吸与节奏。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "落地控制明显下降",
+        "无法保持安全支撑",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    },
+    "H5": {
+      "stationId": "H5",
+      "canonicalOrder": 5,
+      "name": "Row",
+      "zhName": "划船机",
+      "workMetric": "METER",
+      "equipment": [
+        "划船机"
+      ],
+      "zone": "2F_ENGINE",
+      "route": "HYROX_2F",
+      "modality": "ENGINE",
+      "loadable": false,
+      "defaultLoadUnit": null,
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "腿驱动优先，躯干与手臂依次衔接。",
+        "保持可持续配速，避免前段冲得过快。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "技术顺序明显失控",
+        "出现异常疼痛或眩晕"
+      ],
+      "status": "ACTIVE"
+    },
+    "H6": {
+      "stationId": "H6",
+      "canonicalOrder": 6,
+      "name": "Farmers Carry",
+      "zhName": "农夫走",
+      "workMetric": "TURF_LENGTH",
+      "equipment": [
+        "壶铃"
+      ],
+      "zone": "2F_TURF",
+      "route": "HYROX_2F",
+      "modality": "LOCOMOTION",
+      "loadable": true,
+      "defaultLoadUnit": "KG_PER_HAND",
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "保持身体直立、肩带稳定和均匀步幅。",
+        "负重不能以侧倾和耸肩完成。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "LOAD",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "握力失控",
+        "明显侧倾或耸肩",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    },
+    "H7": {
+      "stationId": "H7",
+      "canonicalOrder": 7,
+      "name": "Weighted Lunges",
+      "zhName": "负重行进弓步",
+      "workMetric": "TURF_LENGTH",
+      "equipment": [
+        "牛角包/沙袋类负重"
+      ],
+      "zone": "2F_TURF",
+      "route": "HYROX_2F",
+      "modality": "LOCOMOTION",
+      "loadable": true,
+      "defaultLoadUnit": "KG",
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "保持膝髋控制和稳定步幅。",
+        "负重位置稳定，不以躯干前倾代偿。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "LOAD",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "膝髋控制明显下降",
+        "步幅失控",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    },
+    "H8": {
+      "stationId": "H8",
+      "canonicalOrder": 8,
+      "name": "Wall Ball",
+      "zhName": "墙球",
+      "workMetric": "REP",
+      "equipment": [
+        "墙球",
+        "墙球目标"
+      ],
+      "zone": "2F_WALL_BALL",
+      "route": "HYROX_2F",
+      "modality": "BALL",
+      "loadable": true,
+      "defaultLoadUnit": "KG",
+      "benchmarkEligible": true,
+      "techniqueNotes": [
+        "保持深蹲与投掷节奏连续。",
+        "优先命中目标与动作质量，再提高速度。"
+      ],
+      "scalePolicy": [
+        "WORK",
+        "LOAD",
+        "ROUNDS",
+        "REST_DENSITY",
+        "MOVEMENT_REGRESSION"
+      ],
+      "stopCriteria": [
+        "连续无法命中目标",
+        "深蹲质量明显下降",
+        "出现异常疼痛"
+      ],
+      "status": "ACTIVE"
+    }
+  },
+  "hyroxVenuePolicy": {
+    "turfLengthMeters": 8,
+    "floor": "2F",
+    "runStationEnabled": false,
+    "notes": [
+      "所有草坪 Station 只存 turfLengths；实际米数由 turfLengthMeters 派生。",
+      "V1 不设置 1km 跑步或伪跑步替代 Station。"
+    ]
+  },
+  "hyroxCapacityGroupIds": [
+    "ENGINE",
+    "SLED",
+    "LOCOMOTION",
+    "MIXED_STRENGTH_ENDURANCE"
+  ],
+  "hyroxCapacityGroups": {
+    "ENGINE": {
+      "groupId": "ENGINE",
+      "name": "Engine",
+      "stationIds": [
+        "H1",
+        "H5"
+      ]
+    },
+    "SLED": {
+      "groupId": "SLED",
+      "name": "Sled",
+      "stationIds": [
+        "H2",
+        "H3"
+      ]
+    },
+    "LOCOMOTION": {
+      "groupId": "LOCOMOTION",
+      "name": "Locomotion",
+      "stationIds": [
+        "H4",
+        "H6",
+        "H7"
+      ]
+    },
+    "MIXED_STRENGTH_ENDURANCE": {
+      "groupId": "MIXED_STRENGTH_ENDURANCE",
+      "name": "Mixed Strength Endurance",
+      "stationIds": [
+        "H2",
+        "H3",
+        "H6",
+        "H7",
+        "H8"
+      ]
+    }
+  },
+  "hyroxLevelPolicies": {
+    "L1": {
+      "level": "L1",
+      "name": "Foundation",
+      "targetRpeRange": [
+        5,
+        6
+      ],
+      "stationWork": {
+        "H1": {
+          "metric": "METER",
+          "min": 200,
+          "max": 250
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "min": 3,
+          "max": 3
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "min": 3,
+          "max": 3
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "min": 1,
+          "max": 1
+        },
+        "H5": {
+          "metric": "METER",
+          "min": 200,
+          "max": 250
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "min": 4,
+          "max": 4
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "min": 2,
+          "max": 2
+        },
+        "H8": {
+          "metric": "REP",
+          "min": 15,
+          "max": 20
+        }
+      }
+    },
+    "L2": {
+      "level": "L2",
+      "name": "Base",
+      "targetRpeRange": [
+        6,
+        7
+      ],
+      "stationWork": {
+        "H1": {
+          "metric": "METER",
+          "min": 300,
+          "max": 400
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "min": 4,
+          "max": 4
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "min": 4,
+          "max": 4
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "min": 2,
+          "max": 2
+        },
+        "H5": {
+          "metric": "METER",
+          "min": 300,
+          "max": 400
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "min": 3,
+          "max": 3
+        },
+        "H8": {
+          "metric": "REP",
+          "min": 20,
+          "max": 30
+        }
+      }
+    },
+    "L3": {
+      "level": "L3",
+      "name": "Build",
+      "targetRpeRange": [
+        7,
+        8
+      ],
+      "stationWork": {
+        "H1": {
+          "metric": "METER",
+          "min": 400,
+          "max": 500
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "min": 3,
+          "max": 4
+        },
+        "H5": {
+          "metric": "METER",
+          "min": 400,
+          "max": 500
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "min": 8,
+          "max": 8
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "min": 4,
+          "max": 4
+        },
+        "H8": {
+          "metric": "REP",
+          "min": 30,
+          "max": 50
+        }
+      }
+    },
+    "L4": {
+      "level": "L4",
+      "name": "Performance",
+      "targetRpeRange": [
+        8,
+        9
+      ],
+      "stationWork": {
+        "H1": {
+          "metric": "METER",
+          "min": 500,
+          "max": 750
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "min": 4,
+          "max": 6
+        },
+        "H5": {
+          "metric": "METER",
+          "min": 500,
+          "max": 750
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "min": 12,
+          "max": 12
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "min": 6,
+          "max": 6
+        },
+        "H8": {
+          "metric": "REP",
+          "min": 50,
+          "max": 75
+        }
+      }
+    }
+  },
+  "hyroxLoadPolicies": {
+    "H1": {
+      "type": "NONE"
+    },
+    "H2": {
+      "type": "SLED_CALIBRATION",
+      "profileId": "SLED_PUSH"
+    },
+    "H3": {
+      "type": "SLED_CALIBRATION",
+      "profileId": "SLED_PULL"
+    },
+    "H4": {
+      "type": "BODYWEIGHT"
+    },
+    "H5": {
+      "type": "NONE"
+    },
+    "H6": {
+      "type": "RANGE_BY_LEVEL",
+      "unit": "KG_PER_HAND",
+      "ranges": {
+        "L1": {
+          "min": 6,
+          "max": 8
+        },
+        "L2": {
+          "min": 8,
+          "max": 12
+        },
+        "L3": {
+          "min": 12,
+          "max": 16
+        },
+        "L4": {
+          "min": 16,
+          "max": null
+        }
+      }
+    },
+    "H7": {
+      "type": "RANGE_BY_LEVEL",
+      "unit": "KG",
+      "ranges": {
+        "L1": {
+          "min": 0,
+          "max": 5
+        },
+        "L2": {
+          "min": 5,
+          "max": 7.5
+        },
+        "L3": {
+          "min": 7.5,
+          "max": 10
+        },
+        "L4": {
+          "min": 10,
+          "max": 15
+        }
+      }
+    },
+    "H8": {
+      "type": "RANGE_BY_LEVEL",
+      "unit": "KG",
+      "ranges": {
+        "L1": {
+          "min": 2,
+          "max": 3
+        },
+        "L2": {
+          "min": 3,
+          "max": 3
+        },
+        "L3": {
+          "min": 4,
+          "max": 4
+        },
+        "L4": {
+          "min": 4,
+          "max": 6
+        }
+      }
+    }
+  },
+  "hyroxSledCalibrationPolicy": {
+    "schemaVersion": 1,
+    "requiredBeforeComparableBenchmark": true,
+    "profiles": {
+      "SLED_PUSH": {
+        "stationId": "H2",
+        "requiredFields": [
+          "calibratedLoadKg",
+          "targetRpe",
+          "calibrationVersion"
+        ],
+        "targetRpeByLevel": {
+          "L1": [
+            5,
+            6
+          ],
+          "L2": [
+            6,
+            7
+          ],
+          "L3": [
+            7,
+            8
+          ],
+          "L4": [
+            8,
+            9
+          ]
+        }
+      },
+      "SLED_PULL": {
+        "stationId": "H3",
+        "requiredFields": [
+          "calibratedLoadKg",
+          "targetRpe",
+          "calibrationVersion"
+        ],
+        "targetRpeByLevel": {
+          "L1": [
+            5,
+            6
+          ],
+          "L2": [
+            6,
+            7
+          ],
+          "L3": [
+            7,
+            8
+          ],
+          "L4": [
+            8,
+            9
+          ]
+        }
+      }
+    }
+  },
+  "hyroxBenchmarkProtocolIds": [
+    "B1",
+    "B2",
+    "B3",
+    "B4"
+  ],
+  "hyroxBenchmarkProtocols": {
+    "B1": {
+      "protocolId": "B1",
+      "protocolVersion": "1.0.0",
+      "name": "Foundation",
+      "level": "L1",
+      "orderedStations": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "work": {
+        "H1": {
+          "metric": "METER",
+          "value": 250
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "value": 3
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "value": 3
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "value": 1
+        },
+        "H5": {
+          "metric": "METER",
+          "value": 250
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "value": 4
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "value": 2
+        },
+        "H8": {
+          "metric": "REP",
+          "value": 20
+        }
+      },
+      "loadPolicy": "LEVEL_DEFAULT_OR_EXPLICIT",
+      "comparisonStrategy": "EXACT_PROTOCOL_WORK_LOAD_CALIBRATION_AND_SCALING"
+    },
+    "B2": {
+      "protocolId": "B2",
+      "protocolVersion": "1.0.0",
+      "name": "Base",
+      "level": "L2",
+      "orderedStations": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "work": {
+        "H1": {
+          "metric": "METER",
+          "value": 400
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "value": 4
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "value": 4
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "value": 2
+        },
+        "H5": {
+          "metric": "METER",
+          "value": 400
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "value": 3
+        },
+        "H8": {
+          "metric": "REP",
+          "value": 30
+        }
+      },
+      "loadPolicy": "LEVEL_DEFAULT_OR_EXPLICIT",
+      "comparisonStrategy": "EXACT_PROTOCOL_WORK_LOAD_CALIBRATION_AND_SCALING"
+    },
+    "B3": {
+      "protocolId": "B3",
+      "protocolVersion": "1.0.0",
+      "name": "Standard",
+      "level": "L3",
+      "orderedStations": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "work": {
+        "H1": {
+          "metric": "METER",
+          "value": 500
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "value": 4
+        },
+        "H5": {
+          "metric": "METER",
+          "value": 500
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "value": 8
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "value": 4
+        },
+        "H8": {
+          "metric": "REP",
+          "value": 50
+        }
+      },
+      "loadPolicy": "LEVEL_DEFAULT_OR_EXPLICIT",
+      "comparisonStrategy": "EXACT_PROTOCOL_WORK_LOAD_CALIBRATION_AND_SCALING"
+    },
+    "B4": {
+      "protocolId": "B4",
+      "protocolVersion": "1.0.0",
+      "name": "Performance",
+      "level": "L4",
+      "orderedStations": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "work": {
+        "H1": {
+          "metric": "METER",
+          "value": 750
+        },
+        "H2": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H3": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H4": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H5": {
+          "metric": "METER",
+          "value": 750
+        },
+        "H6": {
+          "metric": "TURF_LENGTH",
+          "value": 12
+        },
+        "H7": {
+          "metric": "TURF_LENGTH",
+          "value": 6
+        },
+        "H8": {
+          "metric": "REP",
+          "value": 75
+        }
+      },
+      "loadPolicy": "LEVEL_DEFAULT_OR_EXPLICIT",
+      "comparisonStrategy": "EXACT_PROTOCOL_WORK_LOAD_CALIBRATION_AND_SCALING"
+    }
+  },
+  "hyroxBenchmarkResultContract": {
+    "schemaVersion": 1,
+    "requiredFields": [
+      "completedAt",
+      "protocolId",
+      "protocolVersion",
+      "level",
+      "totalTimeMs",
+      "stationResults",
+      "comparisonKey"
+    ],
+    "stationRequiredFields": [
+      "stationId",
+      "timeMs",
+      "work",
+      "load"
+    ],
+    "optionalFields": [
+      "rpe",
+      "notes",
+      "sledCalibrationVersion",
+      "scaledVariant",
+      "validityStatus"
+    ],
+    "validityStatuses": [
+      "VALID_COMPARABLE",
+      "VALID_NEW_BASELINE",
+      "SCALED",
+      "INCOMPLETE",
+      "INVALID_PROTOCOL"
+    ]
+  },
+  "hyroxScalingPolicy": {
+    "priority": [
+      "WORK",
+      "LOAD",
+      "ROUNDS",
+      "REST_DENSITY",
+      "MOVEMENT_REGRESSION"
+    ],
+    "preserveStationIdentity": true,
+    "movementRegressionMustSetScaledVariant": true,
+    "scaledBenchmarkDirectlyComparable": false
+  }
+}
