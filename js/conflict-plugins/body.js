@@ -37,6 +37,25 @@
     return issues;
   }
 
+  function exerciseFamilyRedundancyIssues(session){
+    const data=D(),groups=new Map(),issues=[];
+    asArray(session?.main?.content).forEach((item,index)=>{
+      const actionId=item?.actionId||'',group=data.bodyActionMeta?.[actionId]?.redundancyGroup;
+      if(!group)return;
+      if(!groups.has(group))groups.set(group,[]);
+      groups.get(group).push({item,index,actionId,name:data.actions?.[actionId]?.name||actionId});
+    });
+    for(const [group,entries] of groups){
+      if(entries.length<2)continue;
+      issues.push(makeIssue(
+        'hard','同动作家族重复',
+        `${entries.map(entry=>entry.name).join(' + ')} 属于同一动作家族（${group}），同一节 Body 课程只保留一个版本。`,
+        'BODY_EXERCISE_FAMILY_DUPLICATE',10080+entries[0].index
+      ));
+    }
+    return issues;
+  }
+
   function primaryTargetIssue(session){
     const data=D(),family=data.bodyFamilies?.[session?.familyId],direct=session?.domainContext?.volume?.directSetsByTarget||{};
     if(!family)return null;
@@ -111,7 +130,7 @@
   }
 
   function evaluate(session){
-    const issues=[...familyDeviationIssues(session)];
+    const issues=[...familyDeviationIssues(session),...exerciseFamilyRedundancyIssues(session)];
     [
       primaryTargetIssue(session),
       volumeIssue(session),
