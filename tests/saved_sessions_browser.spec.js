@@ -65,18 +65,19 @@ test('F111 saved session round-trip survives refresh, PREP, rename and delete at
   await expect(page.locator('.saved-session-card h3')).toHaveText('F111 已重命名');
 
   await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 F111 L2');
-  let deleteDialog=page.waitForEvent('dialog');
-  await page.locator('[data-saved-delete]').click();
-  let dialog=await deleteDialog;
-  expect(dialog.message()).toContain('F111 · L2');
-  await dialog.dismiss();
+  let dialogMessage='';
+  await Promise.all([
+    page.waitForEvent('dialog').then(async dialog=>{dialogMessage=dialog.message();await dialog.dismiss();}),
+    page.locator('[data-saved-delete]').click(),
+  ]);
+  expect(dialogMessage).toContain('F111 · L2');
   await expect(page.locator('.saved-session-card')).toHaveCount(1);
   await expect(page.locator('[data-saved-session-status]')).toContainText('已取消删除');
 
-  deleteDialog=page.waitForEvent('dialog');
-  await page.locator('[data-saved-delete]').click();
-  dialog=await deleteDialog;
-  await dialog.accept();
+  await Promise.all([
+    page.waitForEvent('dialog').then(dialog=>dialog.accept()),
+    page.locator('[data-saved-delete]').click(),
+  ]);
   await expect(page.locator('.saved-session-card')).toHaveCount(0);
   await expect(page.locator('.saved-session-empty')).toBeVisible();
   await expect390NoOverflow(page);
