@@ -19,7 +19,17 @@
     "PREP-15",
     "PREP-16",
     "PREP-17",
-    "PREP-18"
+    "PREP-18",
+    "PREP-19",
+    "PREP-20",
+    "PREP-21",
+    "PREP-22",
+    "PREP-23",
+    "PREP-24",
+    "PREP-25",
+    "PREP-26",
+    "PREP-27",
+    "PREP-28"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -737,6 +747,388 @@
       "why": "在双腿臀桥基础上增加单侧骨盆控制，适合作为较高等级臀腿训练前激活。",
       "sourceStatus": "V14.3 新增动作",
       "route": "2F PREP"
+    },
+    "PREP-19": {
+      "prepId": "PREP-19",
+      "name": "高位平板支撑",
+      "alias": "直臂平板支撑",
+      "actionId": "SUP-S1-04",
+      "prepGrade": "P1",
+      "role": "核心抗伸展 / 高位支撑",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 20–30秒",
+      "cue": "手掌主动推地，收肋夹臀，头到脚保持一条线并持续呼吸。",
+      "why": "以完整直臂闭链支撑建立基础躯干抗伸展和肩胛稳定，适合多数课程作为低疲劳核心准备。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S1-04",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-20": {
+      "prepId": "PREP-20",
+      "name": "前臂平板支撑",
+      "alias": "肘撑平板支撑",
+      "actionId": "SUP-S1-05",
+      "prepGrade": "P1",
+      "role": "核心抗伸展 / 前臂支撑",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 20–30秒",
+      "cue": "肘在肩下，收肋夹臀，骨盆保持中立，不用憋气换时间。",
+      "why": "用前臂支撑降低腕部负担，建立基础腹壁张力和全身等长控制。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S1-05",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-21": {
+      "prepId": "PREP-21",
+      "name": "仰卧双腿伸直保持",
+      "alias": "仰卧直腿保持",
+      "actionId": "warmup_supine_straight_leg_hold",
+      "prepGrade": "P1",
+      "role": "核心抗伸展 / 仰卧等长",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "髋"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 15–25秒",
+      "cue": "先收肋稳骨盆，再把双腿伸直保持；腿的高度服从腰盆稳定。",
+      "why": "在不需要上肢承重的情况下建立腹壁张力和骨盆控制，适合支撑动作不方便时替换。",
+      "sourceStatus": "新增 PREP / CORE 准备动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-22": {
+      "prepId": "PREP-22",
+      "name": "高位平板交替触肩",
+      "alias": "直臂支撑交替摸肩",
+      "actionId": "SUP-S3-02",
+      "prepGrade": "P2",
+      "role": "核心抗旋转 / 动态支撑",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–10次/侧",
+      "cue": "双脚适度分开，单手触肩时骨盆尽量不转，支撑手主动推地。",
+      "why": "在高位平板基础上减少支点，增加抗旋转与单臂肩胛稳定要求。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S3-02",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-23": {
+      "prepId": "PREP-23",
+      "name": "平板支撑交替抬腿",
+      "alias": "平板交替抬腿",
+      "actionId": "SUP-S3-03",
+      "prepGrade": "P2",
+      "role": "核心抗伸展 / 动态支撑",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "臀部"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–10次/侧",
+      "cue": "腿只抬到骨盆还能保持水平的位置，夹臀但不要用腰椎顶高。",
+      "why": "把平板抗伸展与交替髋伸连接起来，适合臀腿和全身训练前的核心—骨盆协同。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S3-03",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-24": {
+      "prepId": "PREP-24",
+      "name": "瑜伽球前臂平板支撑",
+      "alias": "瑜伽球平板支撑",
+      "actionId": "warmup_stability_ball_forearm_plank",
+      "prepGrade": "P3",
+      "role": "核心抗伸展 / 不稳定支撑",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "瑜伽球 / 垫子",
+      "prescription": "1–2组 × 15–25秒",
+      "cue": "前臂压球，收肋夹臀；允许球轻微移动，但骨盆保持稳定。",
+      "why": "在标准前臂平板上增加不稳定表面，对肩胛和躯干共同稳定提出更高要求。",
+      "sourceStatus": "新增 PREP / CORE 准备动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-25": {
+      "prepId": "PREP-25",
+      "name": "侧支撑穿针旋转",
+      "alias": "侧支撑胸椎旋转",
+      "actionId": "SUP-S5-05",
+      "prepGrade": "P3",
+      "role": "核心旋转控制 / 单侧支撑",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "胸椎",
+        "肩胛",
+        "骨盆"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 5–8次/侧",
+      "cue": "先把侧撑稳定，再让上臂穿针旋转；骨盆保持抬起，不用腰椎硬拧。",
+      "why": "把单侧支撑与胸椎旋转结合，训练旋转中的肩胛—躯干—骨盆整合控制。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S5-05",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-26": {
+      "prepId": "PREP-26",
+      "name": "侧平板髋部升降",
+      "alias": "侧支撑顶髋",
+      "actionId": "SUP-S6-04",
+      "prepGrade": "P3",
+      "role": "核心抗侧屈 / 动态侧支撑",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "髋"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–10次/侧",
+      "cue": "支撑肩稳定，髋部控制下降再主动抬起，躯干保持在同一平面。",
+      "why": "在侧平板基础上加入髋部升降，提高侧链耐力、骨盆控制与动态抗侧屈能力。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S6-04",
+      "route": "FLEX_1F_2F"
+    },
+    "PREP-27": {
+      "prepId": "PREP-27",
+      "name": "BOSU球足端平板支撑",
+      "alias": "BOSU垫脚平板支撑",
+      "actionId": "warmup_bosu_feet_plank",
+      "prepGrade": "P4",
+      "role": "高阶核心抗伸展 / 不稳定支撑",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "肩胛",
+        "骨盆",
+        "足踝"
+      ],
+      "equipment": "BOSU球 / 垫子",
+      "prescription": "1–2组 × 15–20秒",
+      "cue": "双脚稳定在BOSU，双手主动推地；骨盆不要随足端晃动。",
+      "why": "通过足端不稳定表面提高全身张力与近端稳定要求，属于高阶专项核心准备。",
+      "sourceStatus": "新增 PREP / CORE 准备动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-28": {
+      "prepId": "PREP-28",
+      "name": "侧平板抬上侧腿",
+      "alias": "侧支撑抬腿",
+      "actionId": "SUP-S6-05",
+      "prepGrade": "P4",
+      "role": "高阶核心抗侧屈 / 单侧髋稳定",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "臀中肌",
+        "髋"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–10次/侧",
+      "cue": "先把侧平板锁稳，再抬上侧腿；骨盆不要后倒，支撑肩保持稳定。",
+      "why": "在单侧支撑中叠加髋外展，显著增加侧链、臀中肌和骨盆稳定需求，作为 L4 高阶核心准备。",
+      "sourceStatus": "复用正式 SUPPORT 节点 SUP-S6-05",
+      "route": "FLEX_1F_2F"
     }
   },
   "warmupGradeMeta": {
@@ -759,9 +1151,9 @@
       "mainTier": "T2–T4"
     },
     "P4": {
-      "name": "专项准备",
-      "meaning": "预留给爆发、跳跃、投掷或更高协调专项热身；本批动作暂不设置P4。",
-      "session": "L3–L4",
+      "name": "高阶专项准备",
+      "meaning": "高协调、高稳定或不稳定表面专项准备；可包含减少支点、单侧高控制、爆发、跳跃或投掷等。",
+      "session": "L4",
       "mainTier": "T3–T4"
     }
   },
@@ -779,7 +1171,17 @@
       "PREP-13",
       "PREP-14",
       "PREP-16",
-      "PREP-17"
+      "PREP-17",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "髋铰链": [
       "PREP-01",
@@ -792,7 +1194,17 @@
       "PREP-12",
       "PREP-13",
       "PREP-15",
-      "PREP-18"
+      "PREP-18",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "髋伸展": [
       "PREP-01",
@@ -806,7 +1218,17 @@
       "PREP-14",
       "PREP-16",
       "PREP-17",
-      "PREP-18"
+      "PREP-18",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "单腿": [
       "PREP-01",
@@ -821,7 +1243,17 @@
       "PREP-14",
       "PREP-16",
       "PREP-17",
-      "PREP-18"
+      "PREP-18",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "水平推": [
       "PREP-01",
@@ -833,7 +1265,17 @@
       "PREP-07",
       "PREP-08",
       "PREP-09A",
-      "PREP-09B"
+      "PREP-09B",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "垂直推": [
       "PREP-01",
@@ -845,7 +1287,17 @@
       "PREP-07",
       "PREP-08",
       "PREP-09A",
-      "PREP-09B"
+      "PREP-09B",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "水平拉": [
       "PREP-01",
@@ -858,7 +1310,17 @@
       "PREP-08",
       "PREP-09A",
       "PREP-09B",
-      "PREP-15"
+      "PREP-15",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ],
     "垂直拉": [
       "PREP-01",
@@ -870,7 +1332,17 @@
       "PREP-07",
       "PREP-08",
       "PREP-09A",
-      "PREP-09B"
+      "PREP-09B",
+      "PREP-19",
+      "PREP-20",
+      "PREP-21",
+      "PREP-22",
+      "PREP-23",
+      "PREP-24",
+      "PREP-25",
+      "PREP-26",
+      "PREP-27",
+      "PREP-28"
     ]
   }
 }
