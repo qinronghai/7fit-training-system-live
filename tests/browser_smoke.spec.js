@@ -96,7 +96,7 @@ test('Body and Conditioning homes are active while Posture remains a safe landin
   await page.goto('/#/coach/body');
   await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
   await expect(page.locator('.body-family-card')).toHaveCount(4);
-  await expect(page.getByText('推荐 Family / Level', { exact: true })).toBeVisible();
+  await expect(page.getByText('选择训练方向与等级', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: '自由编课 →', exact: true })).toBeVisible();
 
   await page.goto('/#/coach/conditioning');
