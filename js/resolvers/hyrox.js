@@ -267,9 +267,9 @@
     const hardCount=issues.filter(item=>item.severity==='hard').length,warnCount=issues.filter(item=>item.severity==='warn').length;
     return {status:hardCount?'FAIL':warnCount?'WARN':'PASS',hardCount,warnCount,issues};
   }
-  function comparisonKey(protocol,stations){
+  function comparisonKey(protocol,stations,policy){
     if(!protocol)return '';
-    const payload={protocolId:protocol.protocolId,protocolVersion:protocol.protocolVersion,stations:stations.map(item=>({stationId:item.stationId,work:{metric:item.work.metric,value:item.work.value},load:item.load?{value:item.load.value,unit:item.load.unit}:null,calibrationVersion:item.calibrationVersion||'',scaledVariant:item.scaledVariant||''}))};
+    const payload={protocolId:protocol.protocolId,protocolVersion:protocol.protocolVersion,sessionPolicy:{rounds:policy?.rounds||1,restSeconds:policy?.restSeconds||0,transitionSeconds:policy?.transitionSeconds||0},stations:stations.map(item=>({stationId:item.stationId,work:{metric:item.work.metric,value:item.work.value},load:item.load?{value:item.load.value,unit:item.load.unit}:null,calibrationVersion:item.calibrationVersion||'',scaledVariant:item.scaledVariant||''}))};
     return 'HYROX|'+JSON.stringify(payload);
   }
   function sourceId(sessionType,level,focus,protocol){
@@ -290,7 +290,7 @@
     if(sessionType==='MIXED'&&groups.length<2)fail('HYROX_MIXED_DIVERSITY_REQUIRED','HYROX Mixed must cover at least 2 ability groups',{stationIds});
     const conflictContext=assessConflicts(stations);
     if(conflictContext.status==='FAIL')fail('HYROX_CONFLICT_FAIL','HYROX session contains hard conflicts',{conflictContext});
-    const rpe=targetRpe(sessionType,level),workSummary=totalWork(stations,policy.rounds),comparison=comparisonKey(protocol,stations);
+    const rpe=targetRpe(sessionType,level),workSummary=totalWork(stations,policy.rounds),comparison=comparisonKey(protocol,stations,policy);
     const hasScaling=stations.some(item=>item.scaled)||input.roundsOverride!=null||input.restSecondsOverride!=null||input.transitionSecondsOverride!=null;
     const publicItems=stations.map(item=>({actionId:item.actionId,name:item.name,prescription:item.prescription}));
     const protocolId=protocol?.protocolId||(sessionType+'-'+level);
