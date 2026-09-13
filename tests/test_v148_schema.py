@@ -156,7 +156,7 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
     expected = {
         "support": (30, ["ids", "details"]),
         "core": (20, ["ids", "details"]),
-        "prep": (20, ["ids", "details", "matchByPattern"]),
+        "prep": (30, ["ids", "details", "matchByPattern"]),
         "foam": (12, ["ids", "details", "matchByPattern"]),
     }
     for name, (count, required) in expected.items():
