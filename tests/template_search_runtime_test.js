@@ -27,6 +27,9 @@ assert(index.some(x=>x.kind==='action'),'must index actions');
 assert(index.some(x=>x.kind==='f111-combination'),'must index F111 combinations');
 assert(index.some(x=>x.kind==='body-family'),'must index Body families');
 assert(index.some(x=>x.kind==='conditioning-protocol'),'must index Conditioning family/protocol contexts');
+assert(index.some(x=>x.kind==='hyrox-session'),'must index HYROX session types');
+assert(index.some(x=>x.kind==='hyrox-benchmark'),'must index HYROX benchmark protocols');
+assert(S.activeTemplateOptions().some(x=>x.id==='hyrox'),'HYROX must be an active Template Search option');
 
 const ski=S.search({q:'滑雪机',templateId:'conditioning'});
 assert(ski.some(x=>x.kind==='action'&&x.id==='huaxueji_jiange'),'Conditioning action search should find 滑雪机间歇');
@@ -61,6 +64,16 @@ for(const item of conditioning){
   assert(window.V14Router.isValid(parsed),item.href);
   assert(window.V14_DATA.conditioningFamilies[conditioningFamilyId].protocolEligibility.includes(item.meta.protocolId));
 }
+
+const hyroxMixed=S.search({q:'Mixed',templateId:'hyrox',kind:'session'}).find(x=>x.kind==='hyrox-session');
+assert(hyroxMixed,'HYROX Mixed search entry missing');
+assert.strictEqual(hyroxMixed.href,'#/coach/hyrox/mixed/l1');
+assert(window.V14Router.isValid(window.V14Router.parseHash(hyroxMixed.href)));
+
+const hyroxB3=S.search({q:'B3',templateId:'hyrox',kind:'session'}).find(x=>x.kind==='hyrox-benchmark');
+assert(hyroxB3,'HYROX B3 search entry missing');
+assert.strictEqual(hyroxB3.href,'#/coach/hyrox/benchmark/b3');
+assert(window.V14Router.isValid(window.V14Router.parseHash(hyroxB3.href)));
 
 const allActionSearch=S.search({q:'臀',kind:'action'});
 assert(allActionSearch.length>0,'target/action search should return results');
