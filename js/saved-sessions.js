@@ -106,6 +106,27 @@
         input:{familyId,level,protocolId,surface:routeSurface(route)},
       };
     }
+    if(route.templateId==='hyrox'&&route.page==='template-session'){
+      const sessionType=String(route.sessionType||'').toUpperCase();
+      const protocolId=sessionType==='BENCHMARK'?String(route.protocolId||'').toUpperCase():'';
+      const protocol=data.hyroxBenchmarkProtocols?.[protocolId];
+      const level=sessionType==='BENCHMARK'?(protocol?.level||''):String(route.level||'').toUpperCase();
+      if(!(data.hyroxSessionTypeIds||[]).includes(sessionType)||!LEVELS.has(level))return null;
+      const capacityFocus=sessionType==='CAPACITY'?String(route.query?.focus||'ENGINE').toUpperCase():'';
+      if(sessionType==='CAPACITY'&&!(data.hyroxCapacityGroupIds||[]).includes(capacityFocus))return null;
+      if(sessionType==='BENCHMARK'&&!(data.hyroxBenchmarkProtocolIds||[]).includes(protocolId))return null;
+      const sessionKey=sessionType==='BENCHMARK'
+        ?'BENCHMARK-'+protocolId
+        :sessionType==='CAPACITY'
+          ?'CAPACITY-'+capacityFocus+'-'+level
+          :sessionType+'-'+level;
+      const familyId=sessionType==='BENCHMARK'?'HYROX-'+protocolId:sessionType==='CAPACITY'?'HYROX-CAPACITY-'+capacityFocus:'HYROX-'+sessionType;
+      const stateInput=S()?.getSession?.('hyrox',sessionKey)?.input||{};
+      return {
+        templateId:'hyrox',sessionKey,familyId,level,resolverVersion:'hyrox-v1',
+        input:{...clone(stateInput),sessionType,level,...(capacityFocus?{capacityFocus}:{}),...(protocolId?{benchmarkProtocolId:protocolId}:{}),surface:'session'},
+      };
+    }
     return null;
   }
 
@@ -144,6 +165,15 @@
       const family=data.conditioningFamilies?.[descriptor.familyId]?.name||descriptor.familyId;
       const protocol=data.conditioningProtocols?.[descriptor.input.protocolId]?.name||descriptor.input.protocolId;
       return `${family} · ${descriptor.level} · ${protocol}`;
+    }
+    if(descriptor.templateId==='hyrox'){
+      if(descriptor.input.sessionType==='BENCHMARK'){
+        const protocol=data.hyroxBenchmarkProtocols?.[descriptor.input.benchmarkProtocolId]||{};
+        return ('HYROX Benchmark · '+descriptor.input.benchmarkProtocolId+' '+(protocol.name||'')).trim();
+      }
+      const type=data.hyroxSessionTypes?.[descriptor.input.sessionType]?.name||descriptor.input.sessionType;
+      const focus=descriptor.input.capacityFocus?' · '+descriptor.input.capacityFocus:'';
+      return 'HYROX '+type+' · '+descriptor.level+focus;
     }
     return `${template?.shortName||descriptor.templateId} · ${descriptor.level}`;
   }
