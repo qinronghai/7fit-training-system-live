@@ -1,0 +1,868 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/hyrox.schema.json",
+  "title": "7Fit HYROX Data Contract",
+  "type": "object",
+  "required": [
+    "hyroxSessionTypeIds",
+    "hyroxSessionTypes",
+    "hyroxStationIds",
+    "hyroxStations",
+    "hyroxVenuePolicy",
+    "hyroxCapacityGroupIds",
+    "hyroxCapacityGroups",
+    "hyroxLevelPolicies",
+    "hyroxLoadPolicies",
+    "hyroxSledCalibrationPolicy",
+    "hyroxBenchmarkProtocolIds",
+    "hyroxBenchmarkProtocols",
+    "hyroxBenchmarkResultContract",
+    "hyroxScalingPolicy"
+  ],
+  "properties": {
+    "hyroxSessionTypeIds": {
+      "type": "array",
+      "const": [
+        "SKILL",
+        "CAPACITY",
+        "MIXED",
+        "BENCHMARK"
+      ]
+    },
+    "hyroxSessionTypes": {
+      "type": "object",
+      "required": [
+        "SKILL",
+        "CAPACITY",
+        "MIXED",
+        "BENCHMARK"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "SKILL": {
+          "$ref": "#/$defs/sessionType"
+        },
+        "CAPACITY": {
+          "$ref": "#/$defs/sessionType"
+        },
+        "MIXED": {
+          "$ref": "#/$defs/sessionType"
+        },
+        "BENCHMARK": {
+          "$ref": "#/$defs/sessionType"
+        }
+      }
+    },
+    "hyroxStationIds": {
+      "type": "array",
+      "const": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ]
+    },
+    "hyroxStations": {
+      "type": "object",
+      "required": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "H1": {
+          "$ref": "#/$defs/station"
+        },
+        "H2": {
+          "$ref": "#/$defs/station"
+        },
+        "H3": {
+          "$ref": "#/$defs/station"
+        },
+        "H4": {
+          "$ref": "#/$defs/station"
+        },
+        "H5": {
+          "$ref": "#/$defs/station"
+        },
+        "H6": {
+          "$ref": "#/$defs/station"
+        },
+        "H7": {
+          "$ref": "#/$defs/station"
+        },
+        "H8": {
+          "$ref": "#/$defs/station"
+        }
+      }
+    },
+    "hyroxVenuePolicy": {
+      "type": "object",
+      "required": [
+        "turfLengthMeters",
+        "floor",
+        "runStationEnabled",
+        "notes"
+      ],
+      "properties": {
+        "turfLengthMeters": {
+          "const": 8
+        },
+        "floor": {
+          "const": "2F"
+        },
+        "runStationEnabled": {
+          "const": false
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "hyroxCapacityGroupIds": {
+      "type": "array",
+      "const": [
+        "ENGINE",
+        "SLED",
+        "LOCOMOTION",
+        "MIXED_STRENGTH_ENDURANCE"
+      ]
+    },
+    "hyroxCapacityGroups": {
+      "type": "object",
+      "required": [
+        "ENGINE",
+        "SLED",
+        "LOCOMOTION",
+        "MIXED_STRENGTH_ENDURANCE"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/capacityGroup"
+      }
+    },
+    "hyroxLevelPolicies": {
+      "type": "object",
+      "required": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "L1": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L2": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L3": {
+          "$ref": "#/$defs/levelPolicy"
+        },
+        "L4": {
+          "$ref": "#/$defs/levelPolicy"
+        }
+      }
+    },
+    "hyroxLoadPolicies": {
+      "type": "object",
+      "required": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/loadPolicy"
+      }
+    },
+    "hyroxSledCalibrationPolicy": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "requiredBeforeComparableBenchmark",
+        "profiles"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "requiredBeforeComparableBenchmark": {
+          "const": true
+        },
+        "profiles": {
+          "type": "object",
+          "required": [
+            "SLED_PUSH",
+            "SLED_PULL"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "SLED_PUSH": {
+              "$ref": "#/$defs/sledProfile"
+            },
+            "SLED_PULL": {
+              "$ref": "#/$defs/sledProfile"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "hyroxBenchmarkProtocolIds": {
+      "type": "array",
+      "const": [
+        "B1",
+        "B2",
+        "B3",
+        "B4"
+      ]
+    },
+    "hyroxBenchmarkProtocols": {
+      "type": "object",
+      "required": [
+        "B1",
+        "B2",
+        "B3",
+        "B4"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "B1": {
+          "$ref": "#/$defs/benchmarkProtocol"
+        },
+        "B2": {
+          "$ref": "#/$defs/benchmarkProtocol"
+        },
+        "B3": {
+          "$ref": "#/$defs/benchmarkProtocol"
+        },
+        "B4": {
+          "$ref": "#/$defs/benchmarkProtocol"
+        }
+      }
+    },
+    "hyroxBenchmarkResultContract": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "requiredFields",
+        "stationRequiredFields",
+        "optionalFields",
+        "validityStatuses"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "requiredFields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "stationRequiredFields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "optionalFields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "validityStatuses": {
+          "type": "array",
+          "const": [
+            "VALID_COMPARABLE",
+            "VALID_NEW_BASELINE",
+            "SCALED",
+            "INCOMPLETE",
+            "INVALID_PROTOCOL"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "hyroxScalingPolicy": {
+      "type": "object",
+      "required": [
+        "priority",
+        "preserveStationIdentity",
+        "movementRegressionMustSetScaledVariant",
+        "scaledBenchmarkDirectlyComparable"
+      ],
+      "properties": {
+        "priority": {
+          "type": "array",
+          "const": [
+            "WORK",
+            "LOAD",
+            "ROUNDS",
+            "REST_DENSITY",
+            "MOVEMENT_REGRESSION"
+          ]
+        },
+        "preserveStationIdentity": {
+          "const": true
+        },
+        "movementRegressionMustSetScaledVariant": {
+          "const": true
+        },
+        "scaledBenchmarkDirectlyComparable": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sessionType": {
+      "type": "object",
+      "required": [
+        "sessionTypeId",
+        "name",
+        "goal",
+        "wholeSessionTimed"
+      ],
+      "properties": {
+        "sessionTypeId": {
+          "enum": [
+            "SKILL",
+            "CAPACITY",
+            "MIXED",
+            "BENCHMARK"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stationCountRange": {
+          "$ref": "#/$defs/intRange"
+        },
+        "stationCountByLevel": {
+          "type": "object",
+          "required": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "L1": {
+              "$ref": "#/$defs/intRange"
+            },
+            "L2": {
+              "$ref": "#/$defs/intRange"
+            },
+            "L3": {
+              "$ref": "#/$defs/intRange"
+            },
+            "L4": {
+              "$ref": "#/$defs/intRange"
+            }
+          }
+        },
+        "wholeSessionTimed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "station": {
+      "type": "object",
+      "required": [
+        "stationId",
+        "canonicalOrder",
+        "name",
+        "zhName",
+        "workMetric",
+        "equipment",
+        "zone",
+        "route",
+        "modality",
+        "loadable",
+        "defaultLoadUnit",
+        "benchmarkEligible",
+        "techniqueNotes",
+        "scalePolicy",
+        "stopCriteria",
+        "status"
+      ],
+      "properties": {
+        "stationId": {
+          "pattern": "^H[1-8]$"
+        },
+        "canonicalOrder": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "zhName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workMetric": {
+          "enum": [
+            "METER",
+            "TURF_LENGTH",
+            "REP"
+          ]
+        },
+        "equipment": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "zone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "const": "HYROX_2F"
+        },
+        "modality": {
+          "enum": [
+            "ENGINE",
+            "SLED",
+            "LOCOMOTION",
+            "BALL"
+          ]
+        },
+        "loadable": {
+          "type": "boolean"
+        },
+        "defaultLoadUnit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "benchmarkEligible": {
+          "const": true
+        },
+        "techniqueNotes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "scalePolicy": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "WORK",
+              "LOAD",
+              "ROUNDS",
+              "REST_DENSITY",
+              "MOVEMENT_REGRESSION"
+            ]
+          }
+        },
+        "stopCriteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "status": {
+          "const": "ACTIVE"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capacityGroup": {
+      "type": "object",
+      "required": [
+        "groupId",
+        "name",
+        "stationIds"
+      ],
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stationIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "pattern": "^H[1-8]$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "workRange": {
+      "type": "object",
+      "required": [
+        "metric",
+        "min",
+        "max"
+      ],
+      "properties": {
+        "metric": {
+          "enum": [
+            "METER",
+            "TURF_LENGTH",
+            "REP"
+          ]
+        },
+        "min": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "levelPolicy": {
+      "type": "object",
+      "required": [
+        "level",
+        "name",
+        "targetRpeRange",
+        "stationWork"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetRpeRange": {
+          "$ref": "#/$defs/numberRange"
+        },
+        "stationWork": {
+          "type": "object",
+          "required": [
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "H7",
+            "H8"
+          ],
+          "additionalProperties": {
+            "$ref": "#/$defs/workRange"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "loadPolicy": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "NONE",
+            "BODYWEIGHT",
+            "SLED_CALIBRATION",
+            "RANGE_BY_LEVEL"
+          ]
+        },
+        "profileId": {
+          "enum": [
+            "SLED_PUSH",
+            "SLED_PULL"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "KG",
+            "KG_PER_HAND"
+          ]
+        },
+        "ranges": {
+          "type": "object",
+          "required": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "L1": {
+              "$ref": "#/$defs/loadRange"
+            },
+            "L2": {
+              "$ref": "#/$defs/loadRange"
+            },
+            "L3": {
+              "$ref": "#/$defs/loadRange"
+            },
+            "L4": {
+              "$ref": "#/$defs/loadRange"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "loadRange": {
+      "type": "object",
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "sledProfile": {
+      "type": "object",
+      "required": [
+        "stationId",
+        "requiredFields",
+        "targetRpeByLevel"
+      ],
+      "properties": {
+        "stationId": {
+          "enum": [
+            "H2",
+            "H3"
+          ]
+        },
+        "requiredFields": {
+          "type": "array",
+          "const": [
+            "calibratedLoadKg",
+            "targetRpe",
+            "calibrationVersion"
+          ]
+        },
+        "targetRpeByLevel": {
+          "type": "object",
+          "required": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "L1": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "L2": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "L3": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "L4": {
+              "$ref": "#/$defs/numberRange"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "benchmarkProtocol": {
+      "type": "object",
+      "required": [
+        "protocolId",
+        "protocolVersion",
+        "name",
+        "level",
+        "orderedStations",
+        "work",
+        "loadPolicy",
+        "comparisonStrategy"
+      ],
+      "properties": {
+        "protocolId": {
+          "enum": [
+            "B1",
+            "B2",
+            "B3",
+            "B4"
+          ]
+        },
+        "protocolVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "enum": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ]
+        },
+        "orderedStations": {
+          "type": "array",
+          "const": [
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "H7",
+            "H8"
+          ]
+        },
+        "work": {
+          "type": "object",
+          "required": [
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6",
+            "H7",
+            "H8"
+          ],
+          "additionalProperties": {
+            "$ref": "#/$defs/exactWork"
+          }
+        },
+        "loadPolicy": {
+          "const": "LEVEL_DEFAULT_OR_EXPLICIT"
+        },
+        "comparisonStrategy": {
+          "const": "EXACT_PROTOCOL_WORK_LOAD_CALIBRATION_AND_SCALING"
+        }
+      },
+      "additionalProperties": false
+    },
+    "exactWork": {
+      "type": "object",
+      "required": [
+        "metric",
+        "value"
+      ],
+      "properties": {
+        "metric": {
+          "enum": [
+            "METER",
+            "TURF_LENGTH",
+            "REP"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "intRange": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "items": false
+    },
+    "numberRange": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ],
+      "items": false
+    }
+  }
+}

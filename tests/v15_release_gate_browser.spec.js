@@ -47,12 +47,12 @@ test('V15 release: legacy/canonical F111 parity and direct refresh remain safe a
   await expectNoErrors(errors,'F111 release');
 });
 
-test('V15 release: cross-template back forward refresh and Posture future route are stable',async({page})=>{
+test('V15 release: cross-template back forward refresh and future routes are stable',async({page})=>{
   const errors=capturePageErrors(page);
   await page.setViewportSize({width:390,height:844});
 
   await page.goto('/#/coach');
-  await expect(page.locator('.template-card')).toHaveCount(4);
+  await expect(page.locator('.template-card')).toHaveCount(5);
   await page.goto('/#/coach/body/body-02/l3');
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goto('/#/coach/conditioning/con-03/l2');

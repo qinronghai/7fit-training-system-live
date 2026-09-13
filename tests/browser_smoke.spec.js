@@ -29,15 +29,16 @@ async function firstReplaceablePrep(page) {
   return null;
 }
 
-test('390px multi-template coach center renders four registry templates without overflow', async ({ page }) => {
+test('390px multi-template coach center renders registered templates without overflow', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach');
   await expect(page.getByRole('heading', { name: '7Fit Coach Center' })).toBeVisible();
-  await expect(page.locator('[data-template-id]')).toHaveCount(4);
+  await expect(page.locator('[data-template-id]')).toHaveCount(5);
   await expect(page.locator('[data-template-id="f111"]')).toContainText('女性综合 1+1+1');
   await expect(page.locator('[data-template-id="body"]')).toContainText('健美式塑形');
   await expect(page.locator('[data-template-id="conditioning"]')).toContainText('体能训练');
+  await expect(page.locator('[data-template-id="hyrox"]')).toContainText('即将开放');
   await expect(page.locator('[data-template-id="posture"]')).toContainText('即将开放');
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
@@ -91,7 +92,7 @@ test('F111 preset page keeps legacy UI while new dispatcher resolves the same pu
   await expectNoPageErrors(errors);
 });
 
-test('Body and Conditioning homes are active while Posture remains a safe landing', async ({ page }) => {
+test('Body and Conditioning homes are active while HYROX and Posture remain safe future landings', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body');
   await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
@@ -104,6 +105,10 @@ test('Body and Conditioning homes are active while Posture remains a safe landin
   await expect(page.locator('.conditioning-family-card')).toHaveCount(4);
   await expect(page.getByText('选择体能目标 / 等级', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: '自由编课 →', exact: true })).toBeVisible();
+
+  await page.goto('/#/coach/hyrox');
+  await expect(page.getByRole('heading', { name: 'HYROX 训练' })).toBeVisible();
+  await expect(page.getByText('即将开放', { exact: false }).first()).toBeVisible();
 
   await page.goto('/#/coach/posture');
   await expect(page.getByRole('heading', { name: '体态调整' })).toBeVisible();

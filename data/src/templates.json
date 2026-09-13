@@ -3,6 +3,7 @@
     "f111",
     "body",
     "conditioning",
+    "hyrox",
     "posture"
   ],
   "templateRegistry": {
@@ -65,6 +66,26 @@
       },
       "routeBase": "#/coach/conditioning",
       "description": "围绕体能方式、冲击需求、功率需求与训练站点组织的体能模板。"
+    },
+    "hyrox": {
+      "templateId": "hyrox",
+      "name": "HYROX 训练",
+      "shortName": "HYROX",
+      "engine": "hyrox",
+      "status": "FUTURE",
+      "levelSystem": "L1-L4",
+      "capabilities": {
+        "preset": false,
+        "composer": false,
+        "prep": false,
+        "anatomy": false,
+        "copy": false,
+        "save": false,
+        "volume": false,
+        "conditioningMetrics": false
+      },
+      "routeBase": "#/coach/hyrox",
+      "description": "适配 7Fit 二楼器械与 8 米草坪的固定 Station 混合体能训练模板；数据契约已就绪，功能待接入。"
     },
     "posture": {
       "templateId": "posture",

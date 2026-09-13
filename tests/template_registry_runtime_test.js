@@ -10,9 +10,11 @@ for(const file of ['data/system-data.js','js/router.js','js/coach/common.js','js
 
 const D=window.V14_DATA,R=window.V14Router,M=window.V14CoachModules;
 assert(D.templateRegistry,'templateRegistry runtime missing');
-assert.deepStrictEqual(D.templateIds,['f111','body','conditioning','posture']);
+assert.deepStrictEqual(D.templateIds,['f111','body','conditioning','hyrox','posture']);
 assert.strictEqual(D.templateRegistry.conditioning.capabilities.composer,true,'Conditioning composer capability must be ACTIVE after #38');
 assert.strictEqual(D.templateRegistry.conditioning.capabilities.copy,true,'Conditioning copy capability must be ACTIVE after #38');
+assert.strictEqual(D.templateRegistry.hyrox.status,'FUTURE','HYROX must remain FUTURE until #89 activation gate');
+assert.strictEqual(Object.values(D.templateRegistry.hyrox.capabilities).some(Boolean),false,'HYROX capabilities must remain disabled in #87');
 for(const templateId of ['f111','body','conditioning']){
   assert.strictEqual(D.templateRegistry[templateId].capabilities.save,true,`${templateId} Save/Restore capability must be ACTIVE after #11`);
 }
