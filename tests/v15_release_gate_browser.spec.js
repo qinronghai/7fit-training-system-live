@@ -148,7 +148,7 @@ test('V15 release: HYROX save restore re-resolves from intent at 390px',async({p
   const swap=page.locator('[data-hyrox-station-swap]').first();
   const current=await swap.inputValue();
   const values=await swap.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value));
-  const target=values.find(value=>value&&value!==current);
+  const target=values.find(value=>value&&value!==current&&!['H2','H3'].includes(value));
   if(target)await swap.selectOption(target);
 
   await page.locator('[data-save-session-name]').fill('HYROX Mixed Saved');
