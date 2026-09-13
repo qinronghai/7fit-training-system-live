@@ -57,6 +57,14 @@ result=evaluate(baseSession({volume:{totalWorkingSets:10,directSetsByTarget:{qua
 expectCode(result,'BODY_HIGH_FATIGUE_STACK','warn');
 assert.strictEqual(result.status,'WARN');
 
+result=evaluate(baseSession({
+  familyId:'BODY-02',level:'L3',
+  items:[slot('PRIMARY','backext_load_main'),slot('SECONDARY','yaling_luomaniya_yingla'),slot('ACCESSORY','shanyan_tingshen')],
+  volume:{totalWorkingSets:14,directSetsByTarget:{glute_max:8,hamstrings:8},secondaryExposureByTarget:{},isolationWorkingSets:2,isolationRatio:2/14,highFatigueCompoundCount:2,estimatedMinutes:42}
+}));
+expectCode(result,'BODY_EXERCISE_FAMILY_DUPLICATE','hard');
+assert.strictEqual(result.status,'FAIL');
+
 result=evaluate(baseSession({items:[slot('PRIMARY','movement_bench_box_squat'),slot('SECONDARY','banjie_hake'),slot('ACCESSORY','hake_shendun')]}));
 expectCode(result,'BODY_MOVEMENT_REDUNDANCY','warn');
 
