@@ -64,6 +64,7 @@ jobs:
           python tools/prepare_static_site.py --dest _site --build-id "$GITHUB_SHA"
           grep -q "?v=${GITHUB_SHA:0:8}" _site/index.html
           ! grep -q "__BUILD_ID__" _site/index.html
+          python tools/check_artifact_hygiene.py index.html assets _site/index.html _site/assets
 
       - name: Install pinned Playwright Chromium
         run: |
