@@ -2,7 +2,7 @@
   "actions": {
     "mao_niu": {
       "id": "mao_niu",
-      "name": "猫牛",
+      "name": "猫牛式",
       "pattern": "脊柱活动",
       "tier": "",
       "sourceTier": "入门",
@@ -17,7 +17,11 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "热身",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ]
     },
     "qiangmian_huadong": {
       "id": "qiangmian_huadong",
@@ -74,7 +78,11 @@
       "isCore": false,
       "v11StandardTier": "T1",
       "category": "热身",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ]
     },
     "diaoweng_shi": {
       "id": "diaoweng_shi",
@@ -93,7 +101,11 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "激活",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ]
     },
     "sichong": {
       "id": "sichong",
@@ -880,7 +892,11 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "体能",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ]
     },
     "gaowei_xiala_zhaiwo_fanshou": {
       "id": "gaowei_xiala_zhaiwo_fanshou",
@@ -1925,7 +1941,11 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "体能",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ]
     },
     "xueqiao_tui": {
       "id": "xueqiao_tui",
@@ -3091,7 +3111,11 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "热身",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ]
     },
     "paomozhou_tunbu": {
       "id": "paomozhou_tunbu",
@@ -4618,6 +4642,342 @@
       "isSupport": false,
       "isCore": false,
       "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P4"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_foamroller_overhead_reach": {
+      "id": "warmup_foamroller_overhead_reach",
+      "name": "泡沫轴仰卧肩屈上举",
+      "pattern": "胸椎活动",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "泡沫轴 / 垫子",
+      "equipmentId": "eq-foam",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "上肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "活动",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P2"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_kneeling_lat_dynamic": {
+      "id": "warmup_kneeling_lat_dynamic",
+      "name": "跪姿背阔肌动态拉伸",
+      "pattern": "肩屈活动",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "训练垫 / 长凳",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "上肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_wall_slide_liftoff": {
+      "id": "warmup_wall_slide_liftoff",
+      "name": "墙面肩胛上旋滑墙离墙",
+      "pattern": "肩胛控制",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "固定墙面",
+      "equipmentId": "eq-wall",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "上肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_ankle_dorsiflexion_rock": {
+      "id": "warmup_ankle_dorsiflexion_rock",
+      "name": "半跪姿踝背屈前移",
+      "pattern": "踝关节活动",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "下肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_adductor_rockback": {
+      "id": "warmup_adductor_rockback",
+      "name": "四足跪姿内收肌后坐",
+      "pattern": "髋活动",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "下肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_squat_pry": {
+      "id": "warmup_squat_pry",
+      "name": "深蹲底位动态活动",
+      "pattern": "蹲",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "下肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P2"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_reverse_lunge_overhead_reach": {
+      "id": "warmup_reverse_lunge_overhead_reach",
+      "name": "反向弓步配合上举伸展",
+      "pattern": "单腿",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "全身动态",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_dynamic_cossack": {
+      "id": "warmup_dynamic_cossack",
+      "name": "动态哥萨克侧蹲",
+      "pattern": "单腿",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "下肢活动",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_single_leg_hip_airplane": {
+      "id": "warmup_single_leg_hip_airplane",
+      "name": "单腿髋飞机动态控制",
+      "pattern": "单腿",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "下肢整合",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P4"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_side_lying_clamshell": {
+      "id": "warmup_side_lying_clamshell",
+      "name": "侧卧蚌式开合",
+      "pattern": "髋外展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "臀部激活",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_quadruped_hip_extension": {
+      "id": "warmup_quadruped_hip_extension",
+      "name": "四足跪姿髋伸展",
+      "pattern": "髋伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "臀部激活",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P2"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_banded_glute_bridge_abduction": {
+      "id": "warmup_banded_glute_bridge_abduction",
+      "name": "弹力带臀桥外展",
+      "pattern": "髋伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "弹力带 / 垫子",
+      "equipmentId": "eq-band",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "臀部激活",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P2"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_banded_single_leg_glute_bridge": {
+      "id": "warmup_banded_single_leg_glute_bridge",
+      "name": "弹力带单腿臀桥",
+      "pattern": "髋伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "弹力带 / 垫子",
+      "equipmentId": "eq-band",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "臀部激活",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P4"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_rocket_press_light": {
+      "id": "warmup_rocket_press_light",
+      "name": "轻量火箭推节奏",
+      "pattern": "全身整合",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "药球",
+      "equipmentId": "eq-medicineball",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "全身整合",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_kb_goblet_squat_press": {
+      "id": "warmup_kb_goblet_squat_press",
+      "name": "壶铃高脚杯深蹲到推举",
+      "pattern": "全身整合",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "壶铃",
+      "equipmentId": "eq-kb",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "全身整合",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_medicine_ball_squat_press": {
+      "id": "warmup_medicine_ball_squat_press",
+      "name": "药球深蹲推举",
+      "pattern": "全身整合",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "药球",
+      "equipmentId": "eq-medicineball",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "全身整合",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
       "zone": "2F 体能热身大厅",
       "prepGrades": [
         "P4"
@@ -8546,6 +8906,326 @@
         "禁忌 / 限制": "肩腕承重疼痛、明显平衡障碍、急性腰痛",
         "退阶 ID": "warmup_stability_ball_forearm_plank",
         "同级替代 ID": "SUP-S6-05",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_foamroller_overhead_reach": {
+      "summary": "泡沫轴仰卧肩屈上举 活动 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_foamroller_overhead_reach",
+        "来源动作模式": "胸椎活动",
+        "来源层级": "PREP P2",
+        "器械": "泡沫轴 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "肩屈与胸椎伸展协同",
+        "来源处方 / RPE": "1–2组 × 6–8次｜RPE 5–6",
+        "教练口令": "肋骨保持稳定，双臂沿可控范围上举，不用腰椎代偿。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_kneeling_lat_dynamic": {
+      "summary": "跪姿背阔肌动态拉伸 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_kneeling_lat_dynamic",
+        "来源动作模式": "肩屈活动",
+        "来源层级": "PREP P1",
+        "器械": "训练垫 / 长凳",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "背阔肌与肩屈动态活动",
+        "来源处方 / RPE": "1–2组 × 6–8次/侧｜RPE 5–6",
+        "教练口令": "臀部轻向后坐，手臂向前延伸，让腋后侧获得拉长感。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_wall_slide_liftoff": {
+      "summary": "墙面肩胛上旋滑墙离墙 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_wall_slide_liftoff",
+        "来源动作模式": "肩胛控制",
+        "来源层级": "PREP P3",
+        "器械": "固定墙面",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "肩胛上旋与肩屈控制",
+        "来源处方 / RPE": "1–2组 × 6–8次｜RPE 5–6",
+        "教练口令": "前臂沿墙上滑，顶端轻离墙；保持收肋，不耸肩。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_ankle_dorsiflexion_rock": {
+      "summary": "半跪姿踝背屈前移 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_ankle_dorsiflexion_rock",
+        "来源动作模式": "踝关节活动",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "踝背屈活动",
+        "来源处方 / RPE": "1–2组 × 8–10次/侧｜RPE 5–6",
+        "教练口令": "脚跟不离地，膝盖沿第二脚趾方向向前移动。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_adductor_rockback": {
+      "summary": "四足跪姿内收肌后坐 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_adductor_rockback",
+        "来源动作模式": "髋活动",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "髋内收肌动态活动",
+        "来源处方 / RPE": "1–2组 × 8次/侧｜RPE 5–6",
+        "教练口令": "一腿侧伸，臀部向后坐，脊柱保持自然。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_squat_pry": {
+      "summary": "深蹲底位动态活动 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_squat_pry",
+        "来源动作模式": "蹲",
+        "来源层级": "PREP P2",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "深蹲底位髋踝动态活动",
+        "来源处方 / RPE": "1–2组 × 6–8次｜RPE 5–6",
+        "教练口令": "下蹲到可控底位，左右轻移重心，膝盖跟随脚尖。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_reverse_lunge_overhead_reach": {
+      "summary": "反向弓步配合上举伸展 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_reverse_lunge_overhead_reach",
+        "来源动作模式": "单腿",
+        "来源层级": "PREP P3",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "单腿稳定 + 髋伸展 + 上举整合",
+        "来源处方 / RPE": "1组 × 5–6次/侧｜RPE 5–6",
+        "教练口令": "后撤弓步同时双臂上举，骨盆保持正，不用腰椎后仰。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_dynamic_cossack": {
+      "summary": "动态哥萨克侧蹲 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_dynamic_cossack",
+        "来源动作模式": "单腿",
+        "来源层级": "PREP P3",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "侧向髋活动与单腿控制",
+        "来源处方 / RPE": "1组 × 5–6次/侧｜RPE 5–6",
+        "教练口令": "左右换边时控制重心，支撑脚全脚掌着地。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_single_leg_hip_airplane": {
+      "summary": "单腿髋飞机动态控制 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_single_leg_hip_airplane",
+        "来源动作模式": "单腿",
+        "来源层级": "PREP P4",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "单腿髋稳定与骨盆旋转控制",
+        "来源处方 / RPE": "1组 × 4–6次/侧｜RPE 5–6",
+        "教练口令": "支撑腿微屈，骨盆开合幅度服从平衡和躯干稳定。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_side_lying_clamshell": {
+      "summary": "侧卧蚌式开合 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_side_lying_clamshell",
+        "来源动作模式": "髋外展",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "臀中肌与髋外旋激活",
+        "来源处方 / RPE": "1–2组 × 10–12次/侧｜RPE 5–6",
+        "教练口令": "双脚并拢，骨盆不后滚，膝盖小幅打开。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_quadruped_hip_extension": {
+      "summary": "四足跪姿髋伸展 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_quadruped_hip_extension",
+        "来源动作模式": "髋伸展",
+        "来源层级": "PREP P2",
+        "器械": "自重 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "臀大肌激活与骨盆稳定",
+        "来源处方 / RPE": "1–2组 × 8–10次/侧｜RPE 5–6",
+        "教练口令": "膝保持屈曲或自然伸展，髋向后上方伸，不用腰顶。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_banded_glute_bridge_abduction": {
+      "summary": "弹力带臀桥外展 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_banded_glute_bridge_abduction",
+        "来源动作模式": "髋伸展",
+        "来源层级": "PREP P2",
+        "器械": "弹力带 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "臀伸 + 髋外展激活",
+        "来源处方 / RPE": "1–2组 × 10–12次｜RPE 5–6",
+        "教练口令": "桥顶保持，双膝轻向外推带，骨盆不下沉。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_banded_single_leg_glute_bridge": {
+      "summary": "弹力带单腿臀桥 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_banded_single_leg_glute_bridge",
+        "来源动作模式": "髋伸展",
+        "来源层级": "PREP P4",
+        "器械": "弹力带 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "单侧臀伸 + 髋稳定高阶激活",
+        "来源处方 / RPE": "1–2组 × 6–8次/侧｜RPE 5–6",
+        "教练口令": "单腿支撑顶髋，弹力带保持外展张力，骨盆保持水平。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_rocket_press_light": {
+      "summary": "轻量火箭推节奏 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_rocket_press_light",
+        "来源动作模式": "全身整合",
+        "来源层级": "PREP P3",
+        "器械": "药球",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "低负荷全身伸髋—推举整合",
+        "来源处方 / RPE": "1–2组 × 6–8次｜RPE 5–6",
+        "教练口令": "轻量药球，从半蹲到站立推举，连续但不追求速度和疲劳。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_kb_goblet_squat_press": {
+      "summary": "壶铃高脚杯深蹲到推举 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_kb_goblet_squat_press",
+        "来源动作模式": "全身整合",
+        "来源层级": "PREP P3",
+        "器械": "壶铃",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "蹲 + 上肢推举整合",
+        "来源处方 / RPE": "1–2组 × 6次｜RPE 5–6",
+        "教练口令": "轻壶铃高脚杯下蹲，站起后完成轻量推举，收肋控制。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_medicine_ball_squat_press": {
+      "summary": "药球深蹲推举 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_medicine_ball_squat_press",
+        "来源动作模式": "全身整合",
+        "来源层级": "PREP P4",
+        "器械": "药球",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "全身多关节动态整合",
+        "来源处方 / RPE": "1–2组 × 6次｜RPE 5–6",
+        "教练口令": "轻药球抱胸下蹲，站起后上举；动作流畅，不做爆发投掷。",
+        "执行步骤": "按教练口令在无痛、可控范围内完成，保持自然呼吸并避免做到疲劳。",
+        "常见错误": "追求幅度或速度导致躯干代偿、失去呼吸与关节控制。",
+        "禁忌 / 限制": "出现疼痛、明显代偿或无法保持稳定时立即退阶。",
+        "退阶 ID": "—",
+        "同级替代 ID": "—",
         "进阶 ID": "—"
       }
     }
