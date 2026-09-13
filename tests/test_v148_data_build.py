@@ -19,6 +19,7 @@ DOMAIN_FILES = (
     "templates.json",
     "body.json",
     "conditioning.json",
+    "hyrox.json",
     "support.json",
     "core.json",
     "prep.json",
