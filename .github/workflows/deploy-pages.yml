@@ -52,6 +52,7 @@ jobs:
           python tools/prepare_static_site.py --dest _site --build-id "$GITHUB_SHA"
           grep -q "?v=${GITHUB_SHA:0:8}" _site/index.html
           ! grep -q "__BUILD_ID__" _site/index.html
+          python tools/check_artifact_hygiene.py index.html assets _site/index.html _site/assets
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -87,6 +88,7 @@ jobs:
           python tools/prepare_static_site.py --dest _site --build-id "$GITHUB_SHA"
           grep -q "?v=${GITHUB_SHA:0:8}" _site/index.html
           ! grep -q "__BUILD_ID__" _site/index.html
+          python tools/check_artifact_hygiene.py index.html assets _site/index.html _site/assets
 
       - name: Install pinned Playwright Chromium
         run: |
@@ -106,3 +108,24 @@ jobs:
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Smoke deployed HTML/CSS hygiene
+        shell: bash
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          expected="${GITHUB_SHA:0:8}"
+          base="${PAGE_URL%/}"
+          for attempt in {1..12}; do
+            curl --fail --silent --show-error "${base}/" -o /tmp/live-index.html || true
+            if grep -Fq "content=\"${expected}\" name=\"7fit-build\"" /tmp/live-index.html 2>/dev/null \
+              && ! grep -Fq '\n' /tmp/live-index.html; then
+              break
+            fi
+            sleep 5
+          done
+          grep -Fq "content=\"${expected}\" name=\"7fit-build\"" /tmp/live-index.html
+          ! grep -Fq '\n' /tmp/live-index.html
+          curl --fail --silent --show-error "${base}/assets/app.css?v=${expected}" -o /tmp/live-app.css
+          ! grep -Fq '\n' /tmp/live-app.css
