@@ -165,6 +165,26 @@ def validate_payload(data: dict) -> list[str]:
     conditioning = {key: data.get(key) for key in conditioning_keys}
     errors.extend(_schema_errors(conditioning, "conditioning", "conditioning"))
 
+    # HYROX aggregate schema. Keep real runtime keys visible in error paths.
+    hyrox_keys = (
+        "hyroxSessionTypeIds",
+        "hyroxSessionTypes",
+        "hyroxStationIds",
+        "hyroxStations",
+        "hyroxVenuePolicy",
+        "hyroxCapacityGroupIds",
+        "hyroxCapacityGroups",
+        "hyroxLevelPolicies",
+        "hyroxLoadPolicies",
+        "hyroxSledCalibrationPolicy",
+        "hyroxBenchmarkProtocolIds",
+        "hyroxBenchmarkProtocols",
+        "hyroxBenchmarkResultContract",
+        "hyroxScalingPolicy",
+    )
+    hyrox = {key: data.get(key) for key in hyrox_keys}
+    errors.extend(_schema_errors(hyrox, "hyrox", "hyrox"))
+
     # Training Template Registry identity and routing contract.
     if len(template_ids) != len(set(template_ids)):
         errors.append("templateIds: duplicate template IDs are not allowed")
