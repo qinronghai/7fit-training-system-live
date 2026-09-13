@@ -51,6 +51,19 @@ D.bodyActionMeta.tushen_shendun.directTargets=['glute_max'];
 assert(!ids({familyId:'BODY-01',level:'L1',slotKey:'PRIMARY'}).includes('tushen_shendun'),'PRIMARY without Family primary-target overlap must be rejected');
 D.bodyActionMeta.tushen_shendun.directTargets=originalTargets;
 
+const backextAccessory=ids({
+  familyId:'BODY-02',level:'L3',slotKey:'ACCESSORY',
+  currentSelections:{PRIMARY:'backext_load_main'}
+});
+assert(!backextAccessory.includes('shanyan_tingshen'),'loaded back extension must block the same back-extension family from ACCESSORY');
+assert(!backextAccessory.includes('backext_load_main'),'same action must remain excluded');
+
+const hipThrustSecondary=ids({
+  familyId:'BODY-02',level:'L3',slotKey:'SECONDARY',
+  currentSelections:{PRIMARY:'hipthrust_pause_main'}
+});
+assert(!hipThrustSecondary.includes('tun_tui'),'hip thrust machine variants must not occupy adjacent Body slots');
+
 const first=Body.candidates({familyId:'BODY-03',level:'L3',slotKey:'SECONDARY',currentSelections:{PRIMARY:'feiji_labei_zhongba'}});
 const second=Body.candidates({familyId:'BODY-03',level:'L3',slotKey:'SECONDARY',currentSelections:{PRIMARY:'feiji_labei_zhongba'}});
 assert.deepStrictEqual(second,first,'candidate ordering must be deterministic');
