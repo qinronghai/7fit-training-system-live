@@ -85,6 +85,15 @@
   }
 
   function roleName(role){return D().bodyRoles?.[role]?.name||role||'动作';}
+  function targetNames(ids){
+    const catalog=D().bodyTargetCatalog||{};
+    return (ids||[]).map(id=>catalog[id]?.name||id).filter(Boolean);
+  }
+  function slotKind(slotKey){
+    if(slotKey==='PRIMARY'||slotKey==='SECONDARY')return 'main';
+    if(slotKey==='ACCESSORY')return 'accessory';
+    return 'isolation';
+  }
   function resolvedSelectionMap(session){
     return Object.fromEntries((session?.main?.content||[]).map(slot=>[slot.key,{actionId:slot.actionId,source:slot.source}]));
   }
@@ -105,12 +114,20 @@
 
   function slotCard(ctx,slot){
     const session=ctx.session,domain=session.domainContext?.slots?.[slot.key]||{};
-    return `<article class="body-slot-card" data-body-slot="${esc(slot.key)}">
+    const action=D().actions?.[slot.actionId]||{},meta=D().bodyActionMeta?.[slot.actionId]||{};
+    const targets=targetNames(meta.directTargets);
+    return `<article class="body-slot-card body-slot-${slotKind(slot.key)}" data-body-slot="${esc(slot.key)}">
       <div class="body-slot-head"><div><span>${esc(slot.key)}</span><h3>${esc(roleName(domain.role))}</h3></div><small>${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
-      <div class="body-slot-action"><b>${esc(slot.name)}</b><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div>
-      <div class="body-prescription-grid"><div><small>Sets</small><b>${esc(domain.workingSets??'—')}</b></div><div><small>Reps</small><b>${esc(rangeText(domain.repRange))}</b></div><div><small>RIR</small><b>${esc(rangeText(domain.rirRange))}</b></div><div><small>Rest</small><b>${esc(rangeText(domain.restSecondsRange,' 秒'))}</b></div></div>
+      <div class="body-slot-action"><div><b>${esc(slot.name)}</b><div class="body-action-tags"><span>${esc(action.pattern||'动作模式未标')}</span><span>${esc(targets.join(' · ')||'目标肌群未标')}</span></div></div><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div>
+      <div class="body-prescription-grid"><div><small>组数</small><b>${esc(domain.workingSets??'—')}</b></div><div><small>次数</small><b>${esc(rangeText(domain.repRange))}</b></div><div><small>RIR</small><b>${esc(rangeText(domain.rirRange))}</b></div><div><small>休息</small><b>${esc(rangeText(domain.restSecondsRange,' 秒'))}</b></div></div>
       ${slotSelect(ctx,slot)}
     </article>`;
+  }
+
+  function trainingBlock(ctx,{kind,title,caption,keys}){
+    const cards=(ctx.session.main.content||[]).filter(slot=>keys.includes(slot.key)).map(slot=>slotCard(ctx,slot)).join('');
+    if(!cards)return '';
+    return `<section class="body-training-block body-training-${esc(kind)}" data-body-block="${esc(kind)}"><div class="body-training-head"><div><span>${esc(kind==='main'?'01':kind==='accessory'?'02':'03')}</span><div><h3>${esc(title)}</h3><p>${esc(caption)}</p></div></div></div><div class="body-slot-grid body-slot-grid-${esc(kind)}">${cards}</div></section>`;
   }
 
   function anatomy(session){
@@ -133,7 +150,11 @@
   function renderEditor(ctx){
     const session=ctx.session;
     const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
-    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
+    const mainBlock=trainingBlock(ctx,{kind:'main',title:'主训练',caption:'主项 + 次主项｜优先完成今天最重要的高价值动作。',keys:['PRIMARY','SECONDARY']});
+    const accessoryBlock=trainingBlock(ctx,{kind:'accessory',title:'辅助训练',caption:'补足主要目标肌群与动作模式，不重复主项动作家族。',keys:['ACCESSORY']});
+    const isolationBlock=trainingBlock(ctx,{kind:'isolation',title:'局部塑形',caption:'孤立项 + 可选项｜控制疲劳，用于补足局部训练量。',keys:['ISOLATION-1','ISOLATION-2','OPTIONAL']});
+    const structure=`<div class="body-structure-strip"><div><b>01</b><span>主训练</span></div><i>→</i><div><b>02</b><span>辅助训练</span></div><i>→</i><div><b>03</b><span>局部塑形</span></div></div>`;
+    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head body-editor-head"><div><h2>今日训练安排</h2><p>${esc(session.summary)}｜先主训练，再辅助，再局部塑形。</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${structure}${conflict(session)}${mainBlock}${accessoryBlock}${isolationBlock}<section class="body-session-review"><div class="body-review-head"><span>SESSION REVIEW</span><h3>训练量与肌群覆盖</h3></div>${M.BodyVolumeView.render(session)}${anatomy(session)}</section><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
     return `${prepHtml}${editor}${recovery()}`;
   }
 
