@@ -9,7 +9,7 @@ ROOT = Path(__file__).parents[1]
 DATA_FILE = ROOT / "data" / "system-data.js"
 TEMPLATE_SOURCE = ROOT / "data" / "src" / "templates.json"
 REGISTRY_SCHEMA = ROOT / "schemas" / "v14.8" / "template-registry.schema.json"
-EXPECTED_IDS = ["f111", "body", "conditioning", "posture"]
+EXPECTED_IDS = ["f111", "body", "conditioning", "hyrox", "posture"]
 CAPABILITY_KEYS = {
     "preset",
     "composer",
@@ -36,7 +36,7 @@ def test_template_registry_source_and_schema_exist():
     assert REGISTRY_SCHEMA.is_file()
 
 
-def test_registry_source_freezes_initial_four_templates():
+def test_registry_source_tracks_registered_templates():
     data = json.loads(TEMPLATE_SOURCE.read_text(encoding="utf-8"))
     assert data["templateIds"] == EXPECTED_IDS
     assert list(data["templateRegistry"]) == EXPECTED_IDS
@@ -53,6 +53,8 @@ def test_registry_source_freezes_initial_four_templates():
     assert data["templateRegistry"]["f111"]["status"] == "ACTIVE"
     assert data["templateRegistry"]["body"]["status"] == "ACTIVE"
     assert data["templateRegistry"]["conditioning"]["status"] == "ACTIVE"
+    assert data["templateRegistry"]["hyrox"]["status"] == "FUTURE"
+    assert not any(data["templateRegistry"]["hyrox"]["capabilities"].values())
     assert data["templateRegistry"]["posture"]["status"] == "FUTURE"
     assert not any(data["templateRegistry"]["posture"]["capabilities"].values())
 
