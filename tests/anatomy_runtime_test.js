@@ -75,8 +75,8 @@ console.log('v146_role_filter_test: PASS');
 
 vm.runInThisContext(fs.readFileSync(`${root}/js/views-maintenance.js`, 'utf8'), {filename:'js/views-maintenance.js'});
 const coverage = window.V14Maintenance.anatomyCoverage();
-assert.strictEqual(coverage.runtimeExpected, 246);
-assert.strictEqual(coverage.runtimeCovered, 246);
+assert.strictEqual(coverage.runtimeExpected, Object.keys(window.V14_DATA.actions).length);
+assert.strictEqual(coverage.runtimeCovered, coverage.runtimeExpected);
 assert.strictEqual(coverage.phaseA.covered, 120);
 assert.strictEqual(coverage.phaseB.covered, 85);
 assert.strictEqual(coverage.phaseC.covered, 34);
