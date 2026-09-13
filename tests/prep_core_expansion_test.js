@@ -6,6 +6,30 @@ for(const file of ['data/system-data.js','data/anatomy-data.js','js/prep-grade.j
 }
 const D=window.V14_DATA,R=window.V14PrepResolver;
 
+const categoryChecks={
+  'PREP-29':['猫牛式','P1'],
+  'PREP-30':['泡沫轴胸椎伸展','P2'],
+  'PREP-33':['墙面肩胛上旋滑墙离墙','P3'],
+  'PREP-34':['鸟狗式','P2'],
+  'PREP-35':['半跪姿踝背屈前移','P1'],
+  'PREP-40':['单腿髋飞机动态控制','P4'],
+  'PREP-41':['臀桥','P1'],
+  'PREP-45':['弹力带单腿臀桥','P4'],
+  'PREP-46':['划船机低强度热身','P1'],
+  'PREP-47':['滑雪机低强度热身','P2'],
+  'PREP-48':['轻量火箭推节奏','P3'],
+  'PREP-50':['药球深蹲推举','P4'],
+};
+for(const [prepId,[name,grade]] of Object.entries(categoryChecks)){
+  assert.strictEqual(D.warmupDetails[prepId]?.name,name,prepId);
+  assert.strictEqual(D.warmupDetails[prepId]?.prepGrade,grade,prepId);
+}
+const gradeCounts={P1:0,P2:0,P3:0,P4:0};
+for(const prepId of D.warmupIds)gradeCounts[D.warmupDetails[prepId].prepGrade]++;
+assert(gradeCounts.P1>=15&&gradeCounts.P2>=15&&gradeCounts.P3>=8&&gradeCounts.P4>=5,JSON.stringify(gradeCounts));
+assert.strictEqual(D.actions.huachuanji_wentai.warmupEligible,true);
+assert.strictEqual(D.actions.huaxueji_wentai.warmupEligible,true);
+
 const expected={
   'PREP-19':['高位平板支撑','P1','SUP-S1-04'],
   'PREP-20':['前臂平板支撑','P1','SUP-S1-05'],
