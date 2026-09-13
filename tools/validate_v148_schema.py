@@ -211,7 +211,7 @@ def validate_payload(data: dict) -> list[str]:
     expected_counts = {
         "sessions": (sessions, 32),
         "recipeIds": (data.get("recipeIds", []), 8),
-        "supportIds": (data.get("supportIds", []), 30),
+        "supportIds": (data.get("supportIds", []), 31),
         "coreIds": (data.get("coreIds", []), 20),
         "foamRollIds": (data.get("foamRollIds", []), 12),
     }
