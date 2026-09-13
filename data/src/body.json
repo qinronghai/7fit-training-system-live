@@ -211,7 +211,186 @@
         "ACCESSORY",
         "ISOLATION",
         "OPTIONAL"
-      ]
+      ],
+      "slotIntents": {
+        "PRIMARY": {
+          "slotKey": "PRIMARY",
+          "role": "PRIMARY",
+          "intentId": "BODY01_PRIMARY_KNEE_COMPOUND",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "蹲"
+          ],
+          "preferredPatterns": [
+            "蹲"
+          ],
+          "requiredDirectTargets": [
+            "quadriceps"
+          ],
+          "preferredDirectTargets": [
+            "quadriceps"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "moderate"
+        },
+        "SECONDARY": {
+          "slotKey": "SECONDARY",
+          "role": "SECONDARY",
+          "intentId": "BODY01_SECONDARY_KNEE_VARIATION",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "蹲",
+            "单腿"
+          ],
+          "preferredPatterns": [
+            "单腿"
+          ],
+          "requiredDirectTargets": [
+            "quadriceps"
+          ],
+          "preferredDirectTargets": [
+            "glute_max"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY"
+            ],
+            "requireEffectiveDifference": true,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": false,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "moderate"
+        },
+        "ACCESSORY": {
+          "slotKey": "ACCESSORY",
+          "role": "ACCESSORY",
+          "intentId": "BODY01_ACCESSORY_HIP_SUPPORT",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋伸展",
+            "髋外展",
+            "髋铰链"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "glute_max",
+            "glute_med",
+            "hamstrings",
+            "adductors"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY",
+              "SECONDARY"
+            ],
+            "requireEffectiveDifference": false,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": true,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-1": {
+          "slotKey": "ISOLATION-1",
+          "role": "ISOLATION",
+          "intentId": "BODY01_ISO_KNEE_EXTENSION",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "蹲"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "quadriceps"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-2": {
+          "slotKey": "ISOLATION-2",
+          "role": "ISOLATION",
+          "intentId": "BODY01_ISO_POSTERIOR_BALANCE",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋铰链"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "hamstrings"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "OPTIONAL": {
+          "slotKey": "OPTIONAL",
+          "role": "OPTIONAL",
+          "intentId": "BODY01_OPTIONAL_LOW_FATIGUE",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋外展",
+            "髋伸展"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "glute_med",
+            "adductors",
+            "glute_max",
+            "calves"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        }
+      }
     },
     "BODY-02": {
       "familyId": "BODY-02",
@@ -246,7 +425,198 @@
         "ACCESSORY",
         "ISOLATION",
         "OPTIONAL"
-      ]
+      ],
+      "slotIntents": {
+        "PRIMARY": {
+          "slotKey": "PRIMARY",
+          "role": "PRIMARY",
+          "intentId": "BODY02_PRIMARY_POSTERIOR_COMPOUND",
+          "allowedExerciseClasses": [
+            "compound",
+            "accessory"
+          ],
+          "requiredPatterns": [
+            "髋伸展",
+            "髋铰链"
+          ],
+          "preferredPatterns": [
+            "髋铰链",
+            "髋伸展"
+          ],
+          "requiredDirectTargets": [
+            "glute_max",
+            "hamstrings"
+          ],
+          "preferredDirectTargets": [
+            "glute_max",
+            "hamstrings"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "moderate"
+        },
+        "SECONDARY": {
+          "slotKey": "SECONDARY",
+          "role": "SECONDARY",
+          "intentId": "BODY02_SECONDARY_POSTERIOR_VARIATION",
+          "allowedExerciseClasses": [
+            "compound",
+            "accessory"
+          ],
+          "requiredPatterns": [
+            "髋伸展",
+            "髋铰链",
+            "单腿拉"
+          ],
+          "preferredPatterns": [
+            "单腿拉",
+            "髋伸展",
+            "髋铰链"
+          ],
+          "requiredDirectTargets": [
+            "glute_max",
+            "hamstrings"
+          ],
+          "preferredDirectTargets": [
+            "glute_max",
+            "hamstrings"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY"
+            ],
+            "requireEffectiveDifference": true,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": false,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "moderate"
+        },
+        "ACCESSORY": {
+          "slotKey": "ACCESSORY",
+          "role": "ACCESSORY",
+          "intentId": "BODY02_ACCESSORY_POSTERIOR_SUPPORT",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋铰链",
+            "髋伸展",
+            "髋外展"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "hamstrings",
+            "glute_max",
+            "glute_med",
+            "adductors"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY",
+              "SECONDARY"
+            ],
+            "requireEffectiveDifference": false,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": true,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-1": {
+          "slotKey": "ISOLATION-1",
+          "role": "ISOLATION",
+          "intentId": "BODY02_ISO_HAMSTRINGS",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋铰链"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "hamstrings"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-2": {
+          "slotKey": "ISOLATION-2",
+          "role": "ISOLATION",
+          "intentId": "BODY02_ISO_GLUTE",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋伸展",
+            "髋外展"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "glute_max",
+            "glute_med"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "OPTIONAL": {
+          "slotKey": "OPTIONAL",
+          "role": "OPTIONAL",
+          "intentId": "BODY02_OPTIONAL_LOW_FATIGUE",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "髋外展",
+            "髋伸展"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "glute_med",
+            "adductors",
+            "glute_max"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        }
+      }
     },
     "BODY-03": {
       "familyId": "BODY-03",
@@ -281,7 +651,194 @@
         "ACCESSORY",
         "ISOLATION",
         "OPTIONAL"
-      ]
+      ],
+      "slotIntents": {
+        "PRIMARY": {
+          "slotKey": "PRIMARY",
+          "role": "PRIMARY",
+          "intentId": "BODY03_PRIMARY_PULL",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "水平拉",
+            "垂直拉"
+          ],
+          "preferredPatterns": [
+            "水平拉",
+            "垂直拉"
+          ],
+          "requiredDirectTargets": [
+            "lats",
+            "upper_back"
+          ],
+          "preferredDirectTargets": [
+            "upper_back",
+            "lats"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "moderate"
+        },
+        "SECONDARY": {
+          "slotKey": "SECONDARY",
+          "role": "SECONDARY",
+          "intentId": "BODY03_SECONDARY_PULL_DIRECTION",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "水平拉",
+            "垂直拉"
+          ],
+          "preferredPatterns": [
+            "垂直拉",
+            "水平拉"
+          ],
+          "requiredDirectTargets": [
+            "lats",
+            "upper_back"
+          ],
+          "preferredDirectTargets": [
+            "lats",
+            "upper_back"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY"
+            ],
+            "requireEffectiveDifference": true,
+            "blockSamePattern": true,
+            "blockCompoundPatternRepeat": false,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "moderate"
+        },
+        "ACCESSORY": {
+          "slotKey": "ACCESSORY",
+          "role": "ACCESSORY",
+          "intentId": "BODY03_ACCESSORY_SHOULDER_SHAPE",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "肩胛控制",
+            "水平拉"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "lateral_delts",
+            "rear_delts",
+            "upper_back"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY",
+              "SECONDARY"
+            ],
+            "requireEffectiveDifference": false,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": true,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-1": {
+          "slotKey": "ISOLATION-1",
+          "role": "ISOLATION",
+          "intentId": "BODY03_ISO_REAR_DELT",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "水平拉",
+            "肩胛控制"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "rear_delts"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-2": {
+          "slotKey": "ISOLATION-2",
+          "role": "ISOLATION",
+          "intentId": "BODY03_ISO_LATERAL_OR_BICEPS",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "肩胛控制",
+            "垂直拉"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "lateral_delts",
+            "biceps"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "OPTIONAL": {
+          "slotKey": "OPTIONAL",
+          "role": "OPTIONAL",
+          "intentId": "BODY03_OPTIONAL_ARM_SCAPULA",
+          "allowedExerciseClasses": [
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "垂直拉",
+            "肩胛控制"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "biceps",
+            "lateral_delts",
+            "upper_back"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        }
+      }
     },
     "BODY-04": {
       "familyId": "BODY-04",
@@ -316,7 +873,184 @@
         "ACCESSORY",
         "ISOLATION",
         "OPTIONAL"
-      ]
+      ],
+      "slotIntents": {
+        "PRIMARY": {
+          "slotKey": "PRIMARY",
+          "role": "PRIMARY",
+          "intentId": "BODY04_PRIMARY_PRESS",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "水平推"
+          ],
+          "preferredPatterns": [
+            "水平推"
+          ],
+          "requiredDirectTargets": [
+            "chest"
+          ],
+          "preferredDirectTargets": [
+            "chest"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "moderate"
+        },
+        "SECONDARY": {
+          "slotKey": "SECONDARY",
+          "role": "SECONDARY",
+          "intentId": "BODY04_SECONDARY_PRESS_ANGLE",
+          "allowedExerciseClasses": [
+            "compound"
+          ],
+          "requiredPatterns": [
+            "水平推",
+            "垂直推"
+          ],
+          "preferredPatterns": [
+            "水平推"
+          ],
+          "requiredDirectTargets": [
+            "chest",
+            "front_delts",
+            "triceps"
+          ],
+          "preferredDirectTargets": [
+            "front_delts"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY"
+            ],
+            "requireEffectiveDifference": true,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": false,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "moderate"
+        },
+        "ACCESSORY": {
+          "slotKey": "ACCESSORY",
+          "role": "ACCESSORY",
+          "intentId": "BODY04_ACCESSORY_SHOULDER_SHAPE",
+          "allowedExerciseClasses": [
+            "compound",
+            "accessory",
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "垂直推"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "front_delts",
+            "lateral_delts"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": {
+            "against": [
+              "PRIMARY",
+              "SECONDARY"
+            ],
+            "requireEffectiveDifference": false,
+            "blockSamePattern": false,
+            "blockCompoundPatternRepeat": true,
+            "minDirectTargetOverlap": 0.75
+          },
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-1": {
+          "slotKey": "ISOLATION-1",
+          "role": "ISOLATION",
+          "intentId": "BODY04_ISO_LATERAL_DELT",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "肩胛控制"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "lateral_delts"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "ISOLATION-2": {
+          "slotKey": "ISOLATION-2",
+          "role": "ISOLATION",
+          "intentId": "BODY04_ISO_TRICEPS_CHEST",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "水平推"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "triceps",
+            "chest"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        },
+        "OPTIONAL": {
+          "slotKey": "OPTIONAL",
+          "role": "OPTIONAL",
+          "intentId": "BODY04_OPTIONAL_ARM_CHEST",
+          "allowedExerciseClasses": [
+            "isolation"
+          ],
+          "requiredPatterns": [],
+          "preferredPatterns": [
+            "垂直拉",
+            "水平推"
+          ],
+          "requiredDirectTargets": [],
+          "preferredDirectTargets": [
+            "biceps",
+            "triceps",
+            "chest"
+          ],
+          "disallowedCharacteristics": {
+            "fatigueCost": [
+              "high"
+            ],
+            "stabilityDemand": []
+          },
+          "pairRelationship": null,
+          "fatiguePreference": "low"
+        }
+      }
     }
   },
   "bodyLevelPolicies": {
@@ -1095,6 +1829,7 @@
         "L4"
       ],
       "roles": [
+        "SECONDARY",
         "ACCESSORY",
         "ISOLATION"
       ],
@@ -2021,6 +2756,32 @@
       "stabilityDemand": "low",
       "repProfile": "isolation_large",
       "laterality": "bilateral"
+    },
+    "V13_VP_SEATED_LIGHT_DB": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "front_delts"
+      ],
+      "secondaryTargets": [
+        "triceps"
+      ],
+      "exerciseClass": "accessory",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral",
+      "exerciseFamily": "seated_light_db_shoulder_press"
     }
   },
   "bodyVolumePolicy": {
@@ -2041,6 +2802,7 @@
     "estimatedSessionMinutesRange": [
       35,
       50
-    ]
+    ],
+    "maxDirectTargetSlots": 3
   }
 }
