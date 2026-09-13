@@ -50,6 +50,16 @@ test('template-aware search finds actions and legal multi-template coach entries
   await expect(page.getByRole('heading',{name:'Conditioning 自由编课'})).toBeVisible();
 
   await page.goto('/#/library');
+  await page.locator('#action-search').fill('B3');
+  await page.locator('[data-filter="templateId"]').selectOption('hyrox');
+  await page.locator('[data-filter="kind"]').selectOption('session');
+  const hyroxLink=page.locator('[data-search-result-kind="hyrox-benchmark"]').first();
+  await expect(hyroxLink).toBeVisible();
+  await hyroxLink.click();
+  await expect(page).toHaveURL(/#\/coach\/hyrox\/benchmark\/b3/);
+  await expect(page.getByText('雪橇场馆校准',{exact:true})).toBeVisible();
+
+  await page.goto('/#/library');
   await page.locator('#action-search').fill('单腿拉');
   await page.locator('[data-filter="templateId"]').selectOption('f111');
   await page.locator('[data-filter="kind"]').selectOption('session');
