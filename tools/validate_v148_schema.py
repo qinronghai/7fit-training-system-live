@@ -369,6 +369,101 @@ def validate_payload(data: dict) -> list[str]:
     valid_targets = set(body_target_ids)
     valid_roles = set(body_role_ids)
     valid_families = set(body_family_ids)
+    body_slot_keys = ("PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION-1", "ISOLATION-2", "OPTIONAL")
+    valid_exercise_classes = {"compound", "accessory", "isolation"}
+    valid_patterns = {
+        action.get("pattern")
+        for action in actions.values()
+        if isinstance(action, dict) and isinstance(action.get("pattern"), str) and action.get("pattern")
+    }
+
+    # Body V2 Slot Intent Contract: identity, references, and per-level static resolvability.
+    for family_id in body_family_ids:
+        family = data.get("bodyFamilies", {}).get(family_id, {})
+        if not isinstance(family, dict):
+            continue
+        intents = family.get("slotIntents", {})
+        if set(intents) != set(body_slot_keys):
+            errors.append(
+                f"bodyFamilies.{family_id}.slotIntents: must define exactly {list(body_slot_keys)}"
+            )
+            continue
+        intent_ids = []
+        for slot_key in body_slot_keys:
+            intent = intents.get(slot_key, {})
+            prefix = f"bodyFamilies.{family_id}.slotIntents.{slot_key}"
+            if not isinstance(intent, dict):
+                continue
+            if intent.get("slotKey") != slot_key:
+                errors.append(f"{prefix}.slotKey: must equal map key {slot_key}")
+            expected_role = family.get("slotPolicy", {}).get(slot_key)
+            if intent.get("role") != expected_role:
+                errors.append(
+                    f"{prefix}.role: {intent.get('role')} must match slotPolicy role {expected_role}"
+                )
+            intent_id = intent.get("intentId")
+            if isinstance(intent_id, str):
+                intent_ids.append(intent_id)
+            for exercise_class in intent.get("allowedExerciseClasses", []):
+                if exercise_class not in valid_exercise_classes:
+                    errors.append(f"{prefix}.allowedExerciseClasses: unknown class {exercise_class}")
+            for field in ("requiredPatterns", "preferredPatterns"):
+                for pattern in intent.get(field, []):
+                    if pattern not in valid_patterns:
+                        errors.append(f"{prefix}.{field}: unknown action pattern {pattern}")
+            for field in ("requiredDirectTargets", "preferredDirectTargets"):
+                for target in intent.get(field, []):
+                    if target not in valid_targets:
+                        errors.append(f"{prefix}.{field}: unknown target {target}")
+            pair = intent.get("pairRelationship")
+            if isinstance(pair, dict):
+                for against in pair.get("against", []):
+                    if against not in body_slot_keys:
+                        errors.append(f"{prefix}.pairRelationship.against: unknown slot {against}")
+                    if against == slot_key:
+                        errors.append(f"{prefix}.pairRelationship.against: cannot reference itself")
+        if len(intent_ids) != len(set(intent_ids)):
+            errors.append(f"bodyFamilies.{family_id}.slotIntents: intentId values must be unique")
+
+        level_policies = data.get("bodyLevelPolicies", {})
+        for level in sorted(body_level_ids):
+            policy = level_policies.get(level, {})
+            default_sets = policy.get("defaultWorkingSets", {}) if isinstance(policy, dict) else {}
+            for slot_key in body_slot_keys:
+                if not isinstance(default_sets.get(slot_key), int) or default_sets.get(slot_key, 0) <= 0:
+                    continue
+                role = family.get("slotPolicy", {}).get(slot_key)
+                intent = intents.get(slot_key, {})
+                legal = []
+                for action_id, meta in body_action_meta.items():
+                    action = actions.get(action_id, {})
+                    if not isinstance(meta, dict) or not isinstance(action, dict):
+                        continue
+                    if family_id not in meta.get("families", []) or level not in meta.get("levels", []):
+                        continue
+                    if role not in meta.get("roles", []):
+                        continue
+                    if action.get("status") != "可自动编排" or action.get("route") not in FORMAL_ROUTES:
+                        continue
+                    if meta.get("exerciseClass") not in intent.get("allowedExerciseClasses", []):
+                        continue
+                    required_patterns = intent.get("requiredPatterns", [])
+                    if required_patterns and action.get("pattern") not in required_patterns:
+                        continue
+                    required_targets = set(intent.get("requiredDirectTargets", []))
+                    if required_targets and not (required_targets & set(meta.get("directTargets", []))):
+                        continue
+                    disallowed = intent.get("disallowedCharacteristics", {})
+                    if meta.get("fatigueCost") in disallowed.get("fatigueCost", []):
+                        continue
+                    if meta.get("stabilityDemand") in disallowed.get("stabilityDemand", []):
+                        continue
+                    legal.append(action_id)
+                if not legal:
+                    errors.append(
+                        f"bodyFamilies.{family_id}.slotIntents.{slot_key}: {level} has no statically legal candidates"
+                    )
+
     for action_id, meta in sorted(body_action_meta.items()):
         prefix = f"bodyActionMeta.{action_id}"
         action = actions.get(action_id)

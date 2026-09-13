@@ -37,6 +37,92 @@
     return issues;
   }
 
+  function selectionMap(session){
+    return Object.fromEntries(asArray(session?.main?.content)
+      .filter(item=>item?.key&&item?.actionId)
+      .map(item=>[item.key,item.actionId]));
+  }
+
+  function slotIntentAssessment(session,slotKey){
+    const item=asArray(session?.main?.content).find(entry=>entry?.key===slotKey);
+    if(!item?.actionId||!window.V15BodyResolver?.assessSlotIntent)return null;
+    return window.V15BodyResolver.assessSlotIntent({
+      familyId:session.familyId,
+      level:session.level,
+      slotKey,
+      actionId:item.actionId,
+      currentSelections:selectionMap(session),
+    });
+  }
+
+  function slotIntentIssues(session){
+    const issues=[];
+    asArray(session?.main?.content).forEach((item,index)=>{
+      if(!item?.key||!item?.actionId)return;
+      const assessment=slotIntentAssessment(session,item.key);
+      if(!assessment||assessment.ok)return;
+      const handled=new Set([
+        'BODY_PRIMARY_SECONDARY_TOO_SIMILAR',
+        'BODY_ACCESSORY_ROLE_COLLAPSE',
+      ]);
+      const residual=assessment.reasons.filter(code=>!handled.has(code));
+      if(!residual.length)return;
+      const actionName=D().actions?.[item.actionId]?.name||item.actionId;
+      issues.push(makeIssue(
+        'hard','Body 槽位职责不匹配',
+        `${item.key} 的 ${actionName} 不符合当前槽位职责：${residual.join('、')}。`,
+        'BODY_SLOT_INTENT_MISMATCH',10050+index
+      ));
+    });
+    return issues;
+  }
+
+  function primarySecondarySimilarityIssue(session){
+    const assessment=slotIntentAssessment(session,'SECONDARY');
+    if(!assessment?.reasons?.includes('BODY_PRIMARY_SECONDARY_TOO_SIMILAR'))return null;
+    const selections=selectionMap(session),data=D();
+    const primary=data.actions?.[selections.PRIMARY]?.name||selections.PRIMARY||'主项';
+    const secondary=data.actions?.[selections.SECONDARY]?.name||selections.SECONDARY||'次主项';
+    return makeIssue(
+      'hard','主项与次主项过于同质',
+      `${primary} + ${secondary} 未形成足够的动作模式、侧别或目标刺激差异。`,
+      'BODY_PRIMARY_SECONDARY_TOO_SIMILAR',10070
+    );
+  }
+
+  function accessoryRoleCollapseIssue(session){
+    const assessment=slotIntentAssessment(session,'ACCESSORY');
+    if(!assessment?.reasons?.includes('BODY_ACCESSORY_ROLE_COLLAPSE'))return null;
+    const actionId=selectionMap(session).ACCESSORY,actionName=D().actions?.[actionId]?.name||actionId||'辅助动作';
+    return makeIssue(
+      'hard','辅助动作退化为第三主项',
+      `${actionName} 与主项 / 次主项的复合动作路径过度重复，应改为承担补充或塑形职责的动作。`,
+      'BODY_ACCESSORY_ROLE_COLLAPSE',10080
+    );
+  }
+
+  function targetRedundancyIssue(session){
+    const data=D(),limit=Number(data.bodyConflictPolicy?.maxDirectTargetSlots),counts={};
+    if(!Number.isFinite(limit))return null;
+    asArray(session?.main?.content).forEach(item=>{
+      const meta=data.bodyActionMeta?.[item?.actionId];
+      asArray(meta?.directTargets).forEach(target=>{counts[target]=(counts[target]||0)+1;});
+    });
+    const repeated=Object.entries(counts)
+      .filter(([,count])=>count>limit)
+      .sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+    if(!repeated.length)return null;
+    const text=repeated.map(([target,count])=>{
+      const name=data.bodyTargetCatalog?.[target]?.name||target;
+      return `${name} × ${count} 个槽位`;
+    }).join('；');
+    return makeIssue(
+      'warn','局部目标重复偏高',
+      `${text}，超过 ${limit} 个正式槽位的提醒阈值。`,
+      'BODY_SESSION_TARGET_REDUNDANCY',10450
+    );
+  }
+
   function primaryTargetIssue(session){
     const data=D(),family=data.bodyFamilies?.[session?.familyId],direct=session?.domainContext?.volume?.directSetsByTarget||{};
     if(!family)return null;
@@ -127,13 +213,19 @@
   }
 
   function evaluate(session){
-    const issues=[...familyDeviationIssues(session)];
+    const issues=[
+      ...familyDeviationIssues(session),
+      ...slotIntentIssues(session),
+    ];
     [
+      primarySecondarySimilarityIssue(session),
+      accessoryRoleCollapseIssue(session),
       primaryTargetIssue(session),
       volumeIssue(session),
       highFatigueIssue(session),
       exerciseFamilyDuplicateIssue(session),
       movementRedundancyIssue(session),
+      targetRedundancyIssue(session),
       isolationIssue(session),
       timeIssue(session),
     ].forEach(issue=>{if(issue)issues.push(issue);});
