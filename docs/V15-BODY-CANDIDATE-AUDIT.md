@@ -33,7 +33,7 @@
 | hipthrust_pause_main | 臀推停顿主项 | BODY-02 | L2 / L3 / L4 | PRIMARY / SECONDARY | glute_max | hamstrings | compound | high | low | compound_machine | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | movement_single_leg_hip_thrust | 单腿臀推 | BODY-02 | L2 / L3 / L4 | SECONDARY / ACCESSORY | glute_max | hamstrings | compound | medium | medium | single_leg_compound | unilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | yaling_luomaniya_yingla | 哑铃罗马尼亚硬拉 | BODY-02 | L2 / L3 / L4 | PRIMARY / SECONDARY / ACCESSORY | hamstrings / glute_max | adductors | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
-| shanyan_tingshen | 山羊挺身 | BODY-02 | L1 / L2 / L3 / L4 | ACCESSORY / ISOLATION | glute_max / hamstrings | — | accessory | medium | low | accessory_compound | bilateral | 1F_ONLY | 人工准入；辅助/孤立/可选角色 |
+| shanyan_tingshen | 山羊挺身 | BODY-02 | L1 / L2 / L3 / L4 | SECONDARY / ACCESSORY / ISOLATION | glute_max / hamstrings | — | accessory | medium | low | accessory_compound | bilateral | 1F_ONLY | V2 准入；L1 作为臀推主项之外的低稳定髋铰链次主项，避免主次项同质 |
 | backext_load_main | 山羊挺身负重主项 | BODY-02 | L2 / L3 / L4 | PRIMARY / SECONDARY / ACCESSORY | glute_max / hamstrings | — | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | dileigan_hinge | 地雷杆髋铰链 | BODY-02 | L2 / L3 / L4 | PRIMARY / SECONDARY | glute_max / hamstrings | adductors | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | liujiao_gantui_yingla | 六角杠硬拉 | BODY-02 | L3 / L4 | PRIMARY / SECONDARY | glute_max / hamstrings | quadriceps | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
@@ -66,6 +66,7 @@
 | gangling_wotu | 杠铃卧推 | BODY-04 | L3 / L4 | PRIMARY / SECONDARY | chest / triceps | front_delts | compound | high | high | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | shangxie_yaling_wotu | 上斜哑铃卧推 | BODY-04 | L2 / L3 / L4 | PRIMARY / SECONDARY | chest / front_delts | triceps | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | qixie_jian_tui | 器械推肩 | BODY-04 | L1 / L2 / L3 / L4 | SECONDARY / ACCESSORY | front_delts / triceps | lateral_delts | compound | medium | low | compound_machine | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
+| V13_VP_SEATED_LIGHT_DB | 坐姿轻哑铃肩推 | BODY-04 | L1 / L2 / L3 / L4 | ACCESSORY | front_delts | triceps | accessory | low | low | accessory_compound | bilateral | 1F_ONLY | V2 准入；承担低疲劳肩部塑形辅助职责，不作为 PRIMARY / SECONDARY |
 | yaling_jiantui | 哑铃肩推 | BODY-04 | L2 / L3 / L4 | SECONDARY / ACCESSORY | front_delts / triceps | lateral_delts | compound | high | medium | compound_freeweight | bilateral | 1F_ONLY | 人工准入；主项角色命中 Family primary target |
 | shengsuo_santou_xiaya | 绳索三头下压 | BODY-04 | L1 / L2 / L3 / L4 | ACCESSORY / ISOLATION / OPTIONAL | triceps | — | isolation | low | low | isolation_small | bilateral | 1F_ONLY | 人工准入；辅助/孤立/可选角色 |
 | xiongjia_jiaxiong | 蝴蝶机夹胸 | BODY-04 | L1 / L2 / L3 / L4 | ACCESSORY / ISOLATION / OPTIONAL | chest | — | isolation | low | low | isolation_large | bilateral | 1F_ONLY | 人工准入；辅助/孤立/可选角色 |
