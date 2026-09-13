@@ -4983,6 +4983,20 @@
         "P4"
       ],
       "warmupEligible": true
+    },
+    "SUP-S3-06": {
+      "id": "SUP-S3-06",
+      "name": "直臂支撑前跨步",
+      "grade": "SUP-S3",
+      "pattern": "支撑模式",
+      "route": "FLEX_1F_2F",
+      "routeLabel": "1F / 2F 灵活",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "SUPPORT_MAT",
+      "status": "SUPPORT_CANON",
+      "impact": "低冲击",
+      "loadFamily": "支撑稳定",
+      "isSupport": true
     }
   },
   "actionDetails": {
