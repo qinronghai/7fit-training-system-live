@@ -72,18 +72,25 @@
   }
 
   function selectionContext(currentSelections={},currentSlotKey=''){
-    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set();
+    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set(),redundancyGroups=new Set();
     let highFatigueCompounds=0;
     for(const [slotKey,value] of Object.entries(currentSelections||{})){
       if(slotKey===currentSlotKey)continue;
       const actionId=normalizeActionId(value),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
       if(!actionId||!meta||!action)continue;
       usedActionIds.add(actionId);
+      if(meta.redundancyGroup)redundancyGroups.add(meta.redundancyGroup);
       (meta.directTargets||[]).forEach(target=>coveredTargets.add(target));
       if(action.pattern)patterns.add(action.pattern);
       if(meta.exerciseClass==='compound'&&meta.fatigueCost==='high')highFatigueCompounds++;
     }
-    return {coveredTargets,patterns,usedActionIds,highFatigueCompounds};
+    return {coveredTargets,patterns,usedActionIds,redundancyGroups,highFatigueCompounds};
+  }
+
+  function hasRedundancyConflict(actionId,currentSelections={},currentSlotKey=''){
+    const group=D().bodyActionMeta?.[actionId]?.redundancyGroup;
+    if(!group)return false;
+    return selectionContext(currentSelections,currentSlotKey).redundancyGroups.has(group);
   }
 
   function candidateSortKey(candidate,{family,level,context}){
@@ -116,6 +123,8 @@
     const data=D(),context=selectionContext(input.currentSelections||{},slotKey),items=[];
     for(const actionId of Object.keys(data.bodyActionMeta||{})){
       if(context.usedActionIds.has(actionId))continue;
+      const redundancyGroup=data.bodyActionMeta?.[actionId]?.redundancyGroup;
+      if(redundancyGroup&&context.redundancyGroups.has(redundancyGroup))continue;
       if(!isLegalCandidate({familyId,level,family,role,actionId}))continue;
       const meta=data.bodyActionMeta[actionId],action=data.actions[actionId];
       items.push({
@@ -186,7 +195,8 @@
       const requestedActionId=normalizeManualActionId(requested[slotKey]);
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
-      if(requestedActionId&&!used.has(requestedActionId)&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
+      const redundant=requestedActionId&&hasRedundancyConflict(requestedActionId,chosen,slotKey);
+      if(requestedActionId&&!used.has(requestedActionId)&&!redundant&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
         actionId=requestedActionId;
         source='manual';
       }else{
@@ -251,7 +261,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid};
+  const api={resolve,candidates,isSelectionValid,hasRedundancyConflict};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);
