@@ -16,7 +16,7 @@
     L4:Object.freeze(['CA4','CA3','CA2','CA1']),
   });
   const TEMPLATE_TYPES=Object.freeze(['f111','body','conditioning']);
-  const PREP_ROUTES=new Set(['2F PREP','2F_ONLY','FLEX_1F_2F']);
+  const PREP_ROUTES=new Set(['2F PREP','2F_ONLY','FLEX_1F_2F','CONDITIONING_2F']);
   const LOWER_RE=/髋|踝|腘绳|内收|臀|股四|小腿|下肢|后侧链/;
   const UPPER_RE=/胸椎|肩|上背|胸廓|肩胛|肩袖|上肢/;
   const MOBILITY_RE=/活动|伸展|旋转|绕环|捞月/;
