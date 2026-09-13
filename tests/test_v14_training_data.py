@@ -65,8 +65,8 @@ def test_all_swap_options_reference_known_actions():
 
 def test_v143_warmup_library_and_matching_are_present():
     data = load_payload()
-    assert len(data["warmupIds"]) == 30
-    assert len(data["warmupDetails"]) == 30
+    assert len(data["warmupIds"]) >= 52
+    assert len(data["warmupDetails"]) >= 52
     assert data["meta"]["warmupBaseline"] == "PREP-P1-P4"
     assert "PREP-01" in data["warmupDetails"]
     assert data["warmupDetails"]["PREP-01"]["name"] == "四足跪姿支撑"
