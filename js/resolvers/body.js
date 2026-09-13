@@ -71,19 +71,25 @@
     return isLegalCandidate({...normalized,actionId});
   }
 
+  function exerciseFamilyOf(actionId){
+    const meta=D().bodyActionMeta?.[actionId]||{};
+    return String(meta.exerciseFamily||actionId||'');
+  }
+
   function selectionContext(currentSelections={},currentSlotKey=''){
-    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set();
+    const data=D(),coveredTargets=new Set(),patterns=new Set(),usedActionIds=new Set(),usedExerciseFamilies=new Set();
     let highFatigueCompounds=0;
     for(const [slotKey,value] of Object.entries(currentSelections||{})){
       if(slotKey===currentSlotKey)continue;
       const actionId=normalizeActionId(value),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
       if(!actionId||!meta||!action)continue;
       usedActionIds.add(actionId);
+      usedExerciseFamilies.add(exerciseFamilyOf(actionId));
       (meta.directTargets||[]).forEach(target=>coveredTargets.add(target));
       if(action.pattern)patterns.add(action.pattern);
       if(meta.exerciseClass==='compound'&&meta.fatigueCost==='high')highFatigueCompounds++;
     }
-    return {coveredTargets,patterns,usedActionIds,highFatigueCompounds};
+    return {coveredTargets,patterns,usedActionIds,usedExerciseFamilies,highFatigueCompounds};
   }
 
   function candidateSortKey(candidate,{family,level,context}){
@@ -116,8 +122,10 @@
     const data=D(),context=selectionContext(input.currentSelections||{},slotKey),items=[];
     for(const actionId of Object.keys(data.bodyActionMeta||{})){
       if(context.usedActionIds.has(actionId))continue;
+      const meta=data.bodyActionMeta[actionId],exerciseFamily=exerciseFamilyOf(actionId);
+      if(context.usedExerciseFamilies.has(exerciseFamily))continue;
       if(!isLegalCandidate({familyId,level,family,role,actionId}))continue;
-      const meta=data.bodyActionMeta[actionId],action=data.actions[actionId];
+      const action=data.actions[actionId];
       items.push({
         actionId,
         name:String(action.name||actionId),
@@ -129,6 +137,7 @@
         stabilityDemand:String(meta.stabilityDemand||''),
         repProfile:String(meta.repProfile||''),
         laterality:String(meta.laterality||''),
+        exerciseFamily,
         pattern:String(action.pattern||''),
       });
     }
@@ -186,7 +195,8 @@
       const requestedActionId=normalizeManualActionId(requested[slotKey]);
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
-      if(requestedActionId&&!used.has(requestedActionId)&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
+      const usedExerciseFamilies=new Set(Object.values(chosen).map(exerciseFamilyOf));
+      if(requestedActionId&&!used.has(requestedActionId)&&!usedExerciseFamilies.has(exerciseFamilyOf(requestedActionId))&&isLegalCandidate({familyId,level,family,role,actionId:requestedActionId})){
         actionId=requestedActionId;
         source='manual';
       }else{
