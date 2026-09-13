@@ -64,6 +64,16 @@ test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',a
   await page.goto('/#/coach/body/body-02/l3');
 
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
+  await expect(page.locator('[data-body-block="main"] .body-slot-card')).toHaveCount(2);
+  await expect(page.locator('[data-body-block="accessory"] .body-slot-card')).toHaveCount(1);
+  await expect(page.locator('[data-body-block="isolation"] .body-slot-card')).toHaveCount(3);
+  await expect(page.locator('.body-action-tags').first()).toBeVisible();
+  const familyGroups=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    return ctx.session.main.content.map(slot=>window.V14_DATA.bodyActionMeta[slot.actionId]?.exerciseFamily||'').filter(Boolean);
+  });
+  expect(new Set(familyGroups).size).toBe(familyGroups.length);
   await expect(page.getByRole('heading',{name:'ANATOMY｜动作涉及肌群'})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Direct Work Sets｜有效工作组'})).toBeVisible();
   await expect(page.locator('.body-anatomy-summary')).toHaveCount(1);

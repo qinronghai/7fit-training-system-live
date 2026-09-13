@@ -32,7 +32,7 @@ def test_body_candidate_whitelist_is_curated_and_reference_safe():
         action = actions[action_id]
         assert action["route"] in {"1F_ONLY", "FLEX_1F_2F"}, f"invalid Body strength route: {action_id}"
         assert action["status"] == "可自动编排", f"Body candidate not auto-programmable: {action_id}"
-        assert set(meta) == REQUIRED_FIELDS, f"Body metadata fields drifted: {action_id}"
+        assert REQUIRED_FIELDS <= set(meta) <= (REQUIRED_FIELDS | {"exerciseFamily"}), f"Body metadata fields drifted: {action_id}"
         for field in ("families", "levels", "roles", "directTargets", "secondaryTargets"):
             assert len(meta[field]) == len(set(meta[field])), f"duplicate {field}: {action_id}"
         assert meta["families"] and set(meta["families"]) <= valid_families
@@ -46,6 +46,8 @@ def test_body_candidate_whitelist_is_curated_and_reference_safe():
         assert meta["stabilityDemand"] in {"low", "medium", "high"}
         assert meta["repProfile"] in valid_profiles
         assert meta["laterality"] in {"bilateral", "unilateral"}
+        if "exerciseFamily" in meta:
+            assert isinstance(meta["exerciseFamily"], str) and meta["exerciseFamily"].strip(), f"invalid exerciseFamily: {action_id}"
 
 
 def test_every_family_level_required_role_has_at_least_two_legal_candidates():

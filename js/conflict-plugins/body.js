@@ -71,6 +71,22 @@
     );
   }
 
+  function exerciseFamilyDuplicateIssue(session){
+    const data=D(),groups={};
+    asArray(session?.main?.content).forEach(item=>{
+      const actionId=item?.actionId||'',meta=data.bodyActionMeta?.[actionId],group=String(meta?.exerciseFamily||'');
+      if(!group)return;
+      (groups[group]||(groups[group]=[])).push(data.actions?.[actionId]?.name||actionId);
+    });
+    const repeated=Object.entries(groups).filter(([,names])=>names.length>1);
+    if(!repeated.length)return null;
+    return makeIssue(
+      'hard','同动作家族重复',
+      repeated.map(([,names])=>names.join(' + ')).join('；')+'。同一动作家族不能同时占用多个正式训练槽位。',
+      'BODY_EXERCISE_FAMILY_DUPLICATE',10350
+    );
+  }
+
   function movementRedundancyIssue(session){
     const data=D(),policy=data.bodyConflictPolicy||{},max=Number(policy.maxSamePatternActions),counts={};
     if(!Number.isFinite(max))return null;
@@ -116,6 +132,7 @@
       primaryTargetIssue(session),
       volumeIssue(session),
       highFatigueIssue(session),
+      exerciseFamilyDuplicateIssue(session),
       movementRedundancyIssue(session),
       isolationIssue(session),
       timeIssue(session),
