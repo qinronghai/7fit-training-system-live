@@ -53,8 +53,12 @@ def test_registry_source_tracks_registered_templates():
     assert data["templateRegistry"]["f111"]["status"] == "ACTIVE"
     assert data["templateRegistry"]["body"]["status"] == "ACTIVE"
     assert data["templateRegistry"]["conditioning"]["status"] == "ACTIVE"
-    assert data["templateRegistry"]["hyrox"]["status"] == "FUTURE"
-    assert not any(data["templateRegistry"]["hyrox"]["capabilities"].values())
+    assert data["templateRegistry"]["hyrox"]["status"] == "ACTIVE"
+    assert data["templateRegistry"]["hyrox"]["capabilities"]["prep"] is True
+    assert data["templateRegistry"]["hyrox"]["capabilities"]["copy"] is True
+    assert data["templateRegistry"]["hyrox"]["capabilities"]["save"] is True
+    assert data["templateRegistry"]["hyrox"]["capabilities"]["conditioningMetrics"] is True
+    assert data["templateRegistry"]["hyrox"]["capabilities"]["composer"] is False
     assert data["templateRegistry"]["posture"]["status"] == "FUTURE"
     assert not any(data["templateRegistry"]["posture"]["capabilities"].values())
 
