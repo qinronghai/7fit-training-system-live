@@ -3211,7 +3211,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ]
     },
     "SUP-S1-05": {
       "id": "SUP-S1-05",
@@ -3225,7 +3229,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ]
     },
     "SUP-S2-01": {
       "id": "SUP-S2-01",
@@ -3323,7 +3331,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ]
     },
     "SUP-S3-03": {
       "id": "SUP-S3-03",
@@ -3337,7 +3349,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ]
     },
     "SUP-S3-04": {
       "id": "SUP-S3-04",
@@ -3505,7 +3521,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ]
     },
     "SUP-S6-01": {
       "id": "SUP-S6-01",
@@ -3561,7 +3581,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ]
     },
     "SUP-S6-05": {
       "id": "SUP-S6-05",
@@ -3575,7 +3599,11 @@
       "status": "SUPPORT_CANON",
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
-      "isSupport": true
+      "isSupport": true,
+      "warmupEligible": true,
+      "prepGrades": [
+        "P4"
+      ]
     },
     "CORE-L1-01": {
       "id": "CORE-L1-01",
@@ -4532,6 +4560,69 @@
       "v11StandardTier": "T4",
       "category": "主训练",
       "zone": "1F 力量区"
+    },
+    "warmup_supine_straight_leg_hold": {
+      "id": "warmup_supine_straight_leg_hold",
+      "name": "仰卧双腿伸直保持",
+      "pattern": "抗伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "核心稳定",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_stability_ball_forearm_plank": {
+      "id": "warmup_stability_ball_forearm_plank",
+      "name": "瑜伽球前臂平板支撑",
+      "pattern": "抗伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "瑜伽球 / 垫子",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "核心稳定",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P3"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_bosu_feet_plank": {
+      "id": "warmup_bosu_feet_plank",
+      "name": "BOSU球足端平板支撑",
+      "pattern": "抗伸展",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "BOSU球 / 垫子",
+      "equipmentId": "",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "核心稳定",
+      "isSupport": false,
+      "isCore": false,
+      "category": "激活",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P4"
+      ],
+      "warmupEligible": true
     }
   },
   "actionDetails": {
@@ -8395,6 +8486,66 @@
         "禁忌 / 限制": "仅用于已稳定掌握T3且能在目标RIR内保持动作质量的会员",
         "退阶 ID": "movement_db_single_leg_rdl",
         "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_supine_straight_leg_hold": {
+      "summary": "仰卧双腿伸直保持 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_supine_straight_leg_hold",
+        "来源动作模式": "抗伸展",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "核心抗伸展、骨盆控制、腹壁张力",
+        "来源处方 / RPE": "1–2组 × 15–25秒｜RPE 5–6",
+        "教练口令": "收肋稳骨盆；双腿伸直但不追求贴地",
+        "执行步骤": "仰卧建立肋骨—骨盆堆叠，双腿伸直抬至可保持腰盆稳定的位置，持续呼吸后退出",
+        "常见错误": "为了压低双腿而腰椎过伸、憋气、颈部紧张",
+        "禁忌 / 限制": "急性腰痛、直腿位出现神经牵拉样症状",
+        "退阶 ID": "CORE-L1-03",
+        "同级替代 ID": "pingban_zhi",
+        "进阶 ID": "warmup_stability_ball_forearm_plank"
+      }
+    },
+    "warmup_stability_ball_forearm_plank": {
+      "summary": "瑜伽球前臂平板支撑 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_stability_ball_forearm_plank",
+        "来源动作模式": "抗伸展",
+        "来源层级": "PREP P3",
+        "器械": "瑜伽球 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "核心抗伸展、肩胛稳定、不稳定支撑控制",
+        "来源处方 / RPE": "1–2组 × 15–25秒｜RPE 6",
+        "教练口令": "前臂压球；夹臀收肋；球可以晃，骨盆不要晃",
+        "执行步骤": "前臂置于瑜伽球，双脚后撤建立平板，保持肩胛主动稳定与持续呼吸",
+        "常见错误": "塌腰、耸肩、球移动过大、憋气",
+        "禁忌 / 限制": "肩腕承重疼痛、腰痛、无法控制不稳定支撑",
+        "退阶 ID": "SUP-S1-05",
+        "同级替代 ID": "SUP-S6-04",
+        "进阶 ID": "warmup_bosu_feet_plank"
+      }
+    },
+    "warmup_bosu_feet_plank": {
+      "summary": "BOSU球足端平板支撑 激活 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_bosu_feet_plank",
+        "来源动作模式": "抗伸展",
+        "来源层级": "PREP P4",
+        "器械": "BOSU球 / 垫子",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "高阶核心抗伸展、肩胛稳定、足端不稳定支撑控制",
+        "来源处方 / RPE": "1–2组 × 15–20秒｜RPE 6–7",
+        "教练口令": "脚稳在BOSU；手主动推地；骨盆保持正中",
+        "执行步骤": "双脚置于BOSU球面或稳定训练面，双手高位支撑，建立全身直线并保持呼吸",
+        "常见错误": "骨盆摆动、塌腰、耸肩、脚位失控",
+        "禁忌 / 限制": "肩腕承重疼痛、明显平衡障碍、急性腰痛",
+        "退阶 ID": "warmup_stability_ball_forearm_plank",
+        "同级替代 ID": "SUP-S6-05",
         "进阶 ID": "—"
       }
     }
