@@ -32,8 +32,8 @@ function expectCode(fn,code){
   assert.strictEqual(V15.getSchemaVersion(),1);
   const snapshot=plain(V15.snapshot());
   assert.strictEqual(snapshot.schemaVersion,1);
-  eq(Object.keys(snapshot.templates).sort(),['body','conditioning','f111']);
-  for(const id of ['f111','body','conditioning'])eq(snapshot.templates[id],{sessions:{}});
+  eq(Object.keys(snapshot.templates).sort(),['body','conditioning','f111','hyrox']);
+  for(const id of ['f111','body','conditioning','hyrox'])eq(snapshot.templates[id],{sessions:{}});
   eq(snapshot.savedSessions,{});eq(snapshot.recentActions,[]);eq(snapshot.favorites,{});
   eq(JSON.parse(V15.serialize()),snapshot);
   expectCode(()=>V15.getSession('posture','demo'),'UNKNOWN_TEMPLATE');
@@ -45,11 +45,13 @@ function expectCode(fn,code){
   V15.ensureSession('f111','shared-L2',{familyId:'F111-01',level:'L2',resolverVersion:'f111-adapter-v1',input:{mode:'preset',recipeId:'F111-01',level:'L2'}});
   V15.ensureSession('body','shared-L2',{familyId:'BODY-DEMO',level:'L2',resolverVersion:'body-v1',input:{targetMuscles:['臀大肌']}});
   V15.ensureSession('conditioning','shared-L2',{familyId:'COND-DEMO',level:'L2',resolverVersion:'conditioning-v1',input:{goal:'work-capacity'}});
+  V15.ensureSession('hyrox','shared-L2',{familyId:'HYROX-MIXED',level:'L2',resolverVersion:'hyrox-v1',input:{sessionType:'MIXED',level:'L2'}});
   V15.setSelection('f111','shared-L2','A',actionId,'manual');
   V15.setSelection('body','shared-L2','A',actionId,'auto');
   assert.strictEqual(V15.getSelections('f111','shared-L2').A.source,'manual');
   assert.strictEqual(V15.getSelections('body','shared-L2').A.source,'auto');
   eq(V15.getSelections('conditioning','shared-L2'),{});
+  eq(V15.getSelections('hyrox','shared-L2'),{});
 }
 
 // Formal + PREP manual selections survive state.js reload against the same tab storage.
