@@ -47,7 +47,7 @@ test('V15 release: legacy/canonical F111 parity and direct refresh remain safe a
   await expectNoErrors(errors,'F111 release');
 });
 
-test('V15 release: cross-template back forward refresh and future routes are stable',async({page})=>{
+test('V15 release: cross-template back forward refresh and Posture future route are stable',async({page})=>{
   const errors=capturePageErrors(page);
   await page.setViewportSize({width:390,height:844});
 
@@ -57,16 +57,24 @@ test('V15 release: cross-template back forward refresh and future routes are sta
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goto('/#/coach/conditioning/con-03/l2');
   await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await page.goto('/#/coach/hyrox/mixed/l3');
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
 
+  await page.goBack();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2/);
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
   await page.goBack();
   await expect(page).toHaveURL(/#\/coach\/body\/body-02\/l3/);
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goForward();
   await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2/);
   await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await page.goForward();
+  await expect(page).toHaveURL(/#\/coach\/hyrox\/mixed\/l3/);
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
 
   await page.reload();
-  await expect(page.locator('.conditioning-protocol-panel')).toBeVisible();
+  await expect(page.locator('.hyrox-summary-panel')).toBeVisible();
 
   await page.goto('/#/coach/posture');
   await expect(page.getByRole('heading',{name:'体态调整'})).toBeVisible();
@@ -91,7 +99,7 @@ test('V15 release: invalid template routes fail closed without corrupting active
 
   const snapshot=await page.evaluate(()=>window.V15State.snapshot());
   expect(snapshot.schemaVersion).toBe(1);
-  expect(Object.keys(snapshot.templates).sort()).toEqual(['body','conditioning','f111']);
+  expect(Object.keys(snapshot.templates).sort()).toEqual(['body','conditioning','f111','hyrox']);
   await expect390(page);
   await expectNoErrors(errors,'invalid route');
 });
@@ -125,4 +133,37 @@ test('V15 release: all three composers and SavedSession list are operable at 390
   await expect(page.locator('[data-saved-delete]')).toBeVisible();
   await expect390(page);
   await expectNoErrors(errors,'composer/save list');
+});
+
+
+test('V15 release: HYROX save restore re-resolves from intent at 390px',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+
+  await page.goto('/#/coach/hyrox/mixed/l3');
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
+  await page.locator('[data-hyrox-load-level]').selectOption('L1');
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
+
+  const swap=page.locator('[data-hyrox-station-swap]').first();
+  const current=await swap.inputValue();
+  const values=await swap.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value));
+  const target=values.find(value=>value&&value!==current);
+  if(target)await swap.selectOption(target);
+
+  await page.locator('[data-save-session-name]').fill('HYROX Mixed Saved');
+  await page.locator('[data-save-current-session]').click();
+  await expect(page.locator('.saved-session-card')).toHaveCount(1);
+
+  await page.goto('/#/coach');
+  await expect(page.locator('.saved-session-card')).toHaveCount(1);
+  await page.locator('[data-saved-restore]').click();
+  await expect(page).toHaveURL(/#\/coach\/hyrox\/mixed\/l3/);
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
+  await expect(page.locator('[data-hyrox-load-level]')).toHaveValue('L1');
+
+  const state=await page.evaluate(()=>window.V15State.getSession('hyrox','MIXED-L3'));
+  expect(state.input.loadLevel).toBe('L1');
+  await expect390(page);
+  await expectNoErrors(errors,'HYROX save restore');
 });
