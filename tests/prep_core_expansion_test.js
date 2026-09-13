@@ -18,7 +18,7 @@ const expected={
   'PREP-27':['BOSU球足端平板支撑','P4','warmup_bosu_feet_plank'],
   'PREP-28':['侧平板抬上侧腿','P4','SUP-S6-05'],
 };
-assert.strictEqual(D.warmupIds.length,30);
+assert.strictEqual(D.warmupIds.length,52);
 for(const [prepId,[name,grade,actionId]] of Object.entries(expected)){
   const item=D.warmupDetails[prepId];
   assert(item,`${prepId} missing`);
