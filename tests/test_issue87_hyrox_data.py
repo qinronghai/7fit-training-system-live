@@ -41,14 +41,18 @@ def test_hyrox_source_and_schema_exist_and_runtime_validates():
     assert validate_payload(data) == []
 
 
-def test_hyrox_stays_future_and_does_not_activate_capabilities():
+def test_hyrox_registry_activation_preserves_data_contract():
     data = payload()
     assert data["templateIds"] == ["f111", "body", "conditioning", "hyrox", "posture"]
     record = data["templateRegistry"]["hyrox"]
     assert record["engine"] == "hyrox"
-    assert record["status"] == "FUTURE"
+    assert record["status"] == "ACTIVE"
     assert record["routeBase"] == "#/coach/hyrox"
-    assert not any(record["capabilities"].values())
+    assert record["capabilities"]["prep"] is True
+    assert record["capabilities"]["copy"] is True
+    assert record["capabilities"]["save"] is True
+    assert record["capabilities"]["conditioningMetrics"] is True
+    assert record["capabilities"]["composer"] is False
 
 
 def test_hyrox_fixed_station_identity_and_no_run_station():
