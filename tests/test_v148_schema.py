@@ -154,7 +154,7 @@ def test_composer_schema_freezes_core_structure():
 
 def test_collection_schemas_freeze_inventory_and_minimum_fields():
     expected = {
-        "support": (30, ["ids", "details"]),
+        "support": (31, ["ids", "details"]),
         "core": (20, ["ids", "details"]),
         "foam": (12, ["ids", "details", "matchByPattern"]),
     }
@@ -342,7 +342,7 @@ def test_support_inventory_drift_is_rejected():
     data = payload()
     data["supportIds"] = data["supportIds"][:-1]
     errors = validate_payload(data)
-    assert has_error(errors, "support", "30")
+    assert has_error(errors, "support", "31")
 
 
 def test_schema_cli_success_output(monkeypatch, capsys):
