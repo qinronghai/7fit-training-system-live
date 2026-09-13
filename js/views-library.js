@@ -64,7 +64,7 @@
 
   function resultsHtml(items){
     if(!items.length)return '<div class="no-results">没有符合条件的动作或编课入口。</div>';
-    const order=['f111','body','conditioning','shared','general'];
+    const order=['f111','body','conditioning','hyrox','shared','general'];
     const grouped=new Map();
     for(const item of items){
       const key=groupKey(item);
@@ -83,7 +83,7 @@
   function render(){
     const zones=uniq('zone').concat(uniq('routeLabel').filter(x=>!uniq('zone').includes(x)));
     const items=searchResults();
-    return `<section class="view-hero compact"><span class="eyebrow">TEMPLATE-AWARE SEARCH</span><h1>动作与编课搜索</h1><p>统一搜索 Action、F111 组合、Body Family/Role 与 Conditioning Family/Protocol；搜索只负责发现与跳转，课程合法性仍由各 Template Resolver 决定。</p></section>
+    return `<section class="view-hero compact"><span class="eyebrow">TEMPLATE-AWARE SEARCH</span><h1>动作与编课搜索</h1><p>统一搜索 Action、F111 组合、Body Family/Role、Conditioning Family/Protocol 与 HYROX Session；搜索只负责发现与跳转，课程合法性仍由各 Template Resolver 决定。</p></section>
       <section class="section-card">
         <div class="library-controls template-search-controls">
           <input id="action-search" type="search" placeholder="搜索动作 / 肌群 / 器械 / Family / Protocol" value="${esc(filters.q)}">
@@ -111,7 +111,7 @@
 
   function bind(route){
     if(route?.query?.q!==undefined)filters.q=String(route.query.q||'');
-    if(route?.query?.template&&['f111','body','conditioning'].includes(route.query.template))filters.templateId=route.query.template;
+    if(route?.query?.template&&['f111','body','conditioning','hyrox'].includes(route.query.template))filters.templateId=route.query.template;
     if(route?.query?.kind&&['action','session'].includes(route.query.kind))filters.kind=route.query.kind;
 
     const rerender=()=>{

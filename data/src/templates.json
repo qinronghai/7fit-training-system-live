@@ -72,20 +72,20 @@
       "name": "HYROX 训练",
       "shortName": "HYROX",
       "engine": "hyrox",
-      "status": "FUTURE",
+      "status": "ACTIVE",
       "levelSystem": "L1-L4",
       "capabilities": {
         "preset": false,
         "composer": false,
-        "prep": false,
+        "prep": true,
         "anatomy": false,
-        "copy": false,
-        "save": false,
+        "copy": true,
+        "save": true,
         "volume": false,
-        "conditioningMetrics": false
+        "conditioningMetrics": true
       },
       "routeBase": "#/coach/hyrox",
-      "description": "适配 7Fit 二楼器械与 8 米草坪的固定 Station 混合体能训练模板；数据契约已就绪，功能待接入。"
+      "description": "适配 7Fit 二楼器械与 8 米草坪的固定 Station 混合体能训练模板，支持 Skill、Capacity、Mixed 与 Benchmark。"
     },
     "posture": {
       "templateId": "posture",

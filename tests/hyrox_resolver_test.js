@@ -33,8 +33,10 @@ const sledCalibration={
   SLED_PULL:{calibratedLoadKg:36,targetRpe:7,calibrationVersion:'7fit-turf-v1'},
 };
 
-assert.strictEqual(D.templateRegistry.hyrox.status,'FUTURE');
-assert.strictEqual(Object.values(D.templateRegistry.hyrox.capabilities).some(Boolean),false);
+assert.strictEqual(D.templateRegistry.hyrox.status,'ACTIVE');
+assert.strictEqual(D.templateRegistry.hyrox.capabilities.prep,true);
+assert.strictEqual(D.templateRegistry.hyrox.capabilities.copy,true);
+assert.strictEqual(D.templateRegistry.hyrox.capabilities.save,true);
 assert.strictEqual(Dispatcher.has('hyrox'),true);
 assert(Hyrox&&typeof Hyrox.resolve==='function');
 

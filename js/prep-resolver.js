@@ -15,7 +15,7 @@
     L3:Object.freeze(['CA3','CA2','CA1']),
     L4:Object.freeze(['CA4','CA3','CA2','CA1']),
   });
-  const TEMPLATE_TYPES=Object.freeze(['f111','body','conditioning']);
+  const TEMPLATE_TYPES=Object.freeze(['f111','body','conditioning','hyrox']);
   const PREP_ROUTES=new Set(['2F PREP','2F_ONLY','FLEX_1F_2F','CONDITIONING_2F']);
   const LOWER_RE=/髋|踝|腘绳|内收|臀|股四|小腿|下肢|后侧链/;
   const UPPER_RE=/胸椎|肩|上背|胸廓|肩胛|肩袖|上肢/;
@@ -93,6 +93,27 @@
       ...input,
       template:'conditioning',
       mainActionIds:unique([...(input.firstStationActionIds||[]),...(input.mainActionIds||[])]),
+    });
+  }
+
+  function contextFromHyrox(input={}){
+    const stationPatterns={
+      H1:['垂直拉'],
+      H2:['蹲'],
+      H3:['水平拉'],
+      H4:['蹲'],
+      H5:['水平拉'],
+      H6:['单腿'],
+      H7:['单腿'],
+      H8:['蹲','垂直推'],
+    };
+    const stationIds=unique(input.stationIds);
+    return normalizeContext({
+      ...input,
+      template:'hyrox',
+      mainPatterns:unique([...stationIds.flatMap(id=>stationPatterns[id]||[]),...(input.mainPatterns||[])]),
+      mainActionIds:[],
+      formalActionIds:[],
     });
   }
 
@@ -278,7 +299,7 @@
   window.V14PrepResolver={
     SLOT_ORDER,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
     isPrepRouteAllowed,isActionPrepEligible,caLevelFor,
-    normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,normalizeSelections,
+    normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,contextFromHyrox,normalizeSelections,
     candidateFromWarmup,rankSlotCandidates,resolve,
   };
 })();

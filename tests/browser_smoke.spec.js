@@ -38,7 +38,7 @@ test('390px multi-template coach center renders registered templates without ove
   await expect(page.locator('[data-template-id="f111"]')).toContainText('女性综合 1+1+1');
   await expect(page.locator('[data-template-id="body"]')).toContainText('健美式塑形');
   await expect(page.locator('[data-template-id="conditioning"]')).toContainText('体能训练');
-  await expect(page.locator('[data-template-id="hyrox"]')).toContainText('即将开放');
+  await expect(page.locator('[data-template-id="hyrox"]')).toContainText('已启用');
   await expect(page.locator('[data-template-id="posture"]')).toContainText('即将开放');
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
@@ -92,7 +92,7 @@ test('F111 preset page keeps legacy UI while new dispatcher resolves the same pu
   await expectNoPageErrors(errors);
 });
 
-test('Body and Conditioning homes are active while HYROX and Posture remain safe future landings', async ({ page }) => {
+test('Body, Conditioning and HYROX homes are active while Posture remains future', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/body');
   await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
@@ -108,7 +108,8 @@ test('Body and Conditioning homes are active while HYROX and Posture remain safe
 
   await page.goto('/#/coach/hyrox');
   await expect(page.getByRole('heading', { name: 'HYROX 训练' })).toBeVisible();
-  await expect(page.getByText('即将开放', { exact: false }).first()).toBeVisible();
+  await expect(page.locator('.hyrox-type-card')).toHaveCount(4);
+  await expect(page.getByText('不加入 1km 跑步', { exact: false })).toBeVisible();
 
   await page.goto('/#/coach/posture');
   await expect(page.getByRole('heading', { name: '体态调整' })).toBeVisible();
@@ -245,6 +246,40 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
   }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});
+
+
+test('390px HYROX Skill, Mixed and Benchmark calibration workflow are operable', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto('/#/coach/hyrox/skill/l2');
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(3);
+  await expect(page.locator('.hyrox-prep-card')).toHaveCount(5);
+  await expect(page.getByText('Turf 8m', { exact: false }).first()).toBeVisible();
+  let widths = await page.evaluate(() => ({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+
+  await page.goto('/#/coach/hyrox/mixed/l3');
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
+  await expect(page.locator('[data-hyrox-station-swap]')).toHaveCount(5);
+  await expect(page.locator('[data-save-current-session]')).toBeVisible();
+
+  await page.goto('/#/coach/hyrox/benchmark/b3');
+  await expect(page.locator('.hyrox-resolver-block')).toBeVisible();
+  await expect(page.getByText('雪橇场馆校准', { exact: true })).toBeVisible();
+  await page.locator('[data-hyrox-sled-push]').fill('42');
+  await page.locator('[data-hyrox-sled-pull]').fill('36');
+  await page.locator('[data-hyrox-save-calibration]').click();
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(8);
+  await expect(page.locator('[data-hyrox-station-swap]')).toHaveCount(0);
+  await expect(page.getByText('6 趟｜48m', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('只有 Protocol、工作量、有效负重', { exact: false })).toBeVisible();
+
+  widths = await page.evaluate(() => ({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
   expect(widths.scrollWidth).toBe(widths.clientWidth);
   expect(widths.clientWidth).toBe(390);
   await expectNoPageErrors(errors);

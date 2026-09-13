@@ -15,6 +15,7 @@
     }
     if(record.templateId==='body')return D().bodyFamilies?.[record.familyId]?.name||record.familyId;
     if(record.templateId==='conditioning')return D().conditioningFamilies?.[record.familyId]?.name||record.familyId;
+    if(record.templateId==='hyrox')return record.input?.sessionType==='BENCHMARK'?'Benchmark '+(record.input?.benchmarkProtocolId||record.familyId):(D().hyroxSessionTypes?.[record.input?.sessionType]?.name||record.familyId);
     return record.familyId;
   }
   function dateText(value){

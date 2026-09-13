@@ -2,7 +2,6 @@
   'use strict';
 
   const D=()=>window.V14_DATA||{};
-  const ACTIVE_TEMPLATES=['f111','body','conditioning'];
   const clean=value=>String(value??'').trim();
   const lower=value=>clean(value).toLowerCase();
   const unique=values=>[...new Set((Array.isArray(values)?values:[]).filter(Boolean))];
@@ -201,6 +200,40 @@
     return items;
   }
 
+  function hyroxEntries(){
+    const data=D(),items=[];
+    for(const sessionType of ['SKILL','CAPACITY','MIXED']){
+      const type=data.hyroxSessionTypes?.[sessionType]||{};
+      const href=sessionType==='CAPACITY'
+        ?'#/coach/hyrox/capacity/l1?focus=ENGINE'
+        :'#/coach/hyrox/'+sessionType.toLowerCase()+'/l1';
+      items.push({
+        kind:'hyrox-session',
+        id:'hyrox:'+sessionType,
+        title:'HYROX｜'+(type.name||sessionType),
+        subtitle:sessionType==='CAPACITY'?'专项能力组 · L1–L4':'固定 Station · L1–L4',
+        templates:['hyrox'],
+        href,
+        searchText:lower([sessionType,type.name,type.goal,'HYROX 混合体能 Station 8米 草坪'].filter(Boolean).join(' ')),
+        meta:{sessionType},
+      });
+    }
+    for(const protocolId of data.hyroxBenchmarkProtocolIds||[]){
+      const protocol=data.hyroxBenchmarkProtocols?.[protocolId]||{};
+      items.push({
+        kind:'hyrox-benchmark',
+        id:'hyrox:benchmark:'+protocolId,
+        title:'HYROX Benchmark｜'+protocolId+' '+(protocol.name||''),
+        subtitle:'固定 8 Station · '+(protocol.level||''),
+        templates:['hyrox'],
+        href:'#/coach/hyrox/benchmark/'+protocolId.toLowerCase(),
+        searchText:lower([protocolId,protocol.name,protocol.level,'HYROX Benchmark 基准测试 PB 8 Station'].filter(Boolean).join(' ')),
+        meta:{protocolId},
+      });
+    }
+    return items;
+  }
+
   function buildIndex(){
     const data=D();
     const actions=Object.values(data.actions||{}).map(actionEntry);
@@ -210,6 +243,7 @@
       ...f111CombinationEntries(),
       ...bodyFamilyEntries(),
       ...conditioningEntries(),
+      ...hyroxEntries(),
     ];
   }
 
@@ -250,7 +284,7 @@
 
   function activeTemplateOptions(){
     const data=D();
-    return ACTIVE_TEMPLATES.filter(id=>data.templateRegistry?.[id]?.status==='ACTIVE').map(id=>({
+    return (data.templateIds||[]).filter(id=>data.templateRegistry?.[id]?.status==='ACTIVE').map(id=>({
       id,label:data.templateRegistry[id]?.name||id,shortName:templateLabel(id),
     }));
   }
