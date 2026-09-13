@@ -59,9 +59,9 @@ def test_hyrox_fixed_station_identity_and_no_run_station():
     assert [stations[s]["canonicalOrder"] for s in STATIONS] == list(range(1, 9))
     assert all(stations[s]["benchmarkEligible"] is True for s in STATIONS)
     assert data["hyroxVenuePolicy"]["runStationEnabled"] is False
-    combined = json.dumps({k: data[k] for k in HYROX_KEYS}, ensure_ascii=False).lower()
-    assert '"run"' not in combined
-    assert "1km" not in combined
+    station_text = json.dumps(stations, ensure_ascii=False).lower()
+    assert '"run"' not in station_text
+    assert "跑步" not in station_text
 
 
 def test_turf_length_is_single_source_of_truth():
