@@ -71,7 +71,9 @@ def assert_browser_gate(source: str):
     assert "@playwright/test@1.63.0" in source
     assert "playwright install chromium" in source
     assert "npx playwright test" in source
-    assert "cp -a assets data js _site/" in source
+    assert 'python tools/prepare_static_site.py --dest _site --build-id "$GITHUB_SHA"' in source
+    assert 'grep -q "?v=${GITHUB_SHA:0:8}" _site/index.html' in source
+    assert '! grep -q "__BUILD_ID__" _site/index.html' in source
 
 
 def test_pr_workflow_requires_full_verify_then_browser_gate():
