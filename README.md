@@ -41,7 +41,7 @@ V14 is the information-architecture rebuild of the V13.2 static training system.
 
 - 32 F111 sessions
 - 8 recipe families
-- 30 SUPPORT nodes
+- 31 SUPPORT nodes
 - 20 CORE nodes
 - 168 rendered action-detail cards
 - 192 swap controls

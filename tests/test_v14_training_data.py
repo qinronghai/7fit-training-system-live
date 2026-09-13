@@ -13,7 +13,7 @@ def load_payload():
 def test_training_inventory_is_preserved():
     data = load_payload()
     assert len(data["sessions"]) == 32
-    assert len(data["supportIds"]) == 30
+    assert len(data["supportIds"]) == 31
     assert len(data["coreIds"]) == 20
     assert data["recipeIds"] == [f"F111-{i:02d}" for i in range(1, 9)]
 
@@ -43,7 +43,7 @@ def test_eight_pattern_v11_chains_are_frozen():
 def test_v14_non_regression_inventory():
     data = load_payload()
     assert len(data['sessions']) == 32
-    assert len(data['supportIds']) == 30
+    assert len(data['supportIds']) == 31
     assert len(data['coreIds']) == 20
     assert len(data['eightPatterns']) == 8
     assert len(data['actionDetails']) >= 189
