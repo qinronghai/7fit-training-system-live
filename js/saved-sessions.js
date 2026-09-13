@@ -397,7 +397,7 @@
     try{resolved=window.V15TemplateResolver.resolve('hyrox',input);}
     catch(error){
       const fallback={...input};delete fallback.selections;delete fallback.workOverrides;delete fallback.scaledVariants;
-      try{resolved=window.V15TemplateResolver.resolve('hyrox',fallback);Object.assign(input,fallback);addReason(reasons,'STALE_INPUT');}
+      try{resolved=window.V15TemplateResolver.resolve('hyrox',fallback);delete input.selections;delete input.workOverrides;delete input.scaledVariants;Object.assign(input,fallback);addReason(reasons,'STALE_INPUT');}
       catch(_){return failResult('UNRESTORABLE_HYROX_SESSION',error?.message||'Saved HYROX session is no longer restorable',record);}
     }
     if(record.resolverVersion!==resolved.resolverVersion)addReason(reasons,'RESOLVER_VERSION_MISMATCH');
