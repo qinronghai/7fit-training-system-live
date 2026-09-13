@@ -16,7 +16,7 @@
     L4:Object.freeze(['CA4','CA3','CA2','CA1']),
   });
   const TEMPLATE_TYPES=Object.freeze(['f111','body','conditioning']);
-  const PREP_ROUTES=new Set(['2F PREP','2F_ONLY','FLEX_1F_2F']);
+  const PREP_ROUTES=new Set(['2F PREP','2F_ONLY','FLEX_1F_2F','CONDITIONING_2F']);
   const LOWER_RE=/髋|踝|腘绳|内收|臀|股四|小腿|下肢|后侧链/;
   const UPPER_RE=/胸椎|肩|上背|胸廓|肩胛|肩袖|上肢/;
   const MOBILITY_RE=/活动|伸展|旋转|绕环|捞月/;
@@ -193,13 +193,31 @@
       });
     });
     items.sort((a,b)=>a.gradeRank-b.gradeRank||b.slotScore-a.slotScore||a.curatedPriority-b.curatedPriority||a.prepId.localeCompare(b.prepId));
-    const seen=new Set(),deduped=[];
+    const seen=new Set(),all=[];
     for(const item of items){
       if(seen.has(item.actionId))continue;
-      seen.add(item.actionId);deduped.push(item);
-      if(deduped.length>=Math.max(0,limit))break;
+      seen.add(item.actionId);all.push(item);
     }
-    return deduped;
+
+    const cap=Math.max(0,limit);
+    if(!cap||all.length<=cap)return all.slice(0,cap);
+
+    // Keep downward-compatibility visible inside the capped UI list:
+    // first reserve the best legal candidate from each allowed grade,
+    // then fill remaining positions from the normal deterministic ranking.
+    const picked=new Set();
+    for(const grade of (gradeApi?.allowedGrades?.(ctx.level)||[])){
+      const item=all.find(candidate=>candidate.prepGrade===grade);
+      if(item){
+        picked.add(item.actionId);
+        if(picked.size>=cap)break;
+      }
+    }
+    for(const item of all){
+      if(picked.size>=cap)break;
+      picked.add(item.actionId);
+    }
+    return all.filter(item=>picked.has(item.actionId)).slice(0,cap);
   }
 
   function resolve(inputContext,{selections={}}={}){

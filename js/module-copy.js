@@ -21,7 +21,7 @@
     const d=D(),a=d.actions?.[actionId]||{};
     let v=d.actionDetails?.[actionId]?.fields?.['来源处方 / RPE'];
     if(!v&&a.sourceActionId)v=d.actionDetails?.[a.sourceActionId]?.fields?.['来源处方 / RPE'];
-    if(!v){
+    if(!v&&!a.isSupport&&!a.isCore){
       const w=Object.values(d.warmupDetails||{}).find(x=>x.actionId===actionId);if(w)v=w.prescription;
     }
     if(!v){

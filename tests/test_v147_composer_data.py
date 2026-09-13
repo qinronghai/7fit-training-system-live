@@ -44,11 +44,11 @@ def test_single_leg_mode_has_two_branches_without_adding_eleventh_pattern():
     assert branches['single_leg_hinge']['ids']==d['singleLegHingeIds']
 
 
-def test_runtime_anatomy_expands_to_243_and_covers_new_chain():
+def test_runtime_anatomy_covers_current_action_inventory_and_new_chain():
     d=load_js_json('data/system-data.js','V14_DATA')
     a=load_js_json('data/anatomy-data.js','V14_ANATOMY')
-    assert len(d['actions'])==243
-    assert len(a['records'])==243
+    assert len(d['actions'])>=243
+    assert len(a['records'])==len(d['actions'])
     assert set(d['singleLegHingeIds']) <= set(a['records'])
     for action_id in d['singleLegHingeIds']:
         rec=a['records'][action_id]

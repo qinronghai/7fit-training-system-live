@@ -156,7 +156,6 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
     expected = {
         "support": (30, ["ids", "details"]),
         "core": (20, ["ids", "details"]),
-        "prep": (20, ["ids", "details", "matchByPattern"]),
         "foam": (12, ["ids", "details", "matchByPattern"]),
     }
     for name, (count, required) in expected.items():
@@ -165,6 +164,13 @@ def test_collection_schemas_freeze_inventory_and_minimum_fields():
         assert schema["properties"]["ids"]["minItems"] == count
         assert schema["properties"]["ids"]["maxItems"] == count
         assert schema["properties"]["ids"]["uniqueItems"] is True
+
+    prep = load_schema_json("prep")
+    assert prep["required"] == ["ids", "details", "matchByPattern"]
+    assert prep["properties"]["ids"]["minItems"] == 52
+    assert "maxItems" not in prep["properties"]["ids"]
+    assert prep["properties"]["ids"]["uniqueItems"] is True
+
     for name in ("prep", "foam"):
         match_schema = load_schema_json(name)["properties"]["matchByPattern"]
         assert match_schema["minProperties"] == 8

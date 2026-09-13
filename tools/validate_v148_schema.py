@@ -193,12 +193,14 @@ def validate_payload(data: dict) -> list[str]:
         "recipeIds": (data.get("recipeIds", []), 8),
         "supportIds": (data.get("supportIds", []), 30),
         "coreIds": (data.get("coreIds", []), 20),
-        "warmupIds": (data.get("warmupIds", []), 20),
         "foamRollIds": (data.get("foamRollIds", []), 12),
     }
     for name, (collection, expected) in expected_counts.items():
         if len(collection) != expected:
             errors.append(f"{name}: expected {expected}, got {len(collection)}")
+
+    if len(data.get("warmupIds", [])) < 52:
+        errors.append(f"warmupIds: expected at least 52, got {len(data.get('warmupIds', []))}")
 
     # Session identity, exact slot set, references and venue route legality.
     for session_key, session in sorted(sessions.items()):
