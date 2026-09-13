@@ -85,6 +85,20 @@
   }
 
   function roleName(role){return D().bodyRoles?.[role]?.name||role||'动作';}
+  const SLOT_DISPLAY=Object.freeze({
+    PRIMARY:{label:'主项',group:'主训练'},
+    SECONDARY:{label:'次主项',group:'主训练'},
+    ACCESSORY:{label:'辅助复合',group:'辅助训练'},
+    'ISOLATION-1':{label:'孤立 1',group:'孤立 / 补充'},
+    'ISOLATION-2':{label:'孤立 2',group:'孤立 / 补充'},
+    OPTIONAL:{label:'可选补充',group:'孤立 / 补充'},
+  });
+  function slotDisplay(slotKey,role){
+    return SLOT_DISPLAY[slotKey]||{label:roleName(role),group:'训练动作'};
+  }
+  function targetNames(ids){
+    return (ids||[]).map(id=>D().bodyTargetCatalog?.[id]?.name||id).filter(Boolean);
+  }
   function resolvedSelectionMap(session){
     return Object.fromEntries((session?.main?.content||[]).map(slot=>[slot.key,{actionId:slot.actionId,source:slot.source}]));
   }
@@ -104,13 +118,24 @@
   }
 
   function slotCard(ctx,slot){
-    const session=ctx.session,domain=session.domainContext?.slots?.[slot.key]||{};
-    return `<article class="body-slot-card" data-body-slot="${esc(slot.key)}">
-      <div class="body-slot-head"><div><span>${esc(slot.key)}</span><h3>${esc(roleName(domain.role))}</h3></div><small>${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
-      <div class="body-slot-action"><b>${esc(slot.name)}</b><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div>
-      <div class="body-prescription-grid"><div><small>Sets</small><b>${esc(domain.workingSets??'—')}</b></div><div><small>Reps</small><b>${esc(rangeText(domain.repRange))}</b></div><div><small>RIR</small><b>${esc(rangeText(domain.rirRange))}</b></div><div><small>Rest</small><b>${esc(rangeText(domain.restSecondsRange,' 秒'))}</b></div></div>
+    const session=ctx.session,domain=session.domainContext?.slots?.[slot.key]||{},display=slotDisplay(slot.key,domain.role);
+    const targets=targetNames(domain.directTargets);
+    return `<article class="body-slot-card body-slot-${esc(String(slot.key).toLowerCase().replace(/[^a-z0-9]+/g,'-'))}" data-body-slot="${esc(slot.key)}">
+      <div class="body-slot-head"><div><span>${esc(display.group)}</span><h3>${esc(display.label)}</h3></div><small>${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
+      <div class="body-slot-action"><b>${esc(slot.name)}</b><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">动作详情</a></div>
+      <div class="body-slot-targets"><span>主要刺激</span><b>${esc(targets.join(' · ')||'—')}</b></div>
+      <div class="body-prescription-grid"><div><small>工作组</small><b>${esc(domain.workingSets??'—')}</b></div><div><small>次数</small><b>${esc(rangeText(domain.repRange))}</b></div><div><small>RIR</small><b>${esc(rangeText(domain.rirRange))}</b></div><div><small>组间休息</small><b>${esc(rangeText(domain.restSecondsRange,' 秒'))}</b></div></div>
       ${slotSelect(ctx,slot)}
     </article>`;
+  }
+
+  function trainingGroup(ctx,key,title,subtitle,slotKeys){
+    const slots=(ctx.session.main.content||[]).filter(slot=>slotKeys.includes(slot.key));
+    if(!slots.length)return '';
+    return `<section class="body-training-group body-training-group-${esc(key)}" data-body-group="${esc(key)}">
+      <div class="body-training-group-head"><div><span>BODY PROGRAM</span><h3>${esc(title)}</h3><p>${esc(subtitle)}</p></div><small>${slots.length} 个动作</small></div>
+      <div class="body-slot-grid body-slot-grid-${esc(key)}">${slots.map(slot=>slotCard(ctx,slot)).join('')}</div>
+    </section>`;
   }
 
   function anatomy(session){
@@ -133,7 +158,12 @@
   function renderEditor(ctx){
     const session=ctx.session;
     const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
-    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head"><div><h2>今日训练重点</h2><p>${esc(session.summary)}</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}<div class="body-slot-grid">${session.main.content.map(slot=>slotCard(ctx,slot)).join('')}</div><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
+    const groups=[
+      trainingGroup(ctx,'main','主训练｜主项 + 次主项','优先完成当日核心刺激；两个动作应形成负荷路径或角度互补，而不是同一动作的不同版本。',['PRIMARY','SECONDARY']),
+      trainingGroup(ctx,'accessory','辅助训练','补齐主要目标肌群或动作结构，不重复主项动作家族。',['ACCESSORY']),
+      trainingGroup(ctx,'isolation','孤立 / 补充','用较低全身疲劳完成局部刺激；L3–L4 可按时间与恢复加入可选补充。',['ISOLATION-1','ISOLATION-2','OPTIONAL']),
+    ].join('');
+    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head body-editor-head"><div><span class="body-editor-kicker">BODY SESSION</span><h2>今日训练结构</h2><p>${esc(session.summary)}｜先主项，再辅助，最后孤立补量。</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${anatomy(session)}${M.BodyVolumeView.render(session)}${conflict(session)}${groups}<div class="session-toolbar body-session-actions"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
     return `${prepHtml}${editor}${recovery()}`;
   }
 
