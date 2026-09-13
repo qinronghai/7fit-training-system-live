@@ -193,7 +193,7 @@ def validate_payload(data: dict) -> list[str]:
         "recipeIds": (data.get("recipeIds", []), 8),
         "supportIds": (data.get("supportIds", []), 30),
         "coreIds": (data.get("coreIds", []), 20),
-        "warmupIds": (data.get("warmupIds", []), 20),
+        "warmupIds": (data.get("warmupIds", []), 30),
         "foamRollIds": (data.get("foamRollIds", []), 12),
     }
     for name, (collection, expected) in expected_counts.items():
