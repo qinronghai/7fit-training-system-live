@@ -100,7 +100,7 @@ def test_prep_and_foam_anatomy_are_complete_and_mapped():
         action_id = item["actionId"]
         assert records.get(action_id), action_id
         assert records[action_id]["roleType"] in {
-            "support_core", "activation", "mobility", "stretch"
+            "support_core", "activation", "mobility", "stretch", "strength", "conditioning"
         }
 
     for item in base["foamRollDetails"].values():
