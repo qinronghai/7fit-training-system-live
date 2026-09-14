@@ -46,4 +46,3 @@ for(const familyId of D.bodyFamilyIds){
   assert.deepStrictEqual(Object.keys(family.levelPools),['L1','L2','L3','L4']);
   assert(Object.keys(family.progressionChains).length>=2,`${familyId} progression chains missing`);
 }
-
