@@ -10,7 +10,7 @@ for(const file of [
 ]) load(file);
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
-const EXPECTED_SHA='8fa0030bfc1b1bfa658ad60ecca0287e0f3a09cc13f4314de3ad74b59eefdf3a';
+const EXPECTED_SHA='b4faf6725508050aa8567d00fcbed147af7c5cbb3059c23835d594e96a5962a5';
 const families=['BODY-01','BODY-02','BODY-03','BODY-04'],levels=['L1','L2','L3','L4'];
 const expectedSlots={L1:5,L2:5,L3:6,L4:6};
 const expectedSets={L1:10,L2:12,L3:14,L4:16};
@@ -76,5 +76,5 @@ for(const familyId of families){
 
 const sha=crypto.createHash('sha256').update(JSON.stringify(signatures)).digest('hex');
 console.log(`BODY_RESOLVER_BASELINE_SHA=${sha}`);
-assert.strictEqual(sha,EXPECTED_SHA,'Body Resolver #92 capability 16-state baseline drifted');
-console.log('body_resolver_baseline_test: #92 capability 16-state baseline GREEN');
+assert.strictEqual(sha,EXPECTED_SHA,'Body Resolver #93 Family-level pool 16-state baseline drifted');
+console.log('body_resolver_baseline_test: #93 Family-level pool 16-state baseline GREEN');
