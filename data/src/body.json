@@ -1352,6 +1352,7 @@
             "tunqiao",
             "tun_tui",
             "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
             "movement_dowel_hip_hinge"
           ],
           "introducedActionIds": [
@@ -1364,6 +1365,7 @@
             "tunqiao",
             "tun_tui",
             "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
             "movement_dowel_hip_hinge"
           ],
           "retainedActionIds": [],
@@ -1437,7 +1439,6 @@
             "yaling_luomaniya_yingla",
             "backext_load_main",
             "dileigan_hinge",
-            "movement_supported_single_leg_hinge",
             "movement_supported_db_single_leg_rdl"
           ],
           "retainedActionIds": [
@@ -1450,6 +1451,7 @@
             "tunqiao",
             "tun_tui",
             "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
             "movement_dowel_hip_hinge"
           ],
           "downwardCompatibleLevels": [
@@ -3893,6 +3895,7 @@
         "BODY-02"
       ],
       "levels": [
+        "L1",
         "L2",
         "L3",
         "L4"
