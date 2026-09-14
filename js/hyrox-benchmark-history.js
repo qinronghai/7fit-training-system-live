@@ -136,6 +136,21 @@
     const x=(store.records||[]).find(r=>r.recordId===recordId);
     return x?clone(x):null;
   }
+  function stationHistory(stationId,filters={}){
+    const id=String(stationId||'').toUpperCase();
+    if(!/^H[1-8]$/.test(id))return [];
+    return list(filters).map(function(record){
+      const station=(record.stationResults||[]).find(x=>x.stationId===id);
+      if(!station)return null;
+      return {
+        recordId:record.recordId,completedAt:record.completedAt,protocolId:record.protocolId,
+        comparisonKey:record.comparisonKey,validityStatus:record.validityStatus,
+        stationId:id,timeMs:station.timeMs,workPrescription:clone(station.workPrescription),
+        effectiveLoad:clone(station.effectiveLoad),sledCalibrationVersion:station.sledCalibrationVersion,
+        scaledVariant:station.scaledVariant
+      };
+    }).filter(Boolean);
+  }
   function eligible(record){
     return !!record&&!record.legacy&&ELIGIBLE_STATUSES.has(record.validityStatus)&&isCriticalRecordComplete(record);
   }
@@ -319,7 +334,7 @@
   load();
 
   window.V15HyroxBenchmarkHistory={
-    STORAGE_KEY,schemaVersion,getLoadStatus,snapshot,list,get,saveFromSession,remove,restoreRecord,
+    STORAGE_KEY,schemaVersion,getLoadStatus,snapshot,list,get,stationHistory,saveFromSession,remove,restoreRecord,
     analyzeRecord,contextForSession,parseTimeText,formatTimeMs,formatDeltaMs,clear,
   };
 })();
