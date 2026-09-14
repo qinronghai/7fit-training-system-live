@@ -35,7 +35,7 @@ const session=R.resolve('hyrox',{sessionType:'BENCHMARK',level:'L3',benchmarkPro
 
 H.clear();
 assert.strictEqual(H.exportData().schemaVersion,1);
-assert.deepStrictEqual(H.list({}),[]);
+assert.deepStrictEqual(plain(H.list({})),[]);
 
 const firstTimes={H1:120000,H2:90000,H3:100000,H4:110000,H5:125000,H6:80000,H7:90000,H8:100000};
 const first=H.saveSessionResult(session,{
