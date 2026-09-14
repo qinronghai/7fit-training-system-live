@@ -57,8 +57,8 @@
     if(p.benchmark){
       const H=window.V15HyroxBenchmarkHistory,h=p.benchmarkHistory;
       if(h?.latest){
-        lines.push('','【Benchmark 成绩】','会员：'+clean(h.athleteRef),'本次：'+H.formatDuration(h.latest.totalTimeMs||0)+'｜'+clean(h.latest.validityStatus));
-        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious)+'｜PB：'+H.formatDuration(h.summary.pb?.totalTimeMs||0));
+        lines.push('','【Benchmark 成绩】','会员：'+clean(h.athleteRef),'本次：'+H.formatDuration(h.latest.totalTimeMs)+'｜'+clean(h.latest.validityStatus));
+        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious)+'｜PB：'+H.formatDuration(h.summary.pb?.totalTimeMs));
         (h.latest.stationResults||[]).forEach(function(s){if(s.timeMs)lines.push('- '+clean(s.stationId)+' '+clean((D().hyroxStations?.[s.stationId]||{}).zhName||s.stationId)+'｜'+H.formatDuration(s.timeMs));});
         if(h.recommendation?.message)lines.push('下一阶段：'+clean(h.recommendation.message));
       }else lines.push('','本次 Benchmark 成绩：待记录');
@@ -74,8 +74,8 @@
     if(p.benchmark){
       const H=window.V15HyroxBenchmarkHistory,h=p.benchmarkHistory;
       if(h?.latest){
-        lines.push('','【本次 Benchmark】','会员：'+clean(h.athleteRef),'本次成绩：'+H.formatDuration(h.latest.totalTimeMs||0));
-        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious),'PB：'+H.formatDuration(h.summary.pb?.totalTimeMs||0));
+        lines.push('','【本次 Benchmark】','会员：'+clean(h.athleteRef),'本次成绩：'+H.formatDuration(h.latest.totalTimeMs));
+        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious),'PB：'+H.formatDuration(h.summary.pb?.totalTimeMs));
         if(h.recommendation?.message)lines.push('下一阶段重点：'+clean(h.recommendation.message));
       }else lines.push('','本次成绩：待记录');
       lines.push('只有训练规格与负重一致时，才与上次成绩直接比较。');
