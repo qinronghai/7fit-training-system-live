@@ -52,6 +52,7 @@ assert.strictEqual(second.analysis.previous.recordId,'r1');
 assert.strictEqual(second.analysis.deltaPreviousMs,44*1000);
 assert.strictEqual(second.analysis.pb.recordId,'r2');
 assert.strictEqual(second.analysis.stationDeltas.H1,5000);
+assert.strictEqual(H.stationHistory('H1',{comparisonKey:s1.domainContext.benchmarkContext.comparisonKey}).length,2);
 assert(second.analysis.abilityProfile.weakestGroup);
 assert(second.analysis.abilityProfile.recommendation?.hint);
 
@@ -66,6 +67,7 @@ const changed=H.saveFromSession(changedLoad,{recordId:'load-change',completedAt:
 assert.strictEqual(changed.record.validityStatus,'VALID_NEW_BASELINE');
 assert.strictEqual(changed.analysis.previous,null);
 assert.strictEqual(H.contextForSession(changedLoad).sameKeyRecords.length,1);
+assert.strictEqual(H.list({comparisonKey:s1.domainContext.benchmarkContext.comparisonKey}).filter(x=>['VALID_NEW_BASELINE','VALID_COMPARABLE'].includes(x.validityStatus)).length,3);
 
 const changedWork=session(R,{workOverrides:{H1:550}});
 const workChanged=H.saveFromSession(changedWork,{recordId:'work-change',completedAt:'2026-09-12T10:00:00+08:00',totalTimeMs:29*60*1000,stationTimes:times(107)});
