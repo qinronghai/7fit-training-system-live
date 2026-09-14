@@ -203,31 +203,33 @@
   }
 
   function slotSelect(ctx,slot){
-    const result=window.V15BodyResolver.candidates({
-      familyId:ctx.familyId,
-      level:ctx.level,
-      slotKey:slot.key,
-      currentSelections:resolvedSelectionMap(ctx.session),
-    });
+    const result=candidateResult(ctx,slot.key);
     const candidates=result.candidates||[];
     const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
-    const recommended=candidates[0]||null;
-    const reasonText=(recommended?.reasons||[]).slice(0,2).map(item=>item.text).filter(Boolean).join('；');
-    const tradeoffText=(recommended?.tradeoffs||[]).slice(0,1).map(item=>item.text).filter(Boolean).join('；');
-    const recommendation=recommended?`<div class="body-recommendation-note" data-body-recommendation="${esc(slot.key)}" data-score="${esc(recommended.recommendationScore)}"><b>推荐：${esc(recommended.name)} · ${esc(recommended.recommendationScore)} 分</b><span>${esc(reasonText||'当前 Session 综合匹配度最高')}</span>${tradeoffText?`<small>注意：${esc(tradeoffText)}</small>`:''}</div>` : '';
+    const current=candidates.find(candidate=>candidate.actionId===slot.actionId)||null;
+    const currentScore=Number(current?.recommendationScore||0);
+    const candidateCards=candidates.slice(0,4).map((candidate,index)=>{
+      const status=index===0?'推荐':candidate.tradeoffs?.length?'有代价':'可选';
+      const reasons=(candidate.reasons||[]).slice(0,2).map(item=>item.text).filter(Boolean);
+      const tradeoffs=(candidate.tradeoffs||[]).slice(0,1).map(item=>item.text).filter(Boolean);
+      const targets=targetNames(candidate.directTargets).slice(0,3);
+      const better=Number(candidate.recommendationScore)>currentScore&&candidate.actionId!==slot.actionId;
+      return `<article class="body-candidate-card ${esc(status==='推荐'?'recommended':status==='有代价'?'tradeoff':'optional')}" data-body-candidate-card data-action-id="${esc(candidate.actionId)}"><div class="body-candidate-top"><div><span>${esc(status)}</span><b>${esc(candidate.name)}</b></div><strong>${esc(candidate.recommendationScore)} 分</strong></div><p>主要刺激：${esc(targets.join(' · ')||'目标未标')}</p><small>${esc(reasons.join('；')||'符合当前槽位的合法候选')}</small>${better&&reasons[0]?`<em>为什么更合适：${esc(reasons[0])}</em>`:''}${tradeoffs.length?`<em class="warning">注意：${esc(tradeoffs.join('；'))}</em>`:''}<button type="button" data-body-candidate data-body-slot="${esc(slot.key)}" data-action-id="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'disabled':''}>${candidate.actionId===slot.actionId?'当前动作':'换成此动作'}</button></article>`;
+    }).join('');
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
     const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
-    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${recommendation}${quick}`;
+    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label><details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${quick}</div>`;
   }
 
   function slotCard(ctx,slot){
     const session=ctx.session,domain=session.domainContext?.slots?.[slot.key]||{};
     const action=D().actions?.[slot.actionId]||{},meta=D().bodyActionMeta?.[slot.actionId]||{};
     const targets=targetNames(meta.directTargets);
-    return `<article class="body-slot-card body-slot-${slotKind(slot.key)}" data-body-slot="${esc(slot.key)}">
-      <div class="body-slot-head"><div><span>${esc(slot.key)}</span><h3>${esc(roleName(domain.role))}</h3></div><small>${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
-      <div class="body-slot-action"><div><b>${esc(slot.name)}</b><div class="body-action-tags"><span>${esc(action.pattern||'动作模式未标')}</span><span>${esc(targets.join(' · ')||'目标肌群未标')}</span></div></div><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div>
-      <div class="body-prescription-grid"><div><small>组数</small><b>${esc(domain.workingSets??'—')}</b></div><div><small>次数</small><b>${esc(rangeText(domain.repRange))}</b></div><div><small>RIR</small><b>${esc(rangeText(domain.rirRange))}</b></div><div><small>休息</small><b>${esc(rangeText(domain.restSecondsRange,' 秒'))}</b></div></div>
+    const duty=slotDuty(ctx,slot);
+    return `<article class="body-slot-card body-slot-${slotKind(slot.key)} ${slot.key==='PRIMARY'?'body-slot-primary':''}" data-body-slot="${esc(slot.key)}">
+      <div class="body-slot-head"><div><span class="body-coach-role">${esc(coachRoleLabel(slot.key))}</span><span class="body-system-role">${esc(slot.key)}</span></div><small>${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
+      <div class="body-slot-action"><div><h3>${esc(slot.name)}</h3><p class="body-slot-duty">今日职责：${esc(duty)}</p><div class="body-action-tags"><span>${esc(action.pattern||'动作模式未标')}</span><span>主要刺激：${esc(targets.join(' · ')||'目标肌群未标')}</span></div></div><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div>
+      <div class="body-prescription-compact"><b>${esc(domain.workingSets??'—')} × ${esc(rangeText(domain.repRange))}</b><span>RIR ${esc(rangeText(domain.rirRange))}</span><span>休息 ${esc(rangeText(domain.restSecondsRange,' 秒'))}</span></div>
       ${slotSelect(ctx,slot)}
     </article>`;
   }
