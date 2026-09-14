@@ -20,7 +20,8 @@ def test_body_candidate_whitelist_is_curated_and_reference_safe():
     body = load("body.json")
     actions = load("actions.json")["actions"]
     candidates = body["bodyActionMeta"]
-    assert 40 <= len(candidates) <= 60
+    assert 40 <= len(candidates) <= 72
+    assert len(candidates) == 68
 
     valid_families = set(body["bodyFamilyIds"])
     valid_roles = set(body["bodyRoleIds"])
