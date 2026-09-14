@@ -130,3 +130,57 @@ test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',a
   await expect390NoOverflow(page);
   expect(errors,`unexpected Body workflow pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
+
+
+test('Body Compatibility Score reranks and exposes recommendation facts after a manual swap',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/body/body-03/l3');
+
+  await expect(page.locator('.body-recommendation-note')).toHaveCount(6);
+  const before=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    const selections=Object.fromEntries(ctx.session.main.content.map(item=>[item.key,item.actionId]));
+    const result=window.V15BodyResolver.candidates({
+      familyId:ctx.familyId,level:ctx.level,slotKey:'SECONDARY',currentSelections:selections
+    });
+    return result.candidates.map(item=>({
+      actionId:item.actionId,score:item.recommendationScore,reasons:item.reasons,tradeoffs:item.tradeoffs
+    }));
+  });
+  expect(before.length).toBeGreaterThan(0);
+  expect(Number.isFinite(before[0].score)).toBeTruthy();
+  expect(before[0].reasons.length).toBeGreaterThan(0);
+
+  const primary=page.locator('.body-slot-card[data-body-slot="PRIMARY"] .body-slot-select');
+  const current=await primary.inputValue();
+  const alternatives=await primary.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value).filter(Boolean));
+  const target=alternatives.find(value=>value!==current);
+  expect(target,'BODY-03 L3 needs an alternate PRIMARY').toBeTruthy();
+  await primary.selectOption(target);
+  await expect(page.locator('.body-slot-card[data-body-slot="PRIMARY"] .body-slot-select')).toHaveValue(target);
+
+  const after=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    const selections=Object.fromEntries(ctx.session.main.content.map(item=>[item.key,item.actionId]));
+    const result=window.V15BodyResolver.candidates({
+      familyId:ctx.familyId,level:ctx.level,slotKey:'SECONDARY',currentSelections:selections
+    });
+    return result.candidates.map(item=>({
+      actionId:item.actionId,score:item.recommendationScore,reasons:item.reasons,tradeoffs:item.tradeoffs
+    }));
+  });
+
+  expect(after.length).toBeGreaterThan(0);
+  expect(after[0].reasons.length).toBeGreaterThan(0);
+  expect(JSON.stringify(after)).not.toBe(JSON.stringify(before));
+  const note=page.locator('.body-recommendation-note[data-body-recommendation="SECONDARY"]');
+  await expect(note).toBeVisible();
+  await expect(note).toContainText('推荐：');
+  const score=Number(await note.getAttribute('data-score'));
+  expect(Number.isFinite(score)).toBeTruthy();
+  await expect390NoOverflow(page);
+  expect(errors,`unexpected Body compatibility pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+});
