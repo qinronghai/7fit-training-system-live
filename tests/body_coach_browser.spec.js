@@ -155,9 +155,11 @@ test('Body Compatibility Score reranks and exposes recommendation facts after a 
 
   const primary=page.locator('.body-slot-card[data-body-slot="PRIMARY"] .body-slot-select');
   const current=await primary.inputValue();
+  const currentPattern=await page.evaluate(actionId=>window.V14_DATA.actions?.[actionId]?.pattern||'',current);
   const alternatives=await primary.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value).filter(Boolean));
-  const target=alternatives.find(value=>value!==current);
-  expect(target,'BODY-03 L3 needs an alternate PRIMARY').toBeTruthy();
+  const desired=currentPattern==='水平拉'?'gaowei_xiala_vba':'feiji_labei_zhongba';
+  const target=alternatives.includes(desired)?desired:alternatives.find(value=>value!==current);
+  expect(target,'BODY-03 L3 needs an opposite-direction PRIMARY').toBeTruthy();
   await primary.selectOption(target);
   await expect(page.locator('.body-slot-card[data-body-slot="PRIMARY"] .body-slot-select')).toHaveValue(target);
 
