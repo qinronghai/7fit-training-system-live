@@ -949,26 +949,29 @@
   "hyroxBenchmarkResultContract": {
     "schemaVersion": 1,
     "requiredFields": [
+      "recordId",
+      "schemaVersion",
+      "profileRef",
       "completedAt",
       "protocolId",
       "protocolVersion",
       "level",
+      "comparisonKey",
       "totalTimeMs",
       "stationResults",
-      "comparisonKey"
+      "validityStatus"
     ],
     "stationRequiredFields": [
       "stationId",
-      "timeMs",
-      "work",
-      "load"
+      "workPrescription",
+      "effectiveLoad",
+      "timeMs"
     ],
     "optionalFields": [
       "rpe",
       "notes",
       "sledCalibrationVersion",
-      "scaledVariant",
-      "validityStatus"
+      "scaledVariant"
     ],
     "validityStatuses": [
       "VALID_COMPARABLE",
