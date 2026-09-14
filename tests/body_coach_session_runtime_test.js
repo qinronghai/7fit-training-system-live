@@ -20,17 +20,37 @@ assert(M.BodyVolumeView&&typeof M.BodyVolumeView.render==='function','BodyVolume
 assert(M.BodySession&&typeof M.BodySession.context==='function'&&typeof M.BodySession.render==='function','BodySession context/render must exist');
 
 const home=M.BodyHome.render();
+assert(home.includes('6 个正式训练模式'),'Body home must explain six formal modes');
+assert.strictEqual((home.match(/data-body-mode="/g)||[]).length,6,'Body home must render six mode cards');
+assert(home.includes('进入 Body 自由编课'),'Body home main composer CTA missing');
 for(const familyId of D.bodyFamilyIds){
   const family=D.bodyFamilies[familyId];
   assert(home.includes(familyId),`${familyId} card missing`);
   assert(home.includes(family.name),`${familyId} name missing`);
-  for(const level of ['L1','L2','L3','L4'])assert(home.includes(`#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}`),`${familyId} ${level} link missing`);
+  assert(home.includes(`#/coach/body/${familyId.toLowerCase()}`),`${familyId} Family entry missing`);
+  assert(!home.includes(`#/coach/body/${familyId.toLowerCase()}/l1`),`${familyId} must not expose Level links on home`);
   for(const targetId of family.primaryTargets){
     const targetName=D.bodyTargetCatalog[targetId].name;
     assert(home.includes(targetName),`${familyId} primary target ${targetName} missing`);
   }
 }
+for(const modeId of D.bodyTrainingModeIds){
+  const mode=D.bodyTrainingModes[modeId];
+  assert(home.includes(mode.name),`${modeId} name missing`);
+  assert(home.includes(mode.useCase),`${modeId} use case missing`);
+  assert(home.includes(mode.actionLibraryRule),`${modeId} action library relationship missing`);
+}
 assert(home.includes('#/coach/body/compose?family=BODY-01&level=L1'),'Body composer entry missing');
+
+for(const familyId of D.bodyFamilyIds){
+  const detail=M.BodyHome.renderFamily({templateId:'body',page:'template-family',familyId});
+  assert(detail.includes(D.bodyFamilies[familyId].name),`${familyId} Family detail heading missing`);
+  for(const level of ['L1','L2','L3','L4']){
+    assert(detail.includes(`#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}`),`${familyId} ${level} detail link missing`);
+    assert(detail.includes(D.bodyLevelPolicies[level].name),`${familyId} ${level} policy name missing`);
+    assert(detail.includes(D.bodyLevelPolicies[level].abilityIntent),`${familyId} ${level} ability intent missing`);
+  }
+}
 
 const expectedSlots={L1:5,L2:5,L3:6,L4:6};
 for(const familyId of D.bodyFamilyIds){
@@ -67,6 +87,7 @@ for(const familyId of D.bodyFamilyIds){
 const adapter=M.TemplateUI.get('body');
 assert(adapter,'Body Template UI adapter must register');
 assert.strictEqual(adapter.canHandle({page:'template',templateId:'body'}),true);
+assert.strictEqual(adapter.canHandle({page:'template-family',templateId:'body'}),true);
 assert.strictEqual(adapter.canHandle({page:'template-session',templateId:'body'}),true);
 assert.strictEqual(adapter.canHandle({page:'template-compose',templateId:'body'}),true,'Body adapter must own template-compose');
 assert.strictEqual(adapter.canHandle({page:'template',templateId:'conditioning'}),false);
