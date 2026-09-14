@@ -9,8 +9,58 @@
     if(item.type==='core')return 'L1–L4 + Core Demand';
     return 'T1–T4';
   }
+  function auxiliaryClassSummary(catalog,api){
+    const order=['fixed_machine','cable_station','free_weight','bodyweight','other','unknown'];
+    return order.filter(key=>catalog.classCounts?.[key]).map(key=>`${api.equipmentClassLabel(key)} ${catalog.classCounts[key]}`).join(' · ')||'待补齐';
+  }
+  function auxiliaryIndex(data){
+    const api=window.V14AuxiliaryModules;if(!api)return '';
+    const upper=api.catalog('upper'),lower=api.catalog('lower');
+    const card=(catalog,side,subtitle)=>`<a class="knowledge-card auxiliary-module-card" href="#/system/patterns?focus=${catalog.moduleId}">
+      <span>${esc(catalog.eyebrow)}</span><h3>${esc(catalog.title)}</h3><p>${esc(subtitle)}</p>
+      <div class="auxiliary-index-facts"><b>${catalog.total} 个唯一动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
+      <footer>查看模块 →</footer>
+    </a>`;
+    return `<section class="section-card auxiliary-index"><div class="section-head"><div><h2>辅助动作模块</h2><p>模块内容直接来自 Composer D1 / D2 辅助动作池；动作变更后，数量、来源与器械分类会随数据重新生成。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','按水平 / 垂直拉推动作池查看 D2 上肢辅助动作。')}${card(lower,'lower','按下肢动作池查看 D1 辅助动作，并明确区分固定器械与绳索 / 龙门架辅助。')}</div></section>`;
+  }
+  function auxiliaryCard(entry,cfg,systemMode,api){
+    const action=entry.action||{};
+    const detail=entry.detailState||{complete:false,missing:[],fields:{}};
+    const sourceTags=entry.sourcePools.map(pool=>`<span class="auxiliary-pool-tag" data-aux-pool="${esc(pool.key)}">${esc(pool.label)}</span>`).join('');
+    const preview=detail.complete?`<div class="auxiliary-detail-preview"><div><small>训练目标</small><p>${esc(detail.fields['训练目标'])}</p></div><div><small>教练口令</small><p>${esc(detail.fields['教练口令'])}</p></div></div>`:`<p class="auxiliary-detail-pending">待补齐：${esc(detail.missing?.join('、')||'动作详情')}</p>`;
+    const modeMeta=systemMode?`<div class="auxiliary-mode-meta"><div><small>标准 ID</small><b>${esc(entry.id)}</b></div><div><small>equipmentClass</small><b>${esc(entry.equipmentClass)}</b></div><div><small>数据源</small><b>${esc(cfg.sourceLabel)}</b></div></div>`:'';
+    return `<article class="auxiliary-action-card" data-aux-entry="${esc(entry.id)}" data-aux-pools="${esc(entry.sourcePoolKeys.join(','))}" data-aux-equipment-class="${esc(entry.equipmentClass)}">
+      <div class="auxiliary-card-eyebrow"><span>${esc(action.pattern||'辅助动作')}</span><span class="auxiliary-detail-status ${detail.complete?'is-ready':'is-pending'}">${detail.complete?'详情已录入':'动作详情待补齐'}</span></div>
+      <h3>${esc(action.name||entry.id)}</h3>
+      <div class="auxiliary-card-facts"><div><small>器械</small><b>${esc(action.equipment||'—')}</b></div><div><small>分类</small><b>${esc(api.equipmentClassLabel(entry.equipmentClass))}</b></div><div><small>路由</small><b>${esc(action.routeLabel||action.route||'—')}</b></div><div><small>状态</small><b>${esc(action.status||'—')}</b></div></div>
+      <div class="auxiliary-pool-tags"><small>来源动作池</small><div>${sourceTags||'<span class="empty-inline">—</span>'}</div></div>
+      ${preview}${modeMeta}<a class="text-link auxiliary-detail-link" href="#/library?focus=${encodeURIComponent(entry.id)}">查看动作详情 →</a>
+    </article>`;
+  }
+  function auxiliaryModule(route,side){
+    const api=window.V14AuxiliaryModules;if(!api)return '';
+    const cfg=api.configs[side],catalog=api.catalog(side),systemMode=window.V14State?.getMode?.()==='system';
+    const pool=String(route.query?.pool||''),equipmentClass=String(route.query?.equipmentClass||'');
+    const classKeys=side==='lower'?['fixed_machine','cable_station']:['fixed_machine','cable_station','free_weight'];
+    const poolOptions=cfg.poolKeys.map(key=>`<option value="${esc(key)}" ${pool===key?'selected':''}>${esc(cfg.poolLabels[key])}</option>`).join('');
+    const classOptions=classKeys.filter(key=>catalog.classCounts?.[key]).map(key=>`<option value="${esc(key)}" ${equipmentClass===key?'selected':''}>${esc(api.equipmentClassLabel(key))}</option>`).join('');
+    const poolSummary=`<div class="auxiliary-pool-overview">${cfg.poolKeys.map(key=>{const count=catalog.entries.filter(entry=>entry.sourcePoolKeys.includes(key)).length;return `<button type="button" class="auxiliary-pool-chip" data-aux-pool-button="${esc(key)}" aria-pressed="${pool===key?'true':'false'}"><span>${esc(cfg.poolLabels[key])}</span><b>${count} 个</b></button>`;}).join('')}</div>`;
+    const cards=side==='lower'?classKeys.filter(key=>catalog.classCounts?.[key]).map(key=>`<section class="auxiliary-subgroup" data-auxiliary-subgroup="${esc(key)}"><div class="auxiliary-subgroup-head"><div><h3>${esc(api.equipmentClassLabel(key))}</h3><p>${key==='fixed_machine'?'固定器械动作：腿部固定器械与髋内收外展器械。':'绳索 / 龙门架辅助：保留在 D1 辅助池中，但不伪装成固定器械。'}</p></div><b>${catalog.classCounts[key]} 个</b></div><div class="auxiliary-action-grid">${catalog.entries.filter(entry=>entry.equipmentClass===key).map(entry=>auxiliaryCard(entry,cfg,systemMode,api)).join('')}</div></section>`).join(''):catalog.entries.map(entry=>auxiliaryCard(entry,cfg,systemMode,api)).join('');
+    const missingRefs=catalog.missingRefs.length?`<p class="auxiliary-data-warning">规则引用了 ${catalog.missingRefs.length} 个动作库缺失 ID：${esc(catalog.missingRefs.map(item=>item.id).join('、'))}</p>`:'';
+    return tabs('patterns')+`<a class="back-link" href="#/system/patterns">← 返回十大模式</a>`+hero(cfg.title,`${cfg.eyebrow}｜${cfg.intro}`)+
+      `<section class="section-card auxiliary-module" data-auxiliary-module="${esc(cfg.moduleId)}" data-auxiliary-side="${esc(side)}">
+        <div class="section-head"><div><h2>${esc(cfg.title)}</h2><p>${esc(cfg.intro)}</p></div><a class="text-link" href="#/library?kind=action">在动作库中查看全部 →</a></div>
+        <div class="auxiliary-summary-strip"><div><small>唯一动作</small><b data-aux-visible-count>${catalog.total} 个</b></div><div><small>器械分类</small><b>${esc(auxiliaryClassSummary(catalog,api))}</b></div><div><small>来源动作池</small><b>${cfg.poolKeys.length} 个</b></div></div>
+        ${poolSummary}
+        <div class="auxiliary-module-controls"><label>来源动作池<select data-aux-filter="pool" aria-label="来源动作池"><option value="">全部动作池</option>${poolOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：隐藏标准 ID 与审计字段'}</span></div>
+        ${missingRefs}${side==='lower'?cards:`<div class="auxiliary-action-grid">${cards||'<p class="no-results">当前规则暂无动作。</p>'}</div>`}<p class="auxiliary-empty no-results" hidden>当前筛选暂无动作。</p>
+      </section>`;
+  }
   function patterns(route){
     const data=D(),focus=route.query?.focus;
+    if((focus==='aux-upper'||focus==='aux-lower')&&window.V14AuxiliaryModules){
+      return auxiliaryModule(route,focus==='aux-upper'?'upper':'lower');
+    }
     if(focus==='单腿'&&data.singleLegBranches){
       const branchCard=(key,title,subtitle)=>{const branch=data.singleLegBranches[key],levels=(branch?.ids||[]).map((id,i)=>{const a=data.actions[id]||{};return {tier:a.tier||`T${i+1}`,name:a.name||id,id};});const copy=copyControl(`pattern-single-leg-${key}`,'pattern',{name:`单腿模式｜${title}`,levels:levels.map(x=>({tier:x.tier,name:x.name})),note:`${subtitle}。同级替换不等于进阶；实际准入继续服从动作质量、稳定性与场馆最低负荷。`});return `<section class="section-card single-leg-branch"><div class="section-head"><div><h2>${title}</h2><p>${subtitle}</p></div>${copy}</div><div class="tier-grid">${levels.map(x=>`<article class="tier-card"><div class="tier-code">${esc(x.tier)}</div><h3>${esc(x.name)}</h3><p>${key==='single_leg_hinge'?'单侧髋铰链 / 后侧链 / 骨盆抗旋转':'单侧膝主导 / 下肢力量 / 骨盆稳定'}</p><a href="#/library?focus=${encodeURIComponent(x.id)}">动作详情 →</a></article>`).join('')}</div></section>`;};
       return tabs('patterns')+`<a class="back-link" href="#/system/patterns">← 返回十大模式</a>`+hero('04｜单腿模式｜单腿双分支','V14.7 将第 04 模式正式拆为「单腿蹲」与「单腿拉」两条 T1–T4 主链；十大动作模式总数仍保持 10。')+branchCard('single_leg_squat','A｜单腿蹲','单侧膝主导：分腿蹲 / 箭步蹲 / 保加利亚分腿蹲进阶链。')+branchCard('single_leg_hinge','B｜单腿拉','单侧髋主导：扶持髋铰链 → 扶持负重 → 独立单腿 RDL → 高阶负重单腿 RDL。');
@@ -34,7 +84,7 @@
       const v=data.eightPatternDetails[item.key];
       return `<a class="knowledge-card ten-pattern-card" href="#/system/patterns?focus=${encodeURIComponent(item.key)}"><span>${esc(patternLevelLabel(item))}</span><h3>${number}｜${esc(item.name)}</h3><div class="mini-chain">${v.levels.map(x=>`<b>${esc(x.tier)} ${esc(x.name)}</b>`).join('<i>→</i>')}</div></a>`;
     }).join('');
-    return tabs('patterns')+hero('十大动作模式','8 个主动作模式使用 T1–T4；第 09 支撑模式使用 S1–S6；第 10 核心模式使用 L1–L4 + Core Demand。三套等级各自独立，不互相替代。')+`<section class="section-card"><div class="module-copy-row">${catalogCopy}</div><div class="knowledge-grid ten-pattern-grid">${cards}</div></section>`;
+    return tabs('patterns')+hero('十大动作模式','8 个主动作模式使用 T1–T4；第 09 支撑模式使用 S1–S6；第 10 核心模式使用 L1–L4 + Core Demand。三套等级各自独立，不互相替代。')+`<section class="section-card"><div class="module-copy-row">${catalogCopy}</div><div class="knowledge-grid ten-pattern-grid">${cards}</div></section>`+auxiliaryIndex(data);
   }
   function prep(route){
     const data=D(),focus=route.query?.focus,foam=route.query?.foam;
@@ -152,6 +202,35 @@
   function render(route){const page=(route.page||'patterns').split('?')[0];if(page==='prep')return prep(route);if(page==='support')return support(route);if(page==='core')return core(route);return patterns(route);}
   function bind(route){
     const page=(route.page||'patterns').split('?')[0];
+    if(page==='patterns'&&(route.query?.focus==='aux-upper'||route.query?.focus==='aux-lower')){
+      const module=document.querySelector('[data-auxiliary-module]');
+      if(!module)return;
+      const poolControl=module.querySelector('[data-aux-filter="pool"]');
+      const classControl=module.querySelector('[data-aux-filter="equipmentClass"]');
+      const poolButtons=module.querySelectorAll('[data-aux-pool-button]');
+      const count=module.querySelector('[data-aux-visible-count]');
+      const empty=module.querySelector('.auxiliary-empty');
+      const apply=()=>{
+        const pool=poolControl?.value||'',equipmentClass=classControl?.value||'';
+        let visible=0;
+        module.querySelectorAll('[data-aux-entry]').forEach(card=>{
+          const pools=String(card.dataset.auxPools||'').split(',').filter(Boolean);
+          const matches=(!pool||pools.includes(pool))&&(!equipmentClass||card.dataset.auxEquipmentClass===equipmentClass);
+          card.hidden=!matches;if(matches)visible+=1;
+        });
+        module.querySelectorAll('[data-auxiliary-subgroup]').forEach(group=>{
+          group.hidden=!group.querySelector('[data-aux-entry]:not([hidden])');
+        });
+        poolButtons.forEach(button=>button.setAttribute('aria-pressed',String((poolControl?.value||'')===button.dataset.auxPoolButton)));
+        if(count)count.textContent=`${visible} 个`;
+        if(empty)empty.hidden=visible!==0;
+      };
+      poolControl?.addEventListener('change',apply);
+      classControl?.addEventListener('change',apply);
+      poolButtons.forEach(button=>button.addEventListener('click',()=>{if(poolControl)poolControl.value=button.dataset.auxPoolButton||'';apply();}));
+      apply();
+      return;
+    }
     if(page!=='prep'||route.query?.focus||route.query?.foam)return;
     const controls=['prep-pattern','prep-session-level','prep-main-tier'].map(id=>document.getElementById(id)).filter(Boolean);
     controls.forEach(el=>el.addEventListener('change',()=>{

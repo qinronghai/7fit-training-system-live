@@ -1,5 +1,6 @@
 (function(){
   window.V14_CHANGELOG = [
+    {date:'2026-09-14',time:'14:00',type:'功能',area:'训练体系',title:'新增 D1 / D2 辅助动作模块',detail:'系统模式新增 11｜上肢辅助动作与 12｜下肢固定器械动作模块；内容由 Composer 辅助动作池实时去重生成，并按显式 equipmentClass 展示固定器械与绳索 / 龙门架辅助。',issue:79,commit:''},
     {date:'2026-09-14',time:'13:38',type:'修复',area:'UI / Audit',title:'收口 V14.7 live 截图验收问题',detail:'修复 F111 PREP 详情 CTA 挤压、动作库筛选响应式与下拉可访问性；Conditioning 空 Primer 增加约束原因、可跳过与人工安排安全说明，并补齐多尺寸浏览器回归。',issue:71,commit:''},
     {date:'2026-09-14',time:'12:21',type:'功能',area:'Body 首页',title:'Body 首页重构为 Family-first 导航',detail:'新增 6 种真实数据训练模式、Family 详情 → L1–L4 导航，保留旧 Session 深链并强化自由编课入口。',issue:81,commit:'f75e190'},
     {date:'2026-09-14',time:'10:30',type:'体验',area:'Body Session',title:'训练页升级为 Coach-first 信息层级',detail:'优先展示今日重点、主项、风险与替换决策；完整诊断收进高级详情，移动端与保存/恢复行为保持不变。',issue:70,commit:'f18d6f8'},
