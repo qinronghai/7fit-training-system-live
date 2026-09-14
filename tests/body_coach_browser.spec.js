@@ -239,11 +239,20 @@ test('Body Coach-first default hierarchy keeps focus and primary in the mobile d
   await expect(candidates.first()).toContainText('推荐');
   await expect(candidates.first()).toContainText('主要刺激：');
 
-  const actionable=candidates.locator('button:not([disabled])').first();
-  if(await actionable.count()){
-    const target=await actionable.getAttribute('data-action-id');
+  const lowerScoreTarget=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    const selections=Object.fromEntries(ctx.session.main.content.map(item=>[item.key,item.actionId]));
+    const ranked=window.V15BodyResolver.candidates({
+      familyId:ctx.familyId,level:ctx.level,slotKey:'PRIMARY',currentSelections:selections
+    }).candidates;
+    const top=Number(ranked[0]?.recommendationScore);
+    return ranked.find(candidate=>Number(candidate.recommendationScore)<top)?.actionId||'';
+  });
+  if(lowerScoreTarget){
+    const actionable=candidateDetails.locator(`button[data-action-id="${lowerScoreTarget}"]`);
     await actionable.click();
-    await expect(primaryCard.locator('.body-slot-select')).toHaveValue(target);
+    await expect(primaryCard.locator('.body-slot-select')).toHaveValue(lowerScoreTarget);
     await expect(page.locator('[data-body-primary-spotlight]')).toContainText('手动选择');
     await expect(page.locator('[data-body-risk]')).toBeVisible();
     const rerankedDetails=primaryCard.locator('.body-candidate-details');
