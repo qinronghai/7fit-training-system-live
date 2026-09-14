@@ -476,6 +476,10 @@
         (contributors[target]||(contributors[target]=new Set())).add(entry.actionId);
       });
       (entry.meta.secondaryTargets||[]).forEach(target=>{indirect[target]=(indirect[target]||0)+1;});
+      const patternExtras=COMPATIBILITY_POLICY.fatigue.patternTags[entry.action.pattern]||{};
+      Object.keys(patternExtras).forEach(target=>{
+        if(!(entry.meta.directTargets||[]).includes(target))indirect[target]=(indirect[target]||0)+1;
+      });
     });
     const threshold=COMPATIBILITY_POLICY.level[level]?.localFatigueWarn??6;
     const hotspots=Object.entries(totals).map(([target,load])=>({
