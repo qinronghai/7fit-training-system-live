@@ -227,7 +227,8 @@
     return '<section class="section-card hyrox-main '+(benchmark?'benchmark':'')+'">'+
       '<div class="section-head"><div><h2>'+(benchmark?'BENCHMARK｜固定 8 Station':'HYROX MAIN｜今日 Station')+'</h2><p>'+(benchmark?'H1→H8 顺序锁定；不提供普通 Station Swap。':'Station 数量和顺序来自 Resolver，页面只提供 Resolver 允许的合法调整。')+'</p></div><span class="time-badge">'+(benchmark?esc(ctx.protocolId):stations.length+' STATIONS')+'</span></div>'+
       (benchmark?'<div class="hyrox-benchmark-note">只有 Protocol、工作量、有效负重、雪橇校准版本和 Scaling 全部一致，成绩才直接比较；规格变化会建立新基准。</div>':'')+
-      '<div class="hyrox-station-grid">'+stations.map(function(item,index){return stationCard(ctx,item,index);}).join('')+'</div>'+\n    '</section>';
+      '<div class="hyrox-station-grid">'+stations.map(function(item,index){return stationCard(ctx,item,index);}).join('')+'</div>'+ 
+    '</section>';
   }
 
   function conflictPanel(ctx){
