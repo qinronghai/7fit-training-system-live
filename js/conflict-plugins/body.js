@@ -123,6 +123,60 @@
     );
   }
 
+  function fatigueTargetName(target){
+    const names={grip:'握力 / 前臂',erectors:'竖脊肌'};
+    return D().bodyTargetCatalog?.[target]?.name||names[target]||target;
+  }
+
+  function compatibilityIssues(session){
+    const audit=window.V15BodyCompatibility?.analyzeSession?.(session);
+    if(!audit)return [];
+    const issues=[];
+
+    const fatigueHotspots=audit.localFatigue?.hotspots||[];
+    if(fatigueHotspots.length){
+      const text=fatigueHotspots.slice(0,3).map(item=>
+        `${fatigueTargetName(item.target)}：${item.actionIds.length} 个动作连续参与`
+      ).join('；');
+      issues.push(makeIssue(
+        'warn','局部疲劳链持续累积',
+        `${text}。该提示只用于推荐与顺序审计，不计入 Direct Work Sets。`,
+        'BODY_LOCAL_FATIGUE_CHAIN',10460
+      ));
+    }
+
+    const under=audit.targetDistribution?.under||[];
+    if(under.length){
+      issues.push(makeIssue(
+        'warn','主要目标训练量分配不足',
+        `以下主要目标未达到当前等级的有效工作组提示阈值：${under.map(item=>fatigueTargetName(item.target)).join('、')}。`,
+        'BODY_TARGET_DISTRIBUTION_IMBALANCE',10470
+      ));
+    }
+
+    const excessive=audit.targetDistribution?.excessive||[];
+    if(excessive.length){
+      issues.push(makeIssue(
+        'warn','局部训练量占比偏高',
+        excessive.slice(0,3).map(item=>
+          `${fatigueTargetName(item.target)} ${Math.round(item.share*100)}%`
+        ).join('；')+'。建议复核是否挤占其他目标的训练预算。',
+        'BODY_EXCESSIVE_TARGET_SHARE',10480
+      ));
+    }
+
+    const sequence=audit.sequence?.warnings||[];
+    if(sequence.length){
+      const item=sequence[0],data=D();
+      issues.push(makeIssue(
+        'warn','动作顺序可优化',
+        `${data.actions?.[item.beforeActionId]?.name||item.beforeActionId} 位于 ${data.actions?.[item.laterActionId]?.name||item.laterActionId} 之前，且局部疲劳重叠较高；建议优先完成技术 / 高价值动作。`,
+        'BODY_SEQUENCE_SUBOPTIMAL',10490
+      ));
+    }
+    return issues;
+  }
+
   function primaryTargetIssue(session){
     const data=D(),family=data.bodyFamilies?.[session?.familyId],direct=session?.domainContext?.volume?.directSetsByTarget||{};
     if(!family)return null;
@@ -216,6 +270,7 @@
     const issues=[
       ...familyDeviationIssues(session),
       ...slotIntentIssues(session),
+      ...compatibilityIssues(session),
     ];
     [
       primarySecondarySimilarityIssue(session),
