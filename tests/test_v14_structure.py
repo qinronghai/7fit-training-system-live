@@ -182,3 +182,13 @@ def test_maintenance_changelog_module_is_loaded_and_rendered():
     assert 'data-change-log' in maintenance
     assert 'window.V14_CHANGELOG' in changelog
     assert '2026-09-14' in changelog
+
+
+def test_project_governance_requires_changelog_for_website_affecting_prs():
+    governance = (ROOT / 'docs' / 'PROJECT-GOVERNANCE.md').read_text(encoding='utf-8')
+    template = (ROOT / '.github' / 'pull_request_template.md').read_text(encoding='utf-8')
+    assert '网站变更记录（强制）' in governance
+    assert 'data/change-log.js' in governance
+    assert 'Changelog 豁免' in governance
+    assert '已更新 Changelog' in template
+    assert 'Changelog 豁免' in template

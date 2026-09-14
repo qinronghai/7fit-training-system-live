@@ -27,6 +27,15 @@ Closes #
 - [ ] GitHub Pages / DevOps
 - [ ] Documentation only
 
+## 网站变更记录
+
+以下两项必须且只能选择一项：
+
+- [ ] **已更新 Changelog**：本 PR 会改变正式网站行为或用户可见结果，已在 `data/change-log.js` 同步新增记录。
+- [ ] **Changelog 豁免**：本 PR 不改变正式网站行为或用户可见结果。理由：
+
+> 会影响功能、UI、训练逻辑、正式数据、Bug 行为或部署结果的 PR，不得以“豁免”跳过 changelog。
+
 ## V14.7 兼容性检查
 
 - [ ] F111 = 一下肢 + 一上肢 + 一支撑 未被破坏
