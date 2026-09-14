@@ -246,6 +246,9 @@ test('Body Coach-first default hierarchy keeps focus and primary in the mobile d
     await expect(primaryCard.locator('.body-slot-select')).toHaveValue(target);
     await expect(page.locator('[data-body-primary-spotlight]')).toContainText('手动选择');
     await expect(page.locator('[data-body-risk]')).toBeVisible();
+    const rerankedDetails=primaryCard.locator('.body-candidate-details');
+    await rerankedDetails.locator('summary').click();
+    await expect(rerankedDetails).toContainText('为什么更合适：');
   }
 
   await expect390NoOverflow(page);
