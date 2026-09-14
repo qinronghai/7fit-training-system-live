@@ -105,6 +105,103 @@
     return Object.fromEntries((session?.main?.content||[]).map(slot=>[slot.key,{actionId:slot.actionId,source:slot.source}]));
   }
 
+  function coachRoleLabel(slotKey){
+    return ({
+      PRIMARY:'今日主项',
+      SECONDARY:'第二训练方向',
+      ACCESSORY:'辅助塑形',
+      'ISOLATION-1':'局部补充',
+      'ISOLATION-2':'局部补充',
+      OPTIONAL:'可选补充',
+    })[slotKey]||'训练动作';
+  }
+
+  function candidateResult(ctx,slotKey){
+    return window.V15BodyResolver.candidates({
+      familyId:ctx.familyId,
+      level:ctx.level,
+      slotKey,
+      currentSelections:resolvedSelectionMap(ctx.session),
+    });
+  }
+
+  function currentCandidate(ctx,slot){
+    return (candidateResult(ctx,slot.key).candidates||[]).find(candidate=>candidate.actionId===slot.actionId)||null;
+  }
+
+  function slotDuty(ctx,slot){
+    const action=D().actions?.[slot.actionId]||{},meta=D().bodyActionMeta?.[slot.actionId]||{};
+    const targets=targetNames(meta.directTargets);
+    const lead=targets[0]||action.pattern||'目标肌群';
+    if(slot.key==='PRIMARY')return `${lead}主项`;
+    if(slot.key==='SECONDARY')return `${action.pattern||lead}第二训练方向`;
+    if(slot.key==='ACCESSORY')return `${lead}辅助塑形`;
+    if(slot.key==='OPTIONAL')return `${lead}可选补充`;
+    return `${lead}局部补充`;
+  }
+
+  function focusSummary(ctx){
+    const family=ctx.family||{},primary=targetNames(family.primaryTargets).slice(0,2),secondary=targetNames(family.secondaryTargets).slice(0,2);
+    const items=[
+      primary.length?`${primary.join(' / ')}主导`:'',
+      secondary.length?`${secondary.join(' / ')}补充`:'',
+      `${ctx.level} 能力阶段`,
+    ].filter(Boolean);
+    return `<section class="body-coach-focus" data-body-coach-focus><div><span>今日重点</span><h2>${esc(items.join(' · '))}</h2><p>先保证主项质量，再完成第二训练方向与局部塑形；替换动作按当前 Session 推荐排序。</p></div></section>`;
+  }
+
+  function primarySpotlight(ctx){
+    const slot=(ctx.session.main.content||[]).find(item=>item.key==='PRIMARY');
+    if(!slot)return '';
+    const domain=ctx.session.domainContext?.slots?.PRIMARY||{},candidate=currentCandidate(ctx,slot);
+    const reason=(candidate?.reasons||[])[0]?.text||'承担今天最重要的主要刺激';
+    const targets=targetNames(D().bodyActionMeta?.[slot.actionId]?.directTargets).join(' · ')||'主要目标未标';
+    return `<section class="body-primary-spotlight" data-body-primary-spotlight><div class="body-primary-kicker"><span>今日主项</span><small>${esc(slot.source==='manual'?'手动选择':'系统推荐')}</small></div><div class="body-primary-main"><div><h2>${esc(slot.name)}</h2><p>主要刺激：${esc(targets)}</p></div><a href="#/library?focus=${encodeURIComponent(slot.actionId)}">查看动作</a></div><div class="body-primary-prescription"><b>${esc(domain.workingSets??'—')} × ${esc(rangeText(domain.repRange))}</b><span>RIR ${esc(rangeText(domain.rirRange))}</span><span>休息 ${esc(rangeText(domain.restSecondsRange,' 秒'))}</span></div><p class="body-primary-why"><b>为什么是今天的主项：</b>${esc(reason)}</p></section>`;
+  }
+
+  function recommendationForSlot(ctx,slotKey){
+    const result=candidateResult(ctx,slotKey);
+    return result.candidates?.[0]||null;
+  }
+
+  function conflictSuggestion(ctx,issue){
+    const slotByCode={
+      BODY_PRIMARY_SECONDARY_TOO_SIMILAR:'SECONDARY',
+      BODY_ACCESSORY_ROLE_COLLAPSE:'ACCESSORY',
+      BODY_SLOT_INTENT_MISMATCH:'SECONDARY',
+    };
+    const slotKey=slotByCode[issue?.code]||'';
+    if(slotKey){
+      const candidate=recommendationForSlot(ctx,slotKey);
+      if(candidate)return `建议调整${coachRoleLabel(slotKey)}：优先考虑 ${candidate.name}。`;
+    }
+    if(issue?.code==='BODY_LOCAL_FATIGUE_CHAIN')return '建议先保证主项质量，再决定是否保留后续局部补充。';
+    if(issue?.code==='BODY_TARGET_DISTRIBUTION_IMBALANCE')return '建议优先查看能补足主要目标的高分候选。';
+    if(issue?.code==='BODY_EXCESSIVE_TARGET_SHARE')return '建议减少同一目标的重复局部动作，给其他主要目标留出训练预算。';
+    if(issue?.code==='BODY_SEQUENCE_SUBOPTIMAL')return '建议先完成高价值主项，再安排局部补充。';
+    return issue?.severity==='hard'?'请先处理此问题后再继续带课。':'结合会员当日状态决定是否调整。';
+  }
+
+  function coachRisk(ctx){
+    const result=ctx.session.conflictContext||{status:'PASS',issues:[]};
+    const issues=(result.issues||[]).slice(0,3);
+    if(!issues.length){
+      return `<section class="body-coach-risk pass" data-body-risk><div><span>今日风险</span><b>可以继续</b></div><p>当前结构无明显冲突，按计划执行即可。</p></section>`;
+    }
+    const items=issues.map(issue=>`<article class="body-risk-item ${esc(issue.severity||'warn')}"><div><b>${esc(issue.title||'需要调整')}</b><span>${esc(issue.severity==='hard'?'必须处理':'提醒')}</span></div><p>${esc(issue.text||'')}</p><small>${esc(conflictSuggestion(ctx,issue))}</small></article>`).join('');
+    return `<section class="body-coach-risk ${esc(String(result.status||'WARN').toLowerCase())}" data-body-risk><div class="body-risk-head"><span>今日风险</span><b>${esc(result.status==='FAIL'?'需要先调整':'注意以下提醒')}</b></div><div class="body-risk-list">${items}</div></section>`;
+  }
+
+  function compatibilityDebug(ctx){
+    const rows=(ctx.session.main.content||[]).map(slot=>{
+      const candidate=currentCandidate(ctx,slot);
+      if(!candidate)return '';
+      const components=Object.entries(candidate.components||{}).map(([key,value])=>`${key} ${Number(value)>=0?'+':''}${value}`).join(' · ');
+      return `<article class="body-score-row"><div><b>${esc(coachRoleLabel(slot.key))}｜${esc(slot.name)}</b><span>${esc(candidate.recommendationScore)} 分</span></div><p>${esc(components)}</p></article>`;
+    }).join('');
+    return `<section class="body-score-debug"><div class="body-review-head"><span>SCORE / DEBUG</span><h3>Compatibility Score 分项</h3></div>${rows||'<p>当前没有可显示的评分信息。</p>'}</section>`;
+  }
+
   function slotSelect(ctx,slot){
     const result=window.V15BodyResolver.candidates({
       familyId:ctx.familyId,
