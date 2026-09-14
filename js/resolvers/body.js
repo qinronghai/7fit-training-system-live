@@ -159,18 +159,18 @@
     const introduced=(pool.introducedActionIds||[]).includes(actionId);
     const retained=(pool.retainedActionIds||[]).includes(actionId);
     const membership=progressionMembership(familyId,actionId);
-    let preference='replacement',priorityScore=0.24,reason='当前等级合法替换动作';
+    let preference='replacement',priorityScore=0.08,reason='当前等级合法替换动作';
     if(preferredIndex>=0){
       preference='preferred';
-      priorityScore=Math.max(0.72,1-preferredIndex*0.06);
+      priorityScore=preferredIndex===0?1:0.82;
       reason=`当前 ${level} ${slotKey} 优先池第 ${preferredIndex+1} 位`;
     }else if(introduced){
       preference='introduced';
-      priorityScore=0.62;
+      priorityScore=0.55;
       reason=`当前 ${level} 新准入动作，可作为替换`;
     }else if(retained){
       preference='retained';
-      priorityScore=0.42;
+      priorityScore=0.18;
       reason=`低等级已掌握动作，${level} 明确保留为向下兼容替换`;
     }
     return {
