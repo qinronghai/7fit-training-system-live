@@ -603,7 +603,6 @@ body{font-size:14px;line-height:1.55}
 .body-recommendation-note span,.body-recommendation-note small{font-size:12px;line-height:1.5}
 .body-recommendation-note small{opacity:.76}
 
-
 /* ISSUE 70 BODY COACH FIRST */
 .body-coach-overview{display:grid;gap:14px;margin:0 0 18px}
 .body-coach-focus,.body-primary-spotlight,.body-coach-risk{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--surface-soft,#f8f8fb)}
