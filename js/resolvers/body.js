@@ -5,7 +5,16 @@
   const MAIN_ROUTES=new Set(['1F_ONLY','FLEX_1F_2F']);
   const SLOT_ORDER=Object.freeze(['PRIMARY','SECONDARY','ACCESSORY','ISOLATION-1','ISOLATION-2','OPTIONAL']);
   const STABILITY_RANK=Object.freeze({low:0,medium:1,high:2});
-  const LEVEL_STABILITY_MAX=Object.freeze({L1:0,L2:1,L3:2,L4:2});
+  const FATIGUE_RANK=Object.freeze({low:0,medium:1,high:2});
+  const LEVEL_ORDER=Object.freeze(['L1','L2','L3','L4']);
+  const LOADING_STYLE_BY_PROFILE=Object.freeze({
+    accessory_compound:'bodyweight_or_light',
+    compound_machine:'stable_machine',
+    compound_freeweight:'freeweight',
+    single_leg_compound:'unilateral',
+    isolation_large:'isolation',
+    isolation_small:'isolation',
+  });
 
   function fail(code,message,details={}){
     const error=new Error(message);
@@ -67,6 +76,59 @@
     return String(meta.exerciseFamily||actionId||'');
   }
 
+  function actionEntryLevel(meta={}){
+    const levels=Array.isArray(meta.levels)?meta.levels:[];
+    return LEVEL_ORDER.find(level=>levels.includes(level))||'';
+  }
+
+  function loadingStyleOf(meta={}){
+    return LOADING_STYLE_BY_PROFILE[meta.repProfile]||'';
+  }
+
+  function assessLevelEligibility({level,actionId}={}){
+    const data=D(),policy=data.bodyLevelPolicies?.[level],meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId];
+    const reasons=[];
+    if(!policy||!meta||!action)return {
+      ok:false,reasons:['BODY_LEVEL_INPUT_INVALID'],currentLevel:String(level||''),actionId:String(actionId||''),
+      actionEntryLevel:'',loadingStyle:'',qualifiedBy:[]
+    };
+
+    const entryLevel=actionEntryLevel(meta),loadingStyle=loadingStyleOf(meta);
+    if(!meta.levels?.includes(level))reasons.push('BODY_LEVEL_NOT_LISTED');
+    if(!entryLevel||!policy.eligibleEntryLevels?.includes(entryLevel))reasons.push('BODY_LEVEL_ENTRY_TIER');
+    if(!loadingStyle||!policy.allowedLoadingStyles?.includes(loadingStyle))reasons.push('BODY_LEVEL_LOADING_STYLE');
+
+    const stability=STABILITY_RANK[meta.stabilityDemand]??99;
+    const maxStability=STABILITY_RANK[policy.maxStabilityDemand]??-1;
+    if(stability>maxStability)reasons.push('BODY_LEVEL_STABILITY');
+
+    if(meta.exerciseClass==='compound'){
+      const fatigue=FATIGUE_RANK[meta.fatigueCost]??99;
+      const maxFatigue=FATIGUE_RANK[policy.maxCompoundFatigue]??-1;
+      if(fatigue>maxFatigue)reasons.push('BODY_LEVEL_FATIGUE');
+    }
+
+    const qualifiedBy=[
+      entryLevel?`最早准入 ${entryLevel}`:'',
+      loadingStyle?`负荷类型 ${loadingStyle}`:'',
+      meta.stabilityDemand?`稳定性 ${meta.stabilityDemand}`:'',
+      meta.laterality==='unilateral'?`单侧准备 ${policy.unilateralReadiness}`:'',
+      policy.romExpectation?`ROM ${policy.romExpectation}`:'',
+    ].filter(Boolean);
+    return {
+      ok:reasons.length===0,reasons,currentLevel:level,actionId,
+      actionEntryLevel:entryLevel,loadingStyle,
+      maxStabilityDemand:policy.maxStabilityDemand,
+      maxCompoundFatigue:policy.maxCompoundFatigue,
+      unilateralReadiness:policy.unilateralReadiness,
+      romExpectation:policy.romExpectation,
+      tempoPauseEligibility:[...(policy.tempoPauseEligibility||[])],
+      intensityTechniqueEligibility:[...(policy.intensityTechniqueEligibility||[])],
+      fallbackLevel:policy.fallbackLevel,
+      qualifiedBy,
+    };
+  }
+
   function baseIntentAssessment({familyId,level,family,slotKey,role,actionId}){
     const data=D(),meta=data.bodyActionMeta?.[actionId],action=data.actions?.[actionId],reasons=[];
     const intent=slotIntentFor(family,slotKey);
@@ -75,7 +137,8 @@
     if(reasons.length)return {ok:false,reasons,intent,meta,action};
 
     if(!meta.families?.includes(familyId))reasons.push('BODY_FAMILY_DEVIATION');
-    if(!meta.levels?.includes(level))reasons.push('BODY_LEVEL_DEVIATION');
+    const levelEligibility=assessLevelEligibility({level,actionId});
+    if(!levelEligibility.ok)reasons.push(...levelEligibility.reasons);
     if(!meta.roles?.includes(role))reasons.push('BODY_ROLE_DEVIATION');
     if(intent.role!==role||intent.slotKey!==slotKey)reasons.push('BODY_SLOT_INTENT_MISMATCH');
     if(action.status!=='可自动编排')reasons.push('BODY_STATUS_INVALID');
@@ -103,7 +166,7 @@
     if((disallowed.stabilityDemand||[]).includes(meta.stabilityDemand)){
       reasons.push('BODY_SLOT_INTENT_STABILITY');
     }
-    return {ok:reasons.length===0,reasons,intent,meta,action};
+    return {ok:reasons.length===0,reasons:[...new Set(reasons)],intent,meta,action,levelEligibility};
   }
 
   function pairSimilarity(actionId,otherActionId){
@@ -184,6 +247,7 @@
       role:normalized.role,
       actionId,
       pairSimilarity:pairReasons.length?pairReasons.map(code=>({code})):[],
+      levelEligibility:base.levelEligibility||assessLevelEligibility({level:normalized.level,actionId}),
     };
   }
 
@@ -230,7 +294,11 @@
     const primaryCoverage=direct.filter(target=>primaryTargets.has(target)).length;
     const missingTargetBonus=direct.filter(target=>volumeTargets.has(target)&&!context.coveredTargets.has(target)).length;
     const stability=STABILITY_RANK[candidate.stabilityDemand]??2;
-    const stabilityPenalty=Math.max(0,stability-(LEVEL_STABILITY_MAX[level]??2));
+    const maxStability=STABILITY_RANK[D().bodyLevelPolicies?.[level]?.maxStabilityDemand]??2;
+    const stabilityPenalty=Math.max(0,stability-maxStability);
+    const currentLevelIndex=LEVEL_ORDER.indexOf(level);
+    const entryLevelIndex=LEVEL_ORDER.indexOf(candidate.levelEligibility?.actionEntryLevel||'');
+    const levelFit=entryLevelIndex<0?0:Math.max(0,4-Math.abs(currentLevelIndex-entryLevelIndex));
     const fatiguePenalty=candidate.exerciseClass==='compound'&&candidate.fatigueCost==='high'&&context.highFatigueCompounds>=2?1:0;
     const movementDiversity=candidate.pattern&&!context.patterns.has(candidate.pattern)?1:0;
     const targetRedundancy=direct.filter(target=>context.coveredTargets.has(target)).length;
@@ -239,7 +307,7 @@
       return sum+(similarity.samePattern?1:0)+similarity.directTargetOverlap;
     },0);
     return {
-      intentPatternPreference,intentTargetPreference,fatiguePreference,
+      intentPatternPreference,intentTargetPreference,levelFit,fatiguePreference,
       primaryCoverage,missingTargetBonus,stabilityPenalty,fatiguePenalty,
       movementDiversity,targetRedundancy,similarityPenalty
     };
@@ -249,6 +317,7 @@
     const A=candidateSortKey(a,ctx),B=candidateSortKey(b,ctx);
     return B.intentPatternPreference-A.intentPatternPreference
       ||B.intentTargetPreference-A.intentTargetPreference
+      ||B.levelFit-A.levelFit
       ||B.fatiguePreference-A.fatiguePreference
       ||B.primaryCoverage-A.primaryCoverage
       ||B.missingTargetBonus-A.missingTargetBonus
@@ -285,12 +354,17 @@
         laterality:String(meta.laterality||''),
         exerciseFamily,
         pattern:String(action.pattern||''),
+        levelEligibility:assessment.levelEligibility,
+        levelReason:assessment.levelEligibility?.actionEntryLevel===level
+          ?'当前等级正式准入'
+          :'低等级已掌握动作，当前等级继续合法',
       });
     }
     items.sort((a,b)=>compareCandidates(a,b,{family,level,context,intent}));
     return {
       recommended:items[0]?.actionId||'',
       slotIntent:intent?{slotKey,intentId:intent.intentId,role:intent.role}:null,
+      levelContract:{...data.bodyLevelPolicies[level]},
       candidates:items
     };
   }
@@ -403,7 +477,12 @@
       warnings,
       resolvedSelections:publicSlots.map(slot=>({key:slot.key,actionId:slot.actionId,source:slot.source})),
       source:{type:'GENERATED',id:`${familyId}-${level}`},
-      domainContext:{kind:'BODY',slots:domainSlots,volume:window.V15BodyVolume.summarize(domainSlots)},
+      domainContext:{
+        kind:'BODY',
+        levelContract:{...levelPolicy},
+        slots:domainSlots,
+        volume:window.V15BodyVolume.summarize(domainSlots)
+      },
     };
     session.conflictContext=evaluateConflict(session);
     const validation=window.V15ResolvedSession?.validate?.(session);
@@ -411,7 +490,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid,assessSlotIntent,pairSimilarity};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,pairSimilarity};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);
