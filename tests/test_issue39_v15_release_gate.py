@@ -19,6 +19,7 @@ def test_v15_release_matrix_artifacts_are_frozen():
         "tests/body_recovery_browser.spec.js",
         "tests/conditioning_coach_browser.spec.js",
         "tests/saved_sessions_browser.spec.js",
+        "tests/hyrox_benchmark_browser.spec.js",
         "tests/v15_release_gate_browser.spec.js",
     ]
     for path in required:
@@ -45,6 +46,7 @@ def test_playwright_release_gate_discovers_all_v15_critical_specs():
         "body_recovery_browser.spec.js",
         "conditioning_coach_browser.spec.js",
         "saved_sessions_browser.spec.js",
+        "hyrox_benchmark_browser.spec.js",
         "v15_release_gate_browser.spec.js",
     ]:
         assert spec in config, f"Playwright release gate is not discovering {spec}"
