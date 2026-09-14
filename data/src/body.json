@@ -657,8 +657,7 @@
             ],
             "SECONDARY": [
               "movement_supported_split_squat",
-              "movement_bodyweight_split_squat",
-              "tushen_shendun"
+              "movement_bodyweight_split_squat"
             ],
             "ACCESSORY": [
               "tui_qushen",
@@ -721,15 +720,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "V13_SQ_DB_GOBLET",
-              "movement_light_bar_box_squat",
-              "movement_bench_box_squat",
-              "banjie_hake"
+              "movement_light_bar_box_squat"
             ],
             "SECONDARY": [
-              "movement_dumbbell_reverse_lunge",
               "movement_bodyweight_split_squat",
-              "movement_supported_split_squat",
-              "V13_SQ_DB_GOBLET"
+              "movement_dumbbell_reverse_lunge"
             ],
             "ACCESSORY": [
               "tui_qushen",
@@ -806,14 +801,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "hake_shendun",
-              "smith_shendun",
-              "V13_SQ_DB_GOBLET",
-              "movement_light_bar_box_squat"
+              "smith_shendun"
             ],
             "SECONDARY": [
               "movement_dumbbell_reverse_lunge",
-              "baojiayali_fentundun",
-              "movement_bodyweight_split_squat"
+              "baojiayali_fentundun"
             ],
             "ACCESSORY": [
               "tui_qushen",
@@ -896,14 +888,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "hake_shendun",
-              "gangling_shendun",
-              "smith_shendun",
-              "V13_SQ_DB_GOBLET"
+              "gangling_shendun"
             ],
             "SECONDARY": [
               "baojiayali_fentundun",
-              "movement_dumbbell_reverse_lunge",
-              "movement_bodyweight_split_squat"
+              "movement_dumbbell_reverse_lunge"
             ],
             "ACCESSORY": [
               "tui_qushen",
@@ -1316,13 +1305,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "movement_dowel_hip_hinge",
-              "tunqiao",
-              "tun_tui"
+              "tunqiao"
             ],
             "SECONDARY": [
-              "tunqiao",
-              "shanyan_tingshen",
-              "movement_dowel_hip_hinge"
+              "movement_supported_single_leg_hinge",
+              "tunqiao"
             ],
             "ACCESSORY": [
               "tui_wanju",
@@ -1386,15 +1373,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "yaling_luomaniya_yingla",
-              "tun_tui",
-              "hipthrust_pause_main",
-              "movement_dowel_hip_hinge"
+              "tun_tui"
             ],
             "SECONDARY": [
               "movement_supported_db_single_leg_rdl",
-              "movement_supported_single_leg_hinge",
-              "tun_tui",
-              "shanyan_tingshen"
+              "movement_supported_single_leg_hinge"
             ],
             "ACCESSORY": [
               "tui_wanju",
@@ -1472,15 +1455,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "yaling_luomaniya_yingla",
-              "tun_tui",
-              "dileigan_hinge",
-              "liujiao_gantui_yingla",
-              "hipthrust_pause_main"
+              "tun_tui"
             ],
             "SECONDARY": [
               "movement_db_single_leg_rdl",
-              "movement_single_leg_hip_thrust",
-              "movement_supported_db_single_leg_rdl"
+              "movement_single_leg_hip_thrust"
             ],
             "ACCESSORY": [
               "tui_wanju",
@@ -1569,15 +1548,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "hipthrust_pause_main",
-              "gangling_yingla",
-              "liujiao_gantui_yingla",
-              "yaling_luomaniya_yingla",
-              "tun_tui"
+              "gangling_yingla"
             ],
             "SECONDARY": [
               "movement_advanced_db_single_leg_rdl",
-              "movement_db_single_leg_rdl",
-              "movement_single_leg_hip_thrust"
+              "movement_db_single_leg_rdl"
             ],
             "ACCESSORY": [
               "tui_wanju",
@@ -1959,15 +1934,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "V13_HR_SCAP_ROW",
-              "fuzhu_yinti_jianjia_xiachen",
-              "feiji_labei_zhongba",
-              "gaowei_xiala_vba"
+              "fuzhu_yinti_jianjia_xiachen"
             ],
             "SECONDARY": [
               "fuzhu_yinti_jianjia_xiachen",
-              "gaowei_xiala_vba",
-              "V13_HR_SCAP_ROW",
-              "feiji_labei_zhongba"
+              "V13_HR_SCAP_ROW"
             ],
             "ACCESSORY": [
               "mianla",
@@ -2028,14 +1999,10 @@
           "preferredBySlot": {
             "PRIMARY": [
               "feiji_labei_zhongba",
-              "gaowei_xiala_vba",
-              "zuozi_huachuan_bianshi",
-              "danbi_xiala"
+              "gaowei_xiala_vba"
             ],
             "SECONDARY": [
               "gaowei_xiala_vba",
-              "zuozi_huachuan_bianshi",
-              "danbi_xiala",
               "feiji_labei_zhongba"
             ],
             "ACCESSORY": [
@@ -2115,16 +2082,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "zuozi_huachuan_bianshi",
-              "fuzhu_yinti_xiangshang",
-              "danbi_yaling_huachuan",
-              "gaowei_xiala_vba",
-              "dileigan_huachuan"
+              "fuzhu_yinti_xiangshang"
             ],
             "SECONDARY": [
               "fuzhu_yinti_xiangshang",
-              "danbi_xiala",
-              "zuozi_huachuan_bianshi",
-              "feiji_labei_zhongba"
+              "zuozi_huachuan_bianshi"
             ],
             "ACCESSORY": [
               "mianla",
@@ -2210,16 +2172,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "movement_bodyweight_pullup",
-              "gangling_huachuan",
-              "zuozi_huachuan_bianshi",
-              "fuzhu_yinti_xiangshang",
-              "feiji_labei_zhongba"
+              "gangling_huachuan"
             ],
             "SECONDARY": [
               "gangling_huachuan",
-              "movement_bodyweight_pullup",
-              "gaowei_xiala_vba",
-              "zuozi_huachuan_bianshi"
+              "movement_bodyweight_pullup"
             ],
             "ACCESSORY": [
               "mianla",
@@ -2593,8 +2550,7 @@
               "qixie_xiongtui"
             ],
             "SECONDARY": [
-              "qixie_jian_tui",
-              "qixie_xiongtui"
+              "qixie_jian_tui"
             ],
             "ACCESSORY": [
               "V13_VP_SEATED_LIGHT_DB",
@@ -2650,15 +2606,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "qixie_xiongtui",
-              "wotu_xiong_tui",
-              "smith_wotu",
-              "movement_incline_pushup"
+              "wotu_xiong_tui"
             ],
             "SECONDARY": [
               "qixie_jian_tui",
-              "yaling_jiantui",
-              "shangxie_yaling_wotu",
-              "qixie_xiongtui"
+              "yaling_jiantui"
             ],
             "ACCESSORY": [
               "V13_VP_SEATED_LIGHT_DB",
@@ -2724,15 +2676,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "wotu_xiong_tui",
-              "shangxie_yaling_wotu",
-              "qixie_xiongtui",
-              "smith_wotu"
+              "shangxie_yaling_wotu"
             ],
             "SECONDARY": [
               "movement_halfkneeling_landmine_press",
-              "yaling_jiantui",
-              "qixie_jian_tui",
-              "shangxie_yaling_wotu"
+              "yaling_jiantui"
             ],
             "ACCESSORY": [
               "V13_VP_SEATED_LIGHT_DB",
@@ -2806,15 +2754,11 @@
           "preferredBySlot": {
             "PRIMARY": [
               "gangling_wotu",
-              "qixie_xiongtui",
-              "wotu_xiong_tui",
-              "shangxie_yaling_wotu"
+              "qixie_xiongtui"
             ],
             "SECONDARY": [
               "movement_barbell_overhead_press",
-              "movement_halfkneeling_landmine_press",
-              "yaling_jiantui",
-              "qixie_jian_tui"
+              "movement_halfkneeling_landmine_press"
             ],
             "ACCESSORY": [
               "V13_VP_SEATED_LIGHT_DB",
