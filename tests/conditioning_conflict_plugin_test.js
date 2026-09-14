@@ -29,6 +29,18 @@ for(const familyId of D.conditioningFamilyIds){
   }
 }
 
+for(const level of ['L1','L2','L3','L4']){
+  const session=plain(R.resolve('conditioning',{familyId:'CON-04',level,variantId:'A'}));
+  const powerCount=session.blocks.flatMap(block=>Object.values(block.stations)).filter(station=>station.powerEligible===true).length;
+  const powerMax=D.conditioningConflictPolicy.maxPowerStationsByLevel[level];
+  const result=evalSession(session);
+  if(powerCount>powerMax){
+    const powerIssue=find(result,'COND_POWER_STACK');
+    assert.strictEqual(powerIssue.severity,'warn');
+    assert(powerIssue.text.includes(`当前 ${powerCount} 个`),`${level} must count each Power Station across all blocks`);
+  }
+}
+
 let session=plain(R.resolve('conditioning',{familyId:'CON-04',level:'L3',variantId:'A'}));
 session.blocks[0].protocolId='DENSITY';
 let result=evalSession(session);
@@ -74,6 +86,18 @@ session=plain(R.resolve('conditioning',{familyId:'CON-03',level:'L3',variantId:'
 session.domainContext.metrics.estimatedMinutes=99;
 result=evalSession(session);
 assert.strictEqual(find(result,'COND_TIME_BUDGET').severity,'warn');
+
+// Blueprint target work and the estimated-session range must both use the data policy.
+session=plain(R.resolve('conditioning',{familyId:'CON-01',level:'L1',variantId:'A'}));
+result=evalSession(session);
+const targetWork=Object.values(session.blocks).reduce((sum,block)=>sum+Number(block.metrics.targetBlockMinutes||0),0);
+const targetWorkIssue=find(result,'COND_TOTAL_WORK_MINUTES');
+assert.strictEqual(targetWork,11);
+assert(targetWorkIssue.text.includes(`目标工作量 ${targetWork}`));
+session.domainContext.metrics.estimatedMinutes=31;
+result=evalSession(session);
+const levelDurationIssue=find(result,'COND_LEVEL_DURATION');
+assert(levelDurationIssue.text.includes('20–30'), 'Conditioning duration must use the data-owned L1 range');
 
 // Shared core still owns generic duplicate-action integrity.
 session=plain(R.resolve('conditioning',{familyId:'CON-03',level:'L3',variantId:'A'}));

@@ -78,6 +78,40 @@ test('Conditioning blueprint variant and cross-block swap preserve the resolved 
   expect(errors,errors.join(' | ')).toEqual([]);
 });
 
+test('Conditioning session rotates A to B to C and rejects an unknown variant',async({page})=>{
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message||String(error)));
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/conditioning/con-03/l3');
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('B');
+  await page.locator('[data-conditioning-next-variant]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l3\?variant=B/);
+  await expect(page.locator('.conditioning-block-card')).toHaveCount(3);
+  await page.locator('[data-conditioning-next-variant]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l3\?variant=C/);
+  await page.locator('[data-conditioning-next-variant]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l3\?variant=A/);
+
+  await page.goto('/#/coach/conditioning/con-03/l3?variant=UNKNOWN');
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l3\?variant=A/);
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('B');
+  expect(errors,errors.join(' | ')).toEqual([]);
+});
+
+test('Conditioning preserves an explicit legacy Protocol deep link',async({page})=>{
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message||String(error)));
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/conditioning/compose?family=CON-03&level=L2&protocol=CIRCUIT');
+  await expect(page).toHaveURL(/protocol=CIRCUIT/);
+  await expect(page.locator('.conditioning-legacy-editor')).toBeVisible();
+  await expect(page.locator('.conditioning-legacy-editor')).toContainText('旧 Protocol 兼容入口');
+  await expect(page.locator('.conditioning-legacy-editor')).toContainText('不会静默改成 A / B / C 蓝图');
+  await expect(page.locator('.conditioning-block-card')).toHaveCount(0);
+  await expect(page.locator('.conditioning-legacy-editor a[href*="variant=A"]')).toBeVisible();
+  expect(errors,errors.join(' | ')).toEqual([]);
+});
+
 test('Conditioning save surface contains XSS text and rejects 3000-character names',async({page})=>{
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message||String(error)));

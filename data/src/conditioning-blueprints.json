@@ -291,11 +291,11 @@
               "role": "MAIN",
               "roleLabel": "主训练段",
               "label": "主训练段｜6 分钟",
-              "goal": "把稳定配速转成可记录的主要输出。",
+              "goal": "在稳定配速下用更高但可控的主观强度完成能力迁移。",
               "protocolId": "STEADY",
               "targetMinutes": 6,
-              "targetRpe": 5,
-              "prescription": "6 分钟目标段｜按 STEADY 处方执行；以完成标准判断质量。",
+              "targetRpe": 6,
+              "prescription": "6 分钟目标段｜按 STEADY 处方执行；以 RPE 6 内的稳定输出判断质量。",
               "stations": [
                 {
                   "actionId": "huaxueji_wentai",
@@ -317,7 +317,7 @@
                 "出现疼痛、眩晕、异常呼吸或动作失控时立即停止。",
                 "连续两轮无法满足动作质量或恢复要求时结束本段并记录原因。"
               ],
-              "completionMetric": "完成 6 分钟目标段；记录每轮稳定配速与动作质量。",
+              "completionMetric": "完成 6 分钟目标段；在 RPE 6 内记录稳定配速与动作质量。",
               "equipment": [
                 "滑雪机"
               ],
@@ -5466,7 +5466,7 @@
               "goal": "组合不同动作，完成一段可解释的工作容量。",
               "protocolId": "CIRCUIT",
               "targetMinutes": 11,
-              "targetRpe": 8,
+              "targetRpe": 9,
               "prescription": "11 分钟目标段｜按 CIRCUIT 处方执行；以完成标准判断质量。",
               "stations": [
                 {
@@ -5882,11 +5882,11 @@
               "role": "MAIN",
               "roleLabel": "主训练段",
               "label": "主训练段｜6 分钟",
-              "goal": "把爆发动作放在疲劳前，完成高质量功率输出。",
+              "goal": "把爆发动作放在疲劳前，以更高但可控的强度完成功率迁移。",
               "protocolId": "INTERVAL",
               "targetMinutes": 6,
-              "targetRpe": 5,
-              "prescription": "6 分钟目标段｜按 INTERVAL 处方执行；以完成标准判断质量。",
+              "targetRpe": 6,
+              "prescription": "6 分钟目标段｜按 INTERVAL 处方执行；以 RPE 6 内的功率质量判断完成度。",
               "stations": [
                 {
                   "actionId": "xueqiao_tui",
@@ -5908,7 +5908,7 @@
                 "出现疼痛、眩晕、异常呼吸或动作失控时立即停止。",
                 "连续两轮无法满足动作质量或恢复要求时结束本段并记录原因。"
               ],
-              "completionMetric": "完成 6 分钟目标段；记录每轮工作段的实际输出与动作质量。",
+              "completionMetric": "完成 6 分钟目标段；在 RPE 6 内记录每轮功率输出与动作质量。",
               "equipment": [
                 "雪橇车"
               ],

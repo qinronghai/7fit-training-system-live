@@ -94,7 +94,14 @@
       const index=stationIndex(namespace.stationKey);
       if(!block||index<0||index>=block.stations.length)return false;
       const actionId=normalizeActionId(input.actionId);
-      return !!actionId&&isLegalCandidate({
+      if(!actionId)return false;
+      if(variant.repeatPolicy==='UNIQUE_ACTIONS'){
+        const currentKey=input.stationKey||input.slotKey||'';
+        const duplicate=Object.entries(input.currentSelections||{})
+          .some(([key,value])=>key!==currentKey&&normalizeActionId(value)===actionId);
+        if(duplicate)return false;
+      }
+      return isLegalCandidate({
         familyId:input.familyId,
         level:input.level,
         protocolId:block.protocolId,
@@ -457,6 +464,7 @@
     const interBlockRecoverySeconds=blocks.reduce((sum,block)=>sum+Number(block.metrics.interBlockRecoverySeconds||0),0);
     const mainTrainingMinutes=Math.round((blockExecutionMinutes+(transitionSeconds+interBlockRecoverySeconds)/60)*10)/10;
     const fullSessionMinutes=Math.round((Number(blueprint.prep.durationMinutes||0)+mainTrainingMinutes+Number(blueprint.recovery.durationMinutes||0))*10)/10;
+    const targetWorkMinutes=Math.round(blocks.reduce((sum,block)=>sum+Number(block.metrics.targetBlockMinutes||0),0)*10)/10;
     const timing={
       prepMinutes:Number(blueprint.prep.durationMinutes||0),
       blockExecutionMinutes:Math.round(blockExecutionMinutes*10)/10,
@@ -466,6 +474,7 @@
       recoveryMinutes:Number(blueprint.recovery.durationMinutes||0),
       fullSessionMinutes,
       estimatedMinutes:Math.round(fullSessionMinutes),
+      targetWorkMinutes,
       blockCount:blocks.length,
       taskCount:stationItems.length,
     };

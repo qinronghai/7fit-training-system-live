@@ -10,7 +10,7 @@ for(const file of [
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
 const families=['CON-01','CON-02','CON-03','CON-04'],levels=['L1','L2','L3','L4'];
-const EXPECTED_SHA='04645de3cfb704c7a13b80741f280e2e9bc416ae216080b8fe10762a58a9cc63';
+const EXPECTED_SHA='ab9d49afb30577e3c1faa62ce04667b296aeeb756b10979d91616e8897e4d7da';
 
 function signature(session){
   const ctx=session.domainContext;

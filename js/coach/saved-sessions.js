@@ -34,7 +34,10 @@
   function notice(route){
     const n=Service()?.getLastRestoreNotice?.(),descriptor=Service()?.descriptorFromRoute?.(route||{});
     if(!n||!descriptor||n.templateId!==descriptor.templateId||n.sessionKey!==descriptor.sessionKey)return '';
-    if(n.code==='MIGRATED_EXPLICITLY')return `<div class="saved-session-notice warn"><b>已明确升级为多区块版本</b><span>${esc(templateLabel(n.templateId))} · ${esc(n.level||descriptor.level||'')}｜${esc(n.name||'')}</span><small>原旧版单块记录仍保留为备份；本次未按位置映射旧动作，请先确认 A 变体的训练段安排。</small></div>`;
+    if(n.code==='MIGRATED_EXPLICITLY'||n.code==='REPAIRED_EXPLICITLY'){
+      const repaired=n.code==='REPAIRED_EXPLICITLY';
+      return `<div class="saved-session-notice warn"><b>${repaired?'已修复并生成多区块版本':'已明确升级为多区块版本'}</b><span>${esc(templateLabel(n.templateId))} · ${esc(n.level||descriptor.level||'')}｜${esc(n.name||'')}</span><small>原保存记录仍保留为备份；${repaired?'已保留可识别的变体与合法动作选择，请确认当前课程。':'本次未按位置映射旧动作，请先确认 A 变体的训练段安排。'}</small></div>`;
+    }
     const migrated=n.reasons?.length,context=`${templateLabel(n.templateId)} · ${n.level||descriptor.level||''}`;
     return `<div class="saved-session-notice ${migrated?'warn':'ok'}"><b>${migrated?'已恢复并完成兼容处理':'已恢复保存课程'}</b><span>${esc(context)}｜${esc(n.name||'')}</span>${migrated?`<small>${esc(n.reasons.join(' / '))}${n.droppedSelections?.length?`｜动作回退：${esc(n.droppedSelections.join('、'))}`:''}${n.droppedPrepSelections?.length?`｜PREP 回退：${esc(n.droppedPrepSelections.join('、'))}`:''}</small>`:''}</div>`;
   }

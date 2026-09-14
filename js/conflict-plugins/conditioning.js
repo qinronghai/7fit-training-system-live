@@ -155,9 +155,7 @@
         out.push(issue('warn',title,`当前 ${count} 个，超过 ${level} 建议上限 ${max} 个。`,code,10400+index));
       }
     });
-    const powerCount=session?.schemaVersion===2
-      ?new Set(items.filter(item=>item?.powerEligible===true).map(item=>item.blockKey||item.key)).size
-      :items.filter(item=>item?.powerEligible===true).length;
+    const powerCount=items.filter(item=>item?.powerEligible===true).length;
     const powerMax=Number(policy.maxPowerStationsByLevel?.[level]);
     if(Number.isFinite(powerMax)&&powerCount>powerMax){
       out.push(issue('warn','Power Station 偏多',`当前 ${powerCount} 个，超过 ${level} 建议上限 ${powerMax} 个。`,'COND_POWER_STACK',10410));
@@ -208,13 +206,22 @@
     if(Number.isFinite(max)&&Number.isFinite(estimated)&&estimated>max){
       issues.push(issue('warn','Conditioning 时间预算过长',`预计 ${estimated} 分钟，超过 V1 上限 ${max} 分钟。`,'COND_TIME_BUDGET',10700));
     }
-    const blueprintRange=session?.schemaVersion===2
-      ?({L1:[20,35],L2:[30,45],L3:[40,50],L4:[40,55]}[session.level]||null)
-      :levelPolicy.estimatedSessionMinutesRange;
+    const blueprintRange=levelPolicy.estimatedSessionMinutesRange;
     if(Number.isFinite(estimated)&&Array.isArray(blueprintRange)&&!inRange(estimated,blueprintRange)){
       issues.push(issue('warn','Conditioning 等级时长偏离',
         `预计 ${estimated} 分钟，${session.level} 建议区间为 ${blueprintRange[0]}–${blueprintRange[1]} 分钟。`,
         'COND_LEVEL_DURATION',10710));
+    }
+    if(session?.schemaVersion===2&&Array.isArray(levelPolicy.totalWorkMinutesRange)){
+      const targetWork=blockList(session).reduce((sum,currentBlock)=>{
+        const value=Number(currentBlock?.metrics?.targetBlockMinutes);
+        return Number.isFinite(value)?sum+value:sum;
+      },0);
+      if(targetWork>0&&!inRange(targetWork,levelPolicy.totalWorkMinutesRange)){
+        issues.push(issue('warn','Conditioning 总工作量偏离',
+          `目标工作量 ${Math.round(targetWork*10)/10} 分钟，${session.level} 目标区间为 ${levelPolicy.totalWorkMinutesRange[0]}–${levelPolicy.totalWorkMinutesRange[1]} 分钟。`,
+          'COND_TOTAL_WORK_MINUTES',10715));
+      }
     }
     if(session?.schemaVersion!==2&&Number.isFinite(block)&&Array.isArray(levelPolicy.totalWorkMinutesRange)&&!inRange(block,levelPolicy.totalWorkMinutesRange)){
       issues.push(issue('warn','Protocol 主块时长偏离',

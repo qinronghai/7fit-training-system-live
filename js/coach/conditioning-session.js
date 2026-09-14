@@ -13,6 +13,24 @@
     return variants.A?'A':Object.keys(variants)[0]||'A';
   }
 
+  function variantForProtocol(familyId,level,protocolId){
+    const variants=D().conditioningBlueprints?.[familyId]?.[level]||{};
+    return Object.entries(variants).find(([,blueprint])=>
+      blueprint?.blocks?.some(block=>block.protocolId===protocolId)
+    )?.[0]||'';
+  }
+
+  function legacyProtocolForRoute(familyId,route={}){
+    const protocolId=String(route.query?.protocol||'').toUpperCase();
+    const family=D().conditioningFamilies?.[familyId];
+    return D().conditioningProtocols?.[protocolId]&&family?.protocolEligibility?.includes(protocolId)
+      ?protocolId:'';
+  }
+
+  function legacySessionKey(familyId,level,protocolId){
+    return `${familyId}-${level}-PROTOCOL-${protocolId}`;
+  }
+
   function normalizeFamilyLevelProtocol(route={}){
     const familyIds=D().conditioningFamilyIds||[];
     const rawFamily=String(route.familyId||route.query?.family||'CON-01').toUpperCase();
@@ -21,12 +39,16 @@
     const level=/^L[1-4]$/.test(rawLevel)?rawLevel:'L1';
     const rawVariant=String(route.query?.variant||route.variantId||'').toUpperCase();
     const variants=D().conditioningBlueprints?.[familyId]?.[level]||{};
-    const variantId=BLUEPRINT_VARIANTS.includes(rawVariant)&&variants[rawVariant]
-      ?rawVariant:defaultVariant(familyId,level);
+    const explicitVariant=BLUEPRINT_VARIANTS.includes(rawVariant)&&!!variants[rawVariant];
+    const requestedProtocol=legacyProtocolForRoute(familyId,route);
+    const protocolVariant=!explicitVariant&&requestedProtocol
+      ?variantForProtocol(familyId,level,requestedProtocol):'';
+    const variantId=explicitVariant?rawVariant:protocolVariant||defaultVariant(familyId,level);
+    const legacyProtocolId=!explicitVariant&&!protocolVariant?requestedProtocol:'';
     const blueprint=variants[variantId]||{};
-    const protocolId=blueprint.blocks?.find(block=>block.role==='MAIN')?.protocolId||blueprint.blocks?.[0]?.protocolId||'';
+    const protocolId=legacyProtocolId||blueprint.blocks?.find(block=>block.role==='MAIN')?.protocolId||blueprint.blocks?.[0]?.protocolId||'';
     return {
-      familyId,level,variantId,
+      familyId,level,variantId,legacyProtocolId,
       sessionBlueprintId:blueprint.sessionBlueprintId||`${familyId}-${level}-${variantId}`,
       protocolId,
     };
@@ -36,6 +58,15 @@
     const variant=String(value||'').toUpperCase();
     return BLUEPRINT_VARIANTS.includes(variant)&&D().conditioningBlueprints?.[familyId]?.[level]?.[variant]
       ?variant:defaultVariant(familyId,level);
+  }
+
+  function nextVariantId({familyId,level,currentVariantId,previousVariantId}={}){
+    const variants=D().conditioningBlueprints?.[familyId]?.[level]||{};
+    const available=BLUEPRINT_VARIANTS.filter(variantId=>variants[variantId]);
+    if(!available.length)return 'A';
+    const requested=String(currentVariantId||previousVariantId||'').toUpperCase();
+    const current=available.includes(requested)?requested:available[0];
+    return available[(available.indexOf(current)+1)%available.length];
   }
 
   function stateMetadata(familyId,level,variantId){
@@ -65,6 +96,7 @@
         variantId:state.input?.variantId||variant,
         stationKey,
         actionId:entry.actionId,
+        currentSelections:state.selections,
       }),
     };
     if(current.resolverVersion!==RESOLVER_VERSION)return S.reconcileSession('conditioning',sessionKey,options).session;
@@ -72,8 +104,34 @@
     return S.getSession('conditioning',sessionKey);
   }
 
-  function resolveState(familyId,level,variantId){
+  function ensureLegacyState(familyId,level,protocolId){
     const S=window.V15State;
+    if(!S)return null;
+    const sessionKey=legacySessionKey(familyId,level,protocolId),metadata={
+      familyId,level,resolverVersion:'conditioning-v1',input:{familyId,level,protocolId},
+    };
+    if(!S.getSession('conditioning',sessionKey))S.ensureSession('conditioning',sessionKey,metadata);
+    S.reconcileSession('conditioning',sessionKey,{
+      resolverVersion:'conditioning-v1',
+      isSelectionValid:(stationKey,entry,state)=>window.V15ConditioningResolver.isSelectionValid({
+        familyId:state.familyId,level:state.level,protocolId:state.input?.protocolId||protocolId,
+        stationKey,actionId:entry.actionId,currentSelections:state.selections,
+      }),
+    });
+    return S.getSession('conditioning',sessionKey);
+  }
+
+  function resolveState(familyId,level,variantId,legacyProtocolId=''){
+    const S=window.V15State;
+    if(legacyProtocolId){
+      const sessionKey=legacySessionKey(familyId,level,legacyProtocolId);
+      if(!S)return window.V15TemplateResolver.resolve('conditioning',{familyId,level,protocolId:legacyProtocolId,selections:{}});
+      ensureLegacyState(familyId,level,legacyProtocolId);
+      return window.V15TemplateResolver.resolve('conditioning',{
+        familyId,level,protocolId:legacyProtocolId,
+        selections:S.getSelections('conditioning',sessionKey),
+      });
+    }
     const variant=normalizeVariantId(familyId,level,variantId);
     if(!S)return window.V15TemplateResolver.resolve('conditioning',{familyId,level,variantId:variant,selections:{}});
     ensureState(familyId,level,variant);
@@ -90,7 +148,10 @@
     if(!S)throw new Error('Conditioning coach State service is unavailable');
     const variant=normalizeVariantId(familyId,level,variantId);
     ensureState(familyId,level,variant);
-    if(!window.V15ConditioningResolver.isSelectionValid({familyId,level,variantId:variant,stationKey,actionId})){
+    if(!window.V15ConditioningResolver.isSelectionValid({
+      familyId,level,variantId:variant,stationKey,actionId,
+      currentSelections:S.getSelections('conditioning',sessionKeyFor(familyId,level,variant)),
+    })){
       throw new Error(`Invalid Conditioning selection: ${familyId} ${level} ${variant} ${stationKey} ${actionId}`);
     }
     return S.setSelection('conditioning',sessionKeyFor(familyId,level,variant),stationKey,actionId,'manual');
@@ -106,13 +167,14 @@
   }
 
   function context(route={}){
-    const {familyId,level,variantId,sessionBlueprintId,protocolId}=normalizeFamilyLevelProtocol(route);
-    const sessionKey=sessionKeyFor(familyId,level,variantId);
-    const session=resolveState(familyId,level,variantId);
+    const normalized=normalizeFamilyLevelProtocol(route);
+    const {familyId,level,variantId,sessionBlueprintId,protocolId,legacyProtocolId}=normalized;
+    const sessionKey=legacyProtocolId?legacySessionKey(familyId,level,legacyProtocolId):sessionKeyFor(familyId,level,variantId);
+    const session=resolveState(familyId,level,variantId,legacyProtocolId);
     const selections=window.V15State?.getSelections?.('conditioning',sessionKey)||{};
     const prep=M.ConditioningPrep?.resolve?.(session,sessionKey)||null;
     return {
-      familyId,level,variantId,sessionBlueprintId,protocolId,sessionKey,session,selections,prep,
+      familyId,level,variantId,sessionBlueprintId,protocolId,legacyProtocolId,sessionKey,session,selections,prep,
       family:D().conditioningFamilies?.[familyId]||{},
       protocol:D().conditioningProtocols?.[protocolId]||{},
     };
@@ -203,7 +265,8 @@
 
   function protocolPanel(session){
     const stress=stressSummary(session),cells=protocolMetrics(session);
-    return `<section class="section-card conditioning-protocol-panel"><div class="section-head"><div><h2>今日体能结构</h2><p>${esc(session.domainContext?.blueprintLabel||'多段式 Conditioning')}：准备 → 建立 → 主训练 → 挑战 → 恢复；每个训练段都来自当前 ResolvedSession。</p></div><span class="time-badge">${esc(session.variantId||'A')} 变体</span></div>
+    const phases=['准备',...(session.blocks||[]).map(block=>block.roleLabel||block.label||'训练段'),'恢复'];
+    return `<section class="section-card conditioning-protocol-panel"><div class="section-head"><div><h2>今日体能结构</h2><p>${esc(session.domainContext?.blueprintLabel||'多段式 Conditioning')}：${esc(phases.join(' → '))}；每个训练段都来自当前 ResolvedSession。</p></div><span class="time-badge">${esc(session.variantId||'A')} 变体</span></div>
       <div class="conditioning-metric-grid">${cells.map(([label,value])=>`<div><small>${esc(label)}</small><b>${esc(value)}</b></div>`).join('')}</div>
       <div class="conditioning-stress-summary">
         <div><small>Impact</small><b>${esc(RISK_LABEL[stress.impact]||stress.impact)}</b></div>
@@ -245,11 +308,29 @@
     return `${prepHtml}${protocolPanel(session)}${main}${recovery()}`;
   }
 
+  function renderLegacyEditor(ctx){
+    const session=ctx.session,items=session.main?.content?.blocks?.flatMap(block=>block.items||[])||[];
+    return `<section class="section-card conditioning-legacy-editor"><div class="saved-session-notice warn"><b>旧 Protocol 兼容入口</b><span>已保留 ${esc(ctx.protocol?.name||ctx.protocolId)} 的原始链接语义；它不会静默改成 A / B / C 蓝图。</span><small>如需使用新的分段课程，请切换到系统推荐的多区块蓝图。</small></div><div class="section-head"><div><h2>Conditioning｜${esc(ctx.protocol?.name||ctx.protocolId)}</h2><p>${esc(session.summary||'旧版 Conditioning Protocol')}</p></div><span class="time-badge">兼容模式</span></div><div class="conditioning-legacy-actions"><a class="section-action-link" href="#/coach/conditioning/compose?family=${encodeURIComponent(ctx.familyId)}&level=${encodeURIComponent(ctx.level)}&variant=A">切换新版多区块蓝图 →</a></div><div class="conditioning-legacy-stations">${items.map((item,index)=>`<article class="conditioning-legacy-station"><span>任务 ${index+1}</span><h3>${esc(item.name||item.actionId)}</h3><p>${esc(item.prescription||'按当前 Protocol 执行')}</p><a href="#/library?focus=${encodeURIComponent(item.actionId||'')}">查看动作</a></article>`).join('')}</div></section>`;
+  }
+
+  function variantButton(ctx){
+    if(ctx.legacyProtocolId)return '';
+    const next=nextVariantId({familyId:ctx.familyId,level:ctx.level,currentVariantId:ctx.variantId});
+    return `<button type="button" class="conditioning-next-variant" data-conditioning-next-variant>切换下一变体：${esc(next)}</button>`;
+  }
+
+  function sessionHash(route,familyId,level,variantId){
+    const next={...route,query:{variant:variantId}};
+    return window.V14Router?.canonicalHash?.(next)
+      ||`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}?variant=${encodeURIComponent(variantId)}`;
+  }
+
   function render(route){
     const ctx=context(route),family=ctx.family;
+    const editor=ctx.legacyProtocolId?renderLegacyEditor(ctx):renderEditor(ctx);
     return `<a class="back-link" href="#/coach/conditioning">← 返回 Conditioning</a>`+
-      `<section class="view-hero conditioning-session-hero"><span class="eyebrow">COACH CENTER / CONDITIONING</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(ctx.session.domainContext?.blueprintLabel||family.goal||ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${esc(ctx.variantId)} 变体</span><span class="chip">${esc(ctx.session.timing?.blockCount||ctx.session.blocks?.length||0)} 个训练段</span><span class="chip">${esc(ctx.session.timing?.taskCount||0)} 个任务</span><span class="chip">约 ${esc(ctx.session.timing?.estimatedMinutes||'—')} 分钟</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div></section>`+
-      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
+      `<section class="view-hero conditioning-session-hero"><span class="eyebrow">COACH CENTER / CONDITIONING</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(ctx.session.domainContext?.blueprintLabel||family.goal||ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${ctx.legacyProtocolId?'兼容 Protocol':`${esc(ctx.variantId)} 变体`}</span><span class="chip">${esc(ctx.session.timing?.blockCount||ctx.session.blocks?.length||1)} 个训练段</span><span class="chip">${esc(ctx.session.timing?.taskCount||ctx.session.main?.content?.blocks?.flatMap(block=>block.items||[]).length||0)} 个任务</span><span class="chip">约 ${esc(ctx.session.timing?.estimatedMinutes||ctx.session.domainContext?.metrics?.estimatedMinutes||'—')} 分钟</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div>${variantButton(ctx)}</section>`+
+      editor+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function variantOptions(familyId,level,selected){
@@ -267,13 +348,17 @@
       return `<option value="${esc(familyId)}" ${familyId===ctx.familyId?'selected':''}>${esc(family.name||familyId)}</option>`;
     }).join('');
     const levelOptions=LEVELS.map(level=>`<option value="${level}" ${level===ctx.level?'selected':''}>${level}</option>`).join('');
+    const variantControl=ctx.legacyProtocolId
+      ?`<label><span>训练变体</span><div class="conditioning-legacy-control">保留旧 Protocol：${esc(ctx.protocolId)}</div></label>`
+      :`<label><span>训练变体</span><select data-conditioning-compose-variant>${variantOptions(ctx.familyId,ctx.level,ctx.variantId)}</select></label>`;
+    const editor=ctx.legacyProtocolId?renderLegacyEditor(ctx):renderEditor(ctx);
     return `<a class="back-link" href="#/coach/conditioning">← 返回 Conditioning</a>`+
       `<section class="view-hero conditioning-composer-hero"><span class="eyebrow">COACH CENTER / CONDITIONING COMPOSER</span><h1>Conditioning 课程构建</h1><p>选择体能目标、等级与 A / B / C 训练变体；每个变体都由同一 Resolver、State、PREP、Conflict 与 Copy 生成完整课程。</p><div class="conditioning-compose-controls">
         <label><span>训练 Family</span><select data-conditioning-compose-family>${familyOptions}</select></label>
         <label><span>训练等级</span><select data-conditioning-compose-level>${levelOptions}</select></label>
-        <label><span>训练变体</span><select data-conditioning-compose-variant>${variantOptions(ctx.familyId,ctx.level,ctx.variantId)}</select></label>
-      </div></section>`+
-      renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
+        ${variantControl}
+      </div>${variantButton(ctx)}</section>`+
+      editor+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
   function canHandle(route={}){
@@ -311,9 +396,22 @@
   function bind(route,root,rerender){
     if(route.page!=='template-session'&&route.page!=='template-compose')return;
     const normalized=normalizeFamilyLevelProtocol(route);
-    const {familyId,level,variantId}=normalized;
+    const {familyId,level,variantId,legacyProtocolId}=normalized;
 
-    if(route.page==='template-compose'){
+    if(!legacyProtocolId&&route.page==='template-session'){
+      const rawVariant=String(route.query?.variant||'').toUpperCase();
+      const variantValid=BLUEPRINT_VARIANTS.includes(rawVariant)
+        &&!!D().conditioningBlueprints?.[familyId]?.[level]?.[rawVariant];
+      if(rawVariant&&!variantValid){
+        const hash=sessionHash(route,familyId,level,variantId);
+        if(window.location?.hash!==hash){
+          if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
+          return;
+        }
+      }
+    }
+
+    if(!legacyProtocolId&&route.page==='template-compose'){
       const rawFamily=String(route.query?.family||'').toUpperCase();
       const rawLevel=String(route.query?.level||'').toUpperCase();
       const rawVariant=String(route.query?.variant||'').toUpperCase();
@@ -349,6 +447,14 @@
         if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
       });
     }
+
+    root.querySelector('[data-conditioning-next-variant]')?.addEventListener('click',()=>{
+      const next=nextVariantId({familyId,level,currentVariantId:variantId});
+      const hash=route.page==='template-compose'
+        ?composerHash(route,familyId,level,next)
+        :sessionHash(route,familyId,level,next);
+      if(window.V14Router?.navigate)window.V14Router.navigate(hash);else window.location.hash=hash;
+    });
 
     root.querySelectorAll('.conditioning-station-select').forEach(select=>select.addEventListener('change',()=>{
       const stationKey=select.dataset.conditioningStation,candidates=Array.from(select.options).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
@@ -392,7 +498,7 @@
   };
   M.ConditioningSession={
     context,render,renderEditor,renderComposer,ensureState,resolveState,setFormalSelection,reset,copyCurrent,
-    sessionKeyFor,normalizeFamilyLevelProtocol,stressSummary,adapter,
+    sessionKeyFor,normalizeFamilyLevelProtocol,nextVariantId,stressSummary,adapter,
   };
   M.TemplateUI.register('conditioning',adapter);
 })();

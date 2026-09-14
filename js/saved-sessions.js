@@ -30,6 +30,26 @@
     return route?.page==='template-compose'||route?.page==='compose'?'compose':'session';
   }
 
+  function conditioningRouteIntent(data,route={}){
+    const rawFamily=String(route.familyId||route.query?.family||'CON-01').toUpperCase();
+    const familyId=(data.conditioningFamilyIds||[]).includes(rawFamily)?rawFamily:'CON-01';
+    const rawLevel=String(route.level||route.query?.level||'L1').toUpperCase();
+    const level=LEVELS.has(rawLevel)?rawLevel:'L1';
+    const variants=data.conditioningBlueprints?.[familyId]?.[level]||{};
+    const rawVariant=String(route.query?.variant||'').toUpperCase();
+    if(rawVariant&&variants[rawVariant])return {familyId,level,variantId:rawVariant,protocolId:'',legacy:false};
+    const protocolId=String(route.query?.protocol||'').toUpperCase();
+    const family=data.conditioningFamilies?.[familyId];
+    const protocolValid=!!data.conditioningProtocols?.[protocolId]&&family?.protocolEligibility?.includes(protocolId);
+    if(protocolValid){
+      const matching=Object.entries(variants).find(([,blueprint])=>blueprint?.blocks?.some(block=>block.protocolId===protocolId));
+      if(matching)return {familyId,level,variantId:matching[0],protocolId,legacy:false};
+      return {familyId,level,variantId:'',protocolId,legacy:true};
+    }
+    const variantId=variants.A?'A':Object.keys(variants)[0]||'A';
+    return {familyId,level,variantId,protocolId:'',legacy:false};
+  }
+
   function failResult(code,message,record=null){
     return {ok:false,code,message,record:record?clone(record):null,reasons:[code],droppedSelections:[],droppedPrepSelections:[]};
   }
@@ -89,15 +109,15 @@
     }
 
     if(route.templateId==='conditioning'){
-      const ids=data.conditioningFamilyIds||[];
-      const rawFamily=String(route.familyId||route.query?.family||'CON-01').toUpperCase();
-      const familyId=ids.includes(rawFamily)?rawFamily:'CON-01';
-      const rawLevel=String(route.level||route.query?.level||'L1').toUpperCase();
-      const level=LEVELS.has(rawLevel)?rawLevel:'L1';
-      const variants=data.conditioningBlueprints?.[familyId]?.[level]||{};
-      const requested=String(route.query?.variant||'').toUpperCase();
-      const variantId=variants[requested]?requested:'A';
-      const blueprint=variants[variantId]||{};
+      const intent=conditioningRouteIntent(data,route),{familyId,level,variantId}=intent;
+      const blueprint=data.conditioningBlueprints?.[familyId]?.[level]?.[variantId]||{};
+      if(intent.legacy){
+        const sessionKey=`${familyId}-${level}-PROTOCOL-${intent.protocolId}`;
+        return {
+          templateId:'conditioning',sessionKey,familyId,level,resolverVersion:'conditioning-v1',
+          input:{familyId,level,protocolId:intent.protocolId,surface:routeSurface(route)},
+        };
+      }
       return {
         templateId:'conditioning',
         sessionKey:`${familyId}-${level}-BLUEPRINT-${variantId}`,
@@ -373,7 +393,7 @@
     });
     const hash=surface==='compose'
       ?`#/coach/conditioning/compose?family=${encodeURIComponent(familyId)}&level=${encodeURIComponent(level)}&variant=${encodeURIComponent(variantId)}`
-      :`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}`;
+      :`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}?variant=${encodeURIComponent(variantId)}`;
     return {
       ok:true,code:reasons.length?'RESTORED_WITH_MIGRATION':'RESTORED',
       hash,templateId:'conditioning',sessionKey,reasons,
@@ -385,24 +405,38 @@
     const data=D(),familyId=record?.familyId,level=record?.level;
     if(record?.templateId!=='conditioning')return failResult('CONDITIONING_BLUEPRINT_MIGRATION_INVALID','只有 Conditioning 保存记录可以执行此升级',record);
     if(!(data.conditioningFamilyIds||[]).includes(familyId)||!LEVELS.has(level))return failResult('UNRESTORABLE_CONDITIONING_SESSION','Saved Conditioning Family / Level is no longer available',record);
-    if(record.resolverVersion==='conditioning-v2'&&record.input?.variantId){
+    const variants=data.conditioningBlueprints?.[familyId]?.[level]||{};
+    const requestedVariant=String(record.input?.variantId||'').toUpperCase();
+    const repairableV2=record.resolverVersion==='conditioning-v2'&&!!variants[requestedVariant];
+    const currentBlueprint=variants[requestedVariant];
+    if(repairableV2&&record.input?.sessionBlueprintId===currentBlueprint.sessionBlueprintId){
       return failResult('CONDITIONING_BLUEPRINT_ALREADY_CURRENT','这条 Conditioning 保存记录已经是多区块版本',record);
     }
-    const variantId='A',blueprint=data.conditioningBlueprints?.[familyId]?.[level]?.[variantId];
+    const variantId=repairableV2?requestedVariant:'A',blueprint=variants[variantId];
     if(!blueprint)return failResult('CONDITIONING_BLUEPRINT_UNAVAILABLE','当前 Conditioning 多区块蓝图不可用',record);
-    const resolved=window.V15TemplateResolver.resolve('conditioning',{familyId,level,variantId,selections:{}});
+    let resolved,accepted={},dropped=[];
+    try{
+      resolved=window.V15TemplateResolver.resolve('conditioning',{familyId,level,variantId,selections:repairableV2?manualMap(record.selections):{}});
+      if(repairableV2){
+        const formal=acceptedResolvedSelections(record,resolved);
+        accepted=formal.accepted;
+        dropped=formal.dropped;
+      }
+    }catch(error){
+      return failResult('CONDITIONING_BLUEPRINT_MIGRATION_FAILED',error?.message||'升级多区块课程失败，原记录未修改',record);
+    }
     const prep=validatePrep(resolved.prepContext,record.prepSelections);
-    const state=S(),sessionKey=`${familyId}-${level}-BLUEPRINT-${variantId}-MIGRATION-${record.savedId}`;
+    const state=S(),sessionKey=`${familyId}-${level}-BLUEPRINT-${variantId}-${repairableV2?'REPAIR':'MIGRATION'}-${record.savedId}`;
     const targetSessionKey=`${familyId}-${level}-BLUEPRINT-${variantId}`;
     const input={familyId,level,variantId,sessionBlueprintId:blueprint.sessionBlueprintId,surface:record.input?.surface==='compose'?'compose':'session'};
     const baseName=record.name||`${familyId} · ${level}`;
-    const preferredId=`${record.savedId}-blueprint`;
+    const preferredId=`${record.savedId}-${repairableV2?'repair':'blueprint'}`;
     const savedId=state.getSavedSession(preferredId)?undefined:preferredId;
     let created;
     try{
       state.ensureSession('conditioning',sessionKey,{familyId,level,resolverVersion:'conditioning-v2',input});
-      if(Object.keys(prep.accepted).length)state.patchSession('conditioning',sessionKey,{prepSelections:prep.accepted});
-      created=state.createSavedSession('conditioning',sessionKey,{savedId,name:`${baseName} · 多区块 A`,input});
+      state.patchSession('conditioning',sessionKey,{selections:accepted,prepSelections:prep.accepted});
+      created=state.createSavedSession('conditioning',sessionKey,{savedId,name:`${baseName} · 多区块 ${variantId}${repairableV2?' 修复':'升级'}`,input});
     }catch(error){
       state.resetSession('conditioning',sessionKey);
       return failResult('CONDITIONING_BLUEPRINT_MIGRATION_FAILED',error?.message||'升级多区块课程失败，原记录未修改',record);
@@ -411,12 +445,12 @@
     const surface=input.surface;
     const hash=surface==='compose'
       ?`#/coach/conditioning/compose?family=${encodeURIComponent(familyId)}&level=${encodeURIComponent(level)}&variant=${variantId}`
-      :`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}`;
+      :`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}?variant=${encodeURIComponent(variantId)}`;
     return {
-      ok:true,code:'MIGRATED_EXPLICITLY',hash,templateId:'conditioning',sessionKey:targetSessionKey,
+      ok:true,code:repairableV2?'REPAIRED_EXPLICITLY':'MIGRATED_EXPLICITLY',hash,templateId:'conditioning',sessionKey:targetSessionKey,
       savedId:created.savedId,originalSavedId:record.savedId,
-      reasons:['CONDITIONING_BLUEPRINT_MIGRATION','LEGACY_SINGLE_BLOCK_SELECTIONS_DROPPED'],
-      droppedSelections:Object.keys(record.selections||{}),
+      reasons:repairableV2?['CONDITIONING_BLUEPRINT_REPAIRED']:['CONDITIONING_BLUEPRINT_MIGRATION','LEGACY_SINGLE_BLOCK_SELECTIONS_DROPPED'],
+      droppedSelections:repairableV2?dropped:Object.keys(record.selections||{}),
       droppedPrepSelections:prep.dropped,
     };
   }

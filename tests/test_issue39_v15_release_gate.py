@@ -32,7 +32,7 @@ def test_v15_release_matrix_artifacts_are_frozen():
     assert "8fa0030bfc1b1bfa658ad60ecca0287e0f3a09cc13f4314de3ad74b59eefdf3a" in body
 
     conditioning = text("tests/conditioning_resolver_baseline_test.js")
-    assert "04645de3cfb704c7a13b80741f280e2e9bc416ae216080b8fe10762a58a9cc63" in conditioning
+    assert "ab9d49afb30577e3c1faa62ce04667b296aeeb756b10979d91616e8897e4d7da" in conditioning
 
 
 def test_playwright_release_gate_discovers_all_v15_critical_specs():

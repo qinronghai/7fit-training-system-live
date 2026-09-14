@@ -136,6 +136,18 @@ const {D,S,Save,R,Prep,Body,Cond}=env;
   D.conditioningBlueprints[familyId][level].A=originalBlueprint;
 }
 
+// Conditioning session-surface round-trip preserves a non-default blueprint variant.
+{
+  const familyId='CON-03',level='L2',variantId='B',sessionKey=`${familyId}-${level}-BLUEPRINT-${variantId}`;
+  S.ensureSession('conditioning',sessionKey,{familyId,level,resolverVersion:'conditioning-v2',input:{familyId,level,variantId,sessionBlueprintId:`${familyId}-${level}-${variantId}`,surface:'session'}});
+  Save.saveRoute({templateId:'conditioning',page:'template-session',familyId,level,query:{variant:variantId}},'Conditioning B Session 保存测试',{savedId:'save-cond-session-b',now:'2026-09-12T08:12:00.000Z'});
+  S.resetSession('conditioning',sessionKey);
+  const restored=Save.restore('save-cond-session-b');
+  assert.strictEqual(restored.ok,true);
+  assert.strictEqual(restored.hash,`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}?variant=${variantId}`);
+  assert.strictEqual(S.getSession('conditioning',sessionKey).input.variantId,variantId);
+}
+
 // Resolver mismatch is a migration signal; selections are revalidated under current code.
 {
   const raw=JSON.parse(env.memory['7fit-v15-state']);

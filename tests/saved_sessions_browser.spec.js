@@ -144,3 +144,25 @@ test('Conditioning saved session restores blueprint variant and Station intent a
   await expect390NoOverflow(page);
   expect(errors,`unexpected Conditioning Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
+
+test('Conditioning session-surface save/restore keeps the selected B variant at 390px',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/conditioning/con-03/l2?variant=B');
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('C');
+
+  await page.locator('[data-save-session-name]').fill('Conditioning B Session 保存课');
+  await page.locator('[data-save-current-session]').click();
+  await expect(page.locator('.saved-session-card h3')).toHaveText('Conditioning B Session 保存课');
+  await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 Conditioning L2');
+
+  await page.locator('[data-conditioning-next-variant]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2\?variant=C/);
+  await page.locator('[data-saved-restore]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2\?variant=B/);
+  await expect(page.locator('.conditioning-session-hero')).toContainText('B 变体');
+  await expect(page.locator('.saved-session-notice')).toContainText('Conditioning · L2');
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('C');
+  await expect390NoOverflow(page);
+  expect(errors,`unexpected Conditioning session Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+});

@@ -165,9 +165,80 @@
   function validateTiming(value,errors){
     const path='timing';
     if(!isObject(value)){push(errors,path,'must be an object');return;}
-    ['prepMinutes','blockExecutionMinutes','transitionMinutes','interBlockRecoveryMinutes','mainTrainingMinutes','recoveryMinutes','fullSessionMinutes','estimatedMinutes','blockCount','taskCount'].forEach(key=>{
+    ['prepMinutes','blockExecutionMinutes','transitionMinutes','interBlockRecoveryMinutes','mainTrainingMinutes','recoveryMinutes','fullSessionMinutes','estimatedMinutes','targetWorkMinutes','blockCount','taskCount'].forEach(key=>{
       if(!Number.isFinite(value[key])||value[key]<0)push(errors,`${path}.${key}`,'must be a non-negative number');
     });
+  }
+
+  function legalConditioningStation(familyId,level,protocolId,actionId){
+    const data=window.V14_DATA||{},meta=data.conditioningActionMeta?.[actionId],action=data.actions?.[actionId];
+    return !!meta&&!!action
+      &&meta.families?.includes(familyId)
+      &&meta.levels?.includes(level)
+      &&meta.protocolEligibility?.includes(protocolId)
+      &&action.route==='CONDITIONING_2F'
+      &&action.status==='可自动编排'
+      &&(familyId!=='CON-04'||meta.powerEligible===true);
+  }
+
+  function validateConditioningBlueprint(session,errors){
+    const data=window.V14_DATA||{},familyId=session.familyId,level=session.level,variantId=session.variantId;
+    const blueprint=data.conditioningBlueprints?.[familyId]?.[level]?.[variantId];
+    if(!blueprint){
+      push(errors,'conditioning blueprint','must reference a known Family / Level / Variant');
+      return;
+    }
+    if(blueprint.sessionBlueprintId!==session.sessionBlueprintId)push(errors,'sessionBlueprintId','must match the selected conditioning blueprint');
+    if(blueprint.familyId!==familyId)push(errors,'familyId','must match the conditioning blueprint');
+    if(blueprint.level!==level)push(errors,'level','must match the conditioning blueprint');
+    if(blueprint.variantId!==variantId)push(errors,'variantId','must match the conditioning blueprint');
+    if(session.domainContext?.sessionBlueprintId!==session.sessionBlueprintId)push(errors,'domainContext.sessionBlueprintId','must match sessionBlueprintId');
+    if(session.domainContext?.variantId!==session.variantId)push(errors,'domainContext.variantId','must match variantId');
+
+    const expectedBlocks=Array.isArray(blueprint.blocks)?blueprint.blocks:[];
+    const actualBlocks=Array.isArray(session.blocks)?session.blocks:[];
+    if(expectedBlocks.length!==actualBlocks.length){
+      push(errors,'blocks','must preserve the conditioning blueprint block count and order');
+      return;
+    }
+    const allActionIds=[];
+    expectedBlocks.forEach((expected,index)=>{
+      const actual=actualBlocks[index],path=`blocks.${index}`;
+      if(!isObject(actual))return;
+      if(actual.key!==expected.key)push(errors,`${path}.key`,'must preserve conditioning blueprint order');
+      if(actual.role!==expected.role)push(errors,`${path}.role`,'must match the conditioning blueprint role');
+      if(actual.protocolId!==expected.protocolId)push(errors,`${path}.protocolId`,'must match the conditioning blueprint protocol');
+      const expectedStations=Array.isArray(expected.stations)?expected.stations:[];
+      const actualStations=actual.stations&&typeof actual.stations==='object'&&!Array.isArray(actual.stations)?actual.stations:{};
+      const actualKeys=Object.keys(actualStations);
+      if(actualKeys.length!==expectedStations.length)push(errors,`${path}.stations`,'must preserve the conditioning blueprint station count');
+      expectedStations.forEach((expectedStation,stationIndex)=>{
+        const key=`${expected.key}/STATION-${stationIndex+1}`,station=actualStations[key],stationPath=`${path}.stations.${key}`;
+        if(!isObject(station)){push(errors,stationPath,'must preserve namespaced station keys');return;}
+        if(station.key!==key)push(errors,`${stationPath}.key`,'must equal its block-namespaced key');
+        if(station.blockKey!==expected.key)push(errors,`${stationPath}.blockKey`,'must match its parent block');
+        if(!legalConditioningStation(familyId,level,expected.protocolId,station.actionId)){
+          push(errors,`${stationPath}.actionId`,'conditioning action route, status, family, level, and protocol must be legal');
+        }
+        allActionIds.push(station.actionId);
+      });
+      const publicBlock=session.main?.content?.blocks?.[index];
+      if(!isObject(publicBlock)||publicBlock.key!==expected.key)push(errors,`main.content.blocks.${index}`,'must mirror the resolved conditioning block order');
+      const publicItems=Array.isArray(publicBlock?.items)?publicBlock.items:[];
+      if(publicItems.length!==expectedStations.length)push(errors,`main.content.blocks.${index}.items`,'must mirror resolved conditioning stations');
+      expectedStations.forEach((_,stationIndex)=>{
+        const key=`${expected.key}/STATION-${stationIndex+1}`,item=publicItems[stationIndex],station=actualStations[key];
+        if(item?.actionId!==station?.actionId)push(errors,`main.content.blocks.${index}.items.${stationIndex}.actionId`,'must mirror the resolved conditioning station');
+      });
+    });
+    if(blueprint.repeatPolicy==='UNIQUE_ACTIONS'){
+      const unique=new Set(allActionIds.filter(Boolean));
+      if(unique.size!==allActionIds.filter(Boolean).length)push(errors,'blocks.stations','must not duplicate actions under UNIQUE_ACTIONS');
+    }
+    const domainBlocks=session.domainContext?.blocks;
+    if(!Array.isArray(domainBlocks)||domainBlocks.length!==actualBlocks.length||domainBlocks.some((block,index)=>block?.key!==actualBlocks[index]?.key)){
+      push(errors,'domainContext.blocks','must mirror resolved conditioning block order');
+    }
   }
 
   function validate(session){
@@ -194,6 +265,7 @@
       ['sessionBlueprintId','variantId'].forEach(key=>{if(!isNonEmpty(session[key]))push(errors,key,'is required for schema version 2');});
       if('blocks' in session)validateBlueprintBlocks(session.blocks,errors);else push(errors,'blocks','is required for schema version 2');
       if('timing' in session)validateTiming(session.timing,errors);else push(errors,'timing','is required for schema version 2');
+      if(session.templateId==='conditioning')validateConditioningBlueprint(session,errors);
     }
     return {ok:errors.length===0,errors};
   }

@@ -428,6 +428,19 @@ body{font-size:14px;line-height:1.55}
 .conditioning-stress-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .conditioning-stress-summary .conditioning-modality-summary{grid-column:1/-1}
 .conditioning-blueprint-change{margin:10px 0 0;padding:9px 10px;border-radius:10px;background:#f7f4fd;color:var(--muted);font-size:11px;line-height:1.55}
+.conditioning-next-variant{display:inline-flex;align-items:center;justify-content:center;min-height:40px;margin-top:12px;padding:9px 13px;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:900;line-height:1.3;cursor:pointer}
+.conditioning-next-variant:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.58)}
+.conditioning-next-variant:focus-visible{outline:3px solid rgba(255,255,255,.82);outline-offset:2px}
+.conditioning-legacy-editor{overflow:hidden}
+.conditioning-legacy-actions{margin:12px 0 14px}
+.conditioning-legacy-actions a{display:inline-flex;min-height:38px;align-items:center}
+.conditioning-legacy-stations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.conditioning-legacy-station{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff;min-width:0}
+.conditioning-legacy-station>span{font-size:10px;font-weight:900;color:var(--purple-dark)}
+.conditioning-legacy-station h3{font-size:15px;line-height:1.35;margin:6px 0}
+.conditioning-legacy-station p{font-size:11px;line-height:1.55;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.conditioning-legacy-station a{font-size:11px;color:var(--purple-dark);font-weight:850;text-decoration:none}
+.conditioning-legacy-control{min-height:38px;display:flex;align-items:center;box-sizing:border-box;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:9px;font-size:12px;overflow-wrap:anywhere}
 .conditioning-block-timeline{display:grid;gap:12px;margin-top:10px}
 .conditioning-block-card{border:1px solid #dcd4ef;border-radius:17px;padding:14px;background:linear-gradient(180deg,#fcfbff,#fff);min-width:0}
 .conditioning-block-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
@@ -475,6 +488,7 @@ body{font-size:14px;line-height:1.55}
   .conditioning-station-grid{grid-template-columns:1fr}
   .conditioning-stress-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
   .conditioning-prep-grid{grid-template-columns:1fr}
+  .conditioning-legacy-stations{grid-template-columns:1fr}
 }
 @media(max-width:520px){
   .conditioning-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
