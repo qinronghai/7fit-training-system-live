@@ -595,3 +595,44 @@ body{font-size:14px;line-height:1.55}
   .hyrox-control-grid,.hyrox-calibration-grid,.hyrox-metric-grid,.hyrox-station-grid,.hyrox-adjust-grid,.hyrox-prep-grid{grid-template-columns:1fr}
   .hyrox-prescription{font-size:14px}.hyrox-station-card{padding:10px}.hyrox-type-tabs{display:grid;grid-template-columns:1fr 1fr}.hyrox-type-tabs a{text-align:center}
 }
+
+
+/* HYROX Benchmark History */
+.hyrox-benchmark-panel{display:grid;gap:18px}
+.hyrox-benchmark-state{display:grid;gap:5px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface-soft)}
+.hyrox-benchmark-state.warn{border-style:dashed}
+.hyrox-benchmark-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.hyrox-benchmark-summary-grid>div,.hyrox-benchmark-profile,.hyrox-benchmark-trend,.hyrox-benchmark-comparison,.hyrox-benchmark-history-block{padding:14px;border:1px solid var(--line);border-radius:14px}
+.hyrox-benchmark-summary-grid small,.hyrox-benchmark-summary-grid b{display:block}
+.hyrox-benchmark-summary-grid b{font-size:1.28rem;margin-top:4px}
+.hyrox-benchmark-profile{display:grid;gap:6px;margin-top:10px}
+.hyrox-benchmark-entry{display:grid;gap:14px}
+.hyrox-benchmark-total-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hyrox-benchmark-total-row label,.hyrox-benchmark-notes{display:grid;gap:6px}
+.hyrox-benchmark-total-row input,.hyrox-benchmark-notes input,.hyrox-benchmark-input-row input{width:100%;min-width:0}
+.hyrox-benchmark-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hyrox-benchmark-input-row{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:12px;align-items:end;padding:12px;border:1px solid var(--line);border-radius:12px}
+.hyrox-benchmark-input-row>div,.hyrox-benchmark-input-row label{display:grid;gap:4px;min-width:0}
+.hyrox-benchmark-input-row small{white-space:normal}
+.hyrox-benchmark-save-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hyrox-benchmark-station-history{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.hyrox-benchmark-station-history>div{display:grid;gap:3px;padding:10px;border-radius:10px;background:var(--surface-soft)}
+.hyrox-benchmark-station-history em{font-style:normal;font-size:.86rem}
+.hyrox-benchmark-trend{display:grid;gap:10px;margin-top:10px}
+.hyrox-benchmark-trend>div{display:flex;gap:8px;flex-wrap:wrap}
+.hyrox-benchmark-trend span{display:grid;gap:2px;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.hyrox-benchmark-history{display:grid;gap:8px;margin-top:10px}
+.hyrox-benchmark-history article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.hyrox-benchmark-history article>div{display:grid;gap:3px}
+.hyrox-benchmark-history p{margin:0}
+@media(max-width:700px){
+  .hyrox-benchmark-summary-grid,.hyrox-benchmark-inputs,.hyrox-benchmark-station-history,.hyrox-benchmark-total-row{grid-template-columns:1fr 1fr}
+  .hyrox-benchmark-input-row{grid-template-columns:minmax(0,1fr) 105px}
+  .hyrox-benchmark-history article{grid-template-columns:minmax(0,1fr) auto}
+  .hyrox-benchmark-history article p{grid-column:1/-1}
+}
+@media(max-width:430px){
+  .hyrox-benchmark-summary-grid,.hyrox-benchmark-inputs,.hyrox-benchmark-station-history,.hyrox-benchmark-total-row{grid-template-columns:1fr}
+  .hyrox-benchmark-input-row{grid-template-columns:minmax(0,1fr) 105px}
+  .hyrox-benchmark-history article{grid-template-columns:minmax(0,1fr) auto}
+}
