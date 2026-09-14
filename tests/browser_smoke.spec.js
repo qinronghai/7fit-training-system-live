@@ -284,3 +284,71 @@ test('390px HYROX Skill, Mixed and Benchmark calibration workflow are operable',
   expect(widths.clientWidth).toBe(390);
   await expectNoPageErrors(errors);
 });
+
+
+test('390px HYROX Benchmark history persists PB, deltas and weakness profile', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/hyrox/benchmark/b3');
+
+  await page.locator('[data-hyrox-sled-push]').fill('42');
+  await page.locator('[data-hyrox-sled-pull]').fill('36');
+  await page.locator('[data-hyrox-save-calibration]').click();
+  await expect(page.locator('.hyrox-station-card')).toHaveCount(8);
+
+  await page.locator('[data-hyrox-history-athlete]').fill('Benchmark测试会员');
+  await page.locator('[data-hyrox-history-load]').click();
+  await expect(page.locator('.hyrox-benchmark-recorder')).toBeVisible();
+
+  const first = {H1:'2:00',H2:'1:30',H3:'1:40',H4:'1:50',H5:'2:05',H6:'1:20',H7:'1:30',H8:'1:40'};
+  await page.locator('[data-hyrox-benchmark-total]').fill('15:00');
+  for (const [id,value] of Object.entries(first)) {
+    await page.locator(`[data-hyrox-benchmark-time="${id}"]`).fill(value);
+  }
+  await page.locator('[data-hyrox-benchmark-rpe]').fill('8');
+  await page.locator('[data-hyrox-benchmark-save]').click();
+
+  await expect(page.locator('.hyrox-history-row')).toHaveCount(1);
+  await expect(page.locator('.hyrox-benchmark-summary .hyrox-history-baseline')).toContainText('首次建立基准');
+  await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('15:00');
+
+  const second = {H1:'1:55',H2:'1:35',H3:'1:45',H4:'1:45',H5:'2:00',H6:'1:15',H7:'1:25',H8:'1:35'};
+  await page.locator('[data-hyrox-benchmark-total]').fill('14:30');
+  for (const [id,value] of Object.entries(second)) {
+    await page.locator(`[data-hyrox-benchmark-time="${id}"]`).fill(value);
+  }
+  await page.locator('[data-hyrox-benchmark-save]').click();
+
+  await expect(page.locator('.hyrox-history-row')).toHaveCount(2);
+  await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('14:30');
+  await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('15:00');
+  await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('↑ 0:30');
+  await expect(page.locator('.hyrox-ability-panel')).toContainText('当前短板：SLED');
+  await expect(page.locator('.hyrox-history-station-grid')).toContainText('H2');
+  await expect(page.locator('.hyrox-history-station-grid')).toContainText('↓ 0:05');
+
+  const memberCopy = await page.evaluate(() => {
+    const route = window.V14Router.parseHash('#/coach/hyrox/benchmark/b3');
+    const ctx = window.V14CoachModules.HyroxSession.context(route);
+    const payload = window.V14CoachModules.HyroxCopy.buildPayload(ctx.session, ctx.prep);
+    return window.V14CoachModules.HyroxCopy.formatMember(payload);
+  });
+  expect(memberCopy).toContain('14:30');
+  expect(memberCopy).toContain('↑ 0:30');
+  expect(memberCopy).toContain('SLED');
+  expect(memberCopy).not.toContain('comparisonKey');
+  expect(memberCopy).not.toContain('schemaVersion');
+  expect(memberCopy).not.toContain('HYROX|');
+
+  await page.reload();
+  await expect(page.locator('.hyrox-history-row')).toHaveCount(2);
+  await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('14:30');
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});

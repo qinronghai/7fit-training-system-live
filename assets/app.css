@@ -602,3 +602,59 @@ body{font-size:14px;line-height:1.55}
 .body-recommendation-note b{font-size:13px;line-height:1.45}
 .body-recommendation-note span,.body-recommendation-note small{font-size:12px;line-height:1.5}
 .body-recommendation-note small{opacity:.76}
+
+/* =========================================================
+   V15 HYROX Benchmark History / PB
+   ========================================================= */
+.hyrox-history-athlete-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.hyrox-history-athlete-row label,.hyrox-benchmark-recorder-head label,.hyrox-benchmark-time-field{display:grid;gap:4px;min-width:0}
+.hyrox-history-athlete-row label>span,.hyrox-benchmark-recorder-head label>span,.hyrox-benchmark-time-field>span{font-size:8px;font-weight:900;color:var(--muted)}
+.hyrox-history-athlete-row input,.hyrox-benchmark-recorder-head input,.hyrox-benchmark-time-field input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:8px 9px;font-size:9px}
+.hyrox-history-athlete-row button,.hyrox-benchmark-recorder-actions button{border:0;border-radius:9px;background:var(--purple);color:#fff;padding:9px 12px;font-size:8px;font-weight:900;cursor:pointer}
+.hyrox-history-status,.hyrox-benchmark-recorder-actions span{font-size:8px;color:var(--muted);margin-top:6px}
+.hyrox-benchmark-recorder-head{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(100px,.5fr) minmax(220px,1.8fr);gap:8px;margin-bottom:10px}
+.hyrox-benchmark-recorder-head .wide{min-width:0}
+.hyrox-benchmark-time-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.hyrox-benchmark-time-field{border:1px solid var(--line);border-radius:11px;padding:9px;background:#faf9fc}
+.hyrox-benchmark-time-field small{font-size:7px;line-height:1.35;color:var(--muted);min-height:20px}
+.hyrox-benchmark-recorder-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:10px}
+.hyrox-benchmark-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.hyrox-benchmark-kpi-grid>div{display:grid;gap:3px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#faf9fc;min-width:0}
+.hyrox-benchmark-kpi-grid small{font-size:7px;color:var(--muted)}.hyrox-benchmark-kpi-grid b{font-size:15px;line-height:1.15}.hyrox-benchmark-kpi-grid span{font-size:7px;color:var(--muted)}
+.hyrox-history-baseline{padding:9px 10px;border-radius:10px;background:#eef8f1;border:1px solid #cde7d4;color:#247245;font-size:8px;font-weight:850;margin-bottom:10px}
+.hyrox-history-baseline.warn{background:#fff8e9;border-color:#ecd9a8;color:#8a5c00}
+.hyrox-history-station-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.hyrox-history-station{display:grid;grid-template-columns:minmax(100px,1.4fr) repeat(4,minmax(0,.7fr));gap:6px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:8px;min-width:0}
+.hyrox-history-station>span{font-size:8px;font-weight:900}.hyrox-history-station>div{min-width:0}.hyrox-history-station small,.hyrox-history-station b{display:block}.hyrox-history-station small{font-size:6.5px;color:var(--muted)}.hyrox-history-station b{font-size:8px;overflow-wrap:anywhere}
+.hyrox-ability-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.hyrox-ability-grid>div{display:grid;gap:3px;border:1px solid var(--line);border-radius:11px;padding:9px;background:#faf9fc}.hyrox-ability-grid>div.weak{border-color:#e4b6a8;background:#fff8f5}
+.hyrox-ability-grid small{font-size:7px;color:var(--muted)}.hyrox-ability-grid b{font-size:9px}.hyrox-ability-grid span{font-size:7px;color:var(--muted)}
+.hyrox-recommendation{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed var(--line);padding-top:10px;margin-top:10px}.hyrox-recommendation b{font-size:9px;line-height:1.45}
+.hyrox-recommend-link{text-decoration:none;border-radius:999px;background:var(--purple);color:#fff;padding:7px 10px;font-size:7px;font-weight:900;white-space:nowrap}
+.hyrox-history-rows{display:grid;gap:7px}.hyrox-history-row{display:grid;grid-template-columns:minmax(120px,1fr) auto minmax(120px,1.4fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:9px;min-width:0}
+.hyrox-history-row>div{display:grid;gap:2px}.hyrox-history-row b{font-size:8px}.hyrox-history-row span,.hyrox-history-row small{font-size:7px;color:var(--muted);overflow-wrap:anywhere}.hyrox-history-row strong{font-size:11px}.hyrox-history-row button{border:1px solid var(--line);border-radius:8px;background:#fff;color:#9d2b2b;padding:6px 8px;font-size:7px;font-weight:850}.hyrox-history-row.deleted{opacity:.72}
+.hyrox-history-deleted{margin-top:10px}.hyrox-history-deleted summary{cursor:pointer;font-size:8px;font-weight:900;color:var(--muted);margin-bottom:8px}
+.hyrox-benchmark-history-empty{display:grid;gap:4px}.hyrox-benchmark-history-empty b{font-size:11px}.hyrox-benchmark-history-empty span{font-size:8px;color:var(--muted)}
+
+@media(max-width:900px){
+  .hyrox-benchmark-time-grid,.hyrox-benchmark-kpi-grid,.hyrox-ability-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hyrox-history-station-grid{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .hyrox-history-athlete-row,.hyrox-benchmark-recorder-head,.hyrox-benchmark-time-grid,.hyrox-benchmark-kpi-grid,.hyrox-ability-grid{grid-template-columns:1fr}
+  .hyrox-history-athlete-row button,.hyrox-benchmark-recorder-actions button{width:100%}
+  .hyrox-history-station{grid-template-columns:1.3fr 1fr 1fr;gap:5px}.hyrox-history-station>div:nth-of-type(3),.hyrox-history-station>div:nth-of-type(4){margin-top:3px}
+  .hyrox-history-row{grid-template-columns:1fr auto}.hyrox-history-row>small{grid-column:1/-1}.hyrox-history-row button{width:100%}
+  .hyrox-recommendation{display:grid}.hyrox-recommend-link{text-align:center;white-space:normal}
+}
+
+.hyrox-station-trend{grid-column:1/-1;font-size:6.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px;margin-top:2px;overflow-wrap:anywhere}
+.hyrox-history-trend{display:grid;gap:7px;margin-bottom:10px;padding:9px;border:1px solid var(--line);border-radius:11px;background:#faf9fc}
+.hyrox-history-trend>small{font-size:7px;font-weight:900;color:var(--muted)}
+.hyrox-history-trend>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.hyrox-history-trend>div>div{display:grid;gap:2px;border-radius:8px;background:#fff;padding:7px;min-width:0}
+.hyrox-history-trend span,.hyrox-history-trend small{font-size:6.5px;color:var(--muted)}
+.hyrox-history-trend b{font-size:9px}
+@media(max-width:620px){
+  .hyrox-history-trend>div{grid-template-columns:1fr}
+}
