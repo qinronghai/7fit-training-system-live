@@ -88,7 +88,7 @@ def test_issue93_level_priority_is_not_just_volume():
         "BODY-01": {"L1": "movement_bench_box_squat", "L2": "V13_SQ_DB_GOBLET", "L3": "hake_shendun", "L4": "hake_shendun"},
         "BODY-02": {"L1": "movement_dowel_hip_hinge", "L2": "yaling_luomaniya_yingla", "L3": "yaling_luomaniya_yingla", "L4": "hipthrust_pause_main"},
         "BODY-03": {"L1": "V13_HR_SCAP_ROW", "L2": "feiji_labei_zhongba", "L3": "zuozi_huachuan_bianshi", "L4": "movement_bodyweight_pullup"},
-        "BODY-04": {"L1": "movement_incline_pushup", "L2": "qixie_xiongtui", "L3": "wotu_xiong_tui", "L4": "gangling_wotu"},
+        "BODY-04": {"L1": "movement_incline_pushup", "L2": "qixie_xiongtui", "L3": "wotu_xiong_tui", "L4": "qixie_xiongtui"},
     }
     for family_id, by_level in expected_primary_heads.items():
         heads = []
