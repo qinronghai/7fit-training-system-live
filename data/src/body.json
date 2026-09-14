@@ -1072,7 +1072,30 @@
         "ISOLATION-1": 2,
         "ISOLATION-2": 1,
         "OPTIONAL": 0
-      }
+      },
+      "name": "动作学习",
+      "abilityIntent": "优先建立动作控制、稳定路径与低门槛负荷；允许稳定器械，但不把高疲劳复合动作当作新手默认资格。",
+      "eligibleEntryLevels": [
+        "L1"
+      ],
+      "allowedLoadingStyles": [
+        "bodyweight_or_light",
+        "stable_machine",
+        "unilateral",
+        "isolation"
+      ],
+      "maxStabilityDemand": "medium",
+      "maxCompoundFatigue": "medium",
+      "unilateralReadiness": "supported_or_bodyweight",
+      "romExpectation": "controlled_available_rom",
+      "tempoPauseEligibility": [
+        "control_tempo",
+        "intro_pause"
+      ],
+      "intensityTechniqueEligibility": [
+        "straight_sets"
+      ],
+      "fallbackLevel": "L1"
     },
     "L2": {
       "level": "L2",
@@ -1092,7 +1115,32 @@
         "ISOLATION-1": 2,
         "ISOLATION-2": 2,
         "OPTIONAL": 0
-      }
+      },
+      "name": "基础负重",
+      "abilityIntent": "在动作控制稳定后进入基础外部负荷，允许中等稳定性与基础单侧负重，不以高级训练技术作为资格条件。",
+      "eligibleEntryLevels": [
+        "L1",
+        "L2"
+      ],
+      "allowedLoadingStyles": [
+        "bodyweight_or_light",
+        "stable_machine",
+        "freeweight",
+        "unilateral",
+        "isolation"
+      ],
+      "maxStabilityDemand": "medium",
+      "maxCompoundFatigue": "high",
+      "unilateralReadiness": "basic_loaded",
+      "romExpectation": "full_controlled_rom",
+      "tempoPauseEligibility": [
+        "control_tempo",
+        "pause"
+      ],
+      "intensityTechniqueEligibility": [
+        "straight_sets"
+      ],
+      "fallbackLevel": "L1"
     },
     "L3": {
       "level": "L3",
@@ -1112,7 +1160,36 @@
         "ISOLATION-1": 2,
         "ISOLATION-2": 2,
         "OPTIONAL": 1
-      }
+      },
+      "name": "正式塑形 / 肌肥大",
+      "abilityIntent": "允许正式自由重量、完整单侧训练与高稳定性要求动作，以可持续肌肥大质量为核心。",
+      "eligibleEntryLevels": [
+        "L1",
+        "L2",
+        "L3"
+      ],
+      "allowedLoadingStyles": [
+        "bodyweight_or_light",
+        "stable_machine",
+        "freeweight",
+        "unilateral",
+        "isolation"
+      ],
+      "maxStabilityDemand": "high",
+      "maxCompoundFatigue": "high",
+      "unilateralReadiness": "independent_loaded",
+      "romExpectation": "full_rom",
+      "tempoPauseEligibility": [
+        "control_tempo",
+        "pause",
+        "extended_eccentric"
+      ],
+      "intensityTechniqueEligibility": [
+        "straight_sets",
+        "controlled_superset",
+        "tempo_pause"
+      ],
+      "fallbackLevel": "L2"
     },
     "L4": {
       "level": "L4",
@@ -1132,7 +1209,39 @@
         "ISOLATION-1": 3,
         "ISOLATION-2": 2,
         "OPTIONAL": 1
-      }
+      },
+      "name": "完整训练能力 / 高质量肌肥大",
+      "abilityIntent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
+      "eligibleEntryLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "allowedLoadingStyles": [
+        "bodyweight_or_light",
+        "stable_machine",
+        "freeweight",
+        "unilateral",
+        "isolation"
+      ],
+      "maxStabilityDemand": "high",
+      "maxCompoundFatigue": "high",
+      "unilateralReadiness": "full",
+      "romExpectation": "full_rom_or_goal_specific",
+      "tempoPauseEligibility": [
+        "control_tempo",
+        "pause",
+        "extended_eccentric",
+        "goal_specific"
+      ],
+      "intensityTechniqueEligibility": [
+        "straight_sets",
+        "controlled_superset",
+        "tempo_pause",
+        "optional_intensity_techniques"
+      ],
+      "fallbackLevel": "L3"
     }
   },
   "bodyPrescriptionProfiles": {
@@ -1271,7 +1380,6 @@
         "BODY-01"
       ],
       "levels": [
-        "L1",
         "L2",
         "L3",
         "L4"

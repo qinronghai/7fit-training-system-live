@@ -29,3 +29,11 @@ assert.strictEqual(D.bodyVolumePolicy.sessionTotalCounting,'SUM_SLOT_WORKING_SET
 assert.strictEqual(D.bodyVolumePolicy.directTargetCounting,'MULTI_LABEL_EACH_DIRECT_TARGET');
 
 console.log('body_data_runtime_test: PASS');
+
+for(const level of ['L1','L2','L3','L4']){
+  const p=D.bodyLevelPolicies[level];
+  for(const key of ['name','abilityIntent','eligibleEntryLevels','allowedLoadingStyles','maxStabilityDemand','maxCompoundFatigue','unilateralReadiness','romExpectation','tempoPauseEligibility','intensityTechniqueEligibility','fallbackLevel']){
+    assert(p[key]!==undefined,`Body ${level} missing level-contract field ${key}`);
+  }
+}
+assert(!D.bodyActionMeta.banjie_hake.levels.includes('L1'),'半蹲哈克 must not be L1-qualified');
