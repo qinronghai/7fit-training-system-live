@@ -95,9 +95,9 @@ test('Body saved session restores current manual slot intent at 390px',async({pa
   const card=formal.select.locator('xpath=ancestor::article[contains(@class,"body-slot-card")]');
   await expect(card.locator('.body-slot-head small')).toHaveText('手动选择');
 
-  await page.locator('[data-save-session-name]').fill('Body 保存课');
+  await page.locator('[data-save-session-name]').fill('112121 测试');
   await page.locator('[data-save-current-session]').click();
-  await expect(page.locator('.saved-session-card h3')).toHaveText('Body 保存课');
+  await expect(page.locator('.saved-session-card h3')).toHaveText('112121 测试');
   await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 Body L3');
   await expect(page.getByText('LOCAL · 浏览器',{exact:true})).toBeVisible();
 
