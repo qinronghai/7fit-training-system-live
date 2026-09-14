@@ -14,7 +14,8 @@
     "conditioningProtocolPolicies",
     "conditioningActionMeta",
     "conditioningTransitionPolicy",
-    "conditioningConflictPolicy"
+    "conditioningConflictPolicy",
+    "conditioningBlueprints"
   ],
   "properties": {
     "conditioningFamilyIds": {
@@ -142,6 +143,22 @@
     },
     "conditioningConflictPolicy": {
       "$ref": "#/$defs/conflictPolicy"
+    },
+    "conditioningBlueprints": {
+      "type": "object",
+      "required": [
+        "CON-01",
+        "CON-02",
+        "CON-03",
+        "CON-04"
+      ],
+      "properties": {
+        "CON-01": {"$ref": "#/$defs/familyBlueprints"},
+        "CON-02": {"$ref": "#/$defs/familyBlueprints"},
+        "CON-03": {"$ref": "#/$defs/familyBlueprints"},
+        "CON-04": {"$ref": "#/$defs/familyBlueprints"}
+      },
+      "additionalProperties": false
     }
   },
   "$defs": {
@@ -632,6 +649,135 @@
         "postCardioOnlyEligible": {
           "const": false
         }
+      },
+      "additionalProperties": false
+    },
+    "familyBlueprints": {
+      "type": "object",
+      "required": ["L1", "L2", "L3", "L4"],
+      "properties": {
+        "L1": {"$ref": "#/$defs/levelBlueprints"},
+        "L2": {"$ref": "#/$defs/levelBlueprints"},
+        "L3": {"$ref": "#/$defs/levelBlueprints"},
+        "L4": {"$ref": "#/$defs/levelBlueprints"}
+      },
+      "additionalProperties": false
+    },
+    "levelBlueprints": {
+      "type": "object",
+      "required": ["A", "B", "C"],
+      "properties": {
+        "A": {"$ref": "#/$defs/blueprint"},
+        "B": {"$ref": "#/$defs/blueprint"},
+        "C": {"$ref": "#/$defs/blueprint"}
+      },
+      "additionalProperties": false
+    },
+    "blueprint": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "sessionBlueprintId",
+        "familyId",
+        "level",
+        "variantId",
+        "label",
+        "goal",
+        "changeSummary",
+        "repeatPolicy",
+        "prep",
+        "blocks",
+        "recovery",
+        "totalTransitionSeconds"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 2},
+        "sessionBlueprintId": {"type": "string", "pattern": "^CON-0[1-4]-L[1-4]-[ABC]$"},
+        "familyId": {"$ref": "#/$defs/familyId"},
+        "level": {"$ref": "#/$defs/level"},
+        "variantId": {"type": "string", "enum": ["A", "B", "C"]},
+        "label": {"type": "string", "minLength": 1},
+        "goal": {"type": "string", "minLength": 1},
+        "changeSummary": {"type": "string", "minLength": 1},
+        "repeatPolicy": {"type": "string", "enum": ["UNIQUE_ACTIONS", "SKILL_VARIATION"]},
+        "prep": {"$ref": "#/$defs/phase"},
+        "blocks": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/blueprintBlock"}
+        },
+        "recovery": {"$ref": "#/$defs/phase"},
+        "totalTransitionSeconds": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "phase": {
+      "type": "object",
+      "required": ["durationMinutes", "goal", "coachingCues", "completionMetric"],
+      "properties": {
+        "durationMinutes": {"type": "number", "exclusiveMinimum": 0},
+        "goal": {"type": "string", "minLength": 1},
+        "coachingCues": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "completionMetric": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "blueprintBlock": {
+      "type": "object",
+      "required": [
+        "key",
+        "role",
+        "roleLabel",
+        "label",
+        "goal",
+        "protocolId",
+        "targetMinutes",
+        "targetRpe",
+        "prescription",
+        "stations",
+        "coachingCues",
+        "scaleRules",
+        "stopCriteria",
+        "completionMetric",
+        "equipment",
+        "zone",
+        "setup",
+        "transitionAfterSeconds",
+        "interBlockRecoverySeconds"
+      ],
+      "properties": {
+        "key": {"type": "string", "pattern": "^BLOCK-[ABC]$"},
+        "role": {"type": "string", "enum": ["BUILD", "MAIN", "CHALLENGE"]},
+        "roleLabel": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "goal": {"type": "string", "minLength": 1},
+        "protocolId": {"$ref": "#/$defs/protocolId"},
+        "targetMinutes": {"type": "number", "exclusiveMinimum": 0},
+        "targetRpe": {"type": "integer", "minimum": 1, "maximum": 10},
+        "prescription": {"type": "string", "minLength": 1},
+        "stations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/blueprintStation"}},
+        "coachingCues": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "scaleRules": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "stopCriteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "completionMetric": {"type": "string", "minLength": 1},
+        "equipment": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "zone": {"type": "string", "minLength": 1},
+        "setup": {"type": "string", "minLength": 1},
+        "transitionAfterSeconds": {"type": "integer", "minimum": 0},
+        "interBlockRecoverySeconds": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "blueprintStation": {
+      "type": "object",
+      "required": ["actionId", "taskLabel", "setup", "equipment", "zone"],
+      "properties": {
+        "actionId": {"type": "string", "minLength": 1},
+        "taskLabel": {"type": "string", "minLength": 1},
+        "setup": {"type": "string", "minLength": 1},
+        "equipment": {"type": "string", "minLength": 1},
+        "zone": {"type": "string", "minLength": 1}
       },
       "additionalProperties": false
     }
