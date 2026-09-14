@@ -579,6 +579,400 @@
           "pairRelationship": null,
           "fatiguePreference": "low"
         }
+      },
+      "progressionChains": {
+        "BODY01_KNEE_DOMINANT": {
+          "chainId": "BODY01_KNEE_DOMINANT",
+          "name": "膝主导双腿进阶",
+          "description": "从动作学习与可控负荷，进入正式稳定负重；L4 获得完整自由重量选择，但不强制淘汰哈克等稳定有效主项。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "movement_bench_box_squat",
+              "fallbackActionId": "tushen_shendun",
+              "qualificationReason": "用触凳和徒手反馈建立蹲深、重心与膝髋协同。"
+            },
+            {
+              "level": "L2",
+              "actionId": "V13_SQ_DB_GOBLET",
+              "fallbackActionId": "movement_bench_box_squat",
+              "qualificationReason": "进入可连续微调的基础外部负重。"
+            },
+            {
+              "level": "L3",
+              "actionId": "hake_shendun",
+              "fallbackActionId": "V13_SQ_DB_GOBLET",
+              "qualificationReason": "进入正式肌肥大负荷；当前仅定义能力资格，最低起始负重由 #94 Venue Gate 再判断。"
+            },
+            {
+              "level": "L4",
+              "actionId": "gangling_shendun",
+              "fallbackActionId": "hake_shendun",
+              "qualificationReason": "获得完整自由重量资格；哈克仍作为高质量肌肥大工具保留。"
+            }
+          ],
+          "retentionPolicy": "高等级保留已掌握且有效的低等级动作；进阶体现在负荷、ROM、节奏、RIR 与自主稳定能力，不以动作复杂度本身定义高级。"
+        },
+        "BODY01_SINGLE_LEG": {
+          "chainId": "BODY01_SINGLE_LEG",
+          "name": "单腿膝主导进阶",
+          "description": "从扶持稳定到徒手控制，再进入哑铃负重与完整保加利亚分腿能力。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "movement_supported_split_squat",
+              "fallbackActionId": "movement_bodyweight_split_squat",
+              "qualificationReason": "通过扶持降低平衡门槛，先建立单腿力线。"
+            },
+            {
+              "level": "L2",
+              "actionId": "movement_bodyweight_split_squat",
+              "fallbackActionId": "movement_supported_split_squat",
+              "qualificationReason": "在无需外部负重的情况下建立独立控制。"
+            },
+            {
+              "level": "L3",
+              "actionId": "movement_dumbbell_reverse_lunge",
+              "fallbackActionId": "movement_bodyweight_split_squat",
+              "qualificationReason": "进入基础独立负重与动态单腿控制。"
+            },
+            {
+              "level": "L4",
+              "actionId": "baojiayali_fentundun",
+              "fallbackActionId": "movement_dumbbell_reverse_lunge",
+              "qualificationReason": "进入完整单腿负重、ROM 与高质量肌肥大训练。"
+            }
+          ],
+          "retentionPolicy": "单腿能力不足时按链条逐级退阶，不以强行增加平衡难度换取所谓高级感。"
+        }
+      },
+      "levelPools": {
+        "L1": {
+          "level": "L1",
+          "intent": "优先建立动作控制、稳定路径与低门槛负荷；允许稳定器械，但不把高疲劳复合动作当作新手默认资格。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "movement_bench_box_squat",
+              "tushen_shendun"
+            ],
+            "SECONDARY": [
+              "movement_supported_split_squat",
+              "movement_bodyweight_split_squat"
+            ],
+            "ACCESSORY": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "xiao_longmen_wai_zhan",
+              "tunbu_houti"
+            ],
+            "ISOLATION-1": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tui_wanju",
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti"
+          ],
+          "introducedActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti"
+          ],
+          "retainedActionIds": [],
+          "downwardCompatibleLevels": [
+            "L1"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先动作学习与低门槛入口；稳定器械可以合法，但不自动取代模式学习动作。",
+          "progressionChainIds": [
+            "BODY01_KNEE_DOMINANT",
+            "BODY01_SINGLE_LEG"
+          ]
+        },
+        "L2": {
+          "level": "L2",
+          "intent": "在动作控制稳定后进入基础外部负荷，允许中等稳定性与基础单侧负重，不以高级训练技术作为资格条件。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "V13_SQ_DB_GOBLET",
+              "movement_light_bar_box_squat"
+            ],
+            "SECONDARY": [
+              "movement_bodyweight_split_squat",
+              "movement_dumbbell_reverse_lunge"
+            ],
+            "ACCESSORY": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "xiao_longmen_wai_zhan",
+              "tunbu_houti"
+            ],
+            "ISOLATION-1": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tui_wanju",
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "introducedActionIds": [
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "movement_dumbbell_reverse_lunge",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "retainedActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先基础可调负重与稳定路径；允许向下兼容 L1 动作作为技术退阶。",
+          "progressionChainIds": [
+            "BODY01_KNEE_DOMINANT",
+            "BODY01_SINGLE_LEG"
+          ]
+        },
+        "L3": {
+          "level": "L3",
+          "intent": "允许正式自由重量、完整单侧训练与高稳定性要求动作，以可持续肌肥大质量为核心。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "hake_shendun",
+              "smith_shendun"
+            ],
+            "SECONDARY": [
+              "movement_dumbbell_reverse_lunge",
+              "baojiayali_fentundun"
+            ],
+            "ACCESSORY": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "xiao_longmen_wai_zhan",
+              "tunbu_houti"
+            ],
+            "ISOLATION-1": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tui_wanju",
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan"
+            ],
+            "OPTIONAL": [
+              "kuangwai_zhan",
+              "shengsuo_kuan_neishou",
+              "tunbu_houti"
+            ]
+          },
+          "replacementActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "baojiayali_fentundun",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "introducedActionIds": [],
+          "retainedActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "baojiayali_fentundun",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "fallbackLevel": "L2",
+          "qualificationReason": "优先正式肌肥大负荷与独立单侧能力；向下兼容动作保留为高质量替换，而不是默认停留。",
+          "progressionChainIds": [
+            "BODY01_KNEE_DOMINANT",
+            "BODY01_SINGLE_LEG"
+          ]
+        },
+        "L4": {
+          "level": "L4",
+          "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "hake_shendun",
+              "gangling_shendun"
+            ],
+            "SECONDARY": [
+              "baojiayali_fentundun",
+              "movement_dumbbell_reverse_lunge"
+            ],
+            "ACCESSORY": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "xiao_longmen_wai_zhan",
+              "tunbu_houti"
+            ],
+            "ISOLATION-1": [
+              "tui_qushen",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tui_wanju",
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan"
+            ],
+            "OPTIONAL": [
+              "kuangwai_zhan",
+              "shengsuo_kuan_neishou",
+              "tunbu_houti"
+            ]
+          },
+          "replacementActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "gangling_shendun",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "baojiayali_fentundun",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "introducedActionIds": [
+            "gangling_shendun"
+          ],
+          "retainedActionIds": [
+            "tushen_shendun",
+            "movement_bench_box_squat",
+            "banjie_hake",
+            "hake_shendun",
+            "smith_shendun",
+            "movement_light_bar_box_squat",
+            "movement_supported_split_squat",
+            "movement_bodyweight_split_squat",
+            "movement_dumbbell_reverse_lunge",
+            "baojiayali_fentundun",
+            "tui_qushen",
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "V13_SQ_DB_GOBLET"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "fallbackLevel": "L3",
+          "qualificationReason": "获得完整动作选择权；L4 优先体现负荷、ROM、节奏、RIR 与自主稳定，同时明确保留稳定有效器械。",
+          "progressionChainIds": [
+            "BODY01_KNEE_DOMINANT",
+            "BODY01_SINGLE_LEG"
+          ]
+        }
       }
     },
     "BODY-02": {
@@ -805,6 +1199,444 @@
           "pairRelationship": null,
           "fatiguePreference": "low"
         }
+      },
+      "progressionChains": {
+        "BODY02_HINGE": {
+          "chainId": "BODY02_HINGE",
+          "name": "髋铰链进阶",
+          "description": "三点杆模式学习 → 哑铃 RDL → 六角杠 → 杠铃硬拉；#94 再接入场馆最低负重 Gate。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "movement_dowel_hip_hinge",
+              "fallbackActionId": "tunqiao",
+              "qualificationReason": "先学习髋向后与脊柱控制，不用外部负荷证明动作模式。"
+            },
+            {
+              "level": "L2",
+              "actionId": "yaling_luomaniya_yingla",
+              "fallbackActionId": "movement_dowel_hip_hinge",
+              "qualificationReason": "优先进入可连续微调的哑铃 RDL，而不是直接跳到固定起始重量器械。"
+            },
+            {
+              "level": "L3",
+              "actionId": "liujiao_gantui_yingla",
+              "fallbackActionId": "yaling_luomaniya_yingla",
+              "qualificationReason": "能力上可进入六角杠；是否适合当前会员仍需 #94 读取场馆 20kg 起始负重。"
+            },
+            {
+              "level": "L4",
+              "actionId": "gangling_yingla",
+              "fallbackActionId": "liujiao_gantui_yingla",
+              "qualificationReason": "具备完整自由重量硬拉选择权，但不要求每节课使用杠铃硬拉。"
+            }
+          ],
+          "retentionPolicy": "哑铃 RDL 在 L3/L4 继续合法；高等级首先追求高质量后链刺激，而不是器械复杂度。"
+        },
+        "BODY02_HIP_EXTENSION": {
+          "chainId": "BODY02_HIP_EXTENSION",
+          "name": "臀伸进阶",
+          "description": "臀桥 → 器械臀推 → 器械臀推停顿 → L4 高质量器械臀推；7Fit 不使用杠铃臀推作为最高级默认。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "tunqiao",
+              "fallbackActionId": "movement_dowel_hip_hinge",
+              "qualificationReason": "低门槛建立臀部主动伸髋与躯干控制。"
+            },
+            {
+              "level": "L2",
+              "actionId": "tun_tui",
+              "fallbackActionId": "tunqiao",
+              "qualificationReason": "进入稳定器械负重并建立完整臀推路径。"
+            },
+            {
+              "level": "L3",
+              "actionId": "hipthrust_pause_main",
+              "fallbackActionId": "tun_tui",
+              "qualificationReason": "通过器械负荷与顶端停顿提高有效刺激质量。"
+            },
+            {
+              "level": "L4",
+              "actionId": "hipthrust_pause_main",
+              "fallbackActionId": "tun_tui",
+              "qualificationReason": "继续保留器械臀推，通过更高有效负荷、ROM、停顿和 RIR 体现 L4 能力。"
+            }
+          ],
+          "retentionPolicy": "最高级仍可使用器械臀推；禁止为了等级视觉差异虚构杠铃臀推路线。"
+        },
+        "BODY02_SINGLE_LEG_HINGE": {
+          "chainId": "BODY02_SINGLE_LEG_HINGE",
+          "name": "单腿髋铰链进阶",
+          "description": "扶持徒手 → 扶持哑铃 → 独立哑铃 → 高阶负重单腿 RDL。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "movement_supported_single_leg_hinge",
+              "fallbackActionId": "movement_dowel_hip_hinge",
+              "qualificationReason": "扶持降低平衡需求，先建立单腿髋主导。"
+            },
+            {
+              "level": "L2",
+              "actionId": "movement_supported_db_single_leg_rdl",
+              "fallbackActionId": "movement_supported_single_leg_hinge",
+              "qualificationReason": "保持扶持条件下加入基础外部负重。"
+            },
+            {
+              "level": "L3",
+              "actionId": "movement_db_single_leg_rdl",
+              "fallbackActionId": "movement_supported_db_single_leg_rdl",
+              "qualificationReason": "进入独立负重与躯干抗旋转控制。"
+            },
+            {
+              "level": "L4",
+              "actionId": "movement_advanced_db_single_leg_rdl",
+              "fallbackActionId": "movement_db_single_leg_rdl",
+              "qualificationReason": "进入完整单腿负重能力与更高训练质量。"
+            }
+          ],
+          "retentionPolicy": "任何稳定性退化都优先回退扶持版本，而不是降低动作质量维持等级。"
+        }
+      },
+      "levelPools": {
+        "L1": {
+          "level": "L1",
+          "intent": "优先建立动作控制、稳定路径与低门槛负荷；允许稳定器械，但不把高疲劳复合动作当作新手默认资格。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "movement_dowel_hip_hinge",
+              "tunqiao"
+            ],
+            "SECONDARY": [
+              "movement_supported_single_leg_hinge",
+              "tunqiao"
+            ],
+            "ACCESSORY": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "shanyan_tingshen"
+            ],
+            "ISOLATION-1": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan",
+              "shengsuo_kuan_neishou"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
+            "movement_dowel_hip_hinge"
+          ],
+          "introducedActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
+            "movement_dowel_hip_hinge"
+          ],
+          "retainedActionIds": [],
+          "downwardCompatibleLevels": [
+            "L1"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先动作学习与低门槛入口；稳定器械可以合法，但不自动取代模式学习动作。",
+          "progressionChainIds": [
+            "BODY02_HINGE",
+            "BODY02_HIP_EXTENSION",
+            "BODY02_SINGLE_LEG_HINGE"
+          ]
+        },
+        "L2": {
+          "level": "L2",
+          "intent": "在动作控制稳定后进入基础外部负荷，允许中等稳定性与基础单侧负重，不以高级训练技术作为资格条件。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "yaling_luomaniya_yingla",
+              "tun_tui"
+            ],
+            "SECONDARY": [
+              "movement_supported_db_single_leg_rdl",
+              "movement_supported_single_leg_hinge"
+            ],
+            "ACCESSORY": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "shanyan_tingshen"
+            ],
+            "ISOLATION-1": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan",
+              "shengsuo_kuan_neishou"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "shanyan_tingshen",
+            "backext_load_main",
+            "dileigan_hinge",
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_dowel_hip_hinge"
+          ],
+          "introducedActionIds": [
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "backext_load_main",
+            "dileigan_hinge",
+            "movement_supported_db_single_leg_rdl"
+          ],
+          "retainedActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "shanyan_tingshen",
+            "movement_supported_single_leg_hinge",
+            "movement_dowel_hip_hinge"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先基础可调负重与稳定路径；允许向下兼容 L1 动作作为技术退阶。",
+          "progressionChainIds": [
+            "BODY02_HINGE",
+            "BODY02_HIP_EXTENSION",
+            "BODY02_SINGLE_LEG_HINGE"
+          ]
+        },
+        "L3": {
+          "level": "L3",
+          "intent": "允许正式自由重量、完整单侧训练与高稳定性要求动作，以可持续肌肥大质量为核心。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "yaling_luomaniya_yingla",
+              "tun_tui"
+            ],
+            "SECONDARY": [
+              "movement_db_single_leg_rdl",
+              "movement_single_leg_hip_thrust"
+            ],
+            "ACCESSORY": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "shanyan_tingshen"
+            ],
+            "ISOLATION-1": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan",
+              "shengsuo_kuan_neishou"
+            ],
+            "OPTIONAL": [
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "tui_wanju"
+            ]
+          },
+          "replacementActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "shanyan_tingshen",
+            "backext_load_main",
+            "dileigan_hinge",
+            "liujiao_gantui_yingla",
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_db_single_leg_rdl",
+            "movement_advanced_db_single_leg_rdl",
+            "movement_dowel_hip_hinge"
+          ],
+          "introducedActionIds": [
+            "liujiao_gantui_yingla",
+            "movement_db_single_leg_rdl",
+            "movement_advanced_db_single_leg_rdl"
+          ],
+          "retainedActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "shanyan_tingshen",
+            "backext_load_main",
+            "dileigan_hinge",
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_dowel_hip_hinge"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "fallbackLevel": "L2",
+          "qualificationReason": "优先正式肌肥大负荷与独立单侧能力；向下兼容动作保留为高质量替换，而不是默认停留。",
+          "progressionChainIds": [
+            "BODY02_HINGE",
+            "BODY02_HIP_EXTENSION",
+            "BODY02_SINGLE_LEG_HINGE"
+          ]
+        },
+        "L4": {
+          "level": "L4",
+          "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "hipthrust_pause_main"
+            ],
+            "SECONDARY": [
+              "movement_advanced_db_single_leg_rdl",
+              "movement_db_single_leg_rdl"
+            ],
+            "ACCESSORY": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "shanyan_tingshen"
+            ],
+            "ISOLATION-1": [
+              "tui_wanju",
+              "kuangwai_zhan",
+              "kuangnei_shou"
+            ],
+            "ISOLATION-2": [
+              "tunbu_houti",
+              "xiao_longmen_wai_zhan",
+              "shengsuo_kuan_neishou"
+            ],
+            "OPTIONAL": [
+              "kuangwai_zhan",
+              "tunbu_houti",
+              "tui_wanju"
+            ]
+          },
+          "replacementActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "shanyan_tingshen",
+            "backext_load_main",
+            "dileigan_hinge",
+            "liujiao_gantui_yingla",
+            "gangling_yingla",
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_db_single_leg_rdl",
+            "movement_advanced_db_single_leg_rdl",
+            "movement_dowel_hip_hinge"
+          ],
+          "introducedActionIds": [
+            "gangling_yingla"
+          ],
+          "retainedActionIds": [
+            "tui_wanju",
+            "kuangwai_zhan",
+            "xiao_longmen_wai_zhan",
+            "kuangnei_shou",
+            "shengsuo_kuan_neishou",
+            "tunbu_houti",
+            "tunqiao",
+            "tun_tui",
+            "hipthrust_pause_main",
+            "movement_single_leg_hip_thrust",
+            "yaling_luomaniya_yingla",
+            "shanyan_tingshen",
+            "backext_load_main",
+            "dileigan_hinge",
+            "liujiao_gantui_yingla",
+            "movement_supported_single_leg_hinge",
+            "movement_supported_db_single_leg_rdl",
+            "movement_db_single_leg_rdl",
+            "movement_advanced_db_single_leg_rdl",
+            "movement_dowel_hip_hinge"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "fallbackLevel": "L3",
+          "qualificationReason": "获得完整动作选择权；L4 优先体现负荷、ROM、节奏、RIR 与自主稳定，同时明确保留稳定有效器械。",
+          "progressionChainIds": [
+            "BODY02_HINGE",
+            "BODY02_HIP_EXTENSION",
+            "BODY02_SINGLE_LEG_HINGE"
+          ]
+        }
       }
     },
     "BODY-03": {
@@ -1027,6 +1859,407 @@
           "pairRelationship": null,
           "fatiguePreference": "low"
         }
+      },
+      "progressionChains": {
+        "BODY03_HORIZONTAL_PULL": {
+          "chainId": "BODY03_HORIZONTAL_PULL",
+          "name": "水平拉进阶",
+          "description": "基础肩胛划船 → 胸托稳定划船 → 坐姿划船 → 杠铃划船。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "V13_HR_SCAP_ROW",
+              "fallbackActionId": "feiji_labei_zhongba",
+              "qualificationReason": "轻重量学习肩胛后缩与拉肘路径。"
+            },
+            {
+              "level": "L2",
+              "actionId": "feiji_labei_zhongba",
+              "fallbackActionId": "V13_HR_SCAP_ROW",
+              "qualificationReason": "用胸托稳定减少躯干代偿，进入正式背部负重。"
+            },
+            {
+              "level": "L3",
+              "actionId": "zuozi_huachuan_bianshi",
+              "fallbackActionId": "feiji_labei_zhongba",
+              "qualificationReason": "增加独立躯干控制并进入更完整的划船负荷。"
+            },
+            {
+              "level": "L4",
+              "actionId": "gangling_huachuan",
+              "fallbackActionId": "zuozi_huachuan_bianshi",
+              "qualificationReason": "获得高稳定要求自由重量划船资格；稳定器械仍可保留。"
+            }
+          ],
+          "retentionPolicy": "高等级不淘汰胸托/坐姿划船；根据刺激质量、疲劳与当日结构选择。"
+        },
+        "BODY03_VERTICAL_PULL": {
+          "chainId": "BODY03_VERTICAL_PULL",
+          "name": "垂直拉进阶",
+          "description": "辅助引体肩胛下沉 → 高位下拉 → 辅助引体 → 自重引体。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "fuzhu_yinti_jianjia_xiachen",
+              "fallbackActionId": "gaowei_xiala_vba",
+              "qualificationReason": "先建立肩胛下沉与垂直拉起始控制。"
+            },
+            {
+              "level": "L2",
+              "actionId": "gaowei_xiala_vba",
+              "fallbackActionId": "fuzhu_yinti_jianjia_xiachen",
+              "qualificationReason": "进入可控稳定负重的完整垂直拉。"
+            },
+            {
+              "level": "L3",
+              "actionId": "fuzhu_yinti_xiangshang",
+              "fallbackActionId": "gaowei_xiala_vba",
+              "qualificationReason": "进入完整引体路径并用辅助量调节训练强度。"
+            },
+            {
+              "level": "L4",
+              "actionId": "movement_bodyweight_pullup",
+              "fallbackActionId": "fuzhu_yinti_xiangshang",
+              "qualificationReason": "获得自重引体资格；高位下拉和辅助引体继续作为有效训练工具。"
+            }
+          ],
+          "retentionPolicy": "自重引体不是 L4 的强制默认；背阔肌刺激质量和局部疲劳优先于动作炫技。"
+        }
+      },
+      "levelPools": {
+        "L1": {
+          "level": "L1",
+          "intent": "优先建立动作控制、稳定路径与低门槛负荷；允许稳定器械，但不把高疲劳复合动作当作新手默认资格。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "V13_HR_SCAP_ROW",
+              "fuzhu_yinti_jianjia_xiachen"
+            ],
+            "SECONDARY": [
+              "fuzhu_yinti_jianjia_xiachen",
+              "V13_HR_SCAP_ROW"
+            ],
+            "ACCESSORY": [
+              "mianla",
+              "houzu_sanji",
+              "shengsuo_cepingju",
+              "zhibi_xiala"
+            ],
+            "ISOLATION-1": [
+              "houzu_sanji",
+              "mianla",
+              "shengsuo_cepingju"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_cepingju",
+              "shengsuo_ertou_wanju",
+              "zhibi_xiala"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "feiji_labei_zhongba",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen"
+          ],
+          "introducedActionIds": [
+            "feiji_labei_zhongba",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen"
+          ],
+          "retainedActionIds": [],
+          "downwardCompatibleLevels": [
+            "L1"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先动作学习与低门槛入口；稳定器械可以合法，但不自动取代模式学习动作。",
+          "progressionChainIds": [
+            "BODY03_HORIZONTAL_PULL",
+            "BODY03_VERTICAL_PULL"
+          ]
+        },
+        "L2": {
+          "level": "L2",
+          "intent": "在动作控制稳定后进入基础外部负荷，允许中等稳定性与基础单侧负重，不以高级训练技术作为资格条件。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "feiji_labei_zhongba",
+              "gaowei_xiala_vba"
+            ],
+            "SECONDARY": [
+              "gaowei_xiala_vba",
+              "feiji_labei_zhongba"
+            ],
+            "ACCESSORY": [
+              "mianla",
+              "houzu_sanji",
+              "shengsuo_cepingju",
+              "zhibi_xiala"
+            ],
+            "ISOLATION-1": [
+              "houzu_sanji",
+              "mianla",
+              "shengsuo_cepingju"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_cepingju",
+              "shengsuo_ertou_wanju",
+              "zhibi_xiala"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "feiji_labei_zhongba",
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen"
+          ],
+          "introducedActionIds": [
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo"
+          ],
+          "retainedActionIds": [
+            "feiji_labei_zhongba",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先基础可调负重与稳定路径；允许向下兼容 L1 动作作为技术退阶。",
+          "progressionChainIds": [
+            "BODY03_HORIZONTAL_PULL",
+            "BODY03_VERTICAL_PULL"
+          ]
+        },
+        "L3": {
+          "level": "L3",
+          "intent": "允许正式自由重量、完整单侧训练与高稳定性要求动作，以可持续肌肥大质量为核心。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "zuozi_huachuan_bianshi",
+              "fuzhu_yinti_xiangshang"
+            ],
+            "SECONDARY": [
+              "fuzhu_yinti_xiangshang",
+              "zuozi_huachuan_bianshi"
+            ],
+            "ACCESSORY": [
+              "mianla",
+              "houzu_sanji",
+              "shengsuo_cepingju",
+              "zhibi_xiala"
+            ],
+            "ISOLATION-1": [
+              "houzu_sanji",
+              "mianla",
+              "shengsuo_cepingju"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_cepingju",
+              "shengsuo_ertou_wanju",
+              "zhibi_xiala"
+            ],
+            "OPTIONAL": [
+              "shengsuo_ertou_wanju",
+              "shengsuo_cepingju",
+              "mianla"
+            ]
+          },
+          "replacementActionIds": [
+            "feiji_labei_zhongba",
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen",
+            "fuzhu_yinti_xiangshang"
+          ],
+          "introducedActionIds": [
+            "fuzhu_yinti_xiangshang"
+          ],
+          "retainedActionIds": [
+            "feiji_labei_zhongba",
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "fallbackLevel": "L2",
+          "qualificationReason": "优先正式肌肥大负荷与独立单侧能力；向下兼容动作保留为高质量替换，而不是默认停留。",
+          "progressionChainIds": [
+            "BODY03_HORIZONTAL_PULL",
+            "BODY03_VERTICAL_PULL"
+          ]
+        },
+        "L4": {
+          "level": "L4",
+          "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "movement_bodyweight_pullup",
+              "gangling_huachuan"
+            ],
+            "SECONDARY": [
+              "gangling_huachuan",
+              "movement_bodyweight_pullup"
+            ],
+            "ACCESSORY": [
+              "mianla",
+              "houzu_sanji",
+              "shengsuo_cepingju",
+              "zhibi_xiala"
+            ],
+            "ISOLATION-1": [
+              "houzu_sanji",
+              "mianla",
+              "shengsuo_cepingju"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_cepingju",
+              "shengsuo_ertou_wanju",
+              "zhibi_xiala"
+            ],
+            "OPTIONAL": [
+              "shengsuo_ertou_wanju",
+              "shengsuo_cepingju",
+              "mianla"
+            ]
+          },
+          "replacementActionIds": [
+            "feiji_labei_zhongba",
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "gangling_huachuan",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen",
+            "fuzhu_yinti_xiangshang",
+            "movement_bodyweight_pullup"
+          ],
+          "introducedActionIds": [
+            "gangling_huachuan",
+            "movement_bodyweight_pullup"
+          ],
+          "retainedActionIds": [
+            "feiji_labei_zhongba",
+            "zuozi_huachuan_bianshi",
+            "diwei_huachuan",
+            "danbi_yaling_huachuan",
+            "smith_huachuan",
+            "dileigan_huachuan",
+            "gaowei_xiala_vba",
+            "gaowei_xiala_kuanwo",
+            "danbi_xiala",
+            "fuzhu_yinti_zhaiwo",
+            "fuzhu_yinti_kuanwo",
+            "zhibi_xiala",
+            "houzu_sanji",
+            "mianla",
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "V13_HR_SCAP_ROW",
+            "fuzhu_yinti_jianjia_xiachen",
+            "fuzhu_yinti_xiangshang"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "fallbackLevel": "L3",
+          "qualificationReason": "获得完整动作选择权；L4 优先体现负荷、ROM、节奏、RIR 与自主稳定，同时明确保留稳定有效器械。",
+          "progressionChainIds": [
+            "BODY03_HORIZONTAL_PULL",
+            "BODY03_VERTICAL_PULL"
+          ]
+        }
       }
     },
     "BODY-04": {
@@ -1238,6 +2471,362 @@
           },
           "pairRelationship": null,
           "fatiguePreference": "low"
+        }
+      },
+      "progressionChains": {
+        "BODY04_HORIZONTAL_PUSH": {
+          "chainId": "BODY04_HORIZONTAL_PUSH",
+          "name": "水平推进阶",
+          "description": "上斜俯卧撑 → 器械胸推 → 哑铃卧推 → 杠铃卧推。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "movement_incline_pushup",
+              "fallbackActionId": "qixie_xiongtui",
+              "qualificationReason": "通过可调身体角度学习推胸路径与肩胛稳定。"
+            },
+            {
+              "level": "L2",
+              "actionId": "qixie_xiongtui",
+              "fallbackActionId": "movement_incline_pushup",
+              "qualificationReason": "稳定器械进入基础正式负重。"
+            },
+            {
+              "level": "L3",
+              "actionId": "wotu_xiong_tui",
+              "fallbackActionId": "qixie_xiongtui",
+              "qualificationReason": "进入独立哑铃负重与更高稳定要求。"
+            },
+            {
+              "level": "L4",
+              "actionId": "gangling_wotu",
+              "fallbackActionId": "wotu_xiong_tui",
+              "qualificationReason": "获得完整杠铃卧推资格；器械胸推仍可作为高质量肌肥大主项。"
+            }
+          ],
+          "retentionPolicy": "L4 不强制使用杠铃；根据目标、疲劳、肩部状态与当日结构保留稳定器械。"
+        },
+        "BODY04_VERTICAL_PUSH": {
+          "chainId": "BODY04_VERTICAL_PUSH",
+          "name": "垂直推进阶",
+          "description": "坐姿轻哑铃肩推 → 器械推肩 → 半跪地雷杆推举 → 杠铃站姿推举。",
+          "nodes": [
+            {
+              "level": "L1",
+              "actionId": "V13_VP_SEATED_LIGHT_DB",
+              "fallbackActionId": "qixie_jian_tui",
+              "qualificationReason": "低负荷学习肩推轨迹和胸廓骨盆控制。"
+            },
+            {
+              "level": "L2",
+              "actionId": "qixie_jian_tui",
+              "fallbackActionId": "V13_VP_SEATED_LIGHT_DB",
+              "qualificationReason": "稳定器械建立基础肩部负重。"
+            },
+            {
+              "level": "L3",
+              "actionId": "movement_halfkneeling_landmine_press",
+              "fallbackActionId": "qixie_jian_tui",
+              "qualificationReason": "增加单侧与躯干控制，同时保持可控推举路径。"
+            },
+            {
+              "level": "L4",
+              "actionId": "movement_barbell_overhead_press",
+              "fallbackActionId": "movement_halfkneeling_landmine_press",
+              "qualificationReason": "获得完整站姿自由重量推举资格，但不是肩部塑形的强制动作。"
+            }
+          ],
+          "retentionPolicy": "肩部塑形允许长期保留器械推肩、侧平举等稳定有效动作；L4 表示选择权而非复杂度义务。"
+        }
+      },
+      "levelPools": {
+        "L1": {
+          "level": "L1",
+          "intent": "优先建立动作控制、稳定路径与低门槛负荷；允许稳定器械，但不把高疲劳复合动作当作新手默认资格。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "movement_incline_pushup",
+              "qixie_xiongtui"
+            ],
+            "SECONDARY": [
+              "qixie_jian_tui"
+            ],
+            "ACCESSORY": [
+              "V13_VP_SEATED_LIGHT_DB",
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong"
+            ],
+            "ISOLATION-1": [
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "shengsuo_santou_xiaya"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_santou_xiaya",
+              "xiongjia_jiaxiong",
+              "shengsuo_ertou_wanju"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "qixie_jian_tui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB"
+          ],
+          "introducedActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "qixie_jian_tui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB"
+          ],
+          "retainedActionIds": [],
+          "downwardCompatibleLevels": [
+            "L1"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先动作学习与低门槛入口；稳定器械可以合法，但不自动取代模式学习动作。",
+          "progressionChainIds": [
+            "BODY04_HORIZONTAL_PUSH",
+            "BODY04_VERTICAL_PUSH"
+          ]
+        },
+        "L2": {
+          "level": "L2",
+          "intent": "在动作控制稳定后进入基础外部负荷，允许中等稳定性与基础单侧负重，不以高级训练技术作为资格条件。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "qixie_xiongtui",
+              "wotu_xiong_tui"
+            ],
+            "SECONDARY": [
+              "qixie_jian_tui",
+              "yaling_jiantui"
+            ],
+            "ACCESSORY": [
+              "V13_VP_SEATED_LIGHT_DB",
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong"
+            ],
+            "ISOLATION-1": [
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "shengsuo_santou_xiaya"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_santou_xiaya",
+              "xiongjia_jiaxiong",
+              "shengsuo_ertou_wanju"
+            ],
+            "OPTIONAL": []
+          },
+          "replacementActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "wotu_xiong_tui",
+            "shangxie_yaling_wotu",
+            "qixie_jian_tui",
+            "yaling_jiantui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB"
+          ],
+          "introducedActionIds": [
+            "wotu_xiong_tui",
+            "shangxie_yaling_wotu",
+            "yaling_jiantui"
+          ],
+          "retainedActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "qixie_jian_tui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2"
+          ],
+          "fallbackLevel": "L1",
+          "qualificationReason": "优先基础可调负重与稳定路径；允许向下兼容 L1 动作作为技术退阶。",
+          "progressionChainIds": [
+            "BODY04_HORIZONTAL_PUSH",
+            "BODY04_VERTICAL_PUSH"
+          ]
+        },
+        "L3": {
+          "level": "L3",
+          "intent": "允许正式自由重量、完整单侧训练与高稳定性要求动作，以可持续肌肥大质量为核心。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "wotu_xiong_tui",
+              "shangxie_yaling_wotu"
+            ],
+            "SECONDARY": [
+              "movement_halfkneeling_landmine_press",
+              "yaling_jiantui"
+            ],
+            "ACCESSORY": [
+              "V13_VP_SEATED_LIGHT_DB",
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "movement_halfkneeling_landmine_press"
+            ],
+            "ISOLATION-1": [
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "shengsuo_santou_xiaya"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_santou_xiaya",
+              "xiongjia_jiaxiong",
+              "shengsuo_ertou_wanju"
+            ],
+            "OPTIONAL": [
+              "shengsuo_santou_xiaya",
+              "shengsuo_ertou_wanju",
+              "xiongjia_jiaxiong"
+            ]
+          },
+          "replacementActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "wotu_xiong_tui",
+            "shangxie_yaling_wotu",
+            "qixie_jian_tui",
+            "yaling_jiantui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB",
+            "movement_halfkneeling_landmine_press"
+          ],
+          "introducedActionIds": [
+            "movement_halfkneeling_landmine_press"
+          ],
+          "retainedActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "wotu_xiong_tui",
+            "shangxie_yaling_wotu",
+            "qixie_jian_tui",
+            "yaling_jiantui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3"
+          ],
+          "fallbackLevel": "L2",
+          "qualificationReason": "优先正式肌肥大负荷与独立单侧能力；向下兼容动作保留为高质量替换，而不是默认停留。",
+          "progressionChainIds": [
+            "BODY04_HORIZONTAL_PUSH",
+            "BODY04_VERTICAL_PUSH"
+          ]
+        },
+        "L4": {
+          "level": "L4",
+          "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
+          "preferredBySlot": {
+            "PRIMARY": [
+              "qixie_xiongtui"
+            ],
+            "SECONDARY": [
+              "movement_halfkneeling_landmine_press"
+            ],
+            "ACCESSORY": [
+              "V13_VP_SEATED_LIGHT_DB",
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "movement_halfkneeling_landmine_press"
+            ],
+            "ISOLATION-1": [
+              "shengsuo_cepingju",
+              "xiongjia_jiaxiong",
+              "shengsuo_santou_xiaya"
+            ],
+            "ISOLATION-2": [
+              "shengsuo_santou_xiaya",
+              "xiongjia_jiaxiong",
+              "shengsuo_ertou_wanju"
+            ],
+            "OPTIONAL": [
+              "shengsuo_santou_xiaya",
+              "shengsuo_ertou_wanju",
+              "xiongjia_jiaxiong"
+            ]
+          },
+          "replacementActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "wotu_xiong_tui",
+            "gangling_wotu",
+            "shangxie_yaling_wotu",
+            "qixie_jian_tui",
+            "yaling_jiantui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB",
+            "movement_halfkneeling_landmine_press",
+            "movement_barbell_overhead_press"
+          ],
+          "introducedActionIds": [
+            "gangling_wotu",
+            "movement_barbell_overhead_press"
+          ],
+          "retainedActionIds": [
+            "shengsuo_ertou_wanju",
+            "shengsuo_cepingju",
+            "movement_incline_pushup",
+            "qixie_xiongtui",
+            "smith_wotu",
+            "wotu_xiong_tui",
+            "shangxie_yaling_wotu",
+            "qixie_jian_tui",
+            "yaling_jiantui",
+            "shengsuo_santou_xiaya",
+            "xiongjia_jiaxiong",
+            "V13_VP_SEATED_LIGHT_DB",
+            "movement_halfkneeling_landmine_press"
+          ],
+          "downwardCompatibleLevels": [
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ],
+          "fallbackLevel": "L3",
+          "qualificationReason": "获得完整动作选择权；L4 优先体现负荷、ROM、节奏、RIR 与自主稳定，同时明确保留稳定有效器械。",
+          "progressionChainIds": [
+            "BODY04_HORIZONTAL_PUSH",
+            "BODY04_VERTICAL_PUSH"
+          ]
         }
       }
     }
@@ -1675,7 +3264,6 @@
         "BODY-01"
       ],
       "levels": [
-        "L3",
         "L4"
       ],
       "roles": [
@@ -2224,7 +3812,6 @@
         "BODY-02"
       ],
       "levels": [
-        "L3",
         "L4"
       ],
       "roles": [
@@ -2249,6 +3836,7 @@
         "BODY-02"
       ],
       "levels": [
+        "L1",
         "L2",
         "L3",
         "L4"
@@ -2507,7 +4095,6 @@
         "BODY-03"
       ],
       "levels": [
-        "L3",
         "L4"
       ],
       "roles": [
@@ -2905,7 +4492,6 @@
         "BODY-04"
       ],
       "levels": [
-        "L3",
         "L4"
       ],
       "roles": [
@@ -3079,6 +4665,221 @@
       "repProfile": "accessory_compound",
       "laterality": "bilateral",
       "exerciseFamily": "seated_light_db_shoulder_press"
+    },
+    "V13_SQ_DB_GOBLET": {
+      "families": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "secondaryTargets": [
+        "adductors",
+        "hamstrings"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral",
+      "exerciseFamily": "goblet_squat"
+    },
+    "movement_dowel_hip_hinge": {
+      "families": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "secondaryTargets": [
+        "adductors"
+      ],
+      "exerciseClass": "accessory",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral",
+      "exerciseFamily": "hip_hinge_learning"
+    },
+    "V13_HR_SCAP_ROW": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "upper_back",
+        "lats"
+      ],
+      "secondaryTargets": [
+        "rear_delts",
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral",
+      "exerciseFamily": "scapular_row_learning"
+    },
+    "fuzhu_yinti_jianjia_xiachen": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats",
+        "upper_back"
+      ],
+      "secondaryTargets": [
+        "rear_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "low",
+      "stabilityDemand": "low",
+      "repProfile": "accessory_compound",
+      "laterality": "bilateral",
+      "exerciseFamily": "vertical_pull_learning"
+    },
+    "fuzhu_yinti_xiangshang": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats",
+        "upper_back"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_machine",
+      "laterality": "bilateral",
+      "exerciseFamily": "assisted_pullup"
+    },
+    "movement_bodyweight_pullup": {
+      "families": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L4"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "lats",
+        "upper_back"
+      ],
+      "secondaryTargets": [
+        "biceps"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral",
+      "exerciseFamily": "pullup"
+    },
+    "movement_halfkneeling_landmine_press": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L3",
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "directTargets": [
+        "front_delts",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "lateral_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "medium",
+      "stabilityDemand": "medium",
+      "repProfile": "compound_freeweight",
+      "laterality": "unilateral",
+      "exerciseFamily": "landmine_press"
+    },
+    "movement_barbell_overhead_press": {
+      "families": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L4"
+      ],
+      "roles": [
+        "SECONDARY"
+      ],
+      "directTargets": [
+        "front_delts",
+        "triceps"
+      ],
+      "secondaryTargets": [
+        "lateral_delts"
+      ],
+      "exerciseClass": "compound",
+      "fatigueCost": "high",
+      "stabilityDemand": "high",
+      "repProfile": "compound_freeweight",
+      "laterality": "bilateral",
+      "exerciseFamily": "overhead_press"
     }
   },
   "bodyVolumePolicy": {
