@@ -19,6 +19,7 @@
       loadLevel:session.domainContext.loadLevel,
       capacityFocus:session.domainContext.capacityFocus||'',
       benchmark:session.domainContext.benchmarkContext||null,
+      benchmarkResult:window.V15HyroxBenchmarkHistory?.contextForSession?.(session)?.latestAnalysis||null,
       metrics:session.main?.content?.metrics||{},
       prep:M.HyroxPrep?.items?M.HyroxPrep.items(prep):[],
       stations:stationRows(session),
@@ -42,7 +43,17 @@
     lines.push('','【风险检查】','状态：'+clean(p.conflicts.status)+'｜硬冲突 '+Number(p.conflicts.hardCount||0)+'｜警告 '+Number(p.conflicts.warnCount||0));
     (p.conflicts.issues||[]).forEach(function(i){lines.push('- '+clean(i.title)+'｜'+clean(i.text));});
     lines.push('','【'+clean(p.recovery.title)+'】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}),clean(p.recovery.boundary));
-    if(p.benchmark)lines.push('','本次 Benchmark 成绩：待记录（成绩历史由 Benchmark 模块统一管理）');
+    if(p.benchmark){
+      const a=p.benchmarkResult;
+      if(a){
+        lines.push('','【Benchmark 成绩】','本次：'+window.V15HyroxBenchmarkHistory.formatTimeMs(a.record.totalTimeMs));
+        if(a.previous)lines.push('上次同规格：'+window.V15HyroxBenchmarkHistory.formatTimeMs(a.previous.totalTimeMs),'较上次：'+window.V15HyroxBenchmarkHistory.formatDeltaMs(a.deltaPreviousMs));
+        else lines.push('比较：新基准');
+        if(a.pb)lines.push('PB：'+window.V15HyroxBenchmarkHistory.formatTimeMs(a.pb.totalTimeMs));
+        if(a.abilityProfile?.weakestGroup)lines.push('当前短板：'+a.abilityProfile.weakestGroup);
+        if(a.abilityProfile?.recommendation?.hint)lines.push('下一阶段建议：'+a.abilityProfile.recommendation.hint);
+      }else lines.push('','本次 Benchmark 成绩：待记录（成绩历史由 Benchmark 模块统一管理）');
+    }
     return lines.join('\n').trim();
   }
   function formatMember(p){
@@ -51,7 +62,17 @@
     if(p.benchmark)lines.push('测试协议：'+clean(p.benchmark.protocolId)+'（固定 8 个 Station）');
     lines.push('目标强度：RPE '+(m.targetRpe??'—'),'','【训练前准备】',...prepLines(p.prep),'','【主要训练】');
     (p.stations||[]).forEach(function(s){lines.push(s.order+'. '+clean(s.name)+'｜'+clean(s.prescription));});
-    if(p.benchmark)lines.push('','本次成绩：待记录','只有训练规格与负重一致时，才与上次成绩直接比较。');
+    if(p.benchmark){
+      const a=p.benchmarkResult;
+      if(a){
+        lines.push('','本次成绩：'+window.V15HyroxBenchmarkHistory.formatTimeMs(a.record.totalTimeMs));
+        if(a.previous)lines.push('较上次：'+window.V15HyroxBenchmarkHistory.formatDeltaMs(a.deltaPreviousMs));
+        else lines.push('本次建立新基准。');
+        const improved=Object.entries(a.stationDeltas||{}).filter(function(x){return Number(x[1])>0;}).sort(function(x,y){return y[1]-x[1];})[0];
+        if(improved)lines.push('最明显进步：'+improved[0]+'｜'+window.V15HyroxBenchmarkHistory.formatDeltaMs(improved[1]));
+        if(a.abilityProfile?.weakestGroup)lines.push('下一阶段重点：'+a.abilityProfile.weakestGroup);
+      }else lines.push('','本次成绩：待记录','只有训练规格与负重一致时，才与上次成绩直接比较。');
+    }
     lines.push('','【训练后恢复】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}));
     return lines.join('\n').trim();
   }
