@@ -597,6 +597,12 @@ body{font-size:14px;line-height:1.55}
 }
 
 
+/* ISSUE 69 BODY COMPATIBILITY */
+.body-recommendation-note{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;display:grid;gap:4px;background:var(--surface-soft,#f8f8fb)}
+.body-recommendation-note b{font-size:13px;line-height:1.45}
+.body-recommendation-note span,.body-recommendation-note small{font-size:12px;line-height:1.5}
+.body-recommendation-note small{opacity:.76}
+
 /* =========================================================
    V15 HYROX Benchmark History / PB
    ========================================================= */
