@@ -976,7 +976,43 @@
       "SCALED",
       "INCOMPLETE",
       "INVALID_PROTOCOL"
-    ]
+    ],
+    "benchmarkHistorySchemaVersion": 1,
+    "legacyPolicy": "DISPLAY_ONLY_NOT_COMPARABLE",
+    "abilityGroups": {
+      "ENGINE": {
+        "name": "Engine",
+        "stationIds": [
+          "H1",
+          "H5"
+        ],
+        "coachHint": "优先安排 Engine Capacity；其次 Mixed L3。"
+      },
+      "SLED": {
+        "name": "Sled",
+        "stationIds": [
+          "H2",
+          "H3"
+        ],
+        "coachHint": "优先安排 Sled Capacity；其次 Mixed L3。"
+      },
+      "LOCOMOTION": {
+        "name": "Locomotion",
+        "stationIds": [
+          "H4",
+          "H6",
+          "H7"
+        ],
+        "coachHint": "优先安排 Locomotion Capacity；其次 Mixed L3。"
+      },
+      "BALL": {
+        "name": "Wall Ball",
+        "stationIds": [
+          "H8"
+        ],
+        "coachHint": "优先安排 Wall Ball 技术 / 容量；其次 Mixed L3。"
+      }
+    }
   },
   "hyroxScalingPolicy": {
     "priority": [
