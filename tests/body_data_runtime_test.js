@@ -17,7 +17,7 @@ assert.strictEqual(Object.keys(D.bodyTrainingModes).length,6);
 for(const modeId of D.bodyTrainingModeIds){const mode=D.bodyTrainingModes[modeId];assert.strictEqual(mode.modeId,modeId);assert(mode.patterns.length&&mode.primaryTargets.length&&mode.roles.length&&mode.familyIds.length&&mode.levels.length);}
 assert.deepStrictEqual(D.bodyFamilyIds,['BODY-01','BODY-02','BODY-03','BODY-04']);
 assert.deepStrictEqual(Object.keys(D.bodyLevelPolicies),['L1','L2','L3','L4']);
-assert(D.bodyActionMeta && Object.keys(D.bodyActionMeta).length>=40 && Object.keys(D.bodyActionMeta).length<=60,'Body candidate count must remain 40-60');
+assert(D.bodyActionMeta && Object.keys(D.bodyActionMeta).length>=40 && Object.keys(D.bodyActionMeta).length<=72,'Body candidate count must remain curated and bounded (40-72)');
 
 for(const [actionId,meta] of Object.entries(D.bodyActionMeta)){
   assert(D.actions[actionId],`Body candidate references unknown action ${actionId}`);
@@ -40,3 +40,10 @@ for(const level of ['L1','L2','L3','L4']){
   }
 }
 assert(!D.bodyActionMeta.banjie_hake.levels.includes('L1'),'半蹲哈克 must not be L1-qualified');
+assert.strictEqual(Object.keys(D.bodyActionMeta).length,68,'#93 Body curated candidate inventory drifted');
+for(const familyId of D.bodyFamilyIds){
+  const family=D.bodyFamilies[familyId];
+  assert.deepStrictEqual(Object.keys(family.levelPools),['L1','L2','L3','L4']);
+  assert(Object.keys(family.progressionChains).length>=2,`${familyId} progression chains missing`);
+}
+
