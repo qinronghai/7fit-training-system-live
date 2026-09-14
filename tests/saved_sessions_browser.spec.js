@@ -64,7 +64,20 @@ test('F111 saved session round-trip survives refresh, PREP, rename and delete at
   await page.locator('[data-saved-rename]').click();
   await expect(page.locator('.saved-session-card h3')).toHaveText('F111 已重命名');
 
-  await page.locator('[data-saved-delete]').click();
+  await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 F111 L2');
+  let dialogMessage='';
+  await Promise.all([
+    page.waitForEvent('dialog').then(async dialog=>{dialogMessage=dialog.message();await dialog.dismiss();}),
+    page.locator('[data-saved-delete]').click(),
+  ]);
+  expect(dialogMessage).toContain('F111 · L2');
+  await expect(page.locator('.saved-session-card')).toHaveCount(1);
+  await expect(page.locator('[data-saved-session-status]')).toContainText('已取消删除');
+
+  await Promise.all([
+    page.waitForEvent('dialog').then(dialog=>dialog.accept()),
+    page.locator('[data-saved-delete]').click(),
+  ]);
   await expect(page.locator('.saved-session-card')).toHaveCount(0);
   await expect(page.locator('.saved-session-empty')).toBeVisible();
   await expect390NoOverflow(page);
@@ -85,6 +98,8 @@ test('Body saved session restores current manual slot intent at 390px',async({pa
   await page.locator('[data-save-session-name]').fill('Body 保存课');
   await page.locator('[data-save-current-session]').click();
   await expect(page.locator('.saved-session-card h3')).toHaveText('Body 保存课');
+  await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 Body L3');
+  await expect(page.getByText('LOCAL · 浏览器',{exact:true})).toBeVisible();
 
   await page.locator('#reset-body-session').click();
   await expect(page.locator('.body-slot-select').filter({has:page.locator(`option[value="${formal.target}"]`)}).first()).not.toHaveValue(formal.target);
@@ -93,7 +108,10 @@ test('Body saved session restores current manual slot intent at 390px',async({pa
   const restored=page.locator('.body-slot-select').filter({has:page.locator(`option[value="${formal.target}"]`)}).first();
   await expect(restored).toHaveValue(formal.target);
   await expect(restored.locator('xpath=ancestor::article[contains(@class,"body-slot-card")]').locator('.body-slot-head small')).toHaveText('手动选择');
-  await expect(page.locator('.saved-session-notice')).toBeVisible();
+  await expect(page.locator('.saved-session-notice')).toContainText('Body · L3');
+  await page.goto('/#/coach/f111/f111-01/l2');
+  await expect(page.locator('.saved-session-notice')).toHaveCount(0);
+  await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 Body L3');
   await expect390NoOverflow(page);
   expect(errors,`unexpected Body Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
