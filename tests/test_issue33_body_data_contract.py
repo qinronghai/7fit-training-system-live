@@ -12,6 +12,8 @@ BODY_KEYS = [
     "bodyTargetCatalog",
     "bodyRoleIds",
     "bodyRoles",
+    "bodyTrainingModeIds",
+    "bodyTrainingModes",
     "bodyFamilyIds",
     "bodyFamilies",
     "bodyLevelPolicies",
@@ -82,6 +84,33 @@ def test_body_taxonomy_is_exact_and_keyed_by_stable_ids():
     for role_id, record in data["bodyRoles"].items():
         assert record["id"] == role_id
         assert record["name"]
+
+
+
+def test_six_body_training_modes_are_real_data_contracts():
+    data = source()
+    expected_ids = ["BODY-MODE-01","BODY-MODE-02","BODY-MODE-03","BODY-MODE-04","BODY-MODE-05","BODY-MODE-06"]
+    assert data["bodyTrainingModeIds"] == expected_ids
+    assert list(data["bodyTrainingModes"]) == expected_ids
+    actions = json.loads((SRC / "actions.json").read_text(encoding="utf-8"))["actions"]
+    for mode_id in expected_ids:
+        mode = data["bodyTrainingModes"][mode_id]
+        assert mode["modeId"] == mode_id
+        assert mode["name"] and mode["description"] and mode["useCase"] and mode["actionLibraryRule"]
+        assert mode["patterns"] and mode["primaryTargets"] and mode["roles"] and mode["familyIds"] and mode["levels"]
+        matching = []
+        for action_id, meta in data["bodyActionMeta"].items():
+            action = actions.get(action_id, {})
+            if action.get("pattern") not in mode["patterns"]:
+                continue
+            if not set(meta["families"]) & set(mode["familyIds"]):
+                continue
+            if not set(meta["roles"]) & set(mode["roles"]):
+                continue
+            if not set(meta["directTargets"]) & set(mode["primaryTargets"]):
+                continue
+            matching.append(action_id)
+        assert matching, f"{mode_id} must map to real Body action inventory"
 
 
 def test_four_body_families_freeze_targets_and_explicit_slot_roles():
