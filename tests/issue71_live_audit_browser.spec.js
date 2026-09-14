@@ -107,3 +107,16 @@ test('Issue 71: Conditioning L1 Primer is either legal or explicitly explained',
   await expectNoOverflow(page,390);
   await expectClean(diag);
 });
+
+
+test('Issue 71: primary routes never expose literal newline residue',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:390,height:844});
+  for(const route of ['/#/coach','/#/system/prep','/#/rules/venue','/#/library','/#/maintenance/venue']){
+    await page.goto(route);
+    const bodyText=await page.locator('body').innerText();
+    expect(bodyText,'literal newline residue on '+route).not.toContain('\\n');
+    await expectNoOverflow(page,390);
+  }
+  await expectClean(diag);
+});
