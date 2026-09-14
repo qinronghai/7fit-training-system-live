@@ -143,6 +143,117 @@
     return LOADING_STYLE_BY_PROFILE[meta.repProfile]||'';
   }
 
+  function normalizeVenueOverrideReason(value){
+    if(typeof value==='string')return value.trim();
+    if(value&&typeof value==='object'&&typeof value.venueOverrideReason==='string')return value.venueOverrideReason.trim();
+    if(value&&typeof value==='object'&&typeof value.overrideReason==='string')return value.overrideReason.trim();
+    return '';
+  }
+
+  function finiteVenueNumber(value){
+    if(typeof value==='number')return Number.isFinite(value)?value:null;
+    if(typeof value==='string'&&value.trim()!==''){
+      const parsed=Number(value);
+      return Number.isFinite(parsed)?parsed:null;
+    }
+    return null;
+  }
+
+  function actionEquipmentIds(actionId){
+    const action=D().actions?.[actionId]||{};
+    const declared=Array.isArray(action.requiresEquipmentId)&&action.requiresEquipmentId.length
+      ?action.requiresEquipmentId
+      :String(action.equipmentId||'').split(/[、,，]/).map(value=>value.trim()).filter(Boolean);
+    return unique(declared);
+  }
+
+  function venueReasonText(code,{level,levelCeilingKg,minimumSystemLoadKg,equipmentId,actionName,minimumReasonLength}={}){
+    if(code==='BODY_VENUE_MIN_LOAD_EXCEEDS_LEVEL'){
+      return `${actionName||equipmentId||'当前动作'} 的场馆最低系统负重约 ${minimumSystemLoadKg}kg，高于 ${level} 默认可接受的 ${levelCeilingKg}kg；已准备安全退阶。`;
+    }
+    if(code==='BODY_VENUE_EQUIPMENT_UNAVAILABLE')return `${equipmentId||'当前器械'} 当前标记为不可用，不能进入默认编课。`;
+    if(code==='BODY_VENUE_OVERRIDE_REASON_REQUIRED')return `场馆 Gate 需要至少 ${minimumReasonLength} 个字的教练现场确认理由。`;
+    return '';
+  }
+
+  function assessVenueEligibility({familyId,level,slotKey,actionId,overrideReason=''}={}){
+    const data=D(),policy=data.venueCapabilityPolicy||{},action=data.actions?.[actionId]||{};
+    const levelCeilingRaw=policy.bodyLevelMinimumSystemLoadCeilingKg?.[level];
+    const levelCeilingKg=finiteVenueNumber(levelCeilingRaw);
+    const equipmentIds=actionEquipmentIds(actionId),equipment=policy.equipment||{};
+    const checks=[],blocking=[],minimumSystemLoads=[],minimumExternalLoads=[];
+    for(const equipmentId of equipmentIds){
+      const record=equipment[equipmentId];
+      if(!record){
+        checks.push({equipmentId,status:'UNVERIFIED',minimumSystemLoadKg:null,minimumExternalLoadKg:null});
+        continue;
+      }
+      const minimumSystemLoadKg=finiteVenueNumber(record.minimumSystemLoadKg);
+      const minimumExternalLoadKg=finiteVenueNumber(record.minimumExternalLoadKg);
+      if(minimumSystemLoadKg!==null)minimumSystemLoads.push(minimumSystemLoadKg);
+      if(minimumExternalLoadKg!==null)minimumExternalLoads.push(minimumExternalLoadKg);
+      if(record.venueAvailability==='UNAVAILABLE'){
+        blocking.push({code:'BODY_VENUE_EQUIPMENT_UNAVAILABLE',equipmentId,minimumSystemLoadKg,minimumExternalLoadKg});
+        checks.push({equipmentId,status:'BLOCKED',minimumSystemLoadKg,minimumExternalLoadKg});
+        continue;
+      }
+      if(minimumSystemLoadKg!==null&&levelCeilingKg!==null&&minimumSystemLoadKg>levelCeilingKg){
+        blocking.push({code:'BODY_VENUE_MIN_LOAD_EXCEEDS_LEVEL',equipmentId,minimumSystemLoadKg,minimumExternalLoadKg});
+        checks.push({equipmentId,status:'BLOCKED',minimumSystemLoadKg,minimumExternalLoadKg});
+        continue;
+      }
+      checks.push({
+        equipmentId,
+        status:minimumSystemLoadKg===null?'UNVERIFIED':'PASS',
+        minimumSystemLoadKg,
+        minimumExternalLoadKg,
+      });
+    }
+    const minimumSystemLoadKg=minimumSystemLoads.length?Math.max(...minimumSystemLoads):null;
+    const minimumExternalLoadKg=minimumExternalLoads.length?Math.max(...minimumExternalLoads):null;
+    const hasUnverified=checks.some(check=>check.status==='UNVERIFIED');
+    const gate=action.beginnerLoadGate&&typeof action.beginnerLoadGate==='object'?action.beginnerLoadGate:null;
+    const manualPolicy=policy.manualOverridePolicy||{};
+    const reason=normalizeVenueOverrideReason(overrideReason);
+    const minimumReasonLength=Number.isInteger(manualPolicy.minimumReasonLength)?manualPolicy.minimumReasonLength:8;
+    const blocked=blocking.length>0;
+    const onlyLoadThresholdBlock=blocked&&blocking.every(item=>item.code==='BODY_VENUE_MIN_LOAD_EXCEEDS_LEVEL');
+    const overrideAllowed=onlyLoadThresholdBlock&&gate?.type==='minimum_system_load'&&gate.manualOverrideAllowed===true;
+    const reasonRequired=overrideAllowed&&manualPolicy.requiresReason===true;
+    const overrideAccepted=overrideAllowed&&(!reasonRequired||reason.length>=minimumReasonLength);
+    const reasonCodes=[...new Set(blocking.map(item=>item.code))];
+    if(blocked&&overrideAllowed&&reasonRequired&&reason.length>0&&reason.length<minimumReasonLength){
+      reasonCodes.push('BODY_VENUE_OVERRIDE_REASON_REQUIRED');
+    }
+    if(!blocked&&hasUnverified)reasonCodes.push('BODY_VENUE_METADATA_UNVERIFIED');
+    const primaryCode=reasonCodes[0]||'';
+    const status=overrideAccepted?'OVERRIDDEN':blocked?'BLOCKED':hasUnverified?'UNVERIFIED':'PASS';
+    return {
+      ok:!blocked||overrideAccepted,
+      status,
+      familyId:String(familyId||''),
+      level:String(level||''),
+      slotKey:String(slotKey||''),
+      actionId:String(actionId||''),
+      actionName:String(action.name||actionId||''),
+      equipmentIds,
+      equipmentChecks:checks,
+      minimumSystemLoadKg,
+      minimumExternalLoadKg,
+      levelCeilingKg,
+      reasons:reasonCodes,
+      reason:venueReasonText(primaryCode,{level,levelCeilingKg,minimumSystemLoadKg,equipmentId:blocking[0]?.equipmentId,actionName:action.name,minimumReasonLength})
+        ||(hasUnverified?'场馆尚未录入该器械最低负重；不虚构 Gate，保留未核验审计状态。':''),
+      overrideAllowed,
+      overrideReasonRequired:reasonRequired,
+      overrideAccepted,
+      overrideReason:overrideAccepted?reason:'',
+      minimumReasonLength,
+      fallbackActionGroup:String(action.fallbackActionGroup||''),
+      policyVersion:String(policy.policyVersion||''),
+    };
+  }
+
   function assessLevelPoolEligibility({familyId,level,slotKey,actionId}={}){
     const pool=familyLevelPool(familyId,level),family=D().bodyFamilies?.[familyId];
     if(!pool||!family||!actionId)return {
@@ -332,13 +443,24 @@
     const actionId=normalizeActionId(input.actionId);
     if(!actionId)return {ok:false,reasons:['BODY_ACTION_UNKNOWN'],intentId:'',slotKey:normalized.slotKey,actionId:''};
     const base=baseIntentAssessment({...normalized,actionId});
+    const venueEligibility=assessVenueEligibility({
+      familyId:normalized.familyId,
+      level:normalized.level,
+      slotKey:normalized.slotKey,
+      actionId,
+      overrideReason:normalizeVenueOverrideReason(input),
+    });
     const pairReasons=base.ok?pairIntentReasons({
       slotKey:normalized.slotKey,
       intent:base.intent,
       actionId,
       currentSelections:input.currentSelections||{},
     }):[];
-    const reasons=[...new Set([...base.reasons,...pairReasons])];
+    const reasons=[...new Set([
+      ...base.reasons,
+      ...pairReasons,
+      ...(input.includeVenueGate===false||venueEligibility.ok||venueEligibility.overrideAccepted?[]:venueEligibility.reasons),
+    ])];
     return {
       ok:reasons.length===0,
       reasons,
@@ -351,6 +473,7 @@
       levelPoolEligibility:base.levelPoolEligibility||assessLevelPoolEligibility({
         familyId:normalized.familyId,level:normalized.level,slotKey:normalized.slotKey,actionId
       }),
+      venueEligibility,
     };
   }
 
@@ -734,43 +857,60 @@
       ||a.actionId.localeCompare(b.actionId);
   }
 
+  function candidateRecord({actionId,role,intent,level,assessment,currentSelections,familyId,slotKey}={}){
+    const data=D(),meta=data.bodyActionMeta[actionId],action=data.actions[actionId],exerciseFamily=exerciseFamilyOf(actionId);
+    const candidate={
+      actionId,
+      name:String(action.name||actionId),
+      role,
+      intentId:String(intent?.intentId||''),
+      directTargets:[...(meta.directTargets||[])],
+      secondaryTargets:[...(meta.secondaryTargets||[])],
+      exerciseClass:String(meta.exerciseClass||''),
+      fatigueCost:String(meta.fatigueCost||''),
+      stabilityDemand:String(meta.stabilityDemand||''),
+      repProfile:String(meta.repProfile||''),
+      laterality:String(meta.laterality||''),
+      exerciseFamily,
+      pattern:String(action.pattern||''),
+      levelEligibility:assessment.levelEligibility,
+      levelPoolEligibility:assessment.levelPoolEligibility,
+      venueEligibility:assessment.venueEligibility||assessVenueEligibility({familyId,level,slotKey,actionId}),
+      levelReason:assessment.levelPoolEligibility?.reason||(
+        assessment.levelEligibility?.actionEntryLevel===level
+          ?'当前等级正式准入'
+          :'低等级已掌握动作，当前等级继续合法'
+      ),
+    };
+    Object.assign(candidate,Compatibility.scoreCandidate({
+      familyId,level,slotKey,candidate,currentSelections,intent,
+    }));
+    return candidate;
+  }
+
   function candidates(input={}){
     const {familyId,level,family,slotKey,role}=validateInput(input,true);
     const data=D(),currentSelections=input.currentSelections||{},context=selectionContext(currentSelections,slotKey);
-    const intent=slotIntentFor(family,slotKey),items=[];
+    const intent=slotIntentFor(family,slotKey),items=[],blockedItems=[];
     for(const actionId of Object.keys(data.bodyActionMeta||{})){
       if(context.usedActionIds.has(actionId))continue;
       const meta=data.bodyActionMeta[actionId],exerciseFamily=exerciseFamilyOf(actionId);
       if(context.usedExerciseFamilies.has(exerciseFamily))continue;
       const assessment=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections});
-      if(!assessment.ok)continue;
-      const action=data.actions[actionId];
-      const candidate={
-        actionId,
-        name:String(action.name||actionId),
-        role,
-        intentId:String(intent?.intentId||''),
-        directTargets:[...(meta.directTargets||[])],
-        secondaryTargets:[...(meta.secondaryTargets||[])],
-        exerciseClass:String(meta.exerciseClass||''),
-        fatigueCost:String(meta.fatigueCost||''),
-        stabilityDemand:String(meta.stabilityDemand||''),
-        repProfile:String(meta.repProfile||''),
-        laterality:String(meta.laterality||''),
-        exerciseFamily,
-        pattern:String(action.pattern||''),
-        levelEligibility:assessment.levelEligibility,
-        levelPoolEligibility:assessment.levelPoolEligibility,
-        levelReason:assessment.levelPoolEligibility?.reason||(
-          assessment.levelEligibility?.actionEntryLevel===level
-            ?'当前等级正式准入'
-            :'低等级已掌握动作，当前等级继续合法'
-        ),
-      };
-      Object.assign(candidate,Compatibility.scoreCandidate({
-        familyId,level,slotKey,candidate,currentSelections,intent,
-      }));
-      items.push(candidate);
+      if(assessment.ok){
+        items.push(candidateRecord({actionId,role,intent,level,assessment,currentSelections,familyId,slotKey}));
+        continue;
+      }
+      if(input.includeVenueBlocked===true&&assessment.venueEligibility?.status==='BLOCKED'){
+        const venueFree=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections,includeVenueGate:false});
+        if(venueFree.ok){
+          const candidate=candidateRecord({actionId,role,intent,level,assessment:venueFree,currentSelections,familyId,slotKey});
+          candidate.venueEligibility=assessment.venueEligibility;
+          candidate.requiresVenueOverride=true;
+          candidate.blockedReasons=[...(assessment.venueEligibility.reasons||[])];
+          blockedItems.push(candidate);
+        }
+      }
     }
     items.sort((a,b)=>
       b.recommendationScore-a.recommendationScore
@@ -781,7 +921,8 @@
       slotIntent:intent?{slotKey,intentId:intent.intentId,role:intent.role}:null,
       levelContract:{...data.bodyLevelPolicies[level]},
       levelPool:familyLevelPool(familyId,level)?{...familyLevelPool(familyId,level)}:null,
-      candidates:items
+      candidates:items,
+      blockedCandidates:blockedItems.sort((a,b)=>compareCandidates(a,b,{family,level,context,intent})),
     };
   }
 
@@ -822,25 +963,63 @@
     });
   }
 
+  function venueAuditRecord({slotKey,actionId,requestedActionId,source,finalVenue,requestedVenue}={}){
+    const overridden=source==='manual'&&requestedVenue?.overrideAccepted===true;
+    const fallback=!!requestedActionId&&requestedActionId!==actionId;
+    return {
+      slotKey,
+      actionId,
+      requestedActionId:String(requestedActionId||''),
+      status:overridden?'OVERRIDDEN':fallback?'FALLBACK':String(finalVenue?.status||'PASS'),
+      equipmentIds:[...(finalVenue?.equipmentIds||[])],
+      minimumSystemLoadKg:finalVenue?.minimumSystemLoadKg??null,
+      requestedMinimumSystemLoadKg:requestedVenue?.minimumSystemLoadKg??null,
+      levelCeilingKg:finalVenue?.levelCeilingKg??null,
+      reasonCodes:[...(requestedVenue?.reasons||finalVenue?.reasons||[])],
+      reason:String(requestedVenue?.reason||finalVenue?.reason||''),
+      fallbackActionGroup:String(requestedVenue?.fallbackActionGroup||''),
+      overrideReason:overridden?String(requestedVenue.overrideReason||''):'',
+      policyVersion:String(finalVenue?.policyVersion||requestedVenue?.policyVersion||''),
+    };
+  }
+
   function resolve(input={}){
     const {familyId,level,family,levelPolicy}=validateInput(input);
     if(!window.V15BodyVolume?.buildSlot||!window.V15BodyVolume?.summarize){
       fail('BODY_VOLUME_UNAVAILABLE','Body volume calculator is unavailable');
     }
     const requested=input.selections&&typeof input.selections==='object'?input.selections:{};
-    const chosen={},domainSlots={},publicSlots=[],warnings=[];
+    const chosen={},domainSlots={},publicSlots=[],warnings=[],venueSlots={},venueOverrides=[];
 
     for(const slotKey of activeSlotKeys(levelPolicy)){
       const role=family.slotPolicy[slotKey];
-      const requestedActionId=normalizeManualActionId(requested[slotKey]);
+      const requestedEntry=requested[slotKey];
+      const requestedActionId=normalizeManualActionId(requestedEntry);
+      const overrideReason=normalizeVenueOverrideReason(requestedEntry);
       let actionId='',source='auto';
       const used=new Set(Object.values(chosen));
       const usedExerciseFamilies=new Set(Object.values(chosen).map(exerciseFamilyOf));
-      if(requestedActionId&&!used.has(requestedActionId)&&!usedExerciseFamilies.has(exerciseFamilyOf(requestedActionId))&&isLegalCandidate({familyId,level,slotKey,actionId:requestedActionId,currentSelections:chosen})){
+      const requestedIntent= requestedActionId
+        ?assessSlotIntent({familyId,level,slotKey,actionId:requestedActionId,currentSelections:chosen,includeVenueGate:false})
+        :null;
+      const requestedVenue=requestedActionId
+        ?assessVenueEligibility({familyId,level,slotKey,actionId:requestedActionId,overrideReason})
+        :null;
+      const uniqueRequested=!!requestedActionId&&!used.has(requestedActionId)&&!usedExerciseFamilies.has(exerciseFamilyOf(requestedActionId));
+      if(uniqueRequested&&requestedIntent?.ok&&(requestedVenue?.ok||requestedVenue?.overrideAccepted)){
         actionId=requestedActionId;
         source='manual';
+        if(requestedVenue.overrideAccepted)warnings.push(`BODY_VENUE_MANUAL_OVERRIDE:${slotKey}`);
       }else{
-        if(requestedActionId)warnings.push(`BODY_STALE_SELECTION_FALLBACK:${slotKey}`);
+        if(requestedActionId){
+          warnings.push(`BODY_STALE_SELECTION_FALLBACK:${slotKey}`);
+          if(requestedVenue?.status==='BLOCKED'){
+            warnings.push(`BODY_VENUE_GATE_FALLBACK:${slotKey}`);
+            if(requestedVenue.overrideReasonRequired&&!requestedVenue.overrideAccepted){
+              warnings.push(`BODY_VENUE_OVERRIDE_REASON_REQUIRED:${slotKey}`);
+            }
+          }
+        }
         const result=candidates({familyId,level,slotKey,currentSelections:chosen});
         actionId=result.recommended;
         if(!actionId)fail('BODY_NO_ELIGIBLE_CANDIDATE',`No eligible Body candidate for ${familyId} ${level} ${slotKey}`,{familyId,level,slotKey});
@@ -859,6 +1038,18 @@
         prescription:window.V15BodyVolume.formatPrescription(domainSlot),
         source,
       });
+      const finalVenue=assessVenueEligibility({familyId,level,slotKey,actionId});
+      const audit=venueAuditRecord({slotKey,actionId,requestedActionId,source,finalVenue,requestedVenue});
+      venueSlots[slotKey]=audit;
+      if(audit.status==='OVERRIDDEN'){
+        venueOverrides.push({
+          slotKey,
+          actionId,
+          reason:audit.overrideReason,
+          auditCode:String(D().venueCapabilityPolicy?.manualOverridePolicy?.auditCode||'BODY_VENUE_MANUAL_OVERRIDE'),
+          policyVersion:audit.policyVersion,
+        });
+      }
     }
 
     const actionIds=publicSlots.map(slot=>slot.actionId);
@@ -897,7 +1088,14 @@
         kind:'BODY',
         levelContract:{...levelPolicy},
         slots:domainSlots,
-        volume:window.V15BodyVolume.summarize(domainSlots)
+        volume:window.V15BodyVolume.summarize(domainSlots),
+        venue:{
+          policyVersion:String(D().venueCapabilityPolicy?.policyVersion||''),
+          venueId:String(D().venueCapabilityPolicy?.venueId||''),
+          levelCeilingKg:Number(D().venueCapabilityPolicy?.bodyLevelMinimumSystemLoadCeilingKg?.[level]??0),
+          slots:venueSlots,
+          overrides:venueOverrides,
+        },
       },
     };
     session.conflictContext=evaluateConflict(session);
@@ -906,7 +1104,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,assessLevelPoolEligibility,pairSimilarity};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,assessLevelPoolEligibility,assessVenueEligibility,pairSimilarity};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);

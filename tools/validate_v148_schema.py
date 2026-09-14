@@ -675,6 +675,50 @@ def validate_payload(data: dict) -> list[str]:
                         f"{sorted(primary_targets)}"
                     )
 
+    # Venue Capability / Minimum Load contract and Body action cross-record references.
+    venue = data.get("venueCapabilityPolicy", {})
+    errors.extend(_schema_errors(venue, "venue", "venueCapabilityPolicy"))
+    if isinstance(venue, dict):
+        equipment_ids = set(venue.get("equipmentIds", []))
+        equipment = venue.get("equipment", {})
+        if set(equipment) != equipment_ids:
+            errors.append(
+                "venueCapabilityPolicy.equipment: keys must match equipmentIds"
+            )
+        action_ids = venue.get("actionIds", [])
+        if len(action_ids) != len(set(action_ids)):
+            errors.append("venueCapabilityPolicy.actionIds: duplicate action IDs are not allowed")
+        for action_id in action_ids:
+            action = actions.get(action_id)
+            if not isinstance(action, dict):
+                errors.append(f"venueCapabilityPolicy.actionIds: unknown action {action_id}")
+                continue
+            required_equipment = action.get("requiresEquipmentId", [])
+            if not required_equipment:
+                errors.append(
+                    f"actions.{action_id}.requiresEquipmentId: required for a venue-gated action"
+                )
+            for equipment_id in required_equipment:
+                if equipment_id not in equipment_ids:
+                    errors.append(
+                        f"actions.{action_id}.requiresEquipmentId: unknown equipment {equipment_id}"
+                    )
+            gate = action.get("beginnerLoadGate")
+            if not isinstance(gate, dict) or gate.get("type") != "minimum_system_load":
+                errors.append(
+                    f"actions.{action_id}.beginnerLoadGate: minimum_system_load gate is required"
+                )
+            if not isinstance(action.get("fallbackActionGroup"), str) or not action.get("fallbackActionGroup"):
+                errors.append(
+                    f"actions.{action_id}.fallbackActionGroup: explicit fallback group is required"
+                )
+        ceilings = venue.get("bodyLevelMinimumSystemLoadCeilingKg", {})
+        if all(isinstance(ceilings.get(level), (int, float)) for level in ("L1", "L2", "L3", "L4")):
+            if not all(ceilings[level] <= ceilings[next_level] for level, next_level in zip(("L1", "L2", "L3"), ("L2", "L3", "L4"))):
+                errors.append(
+                    "venueCapabilityPolicy.bodyLevelMinimumSystemLoadCeilingKg: must be non-decreasing L1 to L4"
+                )
+
     # Conditioning cross-record identity, candidate references, and V1 venue legality.
     conditioning_family_ids = data.get("conditioningFamilyIds", [])
     conditioning_protocol_ids = data.get("conditioningProtocolIds", [])

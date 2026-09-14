@@ -291,3 +291,52 @@ test('Body Coach-first default hierarchy keeps focus and primary in the mobile d
   await expect390NoOverflow(page);
   expect(errors,`unexpected Body Coach-first pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
+
+test('Body venue gate exposes safe fallback and auditable manual override at 390px',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/body/body-01/l2');
+
+  const primary=page.locator('.body-slot-card[data-body-slot="PRIMARY"]');
+  const gate=primary.locator('[data-body-venue-gate]');
+  await expect(gate).toHaveCount(1);
+  await expect(gate).toContainText('场馆 Gate');
+  await gate.locator('summary').click();
+  const blocked=gate.locator('[data-body-venue-blocked][data-action-id="hake_shendun"]');
+  await expect(blocked).toBeVisible();
+  await expect(blocked).toContainText('最低系统负重');
+  await expect(blocked.locator('[data-body-venue-reason]')).toBeVisible();
+  await blocked.locator('[data-body-venue-override]').click();
+  await expect(blocked.locator('[data-body-venue-error]')).toBeVisible();
+  await expect(primary.locator('.body-slot-select')).not.toHaveValue('hake_shendun');
+
+  await blocked.locator('[data-body-venue-reason]').fill('教练已现场确认会员具备当前器械负荷能力');
+  await blocked.locator('[data-body-venue-override]').click();
+  await expect(primary.locator('.body-slot-select')).toHaveValue('hake_shendun');
+  await expect(primary.locator('.body-venue-current.override')).toContainText('场馆 Gate：已覆盖');
+  await expect(primary.locator('.body-venue-current.override')).toContainText('教练已现场确认');
+  await expect(page.locator('[data-body-risk]')).not.toContainText('需要先调整');
+
+  const audit=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    return {
+      actionId:ctx.session.main.content.find(item=>item.key==='PRIMARY')?.actionId,
+      status:ctx.session.domainContext.venue.slots.PRIMARY.status,
+      reason:ctx.session.domainContext.venue.slots.PRIMARY.overrideReason,
+      overrides:ctx.session.domainContext.venue.overrides.length,
+    };
+  });
+  expect(audit).toEqual({
+    actionId:'hake_shendun',
+    status:'OVERRIDDEN',
+    reason:'教练已现场确认会员具备当前器械负荷能力',
+    overrides:1,
+  });
+
+  await page.reload();
+  await expect(primary.locator('.body-slot-select')).toHaveValue('hake_shendun');
+  await expect(primary.locator('.body-venue-current.override')).toBeVisible();
+  await expect390NoOverflow(page);
+  expect(errors,`unexpected Body venue pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+});

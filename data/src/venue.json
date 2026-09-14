@@ -1,1 +1,71 @@
-{}
+{
+  "venueCapabilityPolicy": {
+    "policyVersion": "venue-v1",
+    "venueId": "7FIT_DEFAULT",
+    "name": "7Fit 默认场馆能力策略",
+    "bodyLevelMinimumSystemLoadCeilingKg": {
+      "L1": 10,
+      "L2": 15,
+      "L3": 30,
+      "L4": 60
+    },
+    "unknownEquipmentPolicy": "ALLOW_WITH_UNVERIFIED_AUDIT",
+    "manualOverridePolicy": {
+      "requiresReason": true,
+      "minimumReasonLength": 8,
+      "auditCode": "BODY_VENUE_MANUAL_OVERRIDE"
+    },
+    "equipmentIds": [
+      "eq-hack",
+      "eq-trapbar",
+      "eq-hipthrust"
+    ],
+    "equipment": {
+      "eq-hack": {
+        "equipmentId": "eq-hack",
+        "stationId": "hack-squat-01",
+        "minimumExternalLoadKg": null,
+        "minimumSystemLoadKg": 20,
+        "loadIncrementKg": null,
+        "assisted": null,
+        "counterbalanced": null,
+        "setupDemand": "unknown",
+        "venueAvailability": "AVAILABLE",
+        "notes": "哈克空机起始系统负重约 20kg；精确值需按现场设备逐台复核。",
+        "constraintSource": "issue-94-venue-baseline"
+      },
+      "eq-trapbar": {
+        "equipmentId": "eq-trapbar",
+        "stationId": "trapbar-01",
+        "minimumExternalLoadKg": null,
+        "minimumSystemLoadKg": 20,
+        "loadIncrementKg": null,
+        "assisted": null,
+        "counterbalanced": null,
+        "setupDemand": "unknown",
+        "venueAvailability": "AVAILABLE",
+        "notes": "六角杠本体起始系统负重约 20kg；精确值需按现场器械复核。",
+        "constraintSource": "issue-94-venue-baseline"
+      },
+      "eq-hipthrust": {
+        "equipmentId": "eq-hipthrust",
+        "stationId": "hip-thrust-01",
+        "minimumExternalLoadKg": null,
+        "minimumSystemLoadKg": null,
+        "loadIncrementKg": null,
+        "assisted": null,
+        "counterbalanced": null,
+        "setupDemand": "unknown",
+        "venueAvailability": "AVAILABLE",
+        "notes": "7Fit 默认使用器械臀推机；尚未录入未经现场复核的最低负重。",
+        "constraintSource": "issue-94-equipment-priority"
+      }
+    },
+    "actionIds": [
+      "banjie_hake",
+      "hake_shendun",
+      "hake_shendun_zhaiju",
+      "liujiao_gantui_yingla"
+    ]
+  }
+}

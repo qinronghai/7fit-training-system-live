@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.local/schemas/v14.8/venue.schema.json",
+  "title": "7Fit Venue Capability Policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policyVersion",
+    "venueId",
+    "name",
+    "bodyLevelMinimumSystemLoadCeilingKg",
+    "unknownEquipmentPolicy",
+    "manualOverridePolicy",
+    "equipmentIds",
+    "equipment",
+    "actionIds"
+  ],
+  "properties": {
+    "policyVersion": {"const": "venue-v1"},
+    "venueId": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "bodyLevelMinimumSystemLoadCeilingKg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["L1", "L2", "L3", "L4"],
+      "properties": {
+        "L1": {"type": "number", "minimum": 0},
+        "L2": {"type": "number", "minimum": 0},
+        "L3": {"type": "number", "minimum": 0},
+        "L4": {"type": "number", "minimum": 0}
+      }
+    },
+    "unknownEquipmentPolicy": {"const": "ALLOW_WITH_UNVERIFIED_AUDIT"},
+    "manualOverridePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiresReason", "minimumReasonLength", "auditCode"],
+      "properties": {
+        "requiresReason": {"const": true},
+        "minimumReasonLength": {"type": "integer", "minimum": 1, "maximum": 300},
+        "auditCode": {"type": "string", "minLength": 1}
+      }
+    },
+    "equipmentIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "equipment": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/equipment"}
+    },
+    "actionIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "equipment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equipmentId",
+        "stationId",
+        "minimumExternalLoadKg",
+        "minimumSystemLoadKg",
+        "loadIncrementKg",
+        "assisted",
+        "counterbalanced",
+        "setupDemand",
+        "venueAvailability",
+        "notes",
+        "constraintSource"
+      ],
+      "properties": {
+        "equipmentId": {"type": "string", "minLength": 1},
+        "stationId": {"type": "string", "minLength": 1},
+        "minimumExternalLoadKg": {"type": ["number", "null"], "minimum": 0},
+        "minimumSystemLoadKg": {"type": ["number", "null"], "minimum": 0},
+        "loadIncrementKg": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "assisted": {"type": ["boolean", "null"]},
+        "counterbalanced": {"type": ["boolean", "null"]},
+        "setupDemand": {"type": "string", "enum": ["low", "medium", "high", "unknown"]},
+        "venueAvailability": {"type": "string", "enum": ["AVAILABLE", "UNAVAILABLE", "UNKNOWN", "PENDING_VERIFICATION"]},
+        "notes": {"type": "string", "minLength": 1},
+        "constraintSource": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
