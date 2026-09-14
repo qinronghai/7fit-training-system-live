@@ -104,4 +104,21 @@ assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)),{});
 assert.deepStrictEqual(plain(S.getPrepSelections('conditioning',sessionKey)),{});
 assert.deepStrictEqual(plain(reset),plain(R.resolve('conditioning',{familyId,level,protocolId,selections:{}})));
 
+
+const emptyPrimerHtml=Prep.renderResolved({
+  fallbackSlots:[],
+  slots:[{
+    slotKey:'PRIMER',slotName:'主动作模式准备',prepGrade:'',source:'auto',
+    name:'',purpose:'用低疲劳动作预习当节主要模式或关键稳定需求',why:'',candidates:[]
+  }]
+},'CON-02-L1-INTERVAL',{
+  level:'L1',
+  prepContext:{level:'L1',impactDemand:'low',mainPatterns:['蹲'],modalities:['rower']}
+});
+assert(emptyPrimerHtml.includes('当前等级、冲击和动作模式约束下没有合法 Primer'));
+assert(emptyPrimerHtml.includes('本槽可以安全跳过'));
+assert(emptyPrimerHtml.includes('不要为了填满卡片而绕过动作准入'));
+assert(emptyPrimerHtml.includes('查看 PREP 规则 / 人工安排参考'));
+assert(emptyPrimerHtml.includes('aria-label="主动作模式准备：Conditioning 热身动作替换"'));
+
 console.log('conditioning_coach_state_prep_test: station State + shared PREP PASS');
