@@ -307,6 +307,7 @@
           pb:stationPb,
           deltaVsPrevious:prior?prior.timeMs-station.timeMs:null,
           gapToPbPct:stationPb&&stationPb.timeMs?Math.max(0,(station.timeMs-stationPb.timeMs)/stationPb.timeMs*100):0,
+          history:history.map(function(item){return item.timeMs;}),
         };
       }
     }
