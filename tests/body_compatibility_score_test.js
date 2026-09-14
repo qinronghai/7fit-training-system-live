@@ -67,24 +67,26 @@ const body03=Body.candidates({
 assert(body03.candidates.every(candidate=>candidate.pattern==='垂直拉'));
 assert(body03.candidates[0].patternContribution.isNovel);
 
-const body04Primary=Body.candidates({familyId:'BODY-04',level:'L2',slotKey:'PRIMARY',currentSelections:{}}).candidates;
-assert(body04Primary.length>=2,'BODY-04 L2 requires two PRIMARY choices for rerank fixture');
+const horizontalPrimary='feiji_labei_zhongba';
+const verticalPrimary='gaowei_xiala_vba';
+assert(Body.isSelectionValid({familyId:'BODY-03',level:'L3',slotKey:'PRIMARY',actionId:horizontalPrimary}));
+assert(Body.isSelectionValid({familyId:'BODY-03',level:'L3',slotKey:'PRIMARY',actionId:verticalPrimary}));
 let changed=false;
-for(const downstreamSlot of ['SECONDARY','ACCESSORY','ISOLATION-1','ISOLATION-2']){
+for(const downstreamSlot of ['ACCESSORY','ISOLATION-1','ISOLATION-2','OPTIONAL']){
   const a=Body.candidates({
-    familyId:'BODY-04',level:'L2',slotKey:downstreamSlot,
-    currentSelections:{PRIMARY:body04Primary[0].actionId}
+    familyId:'BODY-03',level:'L3',slotKey:downstreamSlot,
+    currentSelections:{PRIMARY:horizontalPrimary}
   }).candidates;
   const b=Body.candidates({
-    familyId:'BODY-04',level:'L2',slotKey:downstreamSlot,
-    currentSelections:{PRIMARY:body04Primary[1].actionId}
+    familyId:'BODY-03',level:'L3',slotKey:downstreamSlot,
+    currentSelections:{PRIMARY:verticalPrimary}
   }).candidates;
   const scoresA=Object.fromEntries(a.map(x=>[x.actionId,x.recommendationScore]));
   for(const item of b){
     if(Object.prototype.hasOwnProperty.call(scoresA,item.actionId)&&scoresA[item.actionId]!==item.recommendationScore)changed=true;
   }
 }
-assert(changed,'manual PRIMARY change must alter at least one downstream Compatibility Score');
+assert(changed,'manual pull-direction change must alter at least one downstream Compatibility Score');
 
 const syntheticPush={
   templateId:'body',familyId:'BODY-04',level:'L2',
