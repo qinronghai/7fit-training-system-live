@@ -14,12 +14,17 @@
   }
 
   function buildStations(session){
-    const domains=session?.domainContext?.stations||{};
-    return Object.values(domains).map((station,index)=>{
+    const blocks=Array.isArray(session?.blocks)&&session.blocks.length
+      ?session.blocks
+      :[{key:'MAIN',roleLabel:'主训练段',label:'Conditioning 主训练',stations:session?.domainContext?.stations||{}}];
+    return blocks.flatMap((block,blockIndex)=>Object.values(block.stations||{}).map((station,index)=>{
       const fields=actionFields(station.actionId);
       return {
         key:station.key||`STATION-${index+1}`,
         order:index+1,
+        blockKey:block.key||station.blockKey||`BLOCK-${blockIndex+1}`,
+        blockLabel:block.label||block.roleLabel||'训练段',
+        blockRole:block.roleLabel||block.role||'训练段',
         actionId:station.actionId,
         name:station.name||D().actions?.[station.actionId]?.name||station.actionId,
         prescription:station.prescription||'',
@@ -32,12 +37,12 @@
         cue:clean(fields['教练口令']),
         observation:clean(fields['常见错误']||fields['常见代偿'])||'保持动作质量与节奏；疲劳上升时优先控制幅度和速度。',
       };
-    });
+    }));
   }
 
   function buildPayload(session,resolvedPrep,now){
     if(!session||session.templateId!=='conditioning')throw new Error('ConditioningCopy requires a Conditioning ResolvedSession');
-    const family=D().conditioningFamilies?.[session.familyId]||{},metrics=session.domainContext?.metrics||{};
+    const family=D().conditioningFamilies?.[session.familyId]||{},metrics=session.domainContext?.metrics||{},timing=session.timing||{};
     const prep=M.ConditioningPrep?.items?M.ConditioningPrep.items(resolvedPrep):[];
     return {
       templateId:'conditioning',
@@ -45,11 +50,29 @@
       familyName:family.name||session.title||session.familyId,
       goal:family.goal||'',
       level:session.level,
+      variantId:session.variantId||'',
+      blueprintLabel:session.domainContext?.blueprintLabel||'',
+      changeSummary:session.domainContext?.changeSummary||'',
       date:Shared().formatDate?Shared().formatDate(now):'',
       summary:session.summary||'',
       protocolId:session.domainContext?.protocolId||session.main?.content?.protocolId||'',
       protocolName:session.domainContext?.protocolName||session.main?.content?.name||'',
       metrics:{...metrics},
+      timing:{...timing},
+      blocks:(session.blocks||[]).map(block=>({
+        key:block.key,
+        role:block.roleLabel||block.role||'训练段',
+        label:block.label||block.key,
+        goal:block.goal||'',
+        protocolName:block.protocolName||'',
+        prescription:block.prescription||'',
+        metrics:{...(block.metrics||{})},
+        coachingCues:[...(block.coachingCues||[])],
+        scaleRules:[...(block.scaleRules||[])],
+        stopCriteria:[...(block.stopCriteria||[])],
+        completionMetric:block.completionMetric||'',
+        stations:buildStations({blocks:[block]}),
+      })),
       prep,
       stations:buildStations(session),
       anatomy:session.anatomyContext||{},
@@ -68,6 +91,9 @@
 
   function metricLine(p){
     const m=p.metrics||{};
+    if(p.timing?.fullSessionMinutes!==undefined){
+      return `训练段 ${p.timing.blockCount??(p.blocks||[]).length} 个｜任务 ${p.timing.taskCount??(p.stations||[]).length} 个｜正式训练约 ${p.timing.mainTrainingMinutes??'—'} 分钟｜整节约 ${p.timing.estimatedMinutes??p.timing.fullSessionMinutes??'—'} 分钟`;
+    }
     if(p.protocolId==='STEADY')return `持续输出：约 ${m.blockMinutes??'—'} 分钟｜RPE ${m.targetRpe??'—'}`;
     if(p.protocolId==='DENSITY')return `密度窗：${m.densityWindowMinutes??'—'} 分钟 × ${m.rounds??'—'}｜站间转换 ${m.transitionSeconds??'—'} 秒｜RPE ${m.targetRpe??'—'}`;
     return `Work / Rest：${m.workSeconds??'—'}s / ${m.restSeconds??'—'}s｜Transition ${m.transitionSeconds??'—'}s｜Rounds ${m.rounds??'—'}｜RPE ${m.targetRpe??'—'}`;
@@ -103,13 +129,23 @@
       '',
       '【2F CONDITIONING】',
     ];
-    (p.stations||[]).forEach(station=>{
-      lines.push(`${station.order}. ${clean(station.name)}`);
-      lines.push(clean(station.prescription));
-      lines.push(stressLine(station));
-      if(clean(station.purpose))lines.push(`训练目的：${clean(station.purpose)}`);
-      if(clean(station.cue))lines.push(`教练口令：${clean(station.cue)}`);
-      lines.push(`观察重点：${clean(station.observation)}`);
+    const blocks=p.blocks?.length?[...p.blocks]:[{role:'主训练段',label:'Conditioning 主训练',goal:'',protocolName:p.protocolName,prescription:'',coachingCues:[],scaleRules:[],stopCriteria:[],completionMetric:'',stations:p.stations||[]}];
+    blocks.forEach((block,index)=>{
+      lines.push(`【训练段 ${index+1}｜${clean(block.role)}】`,clean(block.label));
+      if(clean(block.goal))lines.push(`本段目标：${clean(block.goal)}`);
+      if(clean(block.prescription))lines.push(`执行方式：${clean(block.protocolName)}｜${clean(block.prescription)}`);
+      (block.stations||[]).forEach(station=>{
+        lines.push(`${station.order}. ${clean(station.name)}`);
+        lines.push(clean(station.prescription));
+        lines.push(stressLine(station));
+        if(clean(station.purpose))lines.push(`训练目的：${clean(station.purpose)}`);
+        if(clean(station.cue))lines.push(`教练口令：${clean(station.cue)}`);
+        lines.push(`观察重点：${clean(station.observation)}`);
+      });
+      if(block.coachingCues?.length)lines.push(`教练重点：${block.coachingCues.join('；')}`);
+      if(block.scaleRules?.length)lines.push(`降阶规则：${block.scaleRules.join('；')}`);
+      if(block.stopCriteria?.length)lines.push(`停止标准：${block.stopCriteria.join('；')}`);
+      if(clean(block.completionMetric))lines.push(`完成标准：${clean(block.completionMetric)}`);
     });
     lines.push(
       '',
@@ -135,7 +171,7 @@
       `训练主题：${clean(p.familyName)||'体能训练'}`,
       clean(p.goal)?`今天目标：${clean(p.goal)}`:'',
       `训练等级：${clean(p.level)}`,
-      `训练方式：${clean(p.protocolName)}`,
+      clean(p.blueprintLabel)?`课程变体：${clean(p.blueprintLabel)}`:'',
       metricLine(p),
       `预计训练时间：约 ${m.estimatedMinutes??'—'} 分钟`,
       '',
@@ -143,7 +179,10 @@
       ...prepLines(p.prep),
       '',
       '【主要训练】',
-      ...(p.stations||[]).map(memberStationLine),
+      ...((p.blocks?.length?p.blocks:[{label:'主要训练',stations:p.stations||[]}]).flatMap((block,index)=>[
+        `训练段 ${index+1}：${clean(block.label)}`,
+        ...(block.stations||[]).map(memberStationLine),
+      ])),
       '',
       `【${clean(r.title)}】`,
       clean(r.note),

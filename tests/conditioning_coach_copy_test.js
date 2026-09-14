@@ -32,10 +32,10 @@ for(const name of ['buildPayload','formatCoach','formatMember']){
   assert.strictEqual(typeof Copy[name],'function',`ConditioningCopy.${name} must exist`);
 }
 
-const familyId='CON-03',level='L2',protocolId='CIRCUIT',sessionKey='CON-03-L2-CIRCUIT';
+const familyId='CON-03',level='L2',variantId='A',sessionKey='CON-03-L2-BLUEPRINT-A';
 const now=new Date('2026-09-12T06:00:00Z');
-UI.ensureState(familyId,level,protocolId);
-const baseline=UI.resolveState(familyId,level,protocolId);
+UI.ensureState(familyId,level,variantId);
+const baseline=UI.resolveState(familyId,level,variantId);
 const prep=Prep.resolve(baseline,sessionKey);
 const payload=Copy.buildPayload(baseline,prep,now);
 
@@ -43,9 +43,9 @@ assert.strictEqual(payload.templateId,'conditioning');
 assert.strictEqual(payload.familyId,familyId);
 assert.strictEqual(payload.familyName,D.conditioningFamilies[familyId].name);
 assert.strictEqual(payload.level,level);
-assert.strictEqual(payload.protocolId,protocolId);
-assert.strictEqual(payload.protocolName,D.conditioningProtocols[protocolId].name);
-assert.strictEqual(payload.stations.length,baseline.domainContext.metrics.stationCount);
+assert.strictEqual(payload.variantId,variantId);
+assert.strictEqual(payload.blocks.length,baseline.blocks.length);
+assert.strictEqual(payload.stations.length,baseline.timing.taskCount);
 assert.deepStrictEqual(plain(payload.metrics),plain(baseline.domainContext.metrics));
 assert.deepStrictEqual(plain(payload.conflicts),plain(baseline.conflictContext));
 assert.deepStrictEqual(plain(payload.prep.map(x=>x.actionId)),plain(Prep.items(prep).map(x=>x.actionId)));
@@ -54,11 +54,9 @@ assert.strictEqual(payload.recovery.noPostCardio,true);
 const coach=Copy.formatCoach(payload);
 assert(coach.includes('Conditioning 教练训练单'));
 assert(coach.includes(D.conditioningFamilies[familyId].name));
-assert(coach.includes(D.conditioningProtocols[protocolId].name));
-assert(coach.includes('Work / Rest'));
-assert(coach.includes('Rounds'));
-assert(coach.includes('RPE'));
-assert(coach.includes('Station'));
+for(const block of baseline.blocks)assert(coach.includes(block.protocolName),`Coach copy missing ${block.protocolName}`);
+assert(coach.includes('训练段 1'));
+assert(coach.includes('完成标准'));
 assert(coach.includes('Conditioning Conflict'));
 assert(coach.includes('NO POST CARDIO'));
 assert(coach.includes('RECOVERY｜训练后恢复 · 约 5–8 分钟'));
@@ -72,7 +70,7 @@ const member=Copy.formatMember(payload);
 const date=ctx.window.V14SessionCopy.formatDate(now);
 assert(member.includes(date));
 assert(member.includes(D.conditioningFamilies[familyId].name));
-assert(member.includes(D.conditioningProtocols[protocolId].name));
+assert(member.includes('课程变体'));
 assert(member.includes('预计训练时间'));
 assert(member.includes('训练前准备'));
 assert(member.includes('主要训练'));
@@ -89,21 +87,23 @@ for(const forbidden of [
 }
 
 // Swap refresh: Copy must be rebuilt from the current ResolvedSession, never cached.
-const first=baseline.domainContext.stations['STATION-1'];
+const first=baseline.domainContext.stations['BLOCK-B/STATION-1'];
 const current=Object.fromEntries(Object.values(baseline.domainContext.stations).map(x=>[x.key,x.actionId]));
-const alternate=Cond.candidates({familyId,level,protocolId,stationKey:'STATION-1',currentSelections:current})
+const mainBlock=baseline.blocks.find(block=>block.key==='BLOCK-B');
+const alternate=Cond.candidates({familyId,level,protocolId:mainBlock.protocolId,stationKey:first.key,currentSelections:current})
   .candidates.find(x=>x.actionId!==first.actionId);
 assert(alternate,'CON-03/L2/CIRCUIT requires a legal alternate for Copy refresh');
-UI.setFormalSelection(familyId,level,protocolId,'STATION-1',alternate.actionId);
-const swapped=UI.resolveState(familyId,level,protocolId);
+UI.setFormalSelection(familyId,level,variantId,first.key,alternate.actionId);
+const swapped=UI.resolveState(familyId,level,variantId);
 const swappedPrep=Prep.resolve(swapped,sessionKey);
 const refreshed=Copy.buildPayload(swapped,swappedPrep,now);
-assert.strictEqual(refreshed.stations[0].actionId,alternate.actionId);
-assert.notStrictEqual(refreshed.stations[0].actionId,first.actionId);
+const refreshedStation=refreshed.stations.find(station=>station.key===first.key);
+assert.strictEqual(refreshedStation.actionId,alternate.actionId);
+assert.notStrictEqual(refreshedStation.actionId,first.actionId);
 assert.deepStrictEqual(plain(refreshed.metrics),plain(swapped.domainContext.metrics));
 assert.deepStrictEqual(plain(refreshed.conflicts),plain(swapped.conflictContext));
 assert.deepStrictEqual(plain(refreshed.prep.map(x=>x.actionId)),plain(Prep.items(swappedPrep).map(x=>x.actionId)));
-assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)['STATION-1']),{actionId:alternate.actionId,source:'manual'});
+assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)[first.key]),{actionId:alternate.actionId,source:'manual'});
 assert(Copy.formatCoach(refreshed).includes(alternate.name),'refreshed Coach copy must contain swapped Station action');
 assert(Copy.formatMember(refreshed).includes(alternate.name),'refreshed Member copy must contain swapped Station action');
 

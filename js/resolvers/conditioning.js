@@ -49,8 +49,13 @@
   }
 
   function stationIndex(slotKey){
-    const match=/^STATION-(\d+)$/.exec(String(slotKey||''));
+    const match=/(?:^|\/)STATION-(\d+)$/.exec(String(slotKey||''));
     return match?Number(match[1])-1:-1;
+  }
+
+  function stationNamespace(slotKey){
+    const value=String(slotKey||''),match=/^(BLOCK-[ABC])\/(STATION-\d+)$/.exec(value);
+    return {blockKey:match?match[1]:'',stationKey:match?match[2]:value};
   }
 
   function primaryModality(meta){
@@ -78,6 +83,31 @@
   }
 
   function isSelectionValid(input={}){
+    if(input.variantId||input.sessionBlueprintId){
+      const variant=window.V15ConditioningProtocol.blueprint({
+        familyId:input.familyId,
+        level:input.level,
+        variantId:input.variantId||'A',
+      });
+      const namespace=stationNamespace(input.stationKey||input.slotKey);
+      const block=variant.blocks.find(item=>item.key===namespace.blockKey);
+      const index=stationIndex(namespace.stationKey);
+      if(!block||index<0||index>=block.stations.length)return false;
+      const actionId=normalizeActionId(input.actionId);
+      if(!actionId)return false;
+      if(variant.repeatPolicy==='UNIQUE_ACTIONS'){
+        const currentKey=input.stationKey||input.slotKey||'';
+        const duplicate=Object.entries(input.currentSelections||{})
+          .some(([key,value])=>key!==currentKey&&normalizeActionId(value)===actionId);
+        if(duplicate)return false;
+      }
+      return isLegalCandidate({
+        familyId:input.familyId,
+        level:input.level,
+        protocolId:block.protocolId,
+        actionId,
+      });
+    }
     let base;
     try{base=validateBase(input);}catch(error){
       if(['CONDITIONING_INPUT_INVALID','CONDITIONING_PROTOCOL_ILLEGAL','CONDITIONING_STATION_CAPACITY'].includes(error?.code))return false;
@@ -135,12 +165,13 @@
   function candidates(input={}){
     const base=validateBase(input),protocolId=base.plan.protocolId;
     const key=String(input.stationKey||input.slotKey||''),index=stationIndex(key);
-    if(index<0||index>=base.plan.stationCount){
+    const stationCount=Number.isInteger(Number(input.stationCount))?Number(input.stationCount):base.plan.stationCount;
+    if(index<0||index>=stationCount){
       fail('CONDITIONING_INPUT_INVALID',`Inactive or unknown station: ${key}`,{stationKey:key});
     }
     const context=selectionContext(input.currentSelections||{},key),items=[];
     for(const actionId of Object.keys(D().conditioningActionMeta||{})){
-      if(context.usedActionIds.has(actionId))continue;
+      if(context.usedActionIds.has(actionId)&&input.allowRepeatedActions!==true)continue;
       if(!isLegalCandidate({familyId:base.familyId,level:base.level,protocolId,actionId}))continue;
       const meta=D().conditioningActionMeta[actionId],action=D().actions[actionId],workMetric=chooseWorkMetric(meta,protocolId);
       items.push({
@@ -160,7 +191,7 @@
     return {recommended:items[0]?.actionId||'',candidates:items,protocolId};
   }
 
-  function stationRecord(key,actionId,source,plan){
+  function stationRecord(key,actionId,source,plan,details={}){
     const data=D(),meta=data.conditioningActionMeta[actionId]||{},action=data.actions[actionId]||{},workMetric=chooseWorkMetric(meta,plan.protocolId);
     return {
       key,
@@ -175,6 +206,11 @@
       fatigueRisk:String(meta.fatigueRisk||''),
       powerEligible:meta.powerEligible===true,
       prescription:window.V15ConditioningProtocol.formatPrescription(plan,workMetric),
+      taskLabel:String(details.taskLabel||action.name||actionId),
+      setup:String(details.setup||''),
+      equipment:String(details.equipment||action.equipment||''),
+      zone:String(details.zone||action.zone||''),
+      blockKey:String(details.blockKey||stationNamespace(key).blockKey||''),
     };
   }
 
@@ -257,7 +293,7 @@
     });
   }
 
-  function resolve(input={}){
+  function resolveLegacy(input={}){
     const block=resolveBlock(input),data=D(),family=data.conditioningFamilies[block.familyId];
     const stationItems=Object.values(block.stations),actionIds=stationItems.map(item=>item.actionId);
     const anatomy=publicAnatomy(actionIds);
@@ -318,7 +354,210 @@
     return session;
   }
 
-  const api={resolve,resolveBlock,serializeBlock,candidates,isSelectionValid};
+  function resolveBlueprintBlock({familyId,level,blueprint,definition,selections,chosen,warnings}){
+    const protocol=window.V15ConditioningProtocol;
+    const allowRepeatedActions=blueprint.repeatPolicy==='SKILL_VARIATION';
+    const plan=protocol.plan({
+      familyId,
+      level,
+      protocolId:definition.protocolId,
+      stationCount:definition.stations.length,
+      targetBlockMinutes:definition.targetMinutes,
+      targetRpe:definition.targetRpe,
+      allowRepeatedActions,
+    });
+    const stations={},items=[];
+    definition.stations.forEach((stationDefinition,index)=>{
+      const key=`${definition.key}/STATION-${index+1}`;
+      const requestedActionId=normalizeManualActionId(selections[key]);
+      const used=new Set(Object.values(chosen));
+      const canUse=actionId=>isLegalCandidate({familyId,level,protocolId:definition.protocolId,actionId})
+        &&(allowRepeatedActions||!used.has(actionId));
+      let actionId='',source='auto';
+      if(requestedActionId&&canUse(requestedActionId)){
+        actionId=requestedActionId;
+        source='manual';
+      }else{
+        if(requestedActionId)warnings.push(`COND_STALE_SELECTION_FALLBACK:${key}`);
+        if(canUse(stationDefinition.actionId))actionId=stationDefinition.actionId;
+        if(!actionId){
+          const result=candidates({
+            familyId,level,protocolId:definition.protocolId,stationKey:key,
+            stationCount:definition.stations.length,currentSelections:chosen,allowRepeatedActions,
+          });
+          actionId=result.recommended;
+        }
+        if(!actionId)fail('CONDITIONING_NO_ELIGIBLE_CANDIDATE',
+          `No eligible Conditioning candidate for ${familyId} ${level} ${definition.protocolId} ${key}`,
+          {familyId,level,protocolId:definition.protocolId,stationKey:key});
+      }
+      chosen[key]=actionId;
+      const record=stationRecord(key,actionId,source,plan,{...stationDefinition,blockKey:definition.key});
+      stations[key]=record;
+      items.push({
+        actionId:record.actionId,
+        name:record.name,
+        prescription:record.prescription,
+        allowRepeatedAction:allowRepeatedActions,
+      });
+    });
+    return {
+      key:definition.key,
+      role:definition.role,
+      roleLabel:definition.roleLabel,
+      label:definition.label,
+      goal:definition.goal,
+      protocolId:definition.protocolId,
+      protocolName:plan.protocolName,
+      prescription:definition.prescription,
+      plan:{...plan},
+      stations,
+      publicBlock:{key:definition.key,label:definition.label,items},
+      metrics:{
+        ...plan,
+        durationMinutes:plan.blockMinutes,
+        transitionAfterSeconds:definition.transitionAfterSeconds,
+        interBlockRecoverySeconds:definition.interBlockRecoverySeconds,
+      },
+      coachingCues:[...definition.coachingCues],
+      scaleRules:[...definition.scaleRules],
+      stopCriteria:[...definition.stopCriteria],
+      completionMetric:definition.completionMetric,
+      equipment:[...definition.equipment],
+      zone:definition.zone,
+      setup:definition.setup,
+      warnings:[],
+      resolvedSelections:Object.values(stations).map(item=>({key:item.key,actionId:item.actionId,source:item.source})),
+    };
+  }
+
+  function resolveBlueprint(input={}){
+    const familyId=typeof input.familyId==='string'?input.familyId:'';
+    const level=typeof input.level==='string'?input.level:'';
+    const blueprint=window.V15ConditioningProtocol.blueprint({familyId,level,variantId:input.variantId||'A'});
+    const selections=input.selections&&typeof input.selections==='object'?input.selections:{};
+    const chosen={},warnings=[],blocks=[];
+    blueprint.blocks.forEach(definition=>{
+      blocks.push(resolveBlueprintBlock({familyId,level,blueprint,definition,selections,chosen,warnings}));
+    });
+    const stationItems=blocks.flatMap(block=>Object.values(block.stations));
+    const actionIds=stationItems.map(item=>item.actionId),uniqueActionIds=unique(actionIds);
+    const anatomy=publicAnatomy(actionIds);
+    const modalities=unique(stationItems.flatMap(item=>item.modalities));
+    const prepContext=window.V14PrepResolver?.contextFromConditioning?.({
+      level,
+      recipeId:familyId,
+      firstStationActionIds:actionIds.slice(0,2),
+      mainActionIds:actionIds,
+      formalActionIds:actionIds,
+      targetMuscles:anatomy.primary,
+      modalities,
+      impactDemand:maxRisk(stationItems,'impact'),
+      powerDemand:familyId==='CON-04'?'high':stationItems.some(item=>item.powerEligible)?'moderate':'low',
+    })||{
+      template:'conditioning',level,recipeId:familyId,mainPatterns:[],mainActionIds:uniqueActionIds,
+      formalActionIds:uniqueActionIds,targetMuscles:anatomy.primary,modalities,
+      impactDemand:maxRisk(stationItems,'impact'),powerDemand:familyId==='CON-04'?'high':'low',
+    };
+    const blockExecutionMinutes=blocks.reduce((sum,block)=>sum+Number(block.metrics.blockMinutes||0),0);
+    const transitionSeconds=blocks.reduce((sum,block)=>sum+Number(block.metrics.transitionAfterSeconds||0),0);
+    const interBlockRecoverySeconds=blocks.reduce((sum,block)=>sum+Number(block.metrics.interBlockRecoverySeconds||0),0);
+    const mainTrainingMinutes=Math.round((blockExecutionMinutes+(transitionSeconds+interBlockRecoverySeconds)/60)*10)/10;
+    const fullSessionMinutes=Math.round((Number(blueprint.prep.durationMinutes||0)+mainTrainingMinutes+Number(blueprint.recovery.durationMinutes||0))*10)/10;
+    const targetWorkMinutes=Math.round(blocks.reduce((sum,block)=>sum+Number(block.metrics.targetBlockMinutes||0),0)*10)/10;
+    const timing={
+      prepMinutes:Number(blueprint.prep.durationMinutes||0),
+      blockExecutionMinutes:Math.round(blockExecutionMinutes*10)/10,
+      transitionMinutes:Math.round(transitionSeconds/60*10)/10,
+      interBlockRecoveryMinutes:Math.round(interBlockRecoverySeconds/60*10)/10,
+      mainTrainingMinutes,
+      recoveryMinutes:Number(blueprint.recovery.durationMinutes||0),
+      fullSessionMinutes,
+      estimatedMinutes:Math.round(fullSessionMinutes),
+      targetWorkMinutes,
+      blockCount:blocks.length,
+      taskCount:stationItems.length,
+    };
+    const family=D().conditioningFamilies?.[familyId]||{};
+    const mainBlock=blocks.find(block=>block.role==='MAIN')||blocks[0];
+    const title=`${family.name||familyId}｜${level}`;
+    const summary=`${blueprint.label}｜${blocks.length} 个训练段｜${timing.taskCount} 个任务｜整节约 ${timing.estimatedMinutes} 分钟`;
+    const session={
+      schemaVersion:2,
+      resolverVersion:'conditioning-v2',
+      templateId:'conditioning',
+      familyId,
+      level,
+      title,
+      summary,
+      sessionBlueprintId:blueprint.sessionBlueprintId,
+      variantId:blueprint.variantId,
+      blocks,
+      timing,
+      main:{
+        kind:'PROTOCOL',
+        content:{
+          protocolId:mainBlock?.protocolId||'INTERVAL',
+          name:'多段式 Conditioning 课程',
+          blocks:blocks.map(block=>block.publicBlock),
+          metrics:{
+            ...timing,
+            protocolId:mainBlock?.protocolId||'INTERVAL',
+            protocolName:mainBlock?.protocolName||'—',
+            stationCount:timing.taskCount,
+            rounds:mainBlock?.metrics?.rounds||1,
+            targetRpe:mainBlock?.metrics?.targetRpe||0,
+            blockMinutes:timing.mainTrainingMinutes,
+            estimatedMinutes:timing.estimatedMinutes,
+          },
+        },
+      },
+      prepContext,
+      anatomyContext:anatomy,
+      conflictContext:{status:'PASS',hardCount:0,warnCount:0,issues:[]},
+      copyContext:{title,summary,actionIds:uniqueActionIds},
+      warnings,
+      resolvedSelections:stationItems.map(item=>({key:item.key,actionId:item.actionId,source:item.source})),
+      source:{type:'GENERATED',id:blueprint.sessionBlueprintId},
+      domainContext:{
+        kind:'CONDITIONING',
+        protocolId:mainBlock?.protocolId||'INTERVAL',
+        protocolName:'多段式 Conditioning 课程',
+        sessionBlueprintId:blueprint.sessionBlueprintId,
+        variantId:blueprint.variantId,
+        blueprintLabel:blueprint.label,
+        changeSummary:blueprint.changeSummary,
+        repeatPolicy:blueprint.repeatPolicy,
+        blocks,
+        stations:Object.fromEntries(stationItems.map(item=>[item.key,item])),
+        metrics:{
+          ...timing,
+          stationCount:timing.taskCount,
+          rounds:mainBlock?.metrics?.rounds||1,
+          workSeconds:mainBlock?.metrics?.workSeconds||0,
+          restSeconds:mainBlock?.metrics?.restSeconds||0,
+          transitionSeconds:mainBlock?.metrics?.transitionSeconds||0,
+          densityWindowMinutes:mainBlock?.metrics?.densityWindowMinutes||0,
+          targetRpe:mainBlock?.metrics?.targetRpe||0,
+          activeWorkMinutes:timing.blockExecutionMinutes,
+          blockMinutes:timing.mainTrainingMinutes,
+          estimatedMinutes:timing.estimatedMinutes,
+        },
+      },
+    };
+    session.conflictContext=evaluateConflict(session);
+    const validation=window.V15ResolvedSession?.validate?.(session);
+    if(validation&&!validation.ok)fail('CONDITIONING_RESOLVED_SESSION_INVALID',
+      'Conditioning Blueprint Resolver produced invalid ResolvedSession',{validationErrors:validation.errors});
+    return session;
+  }
+
+  function resolve(input={}){
+    if(input?.legacy===true||(input?.protocolId&&!input?.variantId&&!input?.sessionBlueprintId))return resolveLegacy(input);
+    return resolveBlueprint(input);
+  }
+
+  const api={resolve,resolveLegacy,resolveBlueprint,resolveBlock,serializeBlock,candidates,isSelectionValid};
   window.V15ConditioningResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('conditioning',resolve);

@@ -160,12 +160,12 @@ test('Body and Conditioning composers are active template-owned workflows', asyn
   await expect(page.locator('.composer-slot-card')).toHaveCount(0);
 
   await page.goto('/#/coach/conditioning/compose');
-  await expect(page).toHaveURL(/#\/coach\/conditioning\/compose\?family=CON-01&level=L1&protocol=STEADY/);
-  await expect(page.getByRole('heading', { name: 'Conditioning 自由编课' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/compose\?family=CON-01&level=L1&variant=A/);
+  await expect(page.getByRole('heading', { name: 'Conditioning 课程构建' })).toBeVisible();
   await expect(page.locator('[data-conditioning-compose-family]')).toHaveValue('CON-01');
   await expect(page.locator('[data-conditioning-compose-level]')).toHaveValue('L1');
-  await expect(page.locator('[data-conditioning-compose-protocol]')).toHaveValue('STEADY');
-  await expect(page.locator('.conditioning-station-card')).toHaveCount(1);
+  await expect(page.locator('[data-conditioning-compose-variant]')).toHaveValue('A');
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(2);
   await expect(page.getByText('NO POST CARDIO', { exact: false }).first()).toBeVisible();
   await expectNoPageErrors(errors);
 });

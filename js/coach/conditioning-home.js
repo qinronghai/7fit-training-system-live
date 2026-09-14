@@ -36,7 +36,7 @@
   function render(){
     const cards=(D().conditioningFamilyIds||[]).map(familyCard).join('');
     return `<a class="back-link" href="#/coach">← 返回模板中心</a>`+
-      `<section class="view-hero coach-home-hero conditioning-home-hero"><span class="eyebrow">COACH CENTER / CONDITIONING</span><h1>体能训练</h1><p class="coach-home-lead">围绕 Goal、Protocol、Work / Rest、Rounds、Station、RPE 与 Duration 组织完整 2F 体能私教课。</p><div class="chips"><span class="chip">4 个 Conditioning Family</span><span class="chip">4 个 Protocol</span><span class="chip">L1–L4</span><span class="chip">2F Workflow</span></div><div class="conditioning-home-actions"><a class="section-action-link" href="#/coach/conditioning/compose?family=CON-01&level=L1&protocol=STEADY">自由编课 →</a></div></section>`+
+      `<section class="view-hero coach-home-hero conditioning-home-hero"><span class="eyebrow">COACH CENTER / CONDITIONING</span><h1>体能训练</h1><p class="coach-home-lead">围绕目标、训练段、任务、教练提示、降阶与完成标准，组织完整的 2F 体能私教课。</p><div class="chips"><span class="chip">4 个 Conditioning Family</span><span class="chip">A / B / C 变体</span><span class="chip">L1–L4</span><span class="chip">2F Workflow</span></div><div class="conditioning-home-actions"><a class="section-action-link" href="#/coach/conditioning/compose?family=CON-01&level=L1&variant=A">构建课程 →</a></div></section>`+
       `<section class="section-card"><div class="section-head"><div><h2>选择体能目标 / 等级</h2><p>先选择 Family 与 Level；正式 Session 的 Protocol、工作/休息结构、Station 数量与时长统一由 Conditioning Resolver 解析。</p></div></div><div class="recipe-grid conditioning-family-grid">${cards}</div></section>`;
   }
 
