@@ -130,6 +130,28 @@ def test_body_level_policy_freezes_default_set_skeleton_and_windows():
     assert data["bodyLevelPolicies"]["L3"]["optionalDefault"] is True
     assert data["bodyLevelPolicies"]["L4"]["optionalDefault"] is True
 
+    expected_names = {
+        "L1": "动作学习",
+        "L2": "基础负重",
+        "L3": "正式塑形 / 肌肥大",
+        "L4": "完整训练能力 / 高质量肌肥大",
+    }
+    for level, name in expected_names.items():
+        policy = data["bodyLevelPolicies"][level]
+        assert policy["name"] == name
+        assert policy["abilityIntent"]
+        assert policy["eligibleEntryLevels"]
+        assert policy["allowedLoadingStyles"]
+        assert policy["maxStabilityDemand"] in {"low", "medium", "high"}
+        assert policy["maxCompoundFatigue"] in {"low", "medium", "high"}
+        assert policy["unilateralReadiness"]
+        assert policy["romExpectation"]
+        assert policy["tempoPauseEligibility"]
+        assert policy["intensityTechniqueEligibility"]
+        assert policy["fallbackLevel"] in {"L1", "L2", "L3", "L4"}
+
+    assert "L1" not in data["bodyActionMeta"]["banjie_hake"]["levels"]
+
 
 def test_body_prescription_profiles_are_machine_readable_and_do_not_duplicate_rir():
     data = source()
