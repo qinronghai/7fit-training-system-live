@@ -5,13 +5,16 @@ vm.runInThisContext(fs.readFileSync(`${root}/data/system-data.js`,'utf8'),{filen
 
 const D=window.V14_DATA;
 const BODY_KEYS=[
-  'bodyTargetIds','bodyTargetCatalog','bodyRoleIds','bodyRoles','bodyFamilyIds','bodyFamilies',
+  'bodyTargetIds','bodyTargetCatalog','bodyRoleIds','bodyRoles','bodyTrainingModeIds','bodyTrainingModes','bodyFamilyIds','bodyFamilies',
   'bodyLevelPolicies','bodyPrescriptionProfiles','bodyActionMeta','bodyVolumePolicy','bodyConflictPolicy'
 ];
 for(const key of BODY_KEYS) assert(Object.prototype.hasOwnProperty.call(D,key),`runtime missing ${key}`);
 
 assert.strictEqual(D.bodyTargetIds.length,14,'Body target taxonomy drifted');
 assert.deepStrictEqual(D.bodyRoleIds,['PRIMARY','SECONDARY','ACCESSORY','ISOLATION','OPTIONAL']);
+assert.deepStrictEqual(D.bodyTrainingModeIds,["BODY-MODE-01","BODY-MODE-02","BODY-MODE-03","BODY-MODE-04","BODY-MODE-05","BODY-MODE-06"]);
+assert.strictEqual(Object.keys(D.bodyTrainingModes).length,6);
+for(const modeId of D.bodyTrainingModeIds){const mode=D.bodyTrainingModes[modeId];assert.strictEqual(mode.modeId,modeId);assert(mode.patterns.length&&mode.primaryTargets.length&&mode.roles.length&&mode.familyIds.length&&mode.levels.length);}
 assert.deepStrictEqual(D.bodyFamilyIds,['BODY-01','BODY-02','BODY-03','BODY-04']);
 assert.deepStrictEqual(Object.keys(D.bodyLevelPolicies),['L1','L2','L3','L4']);
 assert(D.bodyActionMeta && Object.keys(D.bodyActionMeta).length>=40 && Object.keys(D.bodyActionMeta).length<=60,'Body candidate count must remain 40-60');

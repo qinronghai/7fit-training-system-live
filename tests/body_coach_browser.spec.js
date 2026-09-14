@@ -27,35 +27,63 @@ async function firstReplaceable(page,selector){
   return null;
 }
 
-test('Body home exposes four families and all 16 level routes at 390px',async({page})=>{
+test('Body home presents six modes, Family-first navigation and responsive level entry',async({page})=>{
   const errors=capturePageErrors(page);
+
+  for(const width of [1080,1280,1440]){
+    await page.setViewportSize({width,height:900});
+    await page.goto('/#/coach/body');
+    const dims=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
+    expect(dims.scrollWidth).toBe(dims.clientWidth);
+    await expect(page.locator('[data-body-mode]')).toHaveCount(6);
+    await expect(page.locator('.body-family-card')).toHaveCount(4);
+  }
+
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/body');
-
   await expect(page.getByRole('heading',{name:'健美式塑形'})).toBeVisible();
+  await expect(page.locator('[data-body-mode]')).toHaveCount(6);
   await expect(page.locator('.body-family-card')).toHaveCount(4);
+  await expect(page.locator('.body-family-card .level-links')).toHaveCount(0);
+  await expect(page.locator('.body-family-card a[href*="/l1"]')).toHaveCount(0);
+  const cta=page.getByRole('link',{name:/进入 Body 自由编课/});
+  await expect(cta).toBeVisible();
+  const ctaBox=await cta.boundingBox();
+  expect(ctaBox.height).toBeGreaterThanOrEqual(44);
+  await expect390NoOverflow(page);
+
   for(const familyId of ['BODY-01','BODY-02','BODY-03','BODY-04']){
     const card=page.locator(`.body-family-card[data-body-family="${familyId}"]`);
     await expect(card).toHaveCount(1);
-    await expect(card.locator('.level-links a')).toHaveCount(4);
-    for(const level of ['l1','l2','l3','l4']){
-      await expect(card.locator(`a[href="#/coach/body/${familyId.toLowerCase()}/${level}"]`)).toHaveCount(1);
-    }
+    const enter=card.locator('.body-family-enter');
+    await expect(enter).toHaveAttribute('href',`#/coach/body/${familyId.toLowerCase()}`);
+    const enterBox=await enter.boundingBox();
+    expect(enterBox.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await page.goto('/#/coach/body/body-02');
+  await expect(page.locator('[data-body-family-detail="BODY-02"]')).toBeVisible();
+  await expect(page.locator('.body-level-card')).toHaveCount(4);
+  for(const level of ['l1','l2','l3','l4']){
+    await expect(page.locator(`.body-level-card[href="#/coach/body/body-02/${level}"]`)).toHaveCount(1);
   }
   await expect390NoOverflow(page);
 
-  for(const route of [
-    '#/coach/body/body-01/l1',
-    '#/coach/body/body-02/l2',
-    '#/coach/body/body-03/l3',
-    '#/coach/body/body-04/l4',
-  ]){
-    await page.goto(`/${route}`);
-    await expect(page.locator('.body-editor')).toBeVisible();
-    await expect(page.locator('.body-slot-card').first()).toBeVisible();
-    await expect390NoOverflow(page);
-  }
-  expect(errors,`unexpected Body pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+  await page.locator('.body-level-card[data-body-level="L3"]').click();
+  await expect(page).toHaveURL(/#\/coach\/body\/body-02\/l3/);
+  await expect(page.locator('.body-editor')).toBeVisible();
+  await expect(page.locator('.body-session-level-switch a')).toHaveCount(4);
+  await expect(page.locator('.body-session-level-switch a.active')).toHaveText('L3');
+  await expect(page.locator('.back-link')).toHaveAttribute('href','#/coach/body/body-02');
+  await expect390NoOverflow(page);
+
+  // Old direct deep links remain valid.
+  await page.goto('/#/coach/body/body-04/l4');
+  await expect(page.locator('.body-editor')).toBeVisible();
+  await expect(page.locator('.body-session-level-switch a.active')).toHaveText('L4');
+  await expect390NoOverflow(page);
+
+  expect(errors,`unexpected Body home / Family navigation pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
 
 test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',async({page})=>{

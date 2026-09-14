@@ -137,6 +137,8 @@ def validate_payload(data: dict) -> list[str]:
         "bodyTargetCatalog",
         "bodyRoleIds",
         "bodyRoles",
+        "bodyTrainingModeIds",
+        "bodyTrainingModes",
         "bodyFamilyIds",
         "bodyFamilies",
         "bodyLevelPolicies",
@@ -147,6 +149,30 @@ def validate_payload(data: dict) -> list[str]:
     )
     body = {key: data.get(key) for key in body_keys}
     errors.extend(_schema_errors(body, "body", "body"))
+
+    # Body training modes must resolve to real Body action inventory.
+    mode_ids = data.get("bodyTrainingModeIds", [])
+    modes = data.get("bodyTrainingModes", {})
+    if list(modes) != mode_ids:
+        errors.append("bodyTrainingModes: key order must match bodyTrainingModeIds")
+    for mode_id in mode_ids:
+        record = modes.get(mode_id, {})
+        if record.get("modeId") != mode_id:
+            errors.append(f"bodyTrainingModes.{mode_id}.modeId: must equal map key")
+        matches = []
+        for action_id, meta in data.get("bodyActionMeta", {}).items():
+            action = actions.get(action_id, {})
+            if action.get("pattern") not in set(record.get("patterns", [])):
+                continue
+            if not set(meta.get("families", [])) & set(record.get("familyIds", [])):
+                continue
+            if not set(meta.get("roles", [])) & set(record.get("roles", [])):
+                continue
+            if not set(meta.get("directTargets", [])) & set(record.get("primaryTargets", [])):
+                continue
+            matches.append(action_id)
+        if not matches:
+            errors.append(f"bodyTrainingModes.{mode_id}: no real Body action matches patterns/families/roles/targets")
 
     # Conditioning aggregate schema. Keep the real runtime keys visible in error paths.
     conditioning_keys = (

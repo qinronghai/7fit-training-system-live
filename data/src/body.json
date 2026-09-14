@@ -170,6 +170,195 @@
       "description": "在等级、时间预算或个体需求允许时追加。"
     }
   },
+  "bodyTrainingModeIds": [
+    "BODY-MODE-01",
+    "BODY-MODE-02",
+    "BODY-MODE-03",
+    "BODY-MODE-04",
+    "BODY-MODE-05",
+    "BODY-MODE-06"
+  ],
+  "bodyTrainingModes": {
+    "BODY-MODE-01": {
+      "modeId": "BODY-MODE-01",
+      "name": "膝主导下肢",
+      "description": "以深蹲与单腿膝主导为主，优先发展股四头肌、臀腿线条与下肢基础力量。",
+      "patterns": [
+        "蹲",
+        "单腿"
+      ],
+      "primaryTargets": [
+        "quadriceps",
+        "glute_max"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "familyIds": [
+        "BODY-01"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "腿部比例、股四头肌发展、下肢力量与单腿控制需要优先时。",
+      "actionLibraryRule": "从 BODY-01 合法候选中按当前等级与 Slot Intent 选择蹲 / 单腿动作。"
+    },
+    "BODY-MODE-02": {
+      "modeId": "BODY-MODE-02",
+      "name": "臀髋后链",
+      "description": "以髋铰链、髋伸展与单腿拉为主，发展臀大肌、腘绳肌与后侧链力量。",
+      "patterns": [
+        "髋铰链",
+        "髋伸展",
+        "单腿拉"
+      ],
+      "primaryTargets": [
+        "glute_max",
+        "hamstrings"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY"
+      ],
+      "familyIds": [
+        "BODY-02"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "臀部发展、后侧链塑形、髋伸展能力与臀腿后侧训练需要优先时。",
+      "actionLibraryRule": "从 BODY-02 合法候选中按当前等级与 Slot Intent 选择髋铰链 / 髋伸展 / 单腿拉动作。"
+    },
+    "BODY-MODE-03": {
+      "modeId": "BODY-MODE-03",
+      "name": "水平拉塑形",
+      "description": "以水平拉方向建立背部厚度、肩胛控制与后束刺激，并与垂直拉形成方向互补。",
+      "patterns": [
+        "水平拉"
+      ],
+      "primaryTargets": [
+        "upper_back",
+        "rear_delts",
+        "lats"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION"
+      ],
+      "familyIds": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "背部厚度、肩胛控制、后三角与上背塑形需要加强时。",
+      "actionLibraryRule": "从 BODY-03 合法候选中优先选择水平拉动作；PRIMARY / SECONDARY 的方向差异仍由 Slot Intent 控制。"
+    },
+    "BODY-MODE-04": {
+      "modeId": "BODY-MODE-04",
+      "name": "垂直拉塑形",
+      "description": "以垂直拉方向发展背阔肌与上背线条，同时管理肱二头肌和握力的协同疲劳。",
+      "patterns": [
+        "垂直拉"
+      ],
+      "primaryTargets": [
+        "lats",
+        "upper_back",
+        "biceps"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "OPTIONAL"
+      ],
+      "familyIds": [
+        "BODY-03"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "背阔肌宽度、背部线条与上肢拉力需要优先时。",
+      "actionLibraryRule": "从 BODY-03 合法候选中选择垂直拉动作，并由 Compatibility Score 与水平拉主项做互补排序。"
+    },
+    "BODY-MODE-05": {
+      "modeId": "BODY-MODE-05",
+      "name": "水平推塑形",
+      "description": "以水平推作为胸部主要刺激，兼顾肱三头肌与肩前束，并控制同方向推类动作重复。",
+      "patterns": [
+        "水平推"
+      ],
+      "primaryTargets": [
+        "chest",
+        "triceps",
+        "front_delts"
+      ],
+      "roles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "familyIds": [
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "胸部线条、上肢推力和肱三头肌补充需要优先时。",
+      "actionLibraryRule": "从 BODY-04 合法候选中选择水平推动作；PRIMARY 必须满足主推职责，近重复推类由 Slot Intent 拦截。"
+    },
+    "BODY-MODE-06": {
+      "modeId": "BODY-MODE-06",
+      "name": "肩部塑形",
+      "description": "以垂直推、肩胛控制和三角肌局部训练补足肩部轮廓，不把低价值孤立动作升级成主项。",
+      "patterns": [
+        "垂直推",
+        "肩胛控制"
+      ],
+      "primaryTargets": [
+        "lateral_delts",
+        "rear_delts",
+        "front_delts"
+      ],
+      "roles": [
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION"
+      ],
+      "familyIds": [
+        "BODY-03",
+        "BODY-04"
+      ],
+      "levels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "useCase": "肩部宽度、后三角、肩胛控制和胸背训练后的肩部补充需要加强时。",
+      "actionLibraryRule": "从 BODY-03 / BODY-04 合法候选中按槽位职责选择垂直推、肩胛控制或三角肌局部动作。"
+    }
+  },
   "bodyFamilyIds": [
     "BODY-01",
     "BODY-02",

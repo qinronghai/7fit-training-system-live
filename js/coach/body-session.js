@@ -277,10 +277,14 @@
     return `${coachOverview(ctx)}${prepHtml}${editor}${recovery()}`;
   }
 
+  function levelSwitch(familyId,currentLevel){
+    return `<nav class="body-session-level-switch" aria-label="Body 训练等级">${['L1','L2','L3','L4'].map(level=>`<a class="${level===currentLevel?'active':''}" href="#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}">${level}</a>`).join('')}</nav>`;
+  }
+
   function render(route){
     const ctx=context(route),family=ctx.family;
-    return `<a class="back-link" href="#/coach/body">← 返回 Body</a>`+
-      `<section class="view-hero body-session-hero"><span class="eyebrow">COACH CENTER / BODY</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${esc(ctx.session.domainContext.volume.totalWorkingSets)} 个工作组</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div></section>`+
+    return `<a class="back-link" href="#/coach/body/${ctx.familyId.toLowerCase()}">← 返回 ${esc(family.name||'Family')} 选择等级</a>`+
+      `<section class="view-hero body-session-hero"><span class="eyebrow">COACH CENTER / BODY</span><h1>${esc(family.name||ctx.familyId)}</h1><p>${esc(ctx.session.summary)}</p><div class="chips"><span class="chip">${esc(ctx.level)}</span><span class="chip">${esc(ctx.session.domainContext.volume.totalWorkingSets)} 个工作组</span><span class="chip">${esc(ctx.session.conflictContext.status)}</span></div>${levelSwitch(ctx.familyId,ctx.level)}</section>`+
       renderEditor(ctx)+(M.SavedSessionsUI?.controls?.(route)||'');
   }
 
@@ -297,7 +301,7 @@
   }
 
   function canHandle(route={}){
-    return route.templateId==='body'&&(route.page==='template'||route.page==='template-session'||route.page==='template-compose');
+    return route.templateId==='body'&&(route.page==='template'||route.page==='template-family'||route.page==='template-session'||route.page==='template-compose');
   }
 
   function composerHash(route,familyId,level){
@@ -400,6 +404,7 @@
     canHandle,
     render(route){
       if(route.page==='template')return M.BodyHome.render(route);
+      if(route.page==='template-family')return M.BodyHome.renderFamily(route);
       if(route.page==='template-compose')return renderComposer(route);
       return render(route);
     },

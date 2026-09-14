@@ -45,7 +45,12 @@
           level:(parts[3]||'').toUpperCase(),query,raw:'#/'+raw
         };
       }
-      if(second==='body'||second==='conditioning'){
+      if(second==='body'){
+        const familyId=third.toUpperCase();
+        if(!parts[3])return {area:'coach',page:'template-family',templateId:'body',familyId,query,raw:'#/'+raw};
+        return {area:'coach',page:'template-session',templateId:'body',familyId,level:(parts[3]||'').toUpperCase(),query,raw:'#/'+raw};
+      }
+      if(second==='conditioning'){
         return {
           area:'coach',page:'template-session',templateId:second,familyId:third.toUpperCase(),
           level:(parts[3]||'').toUpperCase(),query,raw:'#/'+raw
@@ -76,6 +81,7 @@
         if(route.page==='compose')return route.templateId==='f111';
         if(route.page==='template')return !!templateRegistry()[route.templateId];
         if(route.page==='template-compose')return templateRegistry()[route.templateId]?.status==='ACTIVE';
+        if(route.page==='template-family')return route.templateId==='body'&&templateRegistry().body?.status==='ACTIVE'&&bodyFamilyIds().includes(route.familyId);
         if(route.page==='template-session'){
           const levelOk=/^L[1-4]$/.test(route.level||'');
           if(route.templateId==='body')return templateRegistry().body?.status==='ACTIVE'&&bodyFamilyIds().includes(route.familyId)&&levelOk;
@@ -107,6 +113,7 @@
       if(route.page==='template')return `#/coach/${route.templateId}${suffix}`;
       if(route.page==='compose')return `#/coach/f111/compose${suffix}`;
       if(route.page==='template-compose')return `#/coach/${route.templateId}/compose${suffix}`;
+      if(route.page==='template-family')return `#/coach/body/${String(route.familyId||'').toLowerCase()}${suffix}`;
       if(route.page==='template-session'){
         if(route.templateId==='hyrox'){
           if(route.sessionType==='BENCHMARK')return `#/coach/hyrox/benchmark/${String(route.protocolId||'').toLowerCase()}${suffix}`;

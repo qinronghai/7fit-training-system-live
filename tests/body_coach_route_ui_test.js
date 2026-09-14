@@ -19,6 +19,15 @@ const pick=route=>plain({
   query:route.query||{},
 });
 
+// Body Family intermediate route contract.
+const bodyFamily=R.parseHash('#/coach/body/body-02');
+assert.deepStrictEqual(pick(bodyFamily),{
+  area:'coach',page:'template-family',templateId:'body',familyId:'BODY-02',recipeId:'',level:'',query:{}
+});
+assert.strictEqual(R.isValid(bodyFamily),true);
+assert.strictEqual(R.canonicalHash(bodyFamily),'#/coach/body/body-02');
+assert.strictEqual(R.isValid(R.parseHash('#/coach/body/body-99')),false);
+
 // Body session route contract.
 const bodySession=R.parseHash('#/coach/body/body-02/l3');
 assert.deepStrictEqual(pick(bodySession),{
