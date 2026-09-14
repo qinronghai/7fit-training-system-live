@@ -60,7 +60,7 @@ assert.strictEqual(slower.analysis.previous.recordId,'r2');
 assert(slower.analysis.deltaPreviousMs<0);
 assert.strictEqual(slower.analysis.pb.recordId,'r2');
 
-const changedLoad=session(R,{explicitLoads:{H6:16}});
+const changedLoad=session(R,{explicitLoads:{H6:99}});
 assert.notStrictEqual(changedLoad.domainContext.benchmarkContext.comparisonKey,s1.domainContext.benchmarkContext.comparisonKey);
 const changed=H.saveFromSession(changedLoad,{recordId:'load-change',completedAt:'2026-09-11T10:00:00+08:00',totalTimeMs:29*60*1000,stationTimes:times(106)});
 assert.strictEqual(changed.record.validityStatus,'VALID_NEW_BASELINE');
@@ -89,6 +89,18 @@ assert.strictEqual(H.get('r3').recordId,'r3');
 
 const cal2=session(R,{calibrationVersion:'7fit-turf-v2'});
 assert.notStrictEqual(cal2.domainContext.benchmarkContext.comparisonKey,s1.domainContext.benchmarkContext.comparisonKey);
+
+// Protocol version changes also create a distinct comparison identity.
+R.resolve('hyrox',{sessionType:'BENCHMARK',level:'L3',benchmarkProtocolId:'B3',
+  sledCalibration:{
+    SLED_PUSH:{calibratedLoadKg:42,targetRpe:7.5,calibrationVersion:'7fit-turf-v1'},
+    SLED_PULL:{calibratedLoadKg:36,targetRpe:7.5,calibrationVersion:'7fit-turf-v1'},
+  }
+});
+env.W.V14_DATA.hyroxBenchmarkProtocols.B3.protocolVersion='1.0.1';
+const version2=session(R);
+assert.notStrictEqual(version2.domainContext.benchmarkContext.comparisonKey,s1.domainContext.benchmarkContext.comparisonKey);
+env.W.V14_DATA.hyroxBenchmarkProtocols.B3.protocolVersion='1.0.0';
 
 env=boot({schemaVersion:0,profileRef:'legacy',records:[{recordId:'legacy-1',completedAt:'2026-08-01',protocolId:'B3',totalTimeMs:1600000}]});
 H=env.H;
