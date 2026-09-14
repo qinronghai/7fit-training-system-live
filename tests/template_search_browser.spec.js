@@ -46,8 +46,8 @@ test('template-aware search finds actions and legal multi-template coach entries
   const conditioningLink=page.locator('[data-search-result-kind="conditioning-protocol"]').first();
   await expect(conditioningLink).toBeVisible();
   await conditioningLink.click();
-  await expect(page).toHaveURL(/#\/coach\/conditioning\/compose\?family=CON-03&level=L1&protocol=/);
-  await expect(page.getByRole('heading',{name:'Conditioning 自由编课'})).toBeVisible();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/compose\?family=CON-03&level=L1&variant=A/);
+  await expect(page.getByRole('heading',{name:'Conditioning 课程构建'})).toBeVisible();
 
   await page.goto('/#/library');
   await page.locator('#action-search').fill('B3');

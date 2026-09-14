@@ -5,7 +5,7 @@
     'schemaVersion','resolverVersion','templateId','familyId','level','title','summary','main',
     'prepContext','anatomyContext','conflictContext','copyContext','warnings','resolvedSelections','source'
   ]);
-  const OPTIONAL=Object.freeze(['domainContext']);
+  const OPTIONAL=Object.freeze(['domainContext','sessionBlueprintId','variantId','blocks','timing']);
   const TOP_LEVEL=new Set([...REQUIRED,...OPTIONAL]);
   const SELECTION_SOURCES=new Set(['baseline','auto','manual']);
   const SOURCE_TYPES=new Set(['PRESET','COMPOSER','GENERATED']);
@@ -48,7 +48,8 @@
           if(!isObject(item)){push(errors,itemPath,'must be an object');return;}
           ['actionId','name'].forEach(key=>{if(!isNonEmpty(item[key]))push(errors,`${itemPath}.${key}`,'must be a non-empty string');});
           if(!isString(item.prescription))push(errors,`${itemPath}.prescription`,'must be a string');
-          Object.keys(item).forEach(key=>{if(!['actionId','name','prescription'].includes(key))push(errors,`${itemPath}.${key}`,'is not allowed');});
+          if('allowRepeatedAction' in item&&typeof item.allowRepeatedAction!=='boolean')push(errors,`${itemPath}.allowRepeatedAction`,'must be a boolean');
+          Object.keys(item).forEach(key=>{if(!['actionId','name','prescription','allowRepeatedAction'].includes(key))push(errors,`${itemPath}.${key}`,'is not allowed');});
         });
         Object.keys(block).forEach(key=>{if(!['key','label','items'].includes(key))push(errors,`${path}.${key}`,'is not allowed');});
       });
@@ -139,13 +140,43 @@
     if(templateId==='body'&&value.kind!=='BODY')push(errors,`${path}.kind`,'must equal BODY for body template');
   }
 
+  function validateBlueprintBlocks(value,errors){
+    const path='blocks';
+    if(!Array.isArray(value)||value.length<2){push(errors,path,'must be an array with at least two blocks');return;}
+    value.forEach((block,index)=>{
+      const blockPath=`${path}.${index}`;
+      if(!isObject(block)){push(errors,blockPath,'must be an object');return;}
+      ['key','role','goal','protocolId','protocolName','label','completionMetric'].forEach(key=>{
+        if(!isNonEmpty(block[key]))push(errors,`${blockPath}.${key}`,'must be a non-empty string');
+      });
+      if(!Array.isArray(block.coachingCues)||!block.coachingCues.length)push(errors,`${blockPath}.coachingCues`,'must be a non-empty array');
+      if(!Array.isArray(block.scaleRules)||!block.scaleRules.length)push(errors,`${blockPath}.scaleRules`,'must be a non-empty array');
+      if(!Array.isArray(block.stopCriteria)||!block.stopCriteria.length)push(errors,`${blockPath}.stopCriteria`,'must be a non-empty array');
+      if(!isObject(block.stations)||!Object.keys(block.stations).length)push(errors,`${blockPath}.stations`,'must be a non-empty object');
+      else Object.entries(block.stations).forEach(([key,station])=>{
+        const stationPath=`${blockPath}.stations.${key}`;
+        if(!isObject(station)){push(errors,stationPath,'must be an object');return;}
+        if(!isNonEmpty(station.key)||station.key!==key)push(errors,`${stationPath}.key`,'must equal the station map key');
+        if(!isNonEmpty(station.actionId))push(errors,`${stationPath}.actionId`,'must be a non-empty string');
+      });
+    });
+  }
+
+  function validateTiming(value,errors){
+    const path='timing';
+    if(!isObject(value)){push(errors,path,'must be an object');return;}
+    ['prepMinutes','blockExecutionMinutes','transitionMinutes','interBlockRecoveryMinutes','mainTrainingMinutes','recoveryMinutes','fullSessionMinutes','estimatedMinutes','blockCount','taskCount'].forEach(key=>{
+      if(!Number.isFinite(value[key])||value[key]<0)push(errors,`${path}.${key}`,'must be a non-negative number');
+    });
+  }
+
   function validate(session){
     const errors=[];
     if(!isObject(session))return {ok:false,errors:['session: must be an object']};
     REQUIRED.forEach(key=>{if(!(key in session))push(errors,key,'is required');});
     if(session.templateId==='body'&&!('domainContext' in session))push(errors,'domainContext','is required for body template');
     Object.keys(session).forEach(key=>{if(!TOP_LEVEL.has(key))push(errors,key,'is not allowed');});
-    if(session.schemaVersion!==1)push(errors,'schemaVersion','must equal 1');
+    if(![1,2].includes(session.schemaVersion))push(errors,'schemaVersion','must equal 1 or 2');
     ['resolverVersion','templateId','familyId','title'].forEach(key=>{if(key in session&&!isNonEmpty(session[key]))push(errors,key,'must be a non-empty string');});
     if('summary' in session&&!isString(session.summary))push(errors,'summary','must be a string');
     if('level' in session&&!/^L[1-4]$/.test(session.level||''))push(errors,'level','must be L1-L4');
@@ -158,6 +189,12 @@
     if('resolvedSelections' in session)validateSelections(session.resolvedSelections,errors);
     if('source' in session)validateSource(session.source,errors);
     if('domainContext' in session)validateDomainContext(session.domainContext,session.templateId,errors);
+    if(session.schemaVersion===2){
+      if(session.templateId!=='conditioning')push(errors,'schemaVersion','version 2 is currently only supported for Conditioning');
+      ['sessionBlueprintId','variantId'].forEach(key=>{if(!isNonEmpty(session[key]))push(errors,key,'is required for schema version 2');});
+      if('blocks' in session)validateBlueprintBlocks(session.blocks,errors);else push(errors,'blocks','is required for schema version 2');
+      if('timing' in session)validateTiming(session.timing,errors);else push(errors,'timing','is required for schema version 2');
+    }
     return {ok:errors.length===0,errors};
   }
 

@@ -186,7 +186,7 @@
           title:`${family.name||familyId}｜${protocol.name||protocolId}`,
           subtitle:`${familyId} · ${protocolId}`,
           templates:['conditioning'],
-          href:`#/coach/conditioning/compose?family=${encodeURIComponent(familyId)}&level=L1&protocol=${encodeURIComponent(protocolId)}`,
+          href:`#/coach/conditioning/compose?family=${encodeURIComponent(familyId)}&level=L1&variant=A`,
           searchText:lower([
             familyId,family.name,family.goal,family.description,
             protocolId,protocol.name,protocol.description,

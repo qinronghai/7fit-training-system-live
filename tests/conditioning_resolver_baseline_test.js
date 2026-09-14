@@ -10,13 +10,7 @@ for(const file of [
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
 const families=['CON-01','CON-02','CON-03','CON-04'],levels=['L1','L2','L3','L4'];
-const EXPECTED_SHA='16a3234e77412aa9a2cd5364e430bdf1d620732a1cb169539e20ef11be07dd6f';
-const expectedProtocols={
-  'CON-01':{L1:'STEADY',L2:'STEADY',L3:'INTERVAL',L4:'INTERVAL'},
-  'CON-02':{L1:'INTERVAL',L2:'INTERVAL',L3:'INTERVAL',L4:'CIRCUIT'},
-  'CON-03':{L1:'CIRCUIT',L2:'CIRCUIT',L3:'CIRCUIT',L4:'DENSITY'},
-  'CON-04':{L1:'INTERVAL',L2:'INTERVAL',L3:'CIRCUIT',L4:'CIRCUIT'},
-};
+const EXPECTED_SHA='04645de3cfb704c7a13b80741f280e2e9bc416ae216080b8fe10762a58a9cc63';
 
 function signature(session){
   const ctx=session.domainContext;
@@ -38,23 +32,29 @@ function signature(session){
 const signatures=[];
 for(const familyId of families){
   for(const level of levels){
-    const session=Dispatcher.resolve('conditioning',{familyId,level});
-    assert.strictEqual(session.schemaVersion,1);
-    assert.strictEqual(session.resolverVersion,'conditioning-v1');
+    const session=Dispatcher.resolve('conditioning',{familyId,level,variantId:'A'});
+    assert.strictEqual(session.schemaVersion,2);
+    assert.strictEqual(session.resolverVersion,'conditioning-v2');
     assert.strictEqual(session.templateId,'conditioning');
     assert.strictEqual(session.familyId,familyId);
     assert.strictEqual(session.level,level);
     assert.strictEqual(session.main.kind,'PROTOCOL');
     assert.strictEqual(session.domainContext.kind,'CONDITIONING');
-    assert.strictEqual(session.domainContext.protocolId,expectedProtocols[familyId][level]);
-    assert.strictEqual(session.main.content.protocolId,expectedProtocols[familyId][level]);
+    assert.strictEqual(session.variantId,'A');
+    assert.strictEqual(session.sessionBlueprintId,`${familyId}-${level}-A`);
+    const mainBlock=session.blocks.find(block=>block.role==='MAIN')||session.blocks[0];
+    assert.strictEqual(session.domainContext.protocolId,mainBlock.protocolId);
+    assert.strictEqual(session.main.content.protocolId,mainBlock.protocolId);
     assert.strictEqual(session.source.type,'GENERATED');
-    assert.strictEqual(session.source.id,`${familyId}-${level}-${expectedProtocols[familyId][level]}`);
+    assert.strictEqual(session.source.id,`${familyId}-${level}-A`);
     const stations=Object.values(session.domainContext.stations);
-    assert.strictEqual(stations.length,session.domainContext.metrics.stationCount);
-    assert.strictEqual(session.main.content.blocks.length,1);
-    assert.strictEqual(session.main.content.blocks[0].items.length,stations.length);
-    assert.strictEqual(new Set(stations.map(s=>s.actionId)).size,stations.length,'auto stations must be unique');
+    assert.strictEqual(stations.length,session.timing.taskCount);
+    assert.strictEqual(session.main.content.blocks.length,session.blocks.length);
+    assert.strictEqual(session.main.content.blocks.flatMap(block=>block.items).length,stations.length);
+    assert(stations.every(s=>/^BLOCK-[ABC]\/STATION-\d+$/.test(s.key)));
+    if(session.domainContext.repeatPolicy==='UNIQUE_ACTIONS'){
+      assert.strictEqual(new Set(stations.map(s=>s.actionId)).size,stations.length,'unique-action blueprints must remain unique');
+    }
     assert(stations.every(s=>D.actions[s.actionId]?.route==='CONDITIONING_2F'));
     assert(stations.every(s=>D.actions[s.actionId]?.status==='可自动编排'));
     assert(stations.every(s=>s.source==='auto'));
@@ -63,7 +63,7 @@ for(const familyId of families){
       `${familyId} ${level} auto baseline must not FAIL: ${JSON.stringify(session.conflictContext)}`);
     const validation=Contract.validate(session);
     assert.strictEqual(validation.ok,true,validation.errors.join(' | '));
-    assert.deepStrictEqual(Dispatcher.resolve('conditioning',{familyId,level}),session,
+    assert.deepStrictEqual(Dispatcher.resolve('conditioning',{familyId,level,variantId:'A'}),session,
       `${familyId} ${level} must resolve deterministically`);
     signatures.push(signature(session));
   }
@@ -71,5 +71,5 @@ for(const familyId of families){
 
 const sha=crypto.createHash('sha256').update(JSON.stringify(signatures)).digest('hex');
 console.log(`CONDITIONING_RESOLVER_BASELINE_SHA=${sha}`);
-assert.strictEqual(sha,EXPECTED_SHA,'Conditioning Resolver V1 16-state baseline drifted');
-console.log('conditioning_resolver_baseline_test: frozen 16-state baseline GREEN');
+assert.strictEqual(sha,EXPECTED_SHA,'Conditioning Blueprint A 16-state baseline drifted');
+console.log('conditioning_resolver_baseline_test: frozen 16-state blueprint baseline GREEN');

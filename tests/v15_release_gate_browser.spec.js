@@ -56,19 +56,19 @@ test('V15 release: cross-template back forward refresh and Posture future route 
   await page.goto('/#/coach/body/body-02/l3');
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goto('/#/coach/conditioning/con-03/l2');
-  await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(5);
   await page.goto('/#/coach/hyrox/mixed/l3');
   await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
 
   await page.goBack();
   await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2/);
-  await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(5);
   await page.goBack();
   await expect(page).toHaveURL(/#\/coach\/body\/body-02\/l3/);
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goForward();
   await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2/);
-  await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(5);
   await page.goForward();
   await expect(page).toHaveURL(/#\/coach\/hyrox\/mixed\/l3/);
   await expect(page.locator('.hyrox-station-card')).toHaveCount(5);
@@ -118,8 +118,8 @@ test('V15 release: all three composers and SavedSession list are operable at 390
   await expect(page.locator('[data-save-current-session]')).toBeVisible();
   await expect390(page);
 
-  await page.goto('/#/coach/conditioning/compose?family=CON-03&level=L2&protocol=CIRCUIT');
-  await expect(page.locator('.conditioning-station-card')).toHaveCount(3);
+  await page.goto('/#/coach/conditioning/compose?family=CON-03&level=L2&variant=A');
+  await expect(page.locator('.conditioning-station-card')).toHaveCount(5);
   await expect(page.locator('[data-save-current-session]')).toBeVisible();
   await page.locator('[data-save-session-name]').fill('Release Gate Saved Session');
   await page.locator('[data-save-current-session]').click();

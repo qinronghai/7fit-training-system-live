@@ -29,6 +29,7 @@
 - Create: `data/src/conditioning-blueprints.json`
 - Modify: `data/src/manifest.json`
 - Modify: `schemas/v14.8/conditioning.schema.json`
+- Modify: `tools/build_system_data.py`
 - Modify: `tools/validate_v148_schema.py`
 - Test: `tests/conditioning_blueprint_data_test.js`
 - Test: `tests/test_issue85_conditioning_blueprints.py`
@@ -223,7 +224,7 @@ git commit -m "feat(issue-85): persist Conditioning blueprints and variants"
 
 **Files:**
 - Modify: `js/coach/conditioning-session.js`
-- Modify: `js/conditioning-copy.js` or the existing Conditioning copy module
+- Modify: `js/coach/conditioning-copy.js`
 - Modify: `assets/app.css`
 - Test: `tests/conditioning_coach_copy_test.js`
 - Test: `tests/conditioning_coach_browser.spec.js`

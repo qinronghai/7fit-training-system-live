@@ -107,37 +107,33 @@ const {D,S,Save,R,Prep,Body,Cond}=env;
   D.actions[alt.actionId].route=originalRoute;
 }
 
-// Conditioning Protocol stale recovery: saved DENSITY safely falls back to current default CIRCUIT.
+// Conditioning blueprint round-trip keeps the explicit variant and namespaced intent.
 {
-  const familyId='CON-03',level='L2',protocolId='DENSITY',sessionKey=`${familyId}-${level}-${protocolId}`;
-  S.ensureSession('conditioning',sessionKey,{familyId,level,resolverVersion:'conditioning-v1',input:{familyId,level,protocolId}});
-  const base=R.resolve('conditioning',{familyId,level,protocolId,selections:{}});
-  const first=Object.values(base.domainContext.stations)[0];
+  const familyId='CON-03',level='L2',variantId='A',sessionKey=`${familyId}-${level}-BLUEPRINT-${variantId}`;
+  S.ensureSession('conditioning',sessionKey,{familyId,level,resolverVersion:'conditioning-v2',input:{familyId,level,variantId,sessionBlueprintId:`${familyId}-${level}-${variantId}`}});
+  const base=R.resolve('conditioning',{familyId,level,variantId,selections:{}});
+  const first=Object.values(base.domainContext.stations).find(item=>item.key==='BLOCK-B/STATION-1')||Object.values(base.domainContext.stations)[0];
   const current=Object.fromEntries(Object.values(base.domainContext.stations).map(x=>[x.key,x.actionId]));
-  const alt=Cond.candidates({familyId,level,protocolId,stationKey:first.key,currentSelections:current}).candidates.find(x=>x.actionId!==first.actionId);
+  const block=base.blocks.find(item=>item.key===first.blockKey);
+  const alt=Cond.candidates({familyId,level,protocolId:block.protocolId,stationKey:first.key,currentSelections:current}).candidates.find(x=>x.actionId!==first.actionId);
   assert(alt,'Conditioning needs alternate');
   S.setSelection('conditioning',sessionKey,first.key,alt.actionId,'manual');
 
-  Save.saveRoute({templateId:'conditioning',page:'template-compose',query:{family:familyId,level,protocol:protocolId}},'Conditioning 保存测试',{savedId:'save-cond',now:'2026-09-12T08:10:00.000Z'});
+  Save.saveRoute({templateId:'conditioning',page:'template-compose',query:{family:familyId,level,variant:variantId}},'Conditioning 保存测试',{savedId:'save-cond',now:'2026-09-12T08:10:00.000Z'});
   S.resetSession('conditioning',sessionKey);
   let restored=Save.restore('save-cond');
   assert.strictEqual(restored.ok,true);
-  assert.strictEqual(restored.hash,`#/coach/conditioning/compose?family=${familyId}&level=${level}&protocol=${protocolId}`);
+  assert.strictEqual(restored.hash,`#/coach/conditioning/compose?family=${familyId}&level=${level}&variant=${variantId}`);
   assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)[first.key]),{actionId:alt.actionId,source:'manual'});
 
-  const original=[...D.conditioningFamilies[familyId].protocolEligibility];
-  D.conditioningFamilies[familyId].protocolEligibility=original.filter(x=>x!==protocolId);
+  const originalBlueprint=D.conditioningBlueprints[familyId][level].A;
+  D.conditioningBlueprints[familyId][level].A=null;
   S.resetSession('conditioning',sessionKey);
   restored=Save.restore('save-cond');
-  assert.strictEqual(restored.ok,true);
-  assert(restored.reasons.includes('STALE_PROTOCOL'));
-  assert(restored.hash.includes('protocol=CIRCUIT'));
-  const migratedKey=`${familyId}-${level}-CIRCUIT`;
-  const migratedState=S.getSession('conditioning',migratedKey);
-  assert(migratedState,'stale protocol restore must create a current legal session');
-  const safe=R.resolve('conditioning',{familyId,level,protocolId:'CIRCUIT',selections:S.getSelections('conditioning',migratedKey)});
-  assert.strictEqual(safe.domainContext.protocolId,'CIRCUIT');
-  D.conditioningFamilies[familyId].protocolEligibility=original;
+  assert.strictEqual(restored.ok,false);
+  assert.strictEqual(restored.code,'CONDITIONING_BLUEPRINT_MIGRATION_REQUIRED');
+  assert.strictEqual(S.getSession('conditioning',sessionKey),null,'failed restore must not create a stale blueprint state');
+  D.conditioningBlueprints[familyId][level].A=originalBlueprint;
 }
 
 // Resolver mismatch is a migration signal; selections are revalidated under current code.

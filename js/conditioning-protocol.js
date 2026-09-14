@@ -17,6 +17,8 @@
   });
   const DESIRED_RATIO=Object.freeze({L1:0.5,L2:0.75,L3:1,L4:1.5});
 
+  function clone(value){return JSON.parse(JSON.stringify(value));}
+
   function fail(code,message,details={}){
     const error=new Error(message);
     error.code=code;
@@ -175,9 +177,27 @@
     const level=typeof input.level==='string'?input.level:'';
     const data=D(),{family,levelPolicy}=validateFamilyLevel(familyId,level);
     const protocolId=selectProtocol(familyId,level,input.protocolId||'');
-    const protocol=data.conditioningProtocols[protocolId],stationCount=chooseStationCount(familyId,level,protocolId);
-    const targetBlockMinutes=midpoint(levelPolicy.totalWorkMinutesRange);
-    const targetRpe=Math.round(midpoint(levelPolicy.targetRpeRange));
+    const protocol=data.conditioningProtocols[protocolId];
+    const requestedStationCount=Number(input.stationCount);
+    const stationCount=Number.isInteger(requestedStationCount)
+      ?requestedStationCount
+      :chooseStationCount(familyId,level,protocolId);
+    const stationBounds=intersect(protocol.stationCountRange,levelPolicy.stationCountRange)||range(protocol.stationCountRange);
+    if(!stationBounds||stationCount<stationBounds[0]||stationCount>stationBounds[1]){
+      fail('CONDITIONING_STATION_COUNT_INVALID',`Station count ${stationCount} is not legal for ${familyId} ${level} ${protocolId}`,{familyId,level,protocolId,stationCount});
+    }
+    const available=legalCandidateCount(familyId,level,protocolId);
+    if(stationCount>available&&input.allowRepeatedActions!==true){
+      fail('CONDITIONING_STATION_CAPACITY',`Not enough legal stations for ${familyId} ${level} ${protocolId}`,{familyId,level,protocolId,available,stationCount});
+    }
+    const requestedTargetMinutes=Number(input.targetBlockMinutes);
+    const targetBlockMinutes=Number.isFinite(requestedTargetMinutes)&&requestedTargetMinutes>0
+      ?requestedTargetMinutes
+      :midpoint(levelPolicy.totalWorkMinutesRange);
+    const requestedTargetRpe=Number(input.targetRpe);
+    const targetRpe=Number.isInteger(requestedTargetRpe)&&requestedTargetRpe>=1&&requestedTargetRpe<=10
+      ?requestedTargetRpe
+      :Math.round(midpoint(levelPolicy.targetRpeRange));
     let timed;
 
     if(protocolId==='STEADY'){
@@ -211,6 +231,19 @@
     };
   }
 
+  function blueprint(input={}){
+    const familyId=typeof input.familyId==='string'?input.familyId:'';
+    const level=typeof input.level==='string'?input.level:'';
+    validateFamilyLevel(familyId,level);
+    const requested=typeof input.variantId==='string'&&input.variantId?input.variantId:'A';
+    if(!['A','B','C'].includes(requested)){
+      fail('CONDITIONING_VARIANT_INVALID',`Conditioning variant must be A, B, or C: ${requested}`,{familyId,level,variantId:requested});
+    }
+    const value=D().conditioningBlueprints?.[familyId]?.[level]?.[requested];
+    if(!value)fail('CONDITIONING_BLUEPRINT_UNAVAILABLE',`No Conditioning blueprint for ${familyId} ${level} ${requested}`,{familyId,level,variantId:requested});
+    return clone(value);
+  }
+
   function formatPrescription(plan,workMetric='time'){
     const metricLabel={time:'时间',distance:'距离',reps:'次数',calories:'卡路里'}[workMetric]||workMetric;
     if(plan.protocolId==='STEADY')return `${plan.blockMinutes} 分钟持续输出｜${metricLabel}｜RPE ${plan.targetRpe}`;
@@ -220,6 +253,6 @@
   }
 
   window.V15ConditioningProtocol={
-    DEFAULT_PROTOCOL,selectProtocol,chooseStationCount,plan,formatPrescription,
+    DEFAULT_PROTOCOL,selectProtocol,chooseStationCount,plan,blueprint,formatPrescription,
   };
 })();

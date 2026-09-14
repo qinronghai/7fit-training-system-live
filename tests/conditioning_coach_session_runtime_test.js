@@ -27,7 +27,7 @@ for(const familyId of D.conditioningFamilyIds){
     assert(home.includes(`#/coach/conditioning/${familyId.toLowerCase()}/${level.toLowerCase()}`),`${familyId} ${level} link missing`);
   }
 }
-assert(home.includes('#/coach/conditioning/compose?family=CON-01&level=L1&protocol=STEADY'),'Conditioning composer entry missing');
+assert(home.includes('#/coach/conditioning/compose?family=CON-01&level=L1&variant=A'),'Conditioning composer entry missing');
 
 for(const familyId of D.conditioningFamilyIds){
   for(const level of ['L1','L2','L3','L4']){
@@ -36,19 +36,20 @@ for(const familyId of D.conditioningFamilyIds){
     assert.strictEqual(ctx.familyId,familyId);
     assert.strictEqual(ctx.level,level);
     assert(ctx.protocolId);
-    assert.strictEqual(ctx.sessionKey,`${familyId}-${level}-${ctx.protocolId}`);
+    assert.strictEqual(ctx.variantId,'A');
+    assert.strictEqual(ctx.sessionKey,`${familyId}-${level}-BLUEPRINT-A`);
     assert.strictEqual(ctx.session.templateId,'conditioning');
     assert.strictEqual(ctx.session.main.kind,'PROTOCOL');
     const html=M.ConditioningSession.render(route);
-    assert(html.includes('PROTOCOL｜今日体能结构'),'Protocol panel missing');
-    assert(html.includes('2F CONDITIONING｜Station 执行'),'Station execution section missing');
-    assert(html.includes('Target RPE'),'RPE label missing');
+    assert(html.includes('今日体能结构'),'Blueprint panel missing');
+    assert(html.includes('2F CONDITIONING｜分段执行'),'Block execution section missing');
+    assert(html.includes('训练任务'),'task count label missing');
     assert(html.includes('预计整节'),'estimated duration label missing');
     assert(html.includes('Impact'),'impact summary missing');
     assert(html.includes('Coordination'),'coordination summary missing');
     assert(html.includes('NO POST CARDIO'),'full Conditioning must explicitly show NO POST CARDIO');
     assert(html.includes('RECOVERY｜训练后恢复 · 约 5–8 分钟'),'Recovery block missing');
-    assert(html.includes(ctx.session.domainContext.protocolName),'protocol name must render from ResolvedSession');
+    for(const block of ctx.session.blocks)assert(html.includes(block.protocolName),`${familyId} ${level} protocol name must render from ResolvedSession`);
     assert(html.includes(String(ctx.session.domainContext.metrics.targetRpe)),'target RPE must render from ResolvedSession');
     assert(html.includes(String(ctx.session.domainContext.metrics.estimatedMinutes)),'duration must render from ResolvedSession');
     const stations=Object.values(ctx.session.domainContext.stations);
@@ -68,23 +69,23 @@ assert.strictEqual(adapter.canHandle({page:'template-session',templateId:'condit
 assert.strictEqual(adapter.canHandle({page:'template-compose',templateId:'conditioning'}),true);
 assert.strictEqual(adapter.canHandle({page:'template',templateId:'body'}),false);
 
-const composeRoute={area:'coach',page:'template-compose',templateId:'conditioning',query:{family:'CON-03',level:'L2',protocol:'CIRCUIT'}};
+const composeRoute={area:'coach',page:'template-compose',templateId:'conditioning',query:{family:'CON-03',level:'L2',variant:'B'}};
 const compose=M.ConditioningSession.context(composeRoute);
 assert.strictEqual(compose.familyId,'CON-03');
 assert.strictEqual(compose.level,'L2');
-assert.strictEqual(compose.protocolId,'CIRCUIT');
-assert.strictEqual(compose.sessionKey,'CON-03-L2-CIRCUIT');
+assert.strictEqual(compose.variantId,'B');
+assert.strictEqual(compose.sessionKey,'CON-03-L2-BLUEPRINT-B');
 const composeHtml=adapter.render(composeRoute);
-assert(composeHtml.includes('Conditioning 自由编课'));
+assert(composeHtml.includes('Conditioning 课程构建'));
 assert(composeHtml.includes('data-conditioning-compose-family'));
 assert(composeHtml.includes('data-conditioning-compose-level'));
-assert(composeHtml.includes('data-conditioning-compose-protocol'));
-assert(composeHtml.includes('CON-03-L2-CIRCUIT'));
+assert(composeHtml.includes('data-conditioning-compose-variant'));
+assert(composeHtml.includes('CON-03-L2-BLUEPRINT-B'));
 assert(composeHtml.includes('NO POST CARDIO'));
 
-const invalid=M.ConditioningSession.context({area:'coach',page:'template-compose',templateId:'conditioning',query:{family:'CON-99',level:'L9',protocol:'MAGIC'}});
+const invalid=M.ConditioningSession.context({area:'coach',page:'template-compose',templateId:'conditioning',query:{family:'CON-99',level:'L9',variant:'MAGIC'}});
 assert.strictEqual(invalid.familyId,'CON-01');
 assert.strictEqual(invalid.level,'L1');
-assert.strictEqual(invalid.protocolId,'STEADY');
+assert.strictEqual(invalid.variantId,'A');
 
 console.log('conditioning_coach_session_runtime_test: PASS');

@@ -105,7 +105,7 @@ test('Body, Conditioning and HYROX homes are active while Posture remains future
   await expect(page.getByRole('heading', { name: '体能训练' })).toBeVisible();
   await expect(page.locator('.conditioning-family-card')).toHaveCount(4);
   await expect(page.getByText('选择体能目标 / 等级', { exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: '自由编课 →', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: '构建课程 →', exact: true })).toBeVisible();
 
   await page.goto('/#/coach/hyrox');
   await expect(page.getByRole('heading', { name: 'HYROX 训练' })).toBeVisible();

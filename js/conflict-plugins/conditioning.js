@@ -17,29 +17,52 @@
     return session?.domainContext?.kind==='CONDITIONING'?session.domainContext:null;
   }
 
-  function stations(session){
-    const map=domain(session)?.stations;
+  function blockList(session){
+    const ctx=domain(session);
+    if(Array.isArray(session?.blocks)&&session.blocks.length)return session.blocks;
+    if(Array.isArray(ctx?.blocks)&&ctx.blocks.length)return ctx.blocks;
+    return [{
+      key:'MAIN',
+      protocolId:ctx?.protocolId,
+      protocolName:ctx?.protocolName,
+      stations:ctx?.stations||{},
+      metrics:ctx?.metrics||{},
+    }];
+  }
+
+  function blockStations(block){
+    const map=block?.stations;
     return map&&typeof map==='object'&&!Array.isArray(map)?Object.values(map):[];
   }
 
+  function stations(session){
+    return blockList(session).flatMap(block=>blockStations(block));
+  }
+
   function protocolIssues(session){
-    const data=D(),family=data.conditioningFamilies?.[session?.familyId],ctx=domain(session),protocolId=ctx?.protocolId;
+    const data=D(),family=data.conditioningFamilies?.[session?.familyId];
     if(!family||!data.conditioningLevelPolicies?.[session?.level]){
       return [issue('hard','Conditioning Family / Level 无效',
         `当前 Family / Level 无法识别：${String(session?.familyId||'未标')} / ${String(session?.level||'未标')}。`,
         'COND_FAMILY_LEVEL_INVALID',10000)];
     }
-    if(!ctx||!data.conditioningProtocols?.[protocolId]||!family.protocolEligibility?.includes(protocolId)){
-      return [issue('hard','Conditioning Protocol 非法',
-        `${session.familyId} 不允许使用 ${String(protocolId||'未标')}。`,
-        'COND_PROTOCOL_ILLEGAL',10010)];
-    }
-    return [];
+    const out=[];
+    blockList(session).forEach((block,index)=>{
+      const protocolId=block?.protocolId;
+      if(!data.conditioningProtocols?.[protocolId]||!family.protocolEligibility?.includes(protocolId)){
+        out.push(issue('hard','Conditioning Protocol 非法',
+          `${session.familyId} 的 ${block?.key||`第 ${index+1} 段`} 不允许使用 ${String(protocolId||'未标')}。`,
+          'COND_PROTOCOL_ILLEGAL',10010+index));
+      }
+    });
+    return out;
   }
 
   function stationIssues(session){
-    const data=D(),out=[],ctx=domain(session),protocolId=ctx?.protocolId,level=session?.level,familyId=session?.familyId;
-    stations(session).forEach((station,index)=>{
+    const data=D(),out=[],level=session?.level,familyId=session?.familyId;
+    blockList(session).forEach((block,blockIndex)=>{
+      const protocolId=block?.protocolId;
+      blockStations(block).forEach((station,index)=>{
       const actionId=station?.actionId||'',meta=data.conditioningActionMeta?.[actionId],action=data.actions?.[actionId];
       const legal=!!meta&&!!action
         &&meta.families?.includes(familyId)
@@ -50,9 +73,10 @@
         &&(familyId!=='CON-04'||meta.powerEligible===true);
       if(!legal){
         out.push(issue('hard','Conditioning Station 非法',
-          `${station?.key||`STATION-${index+1}`} 的 ${action?.name||actionId||'未知动作'} 不符合 ${familyId} / ${level} / ${protocolId} 候选规则。`,
-          'COND_STATION_ILLEGAL',10100+index));
+          `${station?.key||`${block?.key||`BLOCK-${blockIndex+1}`}/STATION-${index+1}`} 的 ${action?.name||actionId||'未知动作'} 不符合 ${familyId} / ${level} / ${protocolId} 候选规则。`,
+          'COND_STATION_ILLEGAL',10100+blockIndex*100+index));
       }
+      });
     });
     return out;
   }
@@ -77,27 +101,27 @@
   }
 
   function prescriptionIssues(session){
-    const data=D(),ctx=domain(session),metrics=ctx?.metrics||{},protocolId=ctx?.protocolId;
-    const protocol=data.conditioningProtocols?.[protocolId]||{},p=data.conditioningProtocolPolicies?.[protocolId]||{};
-    const level=data.conditioningLevelPolicies?.[session?.level]||{},out=[];
+    const data=D(),level=data.conditioningLevelPolicies?.[session?.level]||{},out=[];
     const hard=(title,text,code,order)=>out.push(issue('hard',title,text,code,order));
-
-    if(!inRange(Number(metrics.stationCount),protocol.stationCountRange)||!inRange(Number(metrics.stationCount),level.stationCountRange)){
-      hard('Station 数量不合法',`当前 stationCount=${metrics.stationCount} 不符合 Protocol / Level 范围。`,'COND_STATION_COUNT_POLICY',10300);
-    }
-    if(!inRange(Number(metrics.targetRpe),level.targetRpeRange)){
-      hard('目标 RPE 不合法',`当前 RPE ${metrics.targetRpe} 不符合 ${session.level} 范围。`,'COND_RPE_POLICY',10310);
-    }
-
-    if(protocolId==='STEADY'){
-      if(Number(metrics.rounds)!==1||Number(metrics.stationCount)!==1||Number(metrics.restSeconds)!==0){
-        hard('STEADY 处方结构非法','STEADY 必须为单站、单轮、无固定休息。','COND_WORK_REST_POLICY',10320);
+    blockList(session).forEach((block,blockIndex)=>{
+      const metrics=block?.metrics||{},protocolId=block?.protocolId,protocol=data.conditioningProtocols?.[protocolId]||{},p=data.conditioningProtocolPolicies?.[protocolId]||{};
+      const stationCount=blockStations(block).length;
+      if(!inRange(stationCount,protocol.stationCountRange)||!inRange(stationCount,level.stationCountRange)){
+        hard('Station 数量不合法',`${block?.key||`第 ${blockIndex+1} 段`} 当前 stationCount=${stationCount} 不符合 Protocol / Level 范围。`,'COND_STATION_COUNT_POLICY',10300+blockIndex);
       }
-    }else if(protocolId==='DENSITY'){
-      if(!inRange(Number(metrics.rounds),p.roundsRange)||!inRange(Number(metrics.densityWindowMinutes),p.densityWindowMinutesRange)){
-        hard('DENSITY 处方结构非法','DENSITY rounds / density window 超出 Protocol policy。','COND_WORK_REST_POLICY',10320);
+      if(!inRange(Number(metrics.targetRpe),level.targetRpeRange)){
+        hard('目标 RPE 不合法',`${block?.key||`第 ${blockIndex+1} 段`} 当前 RPE ${metrics.targetRpe} 不符合 ${session.level} 范围。`,'COND_RPE_POLICY',10310+blockIndex);
       }
-    }else{
+
+      if(protocolId==='STEADY'){
+        if(Number(metrics.rounds)!==1||stationCount!==1||Number(metrics.restSeconds)!==0){
+          hard('STEADY 处方结构非法','STEADY 必须为单站、单轮、无固定休息。','COND_WORK_REST_POLICY',10320+blockIndex);
+        }
+      }else if(protocolId==='DENSITY'){
+        if(!inRange(Number(metrics.rounds),p.roundsRange)||!inRange(Number(metrics.densityWindowMinutes),p.densityWindowMinutesRange)){
+          hard('DENSITY 处方结构非法','DENSITY rounds / density window 超出 Protocol policy。','COND_WORK_REST_POLICY',10320+blockIndex);
+        }
+      }else{
       const workRange=[
         Math.max(level.workSecondsRange?.[0]??-Infinity,p.workSecondsRange?.[0]??-Infinity),
         Math.min(level.workSecondsRange?.[1]??Infinity,p.workSecondsRange?.[1]??Infinity),
@@ -111,9 +135,10 @@
         Math.min(level.roundsRange?.[1]??Infinity,p.roundsRange?.[1]??Infinity),
       ];
       if(!inRange(Number(metrics.workSeconds),workRange)||!inRange(Number(metrics.restSeconds),restRange)||!inRange(Number(metrics.rounds),roundsRange)){
-        hard('Work / Rest / Round 不合法','当前计时处方超出 Protocol 与 Level 的交集范围。','COND_WORK_REST_POLICY',10320);
+          hard('Work / Rest / Round 不合法','当前计时处方超出 Protocol 与 Level 的交集范围。','COND_WORK_REST_POLICY',10320+blockIndex);
       }
-    }
+      }
+    });
     return out;
   }
 
@@ -130,7 +155,10 @@
         out.push(issue('warn',title,`当前 ${count} 个，超过 ${level} 建议上限 ${max} 个。`,code,10400+index));
       }
     });
-    const powerCount=items.filter(item=>item?.powerEligible===true).length,powerMax=Number(policy.maxPowerStationsByLevel?.[level]);
+    const powerCount=session?.schemaVersion===2
+      ?new Set(items.filter(item=>item?.powerEligible===true).map(item=>item.blockKey||item.key)).size
+      :items.filter(item=>item?.powerEligible===true).length;
+    const powerMax=Number(policy.maxPowerStationsByLevel?.[level]);
     if(Number.isFinite(powerMax)&&powerCount>powerMax){
       out.push(issue('warn','Power Station 偏多',`当前 ${powerCount} 个，超过 ${level} 建议上限 ${powerMax} 个。`,'COND_POWER_STACK',10410));
     }
@@ -150,12 +178,13 @@
     if(Number.isFinite(max)&&longest>max){
       out.push(issue('warn','连续 Modality 重复',`同一主要 Modality 连续出现 ${longest} 次，超过建议上限 ${max}。`,'COND_MODALITY_REDUNDANCY',10500));
     }
-    if(domain(session)?.protocolId==='CIRCUIT'){
-      const distinct=new Set(primary).size,min=Number(policy.minDistinctModalitiesForCircuit);
+    blockList(session).forEach(block=>{
+      if(block?.protocolId!=='CIRCUIT')return;
+      const distinct=new Set(blockStations(block).map(item=>item?.primaryModality||'').filter(Boolean)).size,min=Number(policy.minDistinctModalitiesForCircuit);
       if(Number.isFinite(min)&&distinct<min){
         out.push(issue('warn','Circuit Modality 过于单一',`当前仅 ${distinct} 类主要 Modality，建议至少 ${min} 类。`,'COND_CIRCUIT_MODALITY_DIVERSITY',10510));
       }
-    }
+    });
     return out;
   }
 
@@ -164,7 +193,9 @@
     if(policy.powerMustPrecedeFatigue!==true)return null;
     const firstHighFatigue=items.findIndex(item=>item?.fatigueRisk==='high');
     if(firstHighFatigue<0)return null;
-    const laterPower=items.findIndex((item,index)=>index>firstHighFatigue&&item?.powerEligible===true);
+    const laterPower=items.findIndex((item,index)=>index>firstHighFatigue
+      &&item?.powerEligible===true
+      &&item?.fatigueRisk!=='high');
     if(laterPower<0)return null;
     return issue('warn','Power 排位过晚',
       '高疲劳 Station 之后仍安排 Power 动作；爆发质量应优先放在疲劳前段。',
@@ -177,12 +208,15 @@
     if(Number.isFinite(max)&&Number.isFinite(estimated)&&estimated>max){
       issues.push(issue('warn','Conditioning 时间预算过长',`预计 ${estimated} 分钟，超过 V1 上限 ${max} 分钟。`,'COND_TIME_BUDGET',10700));
     }
-    if(Number.isFinite(estimated)&&Array.isArray(levelPolicy.estimatedSessionMinutesRange)&&!inRange(estimated,levelPolicy.estimatedSessionMinutesRange)){
+    const blueprintRange=session?.schemaVersion===2
+      ?({L1:[20,35],L2:[30,45],L3:[40,50],L4:[40,55]}[session.level]||null)
+      :levelPolicy.estimatedSessionMinutesRange;
+    if(Number.isFinite(estimated)&&Array.isArray(blueprintRange)&&!inRange(estimated,blueprintRange)){
       issues.push(issue('warn','Conditioning 等级时长偏离',
-        `预计 ${estimated} 分钟，${session.level} 建议区间为 ${levelPolicy.estimatedSessionMinutesRange[0]}–${levelPolicy.estimatedSessionMinutesRange[1]} 分钟。`,
+        `预计 ${estimated} 分钟，${session.level} 建议区间为 ${blueprintRange[0]}–${blueprintRange[1]} 分钟。`,
         'COND_LEVEL_DURATION',10710));
     }
-    if(Number.isFinite(block)&&Array.isArray(levelPolicy.totalWorkMinutesRange)&&!inRange(block,levelPolicy.totalWorkMinutesRange)){
+    if(session?.schemaVersion!==2&&Number.isFinite(block)&&Array.isArray(levelPolicy.totalWorkMinutesRange)&&!inRange(block,levelPolicy.totalWorkMinutesRange)){
       issues.push(issue('warn','Protocol 主块时长偏离',
         `主块约 ${block} 分钟，${session.level} 目标区间为 ${levelPolicy.totalWorkMinutesRange[0]}–${levelPolicy.totalWorkMinutesRange[1]} 分钟。`,
         'COND_BLOCK_DURATION',10720));

@@ -14,9 +14,16 @@
       }catch(_){return record.familyId;}
     }
     if(record.templateId==='body')return D().bodyFamilies?.[record.familyId]?.name||record.familyId;
-    if(record.templateId==='conditioning')return D().conditioningFamilies?.[record.familyId]?.name||record.familyId;
+    if(record.templateId==='conditioning'){
+      const blueprint=D().conditioningBlueprints?.[record.familyId]?.[record.level]?.[record.input?.variantId]||{};
+      return `${D().conditioningFamilies?.[record.familyId]?.name||record.familyId} · ${record.level}${record.input?.variantId?` · ${record.input.variantId} 变体`:''}${blueprint.label?`｜${blueprint.label}`:''}`;
+    }
     if(record.templateId==='hyrox')return record.input?.sessionType==='BENCHMARK'?'Benchmark '+(record.input?.benchmarkProtocolId||record.familyId):(D().hyroxSessionTypes?.[record.input?.sessionType]?.name||record.familyId);
     return record.familyId;
+  }
+  function conditioningNeedsMigration(record){
+    return record.templateId==='conditioning'
+      &&(record.resolverVersion!=='conditioning-v2'||!record.input?.variantId||!record.input?.sessionBlueprintId);
   }
   function dateText(value){
     const d=new Date(value);
@@ -27,15 +34,20 @@
   function notice(route){
     const n=Service()?.getLastRestoreNotice?.(),descriptor=Service()?.descriptorFromRoute?.(route||{});
     if(!n||!descriptor||n.templateId!==descriptor.templateId||n.sessionKey!==descriptor.sessionKey)return '';
+    if(n.code==='MIGRATED_EXPLICITLY')return `<div class="saved-session-notice warn"><b>已明确升级为多区块版本</b><span>${esc(templateLabel(n.templateId))} · ${esc(n.level||descriptor.level||'')}｜${esc(n.name||'')}</span><small>原旧版单块记录仍保留为备份；本次未按位置映射旧动作，请先确认 A 变体的训练段安排。</small></div>`;
     const migrated=n.reasons?.length,context=`${templateLabel(n.templateId)} · ${n.level||descriptor.level||''}`;
     return `<div class="saved-session-notice ${migrated?'warn':'ok'}"><b>${migrated?'已恢复并完成兼容处理':'已恢复保存课程'}</b><span>${esc(context)}｜${esc(n.name||'')}</span>${migrated?`<small>${esc(n.reasons.join(' / '))}${n.droppedSelections?.length?`｜动作回退：${esc(n.droppedSelections.join('、'))}`:''}${n.droppedPrepSelections?.length?`｜PREP 回退：${esc(n.droppedPrepSelections.join('、'))}`:''}</small>`:''}</div>`;
   }
   function card(record){
+    const migration=conditioningNeedsMigration(record);
+    const restoreAction=migration
+      ?`<button type="button" data-saved-migrate="${esc(record.savedId)}">升级为多区块版本</button><small class="saved-session-migration-note">旧版单块记录不会自动映射，原记录会保留为备份。</small>`
+      :`<button type="button" data-saved-restore="${esc(record.savedId)}">恢复到 ${esc(templateLabel(record.templateId))} ${esc(record.level)}</button>`;
     return `<article class="saved-session-card" data-saved-session-id="${esc(record.savedId)}">
       <div class="saved-session-card-head"><div><span>${esc(templateLabel(record.templateId))} · ${esc(record.level)}</span><h3>${esc(record.name)}</h3></div><small>${esc(dateText(record.updatedAt||record.createdAt))}</small></div>
       <p>${esc(familyLabel(record))}</p>
       <div class="saved-session-actions">
-        <button type="button" data-saved-restore="${esc(record.savedId)}">恢复到 ${esc(templateLabel(record.templateId))} ${esc(record.level)}</button>
+        ${restoreAction}
         <label><span>名称</span><input type="text" value="${esc(record.name)}" data-saved-rename-input="${esc(record.savedId)}"></label>
         <button type="button" data-saved-rename="${esc(record.savedId)}">重命名</button>
         <button class="danger" type="button" data-saved-delete="${esc(record.savedId)}">删除</button>
@@ -83,6 +95,14 @@
       try{result=Service().restore(button.dataset.savedRestore);}
       catch(error){setStatus(root,error?.message||'恢复失败，原保存记录未删除。','error');return;}
       if(!result.ok){setStatus(root,(result.message||'恢复失败')+'；原保存记录仍保留。','error');return;}
+      if(window.location?.hash===result.hash){rerender();return;}
+      if(window.V14Router?.navigate)window.V14Router.navigate(result.hash);else window.location.hash=result.hash;
+    }));
+    root.querySelectorAll('[data-saved-migrate]').forEach(button=>button.addEventListener('click',()=>{
+      let result;
+      try{result=Service().migrate(button.dataset.savedMigrate);}
+      catch(error){setStatus(root,error?.message||'升级失败，原保存记录未修改。','error');return;}
+      if(!result.ok){setStatus(root,(result.message||'升级失败')+'；原保存记录仍保留。','error');return;}
       if(window.location?.hash===result.hash){rerender();return;}
       if(window.V14Router?.navigate)window.V14Router.navigate(result.hash);else window.location.hash=result.hash;
     }));
