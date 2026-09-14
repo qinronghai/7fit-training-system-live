@@ -114,9 +114,13 @@
     });
     const candidates=result.candidates||[];
     const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const recommended=candidates[0]||null;
+    const reasonText=(recommended?.reasons||[]).slice(0,2).map(item=>item.text).filter(Boolean).join('；');
+    const tradeoffText=(recommended?.tradeoffs||[]).slice(0,1).map(item=>item.text).filter(Boolean).join('；');
+    const recommendation=recommended?`<div class="body-recommendation-note" data-body-recommendation="${esc(slot.key)}" data-score="${esc(recommended.recommendationScore)}"><b>推荐：${esc(recommended.name)} · ${esc(recommended.recommendationScore)} 分</b><span>${esc(reasonText||'当前 Session 综合匹配度最高')}</span>${tradeoffText?`<small>注意：${esc(tradeoffText)}</small>`:''}</div>`:'';
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
     const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
-    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${quick}`;
+    return `<label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${recommendation}${quick}`;
   }
 
   function slotCard(ctx,slot){
