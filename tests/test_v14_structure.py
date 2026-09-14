@@ -171,3 +171,14 @@ def test_v1461_copy_helper_exposes_formatters():
     text = (ROOT / 'js' / 'session-copy.js').read_text(encoding='utf-8')
     for symbol in ['formatCoach', 'formatMember', 'copyText', 'window.V14SessionCopy']:
         assert symbol in text
+
+
+def test_maintenance_changelog_module_is_loaded_and_rendered():
+    html = (ROOT / 'index.html').read_text(encoding='utf-8')
+    maintenance = (ROOT / 'js' / 'views-maintenance.js').read_text(encoding='utf-8')
+    changelog = (ROOT / 'data' / 'change-log.js').read_text(encoding='utf-8')
+    assert 'data/change-log.js' in html
+    assert '网站变更记录' in maintenance
+    assert 'data-change-log' in maintenance
+    assert 'window.V14_CHANGELOG' in changelog
+    assert '2026-09-14' in changelog
