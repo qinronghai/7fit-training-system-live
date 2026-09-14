@@ -74,6 +74,12 @@ test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',a
     return ctx.session.main.content.map(slot=>window.V14_DATA.bodyActionMeta[slot.actionId]?.exerciseFamily||'').filter(Boolean);
   });
   expect(new Set(familyGroups).size).toBe(familyGroups.length);
+  const advanced=page.locator('[data-body-advanced]');
+  await expect(advanced).toHaveCount(1);
+  await expect(advanced).not.toHaveAttribute('open','');
+  await expect(page.getByRole('heading',{name:'ANATOMY｜动作涉及肌群'})).toBeHidden();
+  await expect(page.getByRole('heading',{name:'Direct Work Sets｜有效工作组'})).toBeHidden();
+  await advanced.locator('summary').click();
   await expect(page.getByRole('heading',{name:'ANATOMY｜动作涉及肌群'})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Direct Work Sets｜有效工作组'})).toBeVisible();
   await expect(page.locator('.body-anatomy-summary')).toHaveCount(1);
@@ -137,7 +143,7 @@ test('Body Compatibility Score reranks and exposes recommendation facts after a 
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/body/body-03/l3');
 
-  await expect(page.locator('.body-recommendation-note')).toHaveCount(6);
+  await expect(page.locator('.body-candidate-details')).toHaveCount(6);
   const before=await page.evaluate(()=>{
     const route=window.V14Router.parseHash(window.location.hash);
     const ctx=window.V14CoachModules.BodySession.context(route);
@@ -178,11 +184,82 @@ test('Body Compatibility Score reranks and exposes recommendation facts after a 
   expect(after.length).toBeGreaterThan(0);
   expect(after[0].reasons.length).toBeGreaterThan(0);
   expect(JSON.stringify(after)).not.toBe(JSON.stringify(before));
-  const note=page.locator('.body-recommendation-note[data-body-recommendation="SECONDARY"]');
-  await expect(note).toBeVisible();
-  await expect(note).toContainText('推荐：');
-  const score=Number(await note.getAttribute('data-score'));
-  expect(Number.isFinite(score)).toBeTruthy();
+  const details=page.locator('.body-slot-card[data-body-slot="SECONDARY"] .body-candidate-details');
+  await details.locator('summary').click();
+  const topCandidate=details.locator('[data-body-candidate-card]').first();
+  await expect(topCandidate).toBeVisible();
+  await expect(topCandidate).toContainText('推荐');
+  await expect(topCandidate).toContainText('主要刺激');
+  await expect(topCandidate.locator('strong')).toContainText('分');
   await expect390NoOverflow(page);
   expect(errors,`unexpected Body compatibility pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+});
+
+
+test('Body Coach-first default hierarchy keeps focus and primary in the mobile decision flow',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/body/body-04/l2');
+
+  const focus=page.locator('[data-body-coach-focus]');
+  const primary=page.locator('[data-body-primary-spotlight]');
+  const risk=page.locator('[data-body-risk]');
+  await expect(focus).toBeVisible();
+  await expect(focus).toContainText('今日重点');
+  await expect(primary).toBeVisible();
+  await expect(primary).toContainText('今日主项');
+  await expect(primary).toContainText('为什么是今天的主项');
+  await expect(risk).toBeVisible();
+  await expect(risk).toContainText('今日风险');
+
+  const positions=await page.evaluate(()=>({
+    focus:document.querySelector('[data-body-coach-focus]')?.getBoundingClientRect().top,
+    primary:document.querySelector('[data-body-primary-spotlight]')?.getBoundingClientRect().top,
+    prep:document.querySelector('.body-prep-section')?.getBoundingClientRect().top,
+  }));
+  expect(positions.focus).toBeLessThan(positions.prep);
+  expect(positions.primary).toBeLessThan(positions.prep);
+  expect(positions.primary).toBeLessThan(844);
+
+  const advanced=page.locator('[data-body-advanced]');
+  await expect(advanced).not.toHaveAttribute('open','');
+  await expect(page.getByRole('heading',{name:'ANATOMY｜动作涉及肌群'})).toBeHidden();
+  await expect(page.getByRole('heading',{name:'Direct Work Sets｜有效工作组'})).toBeHidden();
+
+  const primaryCard=page.locator('.body-slot-card[data-body-slot="PRIMARY"]');
+  await expect(primaryCard.locator('.body-coach-role')).toHaveText('今日主项');
+  await expect(primaryCard.locator('.body-system-role')).toHaveText('PRIMARY');
+  await expect(primaryCard).toContainText('今日职责：');
+  await expect(primaryCard).toContainText('主要刺激：');
+
+  const candidateDetails=primaryCard.locator('.body-candidate-details');
+  await candidateDetails.locator('summary').click();
+  const candidates=candidateDetails.locator('[data-body-candidate-card]');
+  await expect(candidates.first()).toBeVisible();
+  await expect(candidates.first()).toContainText('推荐');
+  await expect(candidates.first()).toContainText('主要刺激：');
+
+  const lowerScoreTarget=await page.evaluate(()=>{
+    const route=window.V14Router.parseHash(window.location.hash);
+    const ctx=window.V14CoachModules.BodySession.context(route);
+    const selections=Object.fromEntries(ctx.session.main.content.map(item=>[item.key,item.actionId]));
+    const ranked=window.V15BodyResolver.candidates({
+      familyId:ctx.familyId,level:ctx.level,slotKey:'PRIMARY',currentSelections:selections
+    }).candidates;
+    const top=Number(ranked[0]?.recommendationScore);
+    return ranked.find(candidate=>Number(candidate.recommendationScore)<top)?.actionId||'';
+  });
+  if(lowerScoreTarget){
+    const actionable=candidateDetails.locator(`button[data-action-id="${lowerScoreTarget}"]`);
+    await actionable.click();
+    await expect(primaryCard.locator('.body-slot-select')).toHaveValue(lowerScoreTarget);
+    await expect(page.locator('[data-body-primary-spotlight]')).toContainText('手动选择');
+    await expect(page.locator('[data-body-risk]')).toBeVisible();
+    const rerankedDetails=primaryCard.locator('.body-candidate-details');
+    await rerankedDetails.locator('summary').click();
+    await expect(rerankedDetails).toContainText('为什么更合适：');
+  }
+
+  await expect390NoOverflow(page);
+  expect(errors,`unexpected Body Coach-first pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
