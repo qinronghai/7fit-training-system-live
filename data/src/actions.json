@@ -197,6 +197,13 @@
       "routeLabel": "1F 专用",
       "equipment": "哈克深蹲机",
       "equipmentId": "eq-hack",
+      "requiresEquipmentId": ["eq-hack"],
+      "entryLoadSensitivity": "fixed_system_load",
+      "beginnerLoadGate": {
+        "type": "minimum_system_load",
+        "manualOverrideAllowed": true
+      },
+      "fallbackActionGroup": "BODY-01-KNEE",
       "status": "可自动编排",
       "impact": "低冲击",
       "loadFamily": "膝主导",
@@ -216,6 +223,13 @@
       "routeLabel": "1F 专用",
       "equipment": "六角杠铃",
       "equipmentId": "eq-trapbar",
+      "requiresEquipmentId": ["eq-trapbar"],
+      "entryLoadSensitivity": "fixed_system_load",
+      "beginnerLoadGate": {
+        "type": "minimum_system_load",
+        "manualOverrideAllowed": true
+      },
+      "fallbackActionGroup": "BODY-02-HINGE",
       "status": "可自动编排",
       "impact": "低冲击",
       "loadFamily": "后链 / 髋主导",
@@ -558,6 +572,15 @@
       "routeLabel": "1F 专用",
       "equipment": "哈克深蹲机",
       "equipmentId": "eq-hack",
+      "requiresEquipmentId": [
+        "eq-hack"
+      ],
+      "entryLoadSensitivity": "fixed_system_load",
+      "beginnerLoadGate": {
+        "type": "minimum_system_load",
+        "manualOverrideAllowed": true
+      },
+      "fallbackActionGroup": "BODY-01-KNEE",
       "status": "可自动编排",
       "impact": "低冲击",
       "loadFamily": "膝主导",
@@ -946,6 +969,15 @@
       "routeLabel": "1F 专用",
       "equipment": "哈克深蹲机",
       "equipmentId": "eq-hack",
+      "requiresEquipmentId": [
+        "eq-hack"
+      ],
+      "entryLoadSensitivity": "fixed_system_load",
+      "beginnerLoadGate": {
+        "type": "minimum_system_load",
+        "manualOverrideAllowed": true
+      },
+      "fallbackActionGroup": "BODY-01-KNEE",
       "status": "可自动编排",
       "impact": "低冲击",
       "loadFamily": "膝主导",

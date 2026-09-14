@@ -32,6 +32,7 @@
         level:state.level,
         slotKey,
         actionId:entry.actionId,
+        venueOverrideReason:entry.venueOverrideReason,
         currentSelections:Object.fromEntries(
           Object.entries(state.selections||{}).map(([key,value])=>[key,value?.actionId||''])
         ),
@@ -53,7 +54,7 @@
     });
   }
 
-  function setFormalSelection(familyId,level,slotKey,actionId){
+  function setFormalSelection(familyId,level,slotKey,actionId,venueOverrideReason=''){
     const S=window.V15State;
     if(!S)throw new Error('Body coach State service is unavailable');
     ensureState(familyId,level);
@@ -61,10 +62,12 @@
       Object.entries(S.getSelections('body',sessionKeyFor(familyId,level))||{})
         .map(([key,value])=>[key,value?.actionId||value||''])
     );
-    if(!window.V15BodyResolver.isSelectionValid({familyId,level,slotKey,actionId,currentSelections})){
+    const reason=typeof venueOverrideReason==='string'?venueOverrideReason.trim():'';
+    if(!window.V15BodyResolver.isSelectionValid({familyId,level,slotKey,actionId,venueOverrideReason:reason,currentSelections})){
       throw new Error(`Invalid Body selection: ${familyId} ${level} ${slotKey} ${actionId}`);
     }
-    return S.setSelection('body',sessionKeyFor(familyId,level),slotKey,actionId,'manual');
+    return S.setSelection('body',sessionKeyFor(familyId,level),slotKey,actionId,'manual',
+      reason?{venueOverrideReason:reason}:{});
   }
 
   function reset(familyId,level){
@@ -122,11 +125,13 @@
       level:ctx.level,
       slotKey,
       currentSelections:resolvedSelectionMap(ctx.session),
+      includeVenueBlocked:true,
     });
   }
 
   function currentCandidate(ctx,slot){
-    return (candidateResult(ctx,slot.key).candidates||[]).find(candidate=>candidate.actionId===slot.actionId)||null;
+    const result=candidateResult(ctx,slot.key);
+    return [...(result.candidates||[]),...(result.blockedCandidates||[])].find(candidate=>candidate.actionId===slot.actionId)||null;
   }
 
   function slotDuty(ctx,slot){
@@ -205,7 +210,10 @@
   function slotSelect(ctx,slot){
     const result=candidateResult(ctx,slot.key);
     const candidates=result.candidates||[];
-    const options=candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}</option>`).join('');
+    const blockedCandidates=result.blockedCandidates||[];
+    const currentBlocked=blockedCandidates.find(candidate=>candidate.actionId===slot.actionId);
+    const selectCandidates=currentBlocked?[currentBlocked,...candidates]:candidates;
+    const options=selectCandidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}${candidate.requiresVenueOverride?'｜场馆 Gate 已覆盖':''}</option>`).join('');
     const current=candidates.find(candidate=>candidate.actionId===slot.actionId)||null;
     const currentScore=Number(current?.recommendationScore||0);
     const candidateCards=candidates.slice(0,4).map((candidate,index)=>{
@@ -216,9 +224,23 @@
       const better=Number(candidate.recommendationScore)>currentScore&&candidate.actionId!==slot.actionId;
       return `<article class="body-candidate-card ${esc(status==='推荐'?'recommended':status==='有代价'?'tradeoff':'optional')}" data-body-candidate-card data-action-id="${esc(candidate.actionId)}"><div class="body-candidate-top"><div><span>${esc(status)}</span><b>${esc(candidate.name)}</b></div><strong>${esc(candidate.recommendationScore)} 分</strong></div><p>主要刺激：${esc(targets.join(' · ')||'目标未标')}</p><small>${esc(reasons.join('；')||'符合当前槽位的合法候选')}</small>${better&&reasons[0]?`<em>为什么更合适：${esc(reasons[0])}</em>`:''}${tradeoffs.length?`<em class="warning">注意：${esc(tradeoffs.join('；'))}</em>`:''}<button type="button" data-body-candidate data-body-slot="${esc(slot.key)}" data-action-id="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'disabled':''}>${candidate.actionId===slot.actionId?'当前动作':'换成此动作'}</button></article>`;
     }).join('');
+    const blockedHtml=blockedCandidates.length?`<details class="body-venue-gate-details" data-body-venue-gate><summary>场馆 Gate：${blockedCandidates.length} 个动作需要教练确认</summary><p>这些动作未通过当前场馆能力 Gate，系统不会静默推荐；如教练现场确认会员能力，可留下理由后覆盖。</p><div class="body-venue-gate-list">${blockedCandidates.map(candidate=>{
+      const venue=candidate.venueEligibility||{};
+      const reason=venue.reason||'当前动作未通过场馆最低负重 Gate。';
+      const reasonLength=Number(venue.minimumReasonLength)||8;
+      const minimumLoad=venue.minimumSystemLoadKg===null||venue.minimumSystemLoadKg===undefined?'未核验':`${venue.minimumSystemLoadKg}kg`;
+      const levelCeiling=venue.levelCeilingKg===null||venue.levelCeilingKg===undefined?'未核验':`${venue.levelCeilingKg}kg`;
+      const override=venue.overrideAllowed?`<label class="body-venue-reason"><span>教练覆盖理由（至少 ${esc(reasonLength)} 个字）</span><input type="text" minlength="${esc(reasonLength)}" maxlength="300" data-body-venue-reason data-body-venue-action="${esc(candidate.actionId)}" placeholder="例如：已现场确认会员具备当前器械负荷能力"></label><button type="button" data-body-venue-override data-body-slot="${esc(slot.key)}" data-action-id="${esc(candidate.actionId)}">确认使用并记录</button>`:'<small>当前动作只可在规则允许的等级与场馆条件下使用，不能通过人工覆盖绕过基础资格。</small>';
+      return `<article class="body-venue-blocked-card" data-body-venue-blocked data-action-id="${esc(candidate.actionId)}"><div class="body-venue-blocked-head"><b>${esc(candidate.name)}</b><span>需要处理</span></div><p>${esc(reason)}</p><small>场馆最低系统负重：${esc(minimumLoad)} · 当前等级门槛：${esc(levelCeiling)}</small>${override}</article>`;
+    }).join('')}</div></details>`:'';
+    const venueAudit=ctx.session.domainContext?.venue?.slots?.[slot.key]||{};
+    const venueStatus=venueAudit.status==='OVERRIDDEN'
+      ?`<p class="body-venue-current override">场馆 Gate：已覆盖 · 已记录理由：${esc(venueAudit.overrideReason||'')}</p>`
+      :venueAudit.status==='FALLBACK'
+        ?`<p class="body-venue-current fallback">场馆 Gate：已回退到安全候选（原请求：${esc(venueAudit.requestedActionId||'—')}）。</p>`:'';
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
     const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
-    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label><details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${quick}</div>`;
+    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${blockedHtml}${quick}</div>`;
   }
 
   function slotCard(ctx,slot){
@@ -386,6 +408,21 @@
       window.V15RecentActions?.record?.({templateId:'body',contextKey,actionId,candidates});
       setFormalSelection(familyId,level,slotKey,actionId);
       rerender();
+    }));
+    root.querySelectorAll('[data-body-venue-override]').forEach(button=>button.addEventListener('click',()=>{
+      const slotKey=button.dataset.bodySlot,actionId=button.dataset.actionId;
+      const card=button.closest('[data-body-venue-blocked]'),input=card?.querySelector('[data-body-venue-reason]');
+      const reason=input?.value?.trim()||'';
+      try{
+        setFormalSelection(familyId,level,slotKey,actionId,reason);
+        rerender();
+      }catch(error){
+        const message=error?.message||'请补充教练现场确认理由后再试。';
+        let status=card?.querySelector('[data-body-venue-error]');
+        if(!status){status=document.createElement('small');status.dataset.bodyVenueError='';status.className='body-venue-error';card?.appendChild(status);}
+        status.textContent=message;
+        input?.focus();
+      }
     }));
     root.querySelectorAll('.body-prep-select').forEach(select=>select.addEventListener('change',()=>{
       M.BodyPrep.setSelection(select.dataset.bodyPrepSession,select.dataset.bodyPrepSlot,select.value);
