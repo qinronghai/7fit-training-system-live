@@ -130,6 +130,7 @@ assert.strictEqual(H.formatDuration(null),'—');
 assert.strictEqual(H.formatDelta(30000),'↑ 0:30');
 assert.strictEqual(H.formatDelta(-5000),'↓ 0:05');
 
+localStorage.removeItem(H.PREF_KEY);
 assert.throws(()=>H.createRecord(session,{athleteRef:'',totalTimeMs:900000,stationTimes:firstTimes}),error=>error.code==='HYROX_HISTORY_ATHLETE_REQUIRED');
 assert.throws(()=>H.createRecord(session,{athleteRef:'梦影',totalTimeMs:100000,stationTimes:firstTimes}),error=>error.code==='HYROX_HISTORY_TIME_INVALID');
 
