@@ -602,3 +602,75 @@ body{font-size:14px;line-height:1.55}
 .body-recommendation-note b{font-size:13px;line-height:1.45}
 .body-recommendation-note span,.body-recommendation-note small{font-size:12px;line-height:1.5}
 .body-recommendation-note small{opacity:.76}
+
+
+/* ISSUE 70 BODY COACH FIRST */
+.body-coach-overview{display:grid;gap:14px;margin:0 0 18px}
+.body-coach-focus,.body-primary-spotlight,.body-coach-risk{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--surface-soft,#f8f8fb)}
+.body-coach-focus span,.body-primary-kicker span,.body-risk-head span{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.body-coach-focus h2{margin:6px 0 7px;font-size:clamp(20px,3vw,30px);line-height:1.25}
+.body-coach-focus p,.body-primary-spotlight p,.body-coach-risk p{margin:0;line-height:1.6}
+.body-primary-spotlight{display:grid;gap:12px}
+.body-primary-kicker,.body-primary-main,.body-risk-head,.body-candidate-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.body-primary-kicker small{font-weight:700}
+.body-primary-main h2{margin:0 0 4px;font-size:clamp(22px,3vw,32px)}
+.body-primary-main a{white-space:nowrap}
+.body-primary-prescription{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px}
+.body-primary-prescription b{font-size:18px}
+.body-primary-prescription span{font-size:13px}
+.body-primary-why{padding-top:10px;border-top:1px solid var(--line)}
+.body-coach-risk.pass{padding-block:14px}
+.body-coach-risk.pass>div{display:flex;justify-content:space-between;gap:12px}
+.body-risk-list{display:grid;gap:10px;margin-top:12px}
+.body-risk-item{display:grid;gap:6px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff)}
+.body-risk-item>div{display:flex;justify-content:space-between;gap:10px}
+.body-risk-item p,.body-risk-item small{margin:0;line-height:1.5}
+.body-risk-item small{font-weight:700}
+.body-slot-primary{border-width:2px}
+.body-slot-head>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.body-coach-role{font-weight:800;font-size:14px}
+.body-system-role{font-size:10px;letter-spacing:.06em;opacity:.55}
+.body-slot-action h3{margin:0 0 5px;font-size:20px}
+.body-slot-duty{margin:0 0 8px;font-size:13px;font-weight:700}
+.body-prescription-compact{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:12px 0}
+.body-prescription-compact b{font-size:17px}
+.body-prescription-compact span{font-size:13px}
+.body-slot-swap-zone{display:grid;gap:10px}
+.body-candidate-details{border-top:1px solid var(--line);padding-top:9px}
+.body-candidate-details>summary{cursor:pointer;font-weight:800;font-size:13px;min-height:44px;display:flex;align-items:center}
+.body-candidate-list{display:grid;gap:10px;padding-top:8px}
+.body-candidate-card{display:grid;gap:7px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff);min-width:0}
+.body-candidate-card p,.body-candidate-card small,.body-candidate-card em{margin:0;font-size:12px;line-height:1.5;font-style:normal;overflow-wrap:anywhere}
+.body-candidate-card em{font-weight:700}
+.body-candidate-card .warning{font-weight:700}
+.body-candidate-top>div{display:grid;gap:3px;min-width:0}
+.body-candidate-top span{font-size:11px;font-weight:800;opacity:.72}
+.body-candidate-top b{font-size:15px}
+.body-candidate-top strong{font-size:13px;white-space:nowrap}
+.body-candidate-card button{min-height:44px;width:100%}
+.body-advanced{margin-top:18px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.body-advanced>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;min-height:56px}
+.body-advanced>summary>div{display:grid;gap:3px}
+.body-advanced>summary span{font-size:12px;font-weight:800;letter-spacing:.06em}
+.body-advanced>summary b{font-size:15px}
+.body-advanced-content{display:grid;gap:16px;padding:0 16px 16px}
+.body-advanced-block{display:grid;gap:10px}
+.body-score-debug{display:grid;gap:10px}
+.body-score-row{padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.body-score-row>div{display:flex;justify-content:space-between;gap:10px}
+.body-score-row p{margin:5px 0 0;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+@media (min-width:900px){
+  .body-coach-overview{grid-template-columns:1.2fr 1fr}
+  .body-coach-focus{grid-column:1/-1}
+  .body-primary-spotlight{grid-column:1}
+  .body-coach-risk{grid-column:2}
+  .body-candidate-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .body-coach-focus,.body-primary-spotlight,.body-coach-risk{padding:14px;border-radius:15px}
+  .body-primary-main{align-items:flex-start}
+  .body-primary-main a{font-size:12px}
+  .body-primary-prescription{gap:6px 10px}
+  .body-advanced>summary{padding:14px}
+  .body-advanced-content{padding:0 12px 12px}
+}
