@@ -86,15 +86,15 @@
     return `<section class="view-hero compact"><span class="eyebrow">TEMPLATE-AWARE SEARCH</span><h1>动作与编课搜索</h1><p>统一搜索 Action、F111 组合、Body Family/Role、Conditioning Family/Protocol 与 HYROX Session；搜索只负责发现与跳转，课程合法性仍由各 Template Resolver 决定。</p></section>
       <section class="section-card">
         <div class="library-controls template-search-controls">
-          <input id="action-search" type="search" placeholder="搜索动作 / 肌群 / 器械 / Family / Protocol" value="${esc(filters.q)}">
-          <select data-filter="templateId">${templateOpts()}</select>
-          <select data-filter="kind">${kindOpts()}</select>
-          <select data-filter="pattern">${opts(uniq('pattern'),'全部模式')}</select>
-          <select data-filter="tier">${opts(uniq('tier'),'全部 V1.1 层级')}</select>
-          <select data-filter="zone">${opts(zones,'全部区域 / 路由')}</select>
-          <select data-filter="equipment">${opts(uniq('equipment'),'全部器械')}</select>
-          <select data-filter="category">${opts(uniq('category'),'全部类别')}</select>
-          <select data-filter="status">${opts(uniq('status'),'全部编排状态')}</select>
+          <input id="action-search" aria-label="搜索动作与编课" type="search" placeholder="搜索动作 / 肌群 / 器械 / Family / Protocol" value="${esc(filters.q)}">
+          <select aria-label="模板筛选" data-filter="templateId">${templateOpts()}</select>
+          <select aria-label="结果类型筛选" data-filter="kind">${kindOpts()}</select>
+          <select aria-label="动作模式筛选" data-filter="pattern">${opts(uniq('pattern'),'全部模式')}</select>
+          <select aria-label="动作层级筛选" data-filter="tier">${opts(uniq('tier'),'全部 V1.1 层级')}</select>
+          <select aria-label="区域与路由筛选" data-filter="zone">${opts(zones,'全部区域 / 路由')}</select>
+          <select aria-label="器械筛选" data-filter="equipment">${opts(uniq('equipment'),'全部器械')}</select>
+          <select aria-label="类别筛选" data-filter="category">${opts(uniq('category'),'全部类别')}</select>
+          <select aria-label="编排状态筛选" data-filter="status">${opts(uniq('status'),'全部编排状态')}</select>
         </div>
         <div class="library-result-head"><b id="library-count">${items.length} 个结果</b><span>动作打开详情；编课结果进入当前合法 Composer Context</span></div>
         <div id="action-results" class="action-results template-search-results">${resultsHtml(items)}</div>

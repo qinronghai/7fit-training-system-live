@@ -139,8 +139,8 @@
   function resolvedGrid(resolved,sessionKey){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=(resolved.slots||[]).map(slot=>{
-      const detail=slot.prepId?`<a href="#/system/prep?focus=${encodeURIComponent(slot.prepId)}">查看动作详情</a>`:'';
-      return `<div class="session-warmup-card prep-slot-card" data-prep-slot-card="${esc(slot.slotKey)}"><div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${esc(sourceLabel(slot.source))}</small></div><b>${esc(slot.name||'暂无合法候选')}</b><p>${esc(slot.purpose||'')}</p><div class="slot-actions"><select class="prep-slot-select" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select>${detail}${slot.why?`<small>${esc(slot.why)}</small>`:''}</div></div>`;
+      const detail=slot.prepId?`<a class="prep-detail-link" href="#/system/prep?focus=${encodeURIComponent(slot.prepId)}">查看动作详情</a>`:'';
+      return `<div class="session-warmup-card prep-slot-card" data-prep-slot-card="${esc(slot.slotKey)}"><div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${esc(sourceLabel(slot.source))}</small></div><b>${esc(slot.name||'暂无合法候选')}</b><p>${esc(slot.purpose||'')}</p><div class="slot-actions"><select class="prep-slot-select" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select>${detail}${slot.why?`<small>${esc(slot.why)}</small>`:''}</div></div>`;
     }).join('');
     return `${fallback}<div class="session-warmup-grid prep-slot-grid">${cards}</div>`;
   }
