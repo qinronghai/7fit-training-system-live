@@ -55,6 +55,22 @@
     return slot.candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.prepGrade||'PREP')}｜${esc(candidate.name)}</option>`).join('');
   }
 
+  const RISK_LABEL={low:'低',medium:'中',high:'高'};
+
+  function emptyGuidance(slot,session){
+    if((slot.candidates||[]).length)return '';
+    const ctx=session?.prepContext||{},level=ctx.level||session?.level||'—';
+    const impact=RISK_LABEL[ctx.impactDemand]||ctx.impactDemand||'未指定';
+    const patterns=(ctx.mainPatterns||[]).join(' / ')||'当前 Station 动作模式';
+    const modalities=(ctx.modalities||[]).join(' / ')||'未指定';
+    const queryPattern=(ctx.mainPatterns||[])[0]||'';
+    const href='#/system/prep?level='+encodeURIComponent(level)+(queryPattern?'&pattern='+encodeURIComponent(queryPattern):'');
+    if(slot.slotKey==='PRIMER'){
+      return `<div class="conditioning-prep-empty" data-conditioning-prep-empty="PRIMER"><b>当前等级、冲击和动作模式约束下没有合法 Primer</b><span>当前约束：${esc(level)} · 冲击 ${esc(impact)} · 模式 ${esc(patterns)} · Modality ${esc(modalities)}</span><p>本槽可以安全跳过，继续完成活动度、核心激活与整合热身；不要为了填满卡片而绕过动作准入。若由教练人工安排，只选当前等级可见、低疲劳、与正式 Station 不重复且符合场馆路线的 PREP 动作。</p><a href="${href}">查看 PREP 规则 / 人工安排参考</a></div>`;
+    }
+    return `<div class="conditioning-prep-empty" data-conditioning-prep-empty="${esc(slot.slotKey)}"><b>当前约束下没有合法候选</b><span>${esc(level)} · 冲击 ${esc(impact)} · ${esc(patterns)}</span><p>保留其他合法 PREP 槽位即可，不放宽动作准入。</p></div>`;
+  }
+
   function renderResolved(resolved,sessionKey,session){
     const power=session?.prepContext?.powerDemand;
     const primerNote=power==='high'
@@ -66,7 +82,7 @@
       <div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
       <b>${esc(slot.name||'暂无合法候选')}</b>
       <p>${esc(slot.purpose||'')}</p>
-      <div class="slot-actions"><select class="conditioning-prep-select" data-conditioning-prep-session="${esc(sessionKey)}" data-conditioning-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>
+      <div class="slot-actions"><select class="conditioning-prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：Conditioning 热身动作替换" data-conditioning-prep-session="${esc(sessionKey)}" data-conditioning-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>${emptyGuidance(slot,session)}
     </article>`).join('');
     return `<section class="section-card conditioning-prep-section"><div class="section-head"><div><h2>PREP / PRIMER｜动态热身 · 动作排演</h2><p>${esc(primerNote)}</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}<div class="conditioning-prep-grid">${cards}</div></section>`;
   }
