@@ -252,6 +252,15 @@
     return `<section class="conflict-box ${String(result.status||'PASS').toLowerCase()}"><b>${esc(result.status||'PASS')}</b><small>${esc(result.hardCount||0)} 硬冲突 · ${esc(result.warnCount||0)} 警告</small></section>`;
   }
 
+  function advancedInfo(ctx){
+    const session=ctx.session;
+    return `<details class="body-advanced" data-body-advanced><summary><div><span>高级训练信息</span><b>有效工作组 · 肌群 · Conflict · Score</b></div><small>默认折叠</small></summary><div class="body-advanced-content"><section class="body-advanced-block"><div class="body-review-head"><span>CONFLICT DETAIL</span><h3>完整风险与冲突详情</h3></div>${conflict(session)}</section>${M.BodyVolumeView.render(session)}${anatomy(session)}${compatibilityDebug(ctx)}</div></details>`;
+  }
+
+  function coachOverview(ctx){
+    return `<section class="body-coach-overview" data-body-coach-overview>${focusSummary(ctx)}${primarySpotlight(ctx)}${coachRisk(ctx)}</section>`;
+  }
+
   function recovery(){
     if(!M.BodyRecovery?.render)throw new Error('Body Recovery presentation is unavailable');
     return M.BodyRecovery.render();
@@ -260,12 +269,12 @@
   function renderEditor(ctx){
     const session=ctx.session;
     const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
-    const mainBlock=trainingBlock(ctx,{kind:'main',title:'主训练',caption:'主项 + 次主项｜优先完成今天最重要的高价值动作。',keys:['PRIMARY','SECONDARY']});
-    const accessoryBlock=trainingBlock(ctx,{kind:'accessory',title:'辅助训练',caption:'补足主要目标肌群与动作模式，不重复主项动作家族。',keys:['ACCESSORY']});
-    const isolationBlock=trainingBlock(ctx,{kind:'isolation',title:'局部塑形',caption:'孤立项 + 可选项｜控制疲劳，用于补足局部训练量。',keys:['ISOLATION-1','ISOLATION-2','OPTIONAL']});
-    const structure=`<div class="body-structure-strip"><div><b>01</b><span>主训练</span></div><i>→</i><div><b>02</b><span>辅助训练</span></div><i>→</i><div><b>03</b><span>局部塑形</span></div></div>`;
-    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head body-editor-head"><div><h2>今日训练安排</h2><p>${esc(session.summary)}｜先主训练，再辅助，再局部塑形。</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${structure}${conflict(session)}${mainBlock}${accessoryBlock}${isolationBlock}<section class="body-session-review"><div class="body-review-head"><span>SESSION REVIEW</span><h3>训练量与肌群覆盖</h3></div>${M.BodyVolumeView.render(session)}${anatomy(session)}</section><div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
-    return `${prepHtml}${editor}${recovery()}`;
+    const mainBlock=trainingBlock(ctx,{kind:'main',title:'主训练',caption:'先完成今日主项，再进入第二训练方向。',keys:['PRIMARY','SECONDARY']});
+    const accessoryBlock=trainingBlock(ctx,{kind:'accessory',title:'辅助塑形',caption:'补足目标刺激，不和主项抢同一训练职责。',keys:['ACCESSORY']});
+    const isolationBlock=trainingBlock(ctx,{kind:'isolation',title:'局部补充',caption:'在主训练质量完成后，用孤立项补足局部训练量。',keys:['ISOLATION-1','ISOLATION-2','OPTIONAL']});
+    const structure=`<div class="body-structure-strip"><div><b>01</b><span>今日主项</span></div><i>→</i><div><b>02</b><span>第二方向</span></div><i>→</i><div><b>03</b><span>辅助 / 局部</span></div></div>`;
+    const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head body-editor-head"><div><span class="eyebrow">TODAY'S SESSION</span><h2>今日训练安排</h2><p>按教练执行顺序展示；系统字段与审计信息已收进高级训练信息。</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${structure}${mainBlock}${accessoryBlock}${isolationBlock}${advancedInfo(ctx)}<div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
+    return `${coachOverview(ctx)}${prepHtml}${editor}${recovery()}`;
   }
 
   function render(route){
