@@ -785,3 +785,28 @@ body{font-size:14px;line-height:1.55}
   .change-copy{grid-column:2;grid-row:1 / span 2}
   .change-meta{grid-column:2;justify-content:flex-start;max-width:none}
 }
+
+
+/* ISSUE 71 LIVE AUDIT HARDENING */
+.prep-slot-card .slot-actions{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.prep-slot-card .slot-actions>small{grid-column:1/-1}
+.prep-detail-link{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:6px 8px;border:1px solid var(--purple-soft);border-radius:8px;background:#fff;color:var(--purple-dark)!important;font-size:10.5px!important;font-weight:900!important;line-height:1.2;white-space:nowrap}
+.template-search-controls{grid-template-columns:repeat(4,minmax(0,1fr))}
+.template-search-controls #action-search{grid-column:span 2}
+.template-search-controls>*{min-width:0!important;max-width:100%;width:100%}
+.conditioning-prep-empty{display:grid;gap:6px;margin-top:9px;padding:10px;border:1px solid #ecdcae;border-radius:10px;background:#fffbef}
+.conditioning-prep-empty b{font-size:11px;line-height:1.45;color:var(--warn)}
+.conditioning-prep-empty span,.conditioning-prep-empty p{font-size:10px;line-height:1.55;color:var(--muted);margin:0}
+.conditioning-prep-empty a{display:inline-flex;align-items:center;justify-content:center;min-height:34px;width:max-content;max-width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--purple-dark);font-size:10px;font-weight:900;text-decoration:none}
+@media(max-width:979px){
+  .template-search-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .template-search-controls #action-search{grid-column:1/-1}
+}
+@media(max-width:620px){
+  .prep-slot-card .slot-actions{grid-template-columns:1fr;align-items:stretch}
+  .prep-slot-card .slot-actions>small{grid-column:auto}
+  .prep-detail-link{width:100%;min-height:42px}
+  .template-search-controls{grid-template-columns:1fr}
+  .template-search-controls #action-search{grid-column:auto}
+  .conditioning-prep-empty a{width:100%}
+}
