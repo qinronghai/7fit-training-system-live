@@ -2,9 +2,28 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const D=()=>window.V14_DATA;
   const A=()=>window.V14_ANATOMY||{meta:{phaseAExpected:0,phaseAIds:[]},records:{}};
+  const CHANGELOG=()=>Array.isArray(window.V14_CHANGELOG)?window.V14_CHANGELOG:[];
   function tabs(active){return `<nav class="subnav"><a class="${active==='home'?'active':''}" href="#/maintenance">数据健康度</a><a class="${active==='audit'?'active':''}" href="#/maintenance/audit">同步审计</a><a class="${active==='venue'?'active':''}" href="#/maintenance/venue">Venue Truth</a></nav>`;}
   function hero(title,body){return `<section class="view-hero compact system-hero"><span class="eyebrow">SYSTEM MAINTENANCE</span><h1>${esc(title)}</h1><p>${esc(body)}</p></section>`;}
   function kpi(value,label,note=''){return `<article class="health-kpi"><b>${esc(value)}</b><span>${esc(label)}</span><small>${esc(note)}</small></article>`;}
+  function changeTypeClass(type){return {'功能':'feature','修复':'fix','规则':'rule','数据':'data','架构':'arch','体验':'ux','部署':'deploy'}[type]||'other';}
+  function changelogPanel(){
+    const items=CHANGELOG();
+    if(!items.length)return '';
+    const dates=[...new Set(items.map(item=>item.date))];
+    const groups=dates.map((date,index)=>{
+      const dayItems=items.filter(item=>item.date===date);
+      const rows=dayItems.map(item=>{
+        const issue=item.issue?'<span>#'+esc(item.issue)+'</span>':'';
+        const commit=item.commit?'<span>'+esc(item.commit)+'</span>':'';
+        return '<article class="change-row" data-change-log><time>'+esc(item.time||'')+'</time><span class="change-type '+changeTypeClass(item.type)+'">'+esc(item.type||'更新')+'</span><div class="change-copy"><div class="change-title"><b>'+esc(item.title)+'</b><span>'+esc(item.area||'系统')+'</span></div><p>'+esc(item.detail||'')+'</p></div><div class="change-meta">'+issue+commit+'</div></article>';
+      }).join('');
+      const head='<div class="change-day-head"><b>'+esc(date)+'</b><span>'+(index===0?'最新':'历史')+' · '+dayItems.length+' 条</span></div>';
+      if(index===0)return '<div class="change-day current">'+head+'<div class="change-rows">'+rows+'</div></div>';
+      return '<details class="change-day"><summary>'+head+'</summary><div class="change-rows">'+rows+'</div></details>';
+    }).join('');
+    return '<section class="section-card change-log-card"><div class="section-head"><div><h2>网站变更记录</h2><p>按日期记录网站功能、规则、数据、修复与部署变化；最新记录置顶，历史日期默认收起。</p></div><span class="time-badge">最近 '+items.length+' 条</span></div><div class="change-log-list">'+groups+'</div></section>';
+  }
   function anatomyCoverage(){
     const d=D(),a=A(),records=a.records||{},meta=a.meta||{};
     const phaseAIds=meta.phaseAIds||[],phaseBIds=meta.phaseBIds||[],phaseCIds=meta.phaseCIds||[];
@@ -29,6 +48,7 @@
     const anatomy=anatomyCoverage(),tenPatterns=d.tenPatternCatalog||[],freeCombos=window.V14Composer?.combinations?.()||[];
     return tabs('home')+hero('系统维护','这里是馆主 / 开发维护层。普通教练无需在日常编课时阅读这些内容。')+
       `<section class="health-grid">${kpi(tenPatterns.length+'/10','十大动作模式','Ten Pattern Catalog')}${kpi(freeCombos.length+'/20','自由组合','20/20 主模式矩阵')}${kpi('2/2','单腿双分支','单腿蹲 + 单腿拉')}${kpi(d.meta.baselineActionCards,'动作库总数','来源动作详情')}${kpi(auto,'可编排节点','含 SUPPORT / CORE Canon')}${kpi((c.supportPending||0)+(c.corePending||0),'待回写','SUPPORT + CORE')}${kpi(c.tierDiff||0,'层级差异','Source Tier vs V1.1')}${kpi(c.venueOverlay||0,'Venue Overlay','场馆覆盖动作')}${kpi(anatomy.runtimeCovered+'/'+anatomy.runtimeExpected,'Runtime Anatomy',anatomy.runtimeCovered+' / '+anatomy.runtimeExpected)}</section>`+
+      changelogPanel()+
       anatomyPanel()+
       `<section class="section-card"><div class="section-head"><div><h2>当前维护重点</h2><p>系统层规则已经可用，但数据源仍有待回写项。</p></div></div><div class="maintenance-list"><a href="#/maintenance/audit"><b>V1.1 同步审计</b><span>查看源 T 与冻结标准差异、场馆覆盖节点。</span></a><a href="#/maintenance/venue"><b>Venue Truth</b><span>查看真实器械和楼层资料。</span></a><details><summary><b>当前动作库需要补齐的地方</b><span>点击展开</span></summary><div class="legacy-panel">${d.legacyHtml.dataGaps||'<p>暂无记录。</p>'}</div></details><details><summary><b>完整替换矩阵（高级资料）</b><span>点击展开</span></summary><div class="legacy-panel">${d.legacyHtml.replacementMatrix||'<p>暂无记录。</p>'}</div></details></div></section>`;
   }
@@ -36,5 +56,5 @@
   function audit(){const d=D();const diffs=Object.values(d.actions).filter(a=>a.sourceTier&&a.tier&&cleanTier(a.sourceTier)&&cleanTier(a.sourceTier)!==a.tier);const overlays=Object.values(d.actions).filter(a=>a.isVenueOverlay);const rows=diffs.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.sourceTier)}</td><td>${esc(a.tier)}</td><td>${esc(a.pattern||'')}</td></tr>`).join('');const ov=overlays.map(a=>`<article><b>${esc(a.name)}</b><span>${esc(a.tier)} · ${esc(a.pattern)}</span><p>${esc(a.note||'')}</p><small>来源映射：${esc(a.sourceActionId||'—')}</small></article>`).join('');return tabs('audit')+hero('V1.1 同步审计','Source Tier 与 V1.1 Standard Tier 始终分开保存；网站不静默改写 Excel 源字段。')+`<section class="section-card"><h2 class="small-title">层级差异</h2><div class="table-scroll"><table class="audit-table"><thead><tr><th>动作</th><th>Source Tier</th><th>V1.1</th><th>模式</th></tr></thead><tbody>${rows||'<tr><td colspan="4">当前运行数据未检测到差异。</td></tr>'}</tbody></table></div></section><section class="section-card"><h2 class="small-title">Venue Overlay</h2><div class="overlay-grid">${ov}</div></section><details class="advanced-reference"><summary>查看 V13 原同步审计记录</summary><div class="legacy-panel">${d.legacyHtml.syncAudit||''}</div></details>`;}
   function venue(){const d=D();return tabs('venue')+hero('Venue Truth','器械和楼层是真实场馆约束，不应该在编课首页长期铺开，但必须可追溯。')+`<section class="section-card legacy-panel venue-legacy">${d.legacyHtml.equipment||'<p>未找到器械清单。</p>'}</section><details class="advanced-reference"><summary>查看 V8 原场馆硬规则资料</summary><div class="legacy-panel">${d.legacyHtml.hardRules||''}</div></details>`;}
   function render(route){const p=route.page||'home';if(p==='audit')return audit();if(p==='venue')return venue();return home();}
-  window.V14Maintenance={renderHome:home,renderAudit:audit,renderVenueTruth:venue,anatomyCoverage};window.V14Views=window.V14Views||{};window.V14Views.maintenance=render;
+  window.V14Maintenance={renderHome:home,renderAudit:audit,renderVenueTruth:venue,anatomyCoverage,changelogPanel};window.V14Views=window.V14Views||{};window.V14Views.maintenance=render;
 })();
