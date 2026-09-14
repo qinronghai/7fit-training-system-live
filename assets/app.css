@@ -595,3 +595,10 @@ body{font-size:14px;line-height:1.55}
   .hyrox-control-grid,.hyrox-calibration-grid,.hyrox-metric-grid,.hyrox-station-grid,.hyrox-adjust-grid,.hyrox-prep-grid{grid-template-columns:1fr}
   .hyrox-prescription{font-size:14px}.hyrox-station-card{padding:10px}.hyrox-type-tabs{display:grid;grid-template-columns:1fr 1fr}.hyrox-type-tabs a{text-align:center}
 }
+
+
+/* ISSUE 69 BODY COMPATIBILITY */
+.body-recommendation-note{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;display:grid;gap:4px;background:var(--surface-soft,#f8f8fb)}
+.body-recommendation-note b{font-size:13px;line-height:1.45}
+.body-recommendation-note span,.body-recommendation-note small{font-size:12px;line-height:1.5}
+.body-recommendation-note small{opacity:.76}
