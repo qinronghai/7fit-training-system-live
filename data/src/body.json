@@ -1547,8 +1547,7 @@
           "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
           "preferredBySlot": {
             "PRIMARY": [
-              "hipthrust_pause_main",
-              "gangling_yingla"
+              "hipthrust_pause_main"
             ],
             "SECONDARY": [
               "movement_advanced_db_single_leg_rdl",
@@ -2753,11 +2752,9 @@
           "intent": "具备完整动作与负荷选择权；高级不等于复杂，稳定有效器械与基础动作仍可继续作为高质量肌肥大工具。",
           "preferredBySlot": {
             "PRIMARY": [
-              "gangling_wotu",
               "qixie_xiongtui"
             ],
             "SECONDARY": [
-              "movement_barbell_overhead_press",
               "movement_halfkneeling_landmine_press"
             ],
             "ACCESSORY": [
