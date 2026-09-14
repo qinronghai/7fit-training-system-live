@@ -121,7 +121,7 @@
 
   function historyPanel(session,ctx){
     if(!ctx.athlete)return '';
-    const rows=[...ctx.protocolRecords].reverse().slice(0,8).map(function(record){
+    const comparable=H().list({athleteRef:ctx.athlete,comparisonKey:session.domainContext.benchmarkContext.comparisonKey}).filter(H().eligible).slice(-5);\n    const trend=comparable.map(function(record,index){const previous=index?comparable[index-1]:null;const d=previous?previous.totalTimeMs-record.totalTimeMs:null;return '<div><span>'+esc(new Date(record.completedAt).toLocaleDateString('zh-CN'))+'</span><b>'+esc(time(record.totalTimeMs))+'</b><small>'+esc(d==null?'基准':delta(d))+'</small></div>';}).join('');\n    const rows=[...ctx.protocolRecords].reverse().slice(0,8).map(function(record){
       return '<article class="hyrox-history-row">'+
         '<div><b>'+esc(new Date(record.completedAt).toLocaleDateString('zh-CN'))+'</b><span>'+esc(statusLabel(record))+'</span></div>'+
         '<strong>'+esc(record.totalTimeMs?time(record.totalTimeMs):'—')+'</strong>'+
@@ -134,7 +134,7 @@
     }).join('');
     return '<section class="section-card hyrox-history-list">'+
       '<div class="section-head"><div><h2>历史记录</h2><p>按当前会员与 '+esc(session.domainContext.benchmarkContext.protocolId)+' 协议查看；不同 comparisonKey 仍保留，但不会强行比较。</p></div></div>'+
-      (rows?'<div class="hyrox-history-rows">'+rows+'</div>':'<div class="saved-session-empty">还没有 Benchmark 记录</div>')+
+      (trend?'<div class="hyrox-history-trend"><small>近 5 次同规格趋势</small><div>'+trend+'</div></div>':'')+\n      (rows?'<div class="hyrox-history-rows">'+rows+'</div>':'<div class="saved-session-empty">还没有 Benchmark 记录</div>')+
       (deleted?'<details class="hyrox-history-deleted"><summary>已删除记录（'+ctx.deleted.length+'）</summary><div class="hyrox-history-rows">'+deleted+'</div></details>':'')+
     '</section>';
   }
