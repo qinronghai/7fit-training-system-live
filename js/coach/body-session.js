@@ -363,6 +363,17 @@
       setFormalSelection(familyId,level,slotKey,select.value);
       rerender();
     }));
+    root.querySelectorAll('[data-body-candidate]').forEach(button=>button.addEventListener('click',()=>{
+      const slotKey=button.dataset.bodySlot,actionId=button.dataset.actionId;
+      if(!slotKey||!actionId||button.disabled)return;
+      const card=button.closest('.body-slot-card'),select=card?.querySelector('.body-slot-select');
+      const candidates=Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
+      if(!candidates.some(candidate=>candidate.actionId===actionId))return;
+      const contextKey=window.V15RecentActions?.context?.body?.({familyId,level,slotKey});
+      window.V15RecentActions?.record?.({templateId:'body',contextKey,actionId,candidates});
+      setFormalSelection(familyId,level,slotKey,actionId);
+      rerender();
+    }));
     root.querySelectorAll('.body-slot-card [data-recent-action]').forEach(button=>button.addEventListener('click',()=>{
       const card=button.closest('.body-slot-card'),slotKey=card?.dataset.bodySlot,select=card?.querySelector('.body-slot-select');
       const actionId=button.dataset.recentAction,candidates=Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
