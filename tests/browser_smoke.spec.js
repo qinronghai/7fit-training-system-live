@@ -309,7 +309,7 @@ test('390px HYROX Benchmark history persists PB, deltas and weakness profile', a
   await page.locator('[data-hyrox-benchmark-save]').click();
 
   await expect(page.locator('.hyrox-history-row')).toHaveCount(1);
-  await expect(page.locator('.hyrox-history-baseline')).toContainText('首次建立基准');
+  await expect(page.locator('.hyrox-benchmark-summary .hyrox-history-baseline')).toContainText('首次建立基准');
   await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('15:00');
 
   const second = {H1:'1:55',H2:'1:35',H3:'1:45',H4:'1:45',H5:'2:00',H6:'1:15',H7:'1:25',H8:'1:35'};
