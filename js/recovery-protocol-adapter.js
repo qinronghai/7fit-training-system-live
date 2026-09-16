@@ -37,8 +37,10 @@
    * genuinely loaded region off the card set.
    */
   const MUSCLE_REGIONS=Object.freeze([
-    {match:['背阔','大圆','斜方','菱形','三角肌后','上背'],region:'upper_back'},
-    {match:['肩后侧'],region:'posterior_shoulder'},
+    {match:['背阔','大圆','斜方','菱形','上背'],region:'upper_back'},
+    // 三角肌后束 is a shoulder muscle, not a back one — lumping it into upper_back
+    // left back-and-shoulder days with only two stretchable regions.
+    {match:['三角肌后','肩后侧'],region:'posterior_shoulder'},
     {match:['肱二头','肱肌','肱桡','前臂握力'],region:'upper_back'},
     {match:['胸大','胸小','胸前侧','胸廓前'],region:'chest'},
     {match:['三角肌前','三角肌中','三角肌'],region:'chest'},
