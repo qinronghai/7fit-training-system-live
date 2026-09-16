@@ -167,6 +167,91 @@
     return unique(declared);
   }
 
+  function stationDiversityPolicy(){
+    return D().venueCapabilityPolicy?.stationDiversityPolicy||{};
+  }
+
+  function actionStationRecord(actionId){
+    const data=D(),action=data.actions?.[actionId]||{},policy=stationDiversityPolicy();
+    const equipmentIds=actionEquipmentIds(actionId);
+    const explicitStationId=typeof action.stationId==='string'?action.stationId.trim():'';
+    const venueStations=unique(equipmentIds.map(equipmentId=>String(
+      data.venueCapabilityPolicy?.equipment?.[equipmentId]?.stationId||''
+    ).trim()).filter(Boolean));
+    const stationId=explicitStationId||(venueStations.length===1?venueStations[0]:'');
+    const stationGroup=typeof action.stationGroup==='string'?action.stationGroup.trim():'';
+    const group=stationGroup?policy.stationGroups?.[stationGroup]:null;
+    return {
+      actionId:String(actionId||''),
+      actionName:String(action.name||actionId||'未知动作'),
+      equipmentIds,
+      stationId,
+      stationGroup,
+      stationName:String(action.equipment||group?.name||stationId||''),
+      stationGroupName:String(group?.name||stationGroup||''),
+      stationGroupMaxFormalActions:Number.isInteger(group?.maxFormalActions)?group.maxFormalActions:null,
+      status:stationId?'MAPPED':'UNVERIFIED',
+    };
+  }
+
+  function stationRole(familyId,slotKey){
+    return D().bodyFamilies?.[familyId]?.slotPolicy?.[slotKey]||'';
+  }
+
+  function stationReuseIsExplicit(stationReusePolicy){
+    return String(stationReusePolicy||'')===String(stationDiversityPolicy().explicitReuseToken||'');
+  }
+
+  function assessEquipmentStation({familyId,level,slotKey,actionId,currentSelections={},stationReusePolicy=''}={}){
+    const policy=stationDiversityPolicy(),record=actionStationRecord(actionId);
+    const formalRoles=new Set(Array.isArray(policy.formalRoles)?policy.formalRoles:[]);
+    const role=stationRole(familyId,slotKey);
+    const explicitReuse=stationReuseIsExplicit(stationReusePolicy);
+    const peers=[];
+    for(const [peerSlotKey,peerValue] of Object.entries(currentSelections||{})){
+      if(peerSlotKey===slotKey)continue;
+      const peerActionId=normalizeActionId(peerValue),peerRole=stationRole(familyId,peerSlotKey);
+      if(!peerActionId||!formalRoles.has(peerRole))continue;
+      peers.push({slotKey:peerSlotKey,role:peerRole,...actionStationRecord(peerActionId)});
+    }
+    const sameStation=record.stationId
+      ?peers.filter(peer=>peer.stationId===record.stationId)
+      :[];
+    const sameGroup=record.stationGroup
+      ?peers.filter(peer=>peer.stationGroup===record.stationGroup)
+      :[];
+    const exactConflict=sameStation.length>0;
+    const groupLimit=record.stationGroupMaxFormalActions;
+    const groupConcentration=Number.isInteger(groupLimit)&&sameGroup.length+1>groupLimit;
+    const reasons=[];
+    const warnings=[];
+    if(exactConflict&&!explicitReuse)reasons.push('BODY_EQUIPMENT_STATION_DUPLICATE');
+    if(groupConcentration)warnings.push('BODY_EQUIPMENT_STATION_CONCENTRATION');
+    const reason=exactConflict
+      ?`${record.actionName} 与 ${sameStation.map(peer=>peer.actionName).join('、')} 使用同一台物理器械（${record.stationName||record.stationGroupName||record.stationId}）；同一节 Body 正式动作默认不重复占用。`
+      :groupConcentration
+        ?`${record.stationName||record.stationGroupName||record.stationGroup} 本节将承担 ${sameGroup.length+1} 个正式动作，超过 ${groupLimit} 个的体验提醒阈值；请确认站点安排。`
+        :!record.stationId
+          ?`${record.actionName} 尚未录入已核验的物理站点；系统不按 equipmentId 猜测，保留未核验审计状态。`
+          :'';
+    return {
+      ok:reasons.length===0,
+      status:exactConflict?(explicitReuse?'EXPLICIT_REUSE':'BLOCKED'):groupConcentration?'GROUP_WARN':record.status,
+      familyId:String(familyId||''),
+      level:String(level||''),
+      slotKey:String(slotKey||''),
+      role,
+      ...record,
+      reasons,
+      warnings,
+      conflicts:sameStation.map(peer=>({slotKey:peer.slotKey,actionId:peer.actionId,actionName:peer.actionName,stationId:peer.stationId})),
+      groupPeers:sameGroup.map(peer=>({slotKey:peer.slotKey,actionId:peer.actionId,actionName:peer.actionName,stationGroup:peer.stationGroup})),
+      reusePolicy:explicitReuse?'STATION_REUSE_ALLOWED':String(policy.defaultReuseMode||'BLOCK'),
+      explicitReuse,
+      reason,
+    };
+  }
+
   function venueReasonText(code,{level,levelCeilingKg,minimumSystemLoadKg,equipmentId,actionName,minimumReasonLength}={}){
     if(code==='BODY_VENUE_MIN_LOAD_EXCEEDS_LEVEL'){
       return `${actionName||equipmentId||'当前动作'} 的场馆最低系统负重约 ${minimumSystemLoadKg}kg，高于 ${level} 默认可接受的 ${levelCeilingKg}kg；已准备安全退阶。`;
@@ -450,6 +535,14 @@
       actionId,
       overrideReason:normalizeVenueOverrideReason(input),
     });
+    const equipmentStation=assessEquipmentStation({
+      familyId:normalized.familyId,
+      level:normalized.level,
+      slotKey:normalized.slotKey,
+      actionId,
+      currentSelections:input.currentSelections||{},
+      stationReusePolicy:input.stationReusePolicy,
+    });
     const pairReasons=base.ok?pairIntentReasons({
       slotKey:normalized.slotKey,
       intent:base.intent,
@@ -459,6 +552,7 @@
     const reasons=[...new Set([
       ...base.reasons,
       ...pairReasons,
+      ...equipmentStation.reasons,
       ...(input.includeVenueGate===false||venueEligibility.ok||venueEligibility.overrideAccepted?[]:venueEligibility.reasons),
     ])];
     return {
@@ -469,6 +563,7 @@
       role:normalized.role,
       actionId,
       pairSimilarity:pairReasons.length?pairReasons.map(code=>({code})):[],
+      equipmentStation,
       levelEligibility:base.levelEligibility||assessLevelEligibility({level:normalized.level,actionId}),
       levelPoolEligibility:base.levelPoolEligibility||assessLevelPoolEligibility({
         familyId:normalized.familyId,level:normalized.level,slotKey:normalized.slotKey,actionId
@@ -876,6 +971,7 @@
       levelEligibility:assessment.levelEligibility,
       levelPoolEligibility:assessment.levelPoolEligibility,
       venueEligibility:assessment.venueEligibility||assessVenueEligibility({familyId,level,slotKey,actionId}),
+      equipmentStation:assessment.equipmentStation||assessEquipmentStation({familyId,level,slotKey,actionId,currentSelections}),
       levelReason:assessment.levelPoolEligibility?.reason||(
         assessment.levelEligibility?.actionEntryLevel===level
           ?'当前等级正式准入'
@@ -891,18 +987,24 @@
   function candidates(input={}){
     const {familyId,level,family,slotKey,role}=validateInput(input,true);
     const data=D(),currentSelections=input.currentSelections||{},context=selectionContext(currentSelections,slotKey);
-    const intent=slotIntentFor(family,slotKey),items=[],blockedItems=[];
+    const intent=slotIntentFor(family,slotKey),items=[],blockedItems=[],stationBlockedItems=[];
     for(const actionId of Object.keys(data.bodyActionMeta||{})){
-      if(context.usedActionIds.has(actionId))continue;
       const meta=data.bodyActionMeta[actionId],exerciseFamily=exerciseFamilyOf(actionId);
-      if(context.usedExerciseFamilies.has(exerciseFamily))continue;
-      const assessment=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections});
+      const assessment=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections,stationReusePolicy:input.stationReusePolicy});
+      const stationOnly=assessment.reasons.length===1&&assessment.reasons[0]==='BODY_EQUIPMENT_STATION_DUPLICATE';
+      if(stationOnly&&!context.usedActionIds.has(actionId)){
+        const candidate=candidateRecord({actionId,role,intent,level,assessment,currentSelections,familyId,slotKey});
+        candidate.stationBlocked=true;
+        candidate.blockedReasons=[...assessment.reasons];
+        stationBlockedItems.push(candidate);
+      }
+      if(context.usedActionIds.has(actionId)||context.usedExerciseFamilies.has(exerciseFamily))continue;
       if(assessment.ok){
         items.push(candidateRecord({actionId,role,intent,level,assessment,currentSelections,familyId,slotKey}));
         continue;
       }
       if(input.includeVenueBlocked===true&&assessment.venueEligibility?.status==='BLOCKED'){
-        const venueFree=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections,includeVenueGate:false});
+        const venueFree=assessSlotIntent({familyId,level,slotKey,actionId,currentSelections,includeVenueGate:false,stationReusePolicy:input.stationReusePolicy});
         if(venueFree.ok){
           const candidate=candidateRecord({actionId,role,intent,level,assessment:venueFree,currentSelections,familyId,slotKey});
           candidate.venueEligibility=assessment.venueEligibility;
@@ -923,6 +1025,7 @@
       levelPool:familyLevelPool(familyId,level)?{...familyLevelPool(familyId,level)}:null,
       candidates:items,
       blockedCandidates:blockedItems.sort((a,b)=>compareCandidates(a,b,{family,level,context,intent})),
+      stationBlockedCandidates:stationBlockedItems.sort((a,b)=>compareCandidates(a,b,{family,level,context,intent})),
     };
   }
 
@@ -989,7 +1092,8 @@
       fail('BODY_VOLUME_UNAVAILABLE','Body volume calculator is unavailable');
     }
     const requested=input.selections&&typeof input.selections==='object'?input.selections:{};
-    const chosen={},domainSlots={},publicSlots=[],warnings=[],venueSlots={},venueOverrides=[];
+    const stationReusePolicy=String(input.stationReusePolicy||'');
+    const chosen={},domainSlots={},publicSlots=[],warnings=[],venueSlots={},venueOverrides=[],stationSlots={};
 
     for(const slotKey of activeSlotKeys(levelPolicy)){
       const role=family.slotPolicy[slotKey];
@@ -1000,7 +1104,7 @@
       const used=new Set(Object.values(chosen));
       const usedExerciseFamilies=new Set(Object.values(chosen).map(exerciseFamilyOf));
       const requestedIntent= requestedActionId
-        ?assessSlotIntent({familyId,level,slotKey,actionId:requestedActionId,currentSelections:chosen,includeVenueGate:false})
+        ?assessSlotIntent({familyId,level,slotKey,actionId:requestedActionId,currentSelections:chosen,includeVenueGate:false,stationReusePolicy})
         :null;
       const requestedVenue=requestedActionId
         ?assessVenueEligibility({familyId,level,slotKey,actionId:requestedActionId,overrideReason})
@@ -1020,11 +1124,16 @@
             }
           }
         }
-        const result=candidates({familyId,level,slotKey,currentSelections:chosen});
+        const result=candidates({familyId,level,slotKey,currentSelections:chosen,stationReusePolicy});
         actionId=result.recommended;
         if(!actionId)fail('BODY_NO_ELIGIBLE_CANDIDATE',`No eligible Body candidate for ${familyId} ${level} ${slotKey}`,{familyId,level,slotKey});
       }
+      const equipmentStation=assessEquipmentStation({
+        familyId,level,slotKey,actionId,currentSelections:chosen,stationReusePolicy,
+      });
       chosen[slotKey]=actionId;
+      stationSlots[slotKey]=equipmentStation;
+      equipmentStation.warnings.forEach(code=>warnings.push(`${code}:${slotKey}`));
       const domainSlot=window.V15BodyVolume.buildSlot({level,slotKey,role,actionId});
       domainSlots[slotKey]=domainSlot;
       const action=D().actions[actionId]||{};
@@ -1096,6 +1205,14 @@
           slots:venueSlots,
           overrides:venueOverrides,
         },
+        equipmentStations:{
+          policyVersion:String(stationDiversityPolicy().policyVersion||''),
+          reusePolicy:stationReuseIsExplicit(stationReusePolicy)
+            ?String(stationDiversityPolicy().explicitReuseToken||stationReusePolicy)
+            :String(stationDiversityPolicy().defaultReuseMode||'BLOCK'),
+          slots:stationSlots,
+          unknownActionIds:Object.values(stationSlots).filter(item=>item.status==='UNVERIFIED').map(item=>item.actionId),
+        },
       },
     };
     session.conflictContext=evaluateConflict(session);
@@ -1104,7 +1221,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,assessLevelPoolEligibility,assessVenueEligibility,pairSimilarity};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessEquipmentStation,assessLevelEligibility,assessLevelPoolEligibility,assessVenueEligibility,pairSimilarity};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);

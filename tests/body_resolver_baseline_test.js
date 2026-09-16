@@ -10,7 +10,7 @@ for(const file of [
 ]) load(file);
 
 const D=window.V14_DATA,Contract=window.V15ResolvedSession,Dispatcher=window.V15TemplateResolver;
-const EXPECTED_SHA='b4faf6725508050aa8567d00fcbed147af7c5cbb3059c23835d594e96a5962a5';
+const EXPECTED_SHA='53cf6c0f7fa0d8fc23d4c59db9983f49b7046691e83daa7b4933b1968993e375';
 const families=['BODY-01','BODY-02','BODY-03','BODY-04'],levels=['L1','L2','L3','L4'];
 const expectedSlots={L1:5,L2:5,L3:6,L4:6};
 const expectedSets={L1:10,L2:12,L3:14,L4:16};

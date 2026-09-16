@@ -211,6 +211,7 @@
     const result=candidateResult(ctx,slot.key);
     const candidates=result.candidates||[];
     const blockedCandidates=result.blockedCandidates||[];
+    const stationBlockedCandidates=result.stationBlockedCandidates||[];
     const currentBlocked=blockedCandidates.find(candidate=>candidate.actionId===slot.actionId);
     const selectCandidates=currentBlocked?[currentBlocked,...candidates]:candidates;
     const options=selectCandidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}${candidate.requiresVenueOverride?'｜场馆 Gate 已覆盖':''}</option>`).join('');
@@ -224,6 +225,12 @@
       const better=Number(candidate.recommendationScore)>currentScore&&candidate.actionId!==slot.actionId;
       return `<article class="body-candidate-card ${esc(status==='推荐'?'recommended':status==='有代价'?'tradeoff':'optional')}" data-body-candidate-card data-action-id="${esc(candidate.actionId)}"><div class="body-candidate-top"><div><span>${esc(status)}</span><b>${esc(candidate.name)}</b></div><strong>${esc(candidate.recommendationScore)} 分</strong></div><p>主要刺激：${esc(targets.join(' · ')||'目标未标')}</p><small>${esc(reasons.join('；')||'符合当前槽位的合法候选')}</small>${better&&reasons[0]?`<em>为什么更合适：${esc(reasons[0])}</em>`:''}${tradeoffs.length?`<em class="warning">注意：${esc(tradeoffs.join('；'))}</em>`:''}<button type="button" data-body-candidate data-body-slot="${esc(slot.key)}" data-action-id="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'disabled':''}>${candidate.actionId===slot.actionId?'当前动作':'换成此动作'}</button></article>`;
     }).join('');
+    const stationBlockedHtml=stationBlockedCandidates.length?`<details class="body-station-gate-details" data-body-station-gate><summary>器械站点 Gate：${stationBlockedCandidates.length} 个动作默认不允许重复占用</summary><p>以下替换会与本节已占用的同一台物理器械冲突。系统按已确认的 stationId 拦截；未确认站点不会擅自猜测。</p><div class="body-station-gate-list">${stationBlockedCandidates.map(candidate=>{
+      const station=candidate.equipmentStation||{};
+      const peers=(station.conflicts||[]).map(peer=>`${peer.slotKey}｜${peer.actionName}`).join('、')||'当前正式动作';
+      const stationLabel=station.stationName||station.stationGroupName||station.stationId||'已确认站点';
+      return `<article class="body-station-blocked-card" data-body-station-blocked data-action-id="${esc(candidate.actionId)}"><div class="body-station-blocked-head"><b>${esc(candidate.name)}</b><span>默认拦截</span></div><p>${esc(station.reason||'该动作会复用本节已经占用的同一台物理器械。')}</p><small>冲突站点：${esc(stationLabel)} · 当前占用：${esc(peers)}</small></article>`;
+    }).join('')}</div></details>`:'';
     const blockedHtml=blockedCandidates.length?`<details class="body-venue-gate-details" data-body-venue-gate><summary>场馆 Gate：${blockedCandidates.length} 个动作需要教练确认</summary><p>这些动作未通过当前场馆能力 Gate，系统不会静默推荐；如教练现场确认会员能力，可留下理由后覆盖。</p><div class="body-venue-gate-list">${blockedCandidates.map(candidate=>{
       const venue=candidate.venueEligibility||{};
       const reason=venue.reason||'当前动作未通过场馆最低负重 Gate。';
@@ -238,9 +245,14 @@
       ?`<p class="body-venue-current override">场馆 Gate：已覆盖 · 已记录理由：${esc(venueAudit.overrideReason||'')}</p>`
       :venueAudit.status==='FALLBACK'
         ?`<p class="body-venue-current fallback">场馆 Gate：已回退到安全候选（原请求：${esc(venueAudit.requestedActionId||'—')}）。</p>`:'';
+    const stationAudit=ctx.session.domainContext?.equipmentStations?.slots?.[slot.key]||{};
+    const stationAuditHtml=stationAudit.status==='UNVERIFIED'
+      ?`<p class="body-station-audit unverified">器械站点：未核验；系统不按 equipmentId 猜测冲突。</p>`
+      :stationAudit.status==='EXPLICIT_REUSE'
+        ?`<p class="body-station-audit explicit">器械站点：已按明确复用 policy 放行，请确认 protocol 与会员体验。</p>`:'';
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
     const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
-    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${blockedHtml}${quick}</div>`;
+    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}${stationAuditHtml}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${stationBlockedHtml}${blockedHtml}${quick}</div>`;
   }
 
   function slotCard(ctx,slot){

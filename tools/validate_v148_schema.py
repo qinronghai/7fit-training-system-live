@@ -679,6 +679,25 @@ def validate_payload(data: dict) -> list[str]:
     venue = data.get("venueCapabilityPolicy", {})
     errors.extend(_schema_errors(venue, "venue", "venueCapabilityPolicy"))
     if isinstance(venue, dict):
+        station_policy = venue.get("stationDiversityPolicy", {})
+        station_groups = station_policy.get("stationGroups", {}) if isinstance(station_policy, dict) else {}
+        if isinstance(station_groups, dict):
+            for group_id, group in sorted(station_groups.items()):
+                if isinstance(group, dict) and group.get("stationGroupId") != group_id:
+                    errors.append(
+                        f"venueCapabilityPolicy.stationDiversityPolicy.stationGroups.{group_id}.stationGroupId: "
+                        f"must equal map key {group_id}"
+                    )
+        # Action-level station groups are references into the venue-owned policy;
+        # an unknown group would make the Resolver silently lose its audit limit.
+        for action_id, action in sorted(actions.items()):
+            if not isinstance(action, dict):
+                continue
+            station_group = action.get("stationGroup")
+            if station_group is not None and station_group not in station_groups:
+                errors.append(
+                    f"actions.{action_id}.stationGroup: unknown station group {station_group}"
+                )
         equipment_ids = set(venue.get("equipmentIds", []))
         equipment = venue.get("equipment", {})
         if set(equipment) != equipment_ids:

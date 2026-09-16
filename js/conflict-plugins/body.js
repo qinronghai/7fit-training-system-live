@@ -53,6 +53,7 @@
       actionId:item.actionId,
       currentSelections:selectionMap(session),
       includeVenueGate:false,
+      stationReusePolicy:session?.domainContext?.equipmentStations?.reusePolicy,
     });
   }
 
@@ -243,11 +244,82 @@
     );
   }
 
+  function equipmentStationIssues(session){
+    const resolver=window.V15BodyResolver,policy=D().venueCapabilityPolicy?.stationDiversityPolicy||{};
+    if(!resolver?.assessEquipmentStation)return [];
+    const family=D().bodyFamilies?.[session?.familyId],formalRoles=new Set(Array.isArray(policy.formalRoles)?policy.formalRoles:[]);
+    if(!family)return [];
+    const items=asArray(session?.main?.content),selections=Object.fromEntries(items.map(item=>[item.key,item.actionId]));
+    const stationEntries=[],groupEntries=[];
+    items.forEach((item,index)=>{
+      const role=family.slotPolicy?.[item?.key];
+      if(!item?.key||!item?.actionId||!formalRoles.has(role))return;
+      const assessment=resolver.assessEquipmentStation({
+        familyId:session.familyId,
+        level:session.level,
+        slotKey:item.key,
+        actionId:item.actionId,
+        currentSelections:selections,
+        stationReusePolicy:session.domainContext?.equipmentStations?.reusePolicy,
+      });
+      if(assessment.stationId)stationEntries.push({
+        index,slotKey:item.key,actionId:item.actionId,actionName:item.name||D().actions?.[item.actionId]?.name||item.actionId,
+        stationId:assessment.stationId,stationName:assessment.stationName||assessment.stationGroupName||assessment.stationId,
+      });
+      if(assessment.stationGroup)groupEntries.push({
+        index,slotKey:item.key,actionId:item.actionId,actionName:item.name||D().actions?.[item.actionId]?.name||item.actionId,
+        stationGroup:assessment.stationGroup,stationName:assessment.stationName||assessment.stationGroupName||assessment.stationGroup,
+        maxFormalActions:assessment.stationGroupMaxFormalActions,
+      });
+    });
+    const issues=[];
+    const exactGroups=new Map();
+    stationEntries.forEach(entry=>{
+      const group=exactGroups.get(entry.stationId)||[];
+      group.push(entry);
+      exactGroups.set(entry.stationId,group);
+    });
+    const explicitReuse=session.domainContext?.equipmentStations?.reusePolicy===String(policy.explicitReuseToken||'');
+    [...exactGroups.entries()].forEach(([stationId,entries])=>{
+      if(entries.length<2)return;
+      const names=entries.map(entry=>entry.actionName).join(' + '),stationName=entries[0].stationName||stationId;
+      issues.push(makeIssue(
+        explicitReuse?'warn':'hard',
+        explicitReuse?'同一台器械被明确复用':'同一台物理器械承担多个正式动作',
+        explicitReuse
+          ?`${names} 明确复用同一台物理器械（${stationName}）；已按特殊 policy 放行，但请确认训练协议与会员体验。`
+          :`${names} 使用同一台物理器械（${stationName}），同一节 Body 正式动作默认最多占用一次。`,
+        explicitReuse?'BODY_EQUIPMENT_STATION_CONCENTRATION':'BODY_EQUIPMENT_STATION_DUPLICATE',
+        10520+Math.min(...entries.map(entry=>entry.index))
+      ));
+    });
+    const groups=new Map();
+    groupEntries.forEach(entry=>{
+      const group=groups.get(entry.stationGroup)||[];
+      group.push(entry);
+      groups.set(entry.stationGroup,group);
+    });
+    [...groups.entries()].forEach(([stationGroup,entries])=>{
+      const limit=entries[0].maxFormalActions;
+      if(!Number.isInteger(limit)||entries.length<=limit)return;
+      const policyGroup=policy.stationGroups?.[stationGroup]||{};
+      issues.push(makeIssue(
+        policyGroup.severity==='info'?'info':'warn',
+        '同一器械区域集中度偏高',
+        `${entries.map(entry=>entry.actionName).join(' + ')} 共使用 ${entries[0].stationName||stationGroup} ${entries.length} 个正式动作，超过 ${limit} 个的体验提醒阈值。`,
+        'BODY_EQUIPMENT_STATION_CONCENTRATION',
+        10540+Math.min(...entries.map(entry=>entry.index))
+      ));
+    });
+    return issues;
+  }
+
   function evaluate(session){
     const issues=[
       ...familyDeviationIssues(session),
       ...slotIntentIssues(session),
       ...compatibilityIssues(session),
+      ...equipmentStationIssues(session),
     ];
     [
       primarySecondarySimilarityIssue(session),

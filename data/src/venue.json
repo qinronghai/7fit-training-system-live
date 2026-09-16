@@ -15,6 +15,27 @@
       "minimumReasonLength": 8,
       "auditCode": "BODY_VENUE_MANUAL_OVERRIDE"
     },
+    "stationDiversityPolicy": {
+      "policyVersion": "body-station-v1",
+      "formalRoles": [
+        "PRIMARY",
+        "SECONDARY",
+        "ACCESSORY",
+        "ISOLATION",
+        "OPTIONAL"
+      ],
+      "defaultReuseMode": "BLOCK",
+      "unknownStationMode": "ALLOW_UNVERIFIED",
+      "explicitReuseToken": "STATION_REUSE_ALLOWED",
+      "stationGroups": {
+        "cable-frame": {
+          "stationGroupId": "cable-frame",
+          "name": "小飞鸟 / 小龙门架",
+          "maxFormalActions": 2,
+          "severity": "warn"
+        }
+      }
+    },
     "equipmentIds": [
       "eq-hack",
       "eq-trapbar",
