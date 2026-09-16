@@ -3,15 +3,15 @@ const { test, expect } = require('@playwright/test');
 async function expectRecovery(page){
   const recovery=page.locator('.body-recovery-section');
   await expect(recovery).toHaveCount(1);
-  await expect(recovery).toContainText('训练后恢复｜约 5–8 分钟');
-  await expect(recovery).toContainText('力量训练结束后进行低强度恢复与呼吸整理；如需拉伸，按当日训练肌群由教练人工选择。');
+  await expect(recovery).toContainText('完成拉伸｜约 5–8 分钟');
+  await expect(recovery.locator('[data-recovery-card]')).toHaveCount(3);
   await expect(recovery).toContainText('恢复内容不计入 Direct Work Sets。');
   const width=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
   expect(width.clientWidth).toBe(390);
   expect(width.scrollWidth).toBe(width.clientWidth);
 }
 
-test('Body Session and Composer show the same fixed Recovery presentation at 390px',async({page})=>{
+test('Body Session and Composer show the same matched Recovery presentation at 390px',async({page})=>{
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message||String(error)));
   await page.setViewportSize({width:390,height:844});

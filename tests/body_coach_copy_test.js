@@ -16,7 +16,8 @@ function boot(){
     'data/system-data.js','data/anatomy-data.js','js/state.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
     'js/resolved-session.js','js/body-volume.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/body.js',
     'js/template-resolver.js','js/resolvers/body.js','js/session-copy.js','js/coach/common.js','js/coach/template-ui.js',
-    'js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-prep.js','js/coach/body-recovery.js'
+    'js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-prep.js','js/coach/body-recovery.js',
+    'js/recovery-protocol-adapter.js','js/recovery-matcher.js'
   ]) vm.runInContext(fs.readFileSync(`${root}/${file}`,'utf8'),ctx,{filename:file});
   assert.strictEqual(fs.existsSync(`${root}/js/coach/body-copy.js`),true,'Body Copy adapter module must exist');
   vm.runInContext(fs.readFileSync(`${root}/js/coach/body-copy.js`,'utf8'),ctx,{filename:'js/coach/body-copy.js'});
@@ -55,7 +56,8 @@ assert(coach.includes(level),'Coach copy must include level');
 assert(coach.includes('Direct Work Sets'),'Coach copy must include Direct Work Sets');
 assert(coach.includes('PREP'),'Coach copy must include PREP');
 assert(coach.includes(String(baseline.conflictContext.status)),'Coach copy must include conflict summary');
-assert(coach.includes('训练后恢复｜约 5–8 分钟'),'Coach copy must include fixed Recovery title');
+assert(coach.includes('完成拉伸｜约 5–8 分钟'),'Coach copy must include the shared Recovery title');
+assert(coach.includes('背阔肌拉伸')||/拉伸/.test(coach),'Coach copy must include the matched stretch actions');
 assert(coach.includes('恢复内容不计入 Direct Work Sets。'),'Coach copy must include Recovery boundary');
 
 for(const slot of payload.slots){
@@ -91,7 +93,7 @@ for(const item of payload.prep.filter(x=>x.name)){
 const purposeSlot=payload.slots.find(slot=>slot.purpose);
 assert(purposeSlot,'BODY-02/L3 should expose at least one action purpose');
 assert(member.includes(purposeSlot.purpose),'Member copy must include member-facing action purpose');
-assert(member.includes('训练后恢复｜约 5–8 分钟'),'Member copy must include Recovery');
+assert(member.includes('完成拉伸｜约 5–8 分钟'),'Member copy must include Recovery');
 
 for(const forbidden of [
   'PRIMARY','SECONDARY','ACCESSORY','ISOLATION','OPTIONAL','BODY_','resolverVersion','body-v1',

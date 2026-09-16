@@ -13,9 +13,9 @@
   function roleName(role){return D().bodyRoles?.[role]?.name||role||'动作';}
   function targetName(id){return D().bodyTargetCatalog?.[id]?.name||id;}
   function actionFields(actionId){return D().actionDetails?.[actionId]?.fields||{};}
-  function recovery(){
+  function recovery(session){
     if(!M.BodyRecovery?.payload)throw new Error('Body Recovery presentation is unavailable');
-    return M.BodyRecovery.payload();
+    return M.BodyRecovery.payload(session);
   }
 
   function buildSlots(session){
@@ -58,7 +58,7 @@
       anatomy:session.anatomyContext||{},
       volume:session.domainContext?.volume||{},
       conflicts:session.conflictContext||{status:'PASS',hardCount:0,warnCount:0,issues:[]},
-      recovery:recovery(),
+      recovery:recovery(session),
     };
   }
 
@@ -117,6 +117,7 @@
       '',
       `【${clean(r.title)}】`,
       clean(r.note),
+      ...(r.items||[]).map(item=>`- ${clean(item)}`),
       clean(r.boundary),
     );
     return lines.filter((line,index,array)=>line!==''||array[index-1]!=='').join('\n').trim();
@@ -144,6 +145,7 @@
       '',
       `【${clean(r.title)}】`,
       clean(r.note),
+      ...(r.items||[]).map(item=>`- ${clean(item)}`),
     );
     return lines.filter((line,index,array)=>line!==''||array[index-1]!=='').join('\n').trim();
   }

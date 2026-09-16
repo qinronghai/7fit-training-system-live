@@ -53,7 +53,7 @@
     });
     lines.push('','【风险检查】','状态：'+clean(p.conflicts.status)+'｜硬冲突 '+Number(p.conflicts.hardCount||0)+'｜警告 '+Number(p.conflicts.warnCount||0));
     (p.conflicts.issues||[]).forEach(function(i){lines.push('- '+clean(i.title)+'｜'+clean(i.text));});
-    lines.push('','【'+clean(p.recovery.title)+'】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}),clean(p.recovery.boundary));
+    lines.push('','【'+clean(p.recovery.title)+'】',...(p.recovery.stretchItems||[]).map(function(x){return '- '+clean(x);}),...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}),clean(p.recovery.boundary));
     if(p.benchmark){
       const H=window.V15HyroxBenchmarkHistory,h=p.benchmarkHistory;
       if(h?.latest){
@@ -80,7 +80,7 @@
       }else lines.push('','本次成绩：待记录');
       lines.push('只有训练规格与负重一致时，才与上次成绩直接比较。');
     }
-    lines.push('','【训练后恢复】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}));
+    lines.push('','【训练后恢复】',...(p.recovery.stretchItems||[]).map(function(x){return '- '+clean(x);}),...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}));
     return lines.join('\n').trim();
   }
   M.HyroxCopy={buildPayload,formatCoach,formatMember};

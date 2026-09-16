@@ -290,9 +290,9 @@
     return `<section class="conflict-box ${String(result.status||'PASS').toLowerCase()}"><b>${esc(result.status||'PASS')}</b><small>${esc(result.hardCount||0)} 硬冲突 · ${esc(result.warnCount||0)} 警告</small></section>`;
   }
 
-  function recovery(){
+  function recovery(ctx){
     if(!M.ConditioningRecovery?.render)throw new Error('Conditioning Recovery presentation is unavailable');
-    return M.ConditioningRecovery.render();
+    return M.ConditioningRecovery.render(ctx?.session);
   }
 
   function renderEditor(ctx){
@@ -305,7 +305,7 @@
       <div class="conditioning-block-timeline">${blocks.map((block,index)=>blockCard(ctx,block,index)).join('')}</div>
       <div class="session-toolbar"><div class="conditioning-no-post-cardio-inline">完整 Conditioning：NO POST CARDIO</div><div class="session-toolbar-actions"><button data-conditioning-copy="coach" type="button">复制教练版</button><button data-conditioning-copy="member" type="button">复制会员版</button><button id="reset-conditioning-session" type="button">恢复系统推荐</button></div></div>
     </section>`;
-    return `${prepHtml}${protocolPanel(session)}${main}${recovery()}`;
+    return `${prepHtml}${protocolPanel(session)}${main}${recovery(ctx)}`;
   }
 
   function renderLegacyEditor(ctx){

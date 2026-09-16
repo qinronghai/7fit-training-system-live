@@ -6,7 +6,8 @@ function load(file){vm.runInThisContext(fs.readFileSync(`${root}/${file}`,'utf8'
 for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
   'js/resolved-session.js','js/body-volume.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/body.js',
-  'js/template-resolver.js','js/resolvers/body.js','js/coach/common.js','js/coach/template-ui.js'
+  'js/template-resolver.js','js/resolvers/body.js','js/coach/common.js','js/coach/template-ui.js',
+  'js/recovery-protocol-adapter.js','js/recovery-matcher.js'
 ]) load(file);
 
 for(const file of ['js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-recovery.js','js/coach/body-session.js']){
@@ -66,8 +67,8 @@ for(const familyId of D.bodyFamilyIds){
     assert(html.includes('ANATOMY｜动作涉及肌群'),'Body Anatomy label must be explicit');
     assert(html.includes('Direct Work Sets｜有效工作组'),'Body Direct Work Sets label must be explicit');
     assert(html.includes('协同暴露（不计入 Direct Work Sets）'),'secondary exposure disclaimer missing');
-    assert(html.includes('训练后恢复｜约 5–8 分钟'),'Body Session must display fixed Recovery title');
-    assert(html.includes('力量训练结束后进行低强度恢复与呼吸整理；如需拉伸，按当日训练肌群由教练人工选择。'),'Body Session must display fixed Recovery guidance');
+    assert(html.includes('完成拉伸｜约 5–8 分钟'),'Body Session must display the shared Recovery title');
+    assert.strictEqual((html.match(/data-recovery-card=/g)||[]).length,3,`Body Session must match three Recovery cards for ${familyId} ${level}`);
     assert(html.includes('恢复内容不计入 Direct Work Sets。'),'Body Session must display Recovery volume boundary');
     assert(html.includes(String(ctx.session.domainContext.volume.totalWorkingSets)),'totalWorkingSets must render from domainContext.volume');
     assert(html.includes(String(ctx.session.domainContext.volume.estimatedMinutes)),'estimatedMinutes must render from domainContext.volume');
@@ -113,7 +114,8 @@ assert(composeHtml.includes('Body 自由编课'),'Body Composer heading missing'
 assert(composeHtml.includes('data-body-compose-family'),'Body Composer family selector missing');
 assert(composeHtml.includes('data-body-compose-level'),'Body Composer level selector missing');
 assert(composeHtml.includes('BODY-02-L3'),'Composer must render the shared Body session editor');
-assert(composeHtml.includes('训练后恢复｜约 5–8 分钟'),'Body Composer must display the same fixed Recovery block as Session');
+assert(composeHtml.includes('完成拉伸｜约 5–8 分钟'),'Body Composer must display the shared Recovery block');
+assert.strictEqual((composeHtml.match(/data-recovery-card=/g)||[]).length,3,'Body Composer must match three Recovery cards');
 for(const forbidden of ['5 × 4 主模式矩阵','lowerMode','upperMode','coreDemand','SUPPORT Grade'])assert(!composeHtml.includes(forbidden),`Body Composer must not leak F111 concept: ${forbidden}`);
 
 console.log('body_coach_session_runtime_test: PASS');

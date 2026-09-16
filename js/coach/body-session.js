@@ -295,9 +295,9 @@
     return `<section class="body-coach-overview" data-body-coach-overview>${focusSummary(ctx)}${primarySpotlight(ctx)}${coachRisk(ctx)}</section>`;
   }
 
-  function recovery(){
+  function recovery(ctx){
     if(!M.BodyRecovery?.render)throw new Error('Body Recovery presentation is unavailable');
-    return M.BodyRecovery.render();
+    return M.BodyRecovery.render(ctx?.session);
   }
 
   function renderEditor(ctx){
@@ -308,7 +308,7 @@
     const isolationBlock=trainingBlock(ctx,{kind:'isolation',title:'局部补充',caption:'在主训练质量完成后，用孤立项补足局部训练量。',keys:['ISOLATION-1','ISOLATION-2','OPTIONAL']});
     const structure=`<div class="body-structure-strip"><div><b>01</b><span>今日主项</span></div><i>→</i><div><b>02</b><span>第二方向</span></div><i>→</i><div><b>03</b><span>辅助 / 局部</span></div></div>`;
     const editor=`<section class="section-card body-editor" data-body-session="${esc(ctx.sessionKey)}"><div class="section-head body-editor-head"><div><span class="eyebrow">TODAY'S SESSION</span><h2>今日训练安排</h2><p>按教练执行顺序展示；系统字段与审计信息已收进高级训练信息。</p></div><span class="time-badge">${esc(ctx.level)}</span></div>${structure}${mainBlock}${accessoryBlock}${isolationBlock}${advancedInfo(ctx)}<div class="session-toolbar"><div></div><div class="session-toolbar-actions"><button data-body-copy="coach" type="button">复制教练版</button><button data-body-copy="member" type="button">复制会员版</button><button id="reset-body-session" type="button">恢复系统推荐</button></div></div></section>`;
-    return `${coachOverview(ctx)}${prepHtml}${editor}${recovery()}`;
+    return `${coachOverview(ctx)}${prepHtml}${editor}${recovery(ctx)}`;
   }
 
   function levelSwitch(familyId,currentLevel){

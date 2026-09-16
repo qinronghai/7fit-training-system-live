@@ -18,6 +18,7 @@ function boot(){
     'js/conditioning-protocol.js','js/template-resolver.js','js/resolvers/conditioning.js','js/session-copy.js',
     'js/coach/common.js','js/coach/template-ui.js','js/coach/conflict-view.js',
     'js/coach/conditioning-home.js','js/coach/conditioning-prep.js','js/coach/conditioning-recovery.js',
+    'js/recovery-protocol-adapter.js','js/recovery-matcher.js',
     'js/coach/conditioning-copy.js','js/coach/conditioning-session.js'
   ])vm.runInContext(fs.readFileSync(`${root}/${file}`,'utf8'),ctx,{filename:file});
   return {
@@ -59,7 +60,7 @@ assert(coach.includes('训练段 1'));
 assert(coach.includes('完成标准'));
 assert(coach.includes('Conditioning Conflict'));
 assert(coach.includes('NO POST CARDIO'));
-assert(coach.includes('RECOVERY｜训练后恢复 · 约 5–8 分钟'));
+assert(coach.includes('完成拉伸｜约 5–8 分钟'));
 for(const station of payload.stations){
   assert(coach.includes(station.name),`Coach copy missing ${station.name}`);
   assert(coach.includes(station.prescription),`Coach copy missing prescription for ${station.name}`);

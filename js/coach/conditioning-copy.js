@@ -8,9 +8,9 @@
 
   function clean(value){return String(value??'').trim();}
   function actionFields(actionId){return D().actionDetails?.[actionId]?.fields||{};}
-  function recovery(){
+  function recovery(session){
     if(!M.ConditioningRecovery?.payload)throw new Error('Conditioning Recovery presentation is unavailable');
-    return M.ConditioningRecovery.payload();
+    return M.ConditioningRecovery.payload(session);
   }
 
   function buildStations(session){
@@ -77,7 +77,7 @@
       stations:buildStations(session),
       anatomy:session.anatomyContext||{},
       conflicts:session.conflictContext||{status:'PASS',hardCount:0,warnCount:0,issues:[]},
-      recovery:recovery(),
+      recovery:recovery(session),
     };
   }
 
@@ -154,6 +154,8 @@
       '',
       `【${clean(r.title)}】`,
       clean(r.note),
+      ...(r.items||[]).map(item=>`- ${clean(item)}`),
+      ...(r.items||[]).map(item=>`- ${clean(item)}`),
       clean(r.boundary),
     );
     return lines.filter((line,index,array)=>line!==''||array[index-1]!=='').join('\n').trim();
