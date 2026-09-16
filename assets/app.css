@@ -984,7 +984,6 @@ body{font-size:14px;line-height:1.55}
   .favorite-card-actions{display:grid;grid-template-columns:1fr 1fr}
  .favorite-card-actions a,.favorite-card-actions button{text-align:center;width:100%}
 }
-.prep-slot-card .slot-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;min-width:0}
 /* ISSUE 13 CONTENT REVIEW */
 .content-review-panel{min-width:0;overflow:hidden}
 .content-review-panel .section-head>div{min-width:0}
