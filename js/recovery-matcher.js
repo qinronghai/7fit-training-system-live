@@ -2,15 +2,6 @@
   'use strict';
 
   const SLOT_WEIGHT=Object.freeze({A:5,B:5,D1:3,D2:3,C:2,CORE:2});
-  /**
-   * Damping exponent for the protocol breadth normalization (see `score`).
-   * Tuned against the 24 Conditioning / HYROX family x level matrix: 1.0 drops
-   * 臀部 from most leg-dominant sessions (over-favouring the narrowest
-   * candidate), 0.5 lets the broadest candidate win again (upper body collapses
-   * to 肩后侧 everywhere). 0.65 keeps 臀部 in 19/24 sessions, keeps 划船 / 滑雪
-   * sessions on 上背与腋下, and yields the widest spread of distinct results.
-   */
-  const PROTOCOL_BREADTH_EXPONENT=0.65;
   const D=()=>window.V14_DATA||{};
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const asArray=value=>Array.isArray(value)?value.filter(item=>typeof item==='string'&&item):[];
@@ -53,13 +44,11 @@
   /**
    * Weighted rarity of each demand term in this session.
    *
-   * Scoring sums over every matching signal, so a candidate that declares many
-   * target terms (臀肌拉伸 covers 4 patterns + 3 load families) outranks a
-   * specialist even when the session is dominated by the specialist's demand —
-   * the same signal saturation that flattens PREP matching. Weighting each term
-   * by ln(1 + mass/frequency) makes a ubiquitous demand (蹲 in a leg session)
-   * contribute little while a distinctive one (水平拉 in a rowing block) keeps
-   * its full weight, so selection follows the session instead of the metadata.
+   * A demand present everywhere (蹲 in a leg session) says little about which
+   * region was worked; a demand only a few stations impose (水平拉 in a rowing
+   * block) says a lot. Weighting each term by ln(1 + mass/frequency) encodes
+   * that, so selection follows the session rather than the metadata — the same
+   * saturation that flattens PREP matching.
    */
   function demandRarity(known){
     const frequency=new Map();
@@ -83,27 +72,35 @@
     const loadTargets=new Set(asArray(action.recoveryTargetLoadFamilies));
     const reasons=[];
     let matched=0;
+    const hitTerms=new Set();
     known.forEach(({slot,pattern,loadFamily})=>{
       // Protocol adapter signals carry an explicit exposure weight (primary
       // mover vs assisting muscle); SLOT entries keep the slot-key weights.
       const weight=Number.isFinite(Number(slot?.weight))?Number(slot.weight):(SLOT_WEIGHT[slot?.key]||1);
       if(patternTargets.has(pattern)){
         matched+=24*weight*(tuning.rarity.get(pattern)??1);
+        hitTerms.add(`pattern:${pattern}`);
         if(!reasons.some(reason=>reason.type==='pattern'))reasons.push({type:'pattern',value:pattern});
       }
       if(loadTargets.has(loadFamily)){
         matched+=20*weight*(tuning.rarity.get(loadFamily)??1);
+        hitTerms.add(`load:${loadFamily}`);
         if(!reasons.some(reason=>reason.type==='load'))reasons.push({type:'load',value:loadFamily});
       }
     });
-    // `matched` sums over every signal, so a candidate that declares many target
-    // terms (臀肌拉伸 covers 4 patterns + 3 loads) outranks a specialist purely on
-    // breadth. That is harmless for SLOT sessions — each signal there is a real
-    // training action — but the protocol adapter emits several derived demand
-    // entries per station, so without normalization every Conditioning / HYROX
-    // session collapses onto the same three broadest cards.
-    const breadth=patternTargets.size+loadTargets.size||1;
-    const contribution=tuning.normalize?matched/Math.pow(breadth,PROTOCOL_BREADTH_EXPONENT):matched;
+    // SLOT sessions sum `matched` unchanged: every signal there is a real
+    // training slot with a real weight. Protocol signals are derived estimates
+    // emitted per station, so summing lets a card win purely by declaring more
+    // targets — without normalisation all 24 Conditioning / HYROX sessions
+    // returned the same three broadest cards.
+    //
+    // The divisor is the number of demands this session ACTUALLY hit, not the
+    // number the candidate declares. 臀肌拉伸 declares 7 targets and 小腿后侧拉伸
+    // only 3; dividing by the declaration let the narrower card win on nothing
+    // but narrowness, which dropped 臀部 from HYROX sessions where the two cards
+    // match exactly the same 蹲 / 膝主导 demands. Averaging over hit demands puts
+    // them on equal footing, so 臀部 wins on its own priority.
+    const contribution=tuning.normalize?matched/(hitTerms.size||1):matched;
     let score=(Number.isFinite(Number(action.recoveryPriority))?Number(action.recoveryPriority):0)+contribution;
     const reason=reasons.find(item=>item.type==='load')||reasons[0];
     return {
@@ -116,6 +113,9 @@
       reason:reason?`匹配本节的${reason.value}负荷`:'作为训练后主要部位恢复建议',
       detail:D().actionDetails?.[candidate.id]?.fields?.['训练目标']||`训练后完成${action.recoveryRegionLabel}轻柔拉伸。`,
       score,
+      // Un-normalised strength, used by match() to pin the hardest-loaded lower
+      // region onto the card set.
+      mass:matched,
       priority:Number.isFinite(Number(action.recoveryPriority))?Number(action.recoveryPriority):0,
     };
   }
@@ -139,13 +139,24 @@
       upper:rankedRegions.filter(item=>item.regionGroup==='upper'),
       lower:rankedRegions.filter(item=>item.regionGroup==='lower'),
     };
+    // Averaging over matched demands rewards narrow cards, which can push the
+    // hardest-loaded region off the sheet: 臀部 declares more targets than
+    // 小腿后侧 but the two often match exactly the same demands. For protocol
+    // sessions the single highest-demand lower region is therefore pinned into
+    // the two lower slots, and the remaining slot stays open to the specialist
+    // competition (which is how 小腿后侧 gets in on running-heavy sessions).
+    let lowerPicks=itemsByGroup.lower.slice(0,2);
+    if(tuning.normalize&&itemsByGroup.lower.length>2){
+      const dominant=itemsByGroup.lower.slice().sort((a,b)=>(b.mass||0)-(a.mass||0))[0];
+      if(dominant&&!lowerPicks.some(item=>item.region===dominant.region))lowerPicks=[dominant,lowerPicks[0]].filter(Boolean);
+    }
     const selected=[];
     if(itemsByGroup.upper[0])selected.push(itemsByGroup.upper[0]);
-    itemsByGroup.lower.slice(0,2).forEach(item=>selected.push(item));
+    lowerPicks.forEach(item=>selected.push(item));
     if(!selected.length)itemsByGroup.upper.slice(0,2).forEach(item=>selected.push(item));
     rankedRegions.forEach(item=>{if(selected.length<3&&!selected.some(current=>current.region===item.region))selected.push(item);});
     const items=selected.slice(0,3).map(item=>{
-      const {score:internalScore,priority,...publicItem}=item;
+      const {score:internalScore,priority,mass,...publicItem}=item;
       return publicItem;
     });
     if(items.length<3)return incomplete('当前动作库不足以生成 3 个不同部位的拉伸建议，请由教练人工安排。',items);

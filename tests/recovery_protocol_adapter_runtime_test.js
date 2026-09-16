@@ -53,10 +53,23 @@ assert(signatures.size>=5,`protocol Recovery must differ per session, saw ${sign
 assert(regions(protocol('conditioning',{familyId:'CON-01',level:'L3'})).includes('upper_back'),
   'rowing / ski Conditioning must expose an upper-back Recovery target');
 
-// The posterior chain is the primary driver of every protocol family.
-const gluteRows=Object.keys(D.actions).length&&['CON-01','CON-02','CON-03','CON-04'].flatMap(familyId=>
+// 臀部 is the hardest-loaded region in every protocol family and must never be
+// squeezed off the sheet by a narrower specialist card.
+const gluteRows=['CON-01','CON-02','CON-03','CON-04'].flatMap(familyId=>
   ['L1','L2','L3','L4'].filter(level=>regions(protocol('conditioning',{familyId,level})).includes('glute')));
-assert(gluteRows.length>=12,`臀部 must stay in most leg-loaded protocol sessions, saw ${gluteRows.length}/16`);
+assert.strictEqual(gluteRows.length,16,`臀部 must appear in every Conditioning session, saw ${gluteRows.length}/16`);
+for(const sessionType of ['SKILL','MIXED']){
+  for(const level of ['L1','L2','L3','L4']){
+    assert(regions(protocol('hyrox',{sessionType,level,protocolId:''})).includes('glute'),
+      `臀部 must appear in HYROX ${sessionType} ${level}`);
+  }
+}
+
+// 小腿后侧 is a routine part of this gym's practice, so it must be able to win a
+// lower slot on load-dominant sessions rather than being locked out.
+const calfRows=['CON-01','CON-02','CON-03','CON-04'].flatMap(familyId=>
+  ['L1','L2','L3','L4'].filter(level=>regions(protocol('conditioning',{familyId,level})).includes('calf')));
+assert(calfRows.length>=4,`小腿后侧 must be selectable on load-dominant sessions, saw ${calfRows.length}/16`);
 
 // --- Adapter signals are derived, weighted, and inert for SLOT --------------
 const conditioningSession=R.resolve('conditioning',{familyId:'CON-01',level:'L3'});
