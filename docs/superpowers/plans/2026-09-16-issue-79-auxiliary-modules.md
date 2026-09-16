@@ -18,7 +18,7 @@
 - [x] Run full Node/Python/schema/build/artifact/syntax gates: Node runtime 16/16, Python 222 passed, JS syntax 138/138, V14.8 schema PASS, `system-data.js` build check PASS, artifact hygiene 3 passed, and `git diff --check` PASS.
 - [x] Run full Chromium suite and record the result: 47 passed, including the stacked #71/#73 PREP regressions and the four Issue #79 browser checks.
 - [x] Use the in-app browser/computer-use surface for a visual/AX check of both modules: index and upper-module screenshots, upper pool filter to 4 entries, lower module at 390px with `scrollWidth === clientWidth === 390`, and action-detail drawer deep link; browser viewport restored afterward.
-- [ ] Push the isolated branch and open an unmerged PR referencing #79.
+- [x] Push the isolated branch and open unmerged PR #117 referencing #79: https://github.com/qinronghai/7fit-training-system-live/pull/117
 
 ## Constraints
 
