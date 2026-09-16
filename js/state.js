@@ -7,6 +7,7 @@
   const SCHEMA_VERSION=1;
   const SAVED_SESSION_SCHEMA_VERSION=1;
   const MAX_SAVED_SESSION_NAME_LENGTH=120;
+  const MAX_SELECTION_NOTE_LENGTH=300;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
@@ -62,6 +63,10 @@
       if(!isObject(entry)||typeof entry.actionId!=='string'||!entry.actionId)continue;
       if(!allowed.has(entry.source))continue;
       out[key]={actionId:entry.actionId,source:entry.source};
+      if(!prep&&typeof entry.venueOverrideReason==='string'){
+        const reason=entry.venueOverrideReason.trim().slice(0,MAX_SELECTION_NOTE_LENGTH);
+        if(reason)out[key].venueOverrideReason=reason;
+      }
     }
     return out;
   }
@@ -319,12 +324,16 @@
   function getSelections(templateId,sessionKey){return clone(sessionRef(templateId,sessionKey)?.selections||{});}
   function getPrepSelections(templateId,sessionKey){return clone(sessionRef(templateId,sessionKey)?.prepSelections||{});}
 
-  function setSelection(templateId,sessionKey,key,actionId,source='manual'){
+  function setSelection(templateId,sessionKey,key,actionId,source='manual',details={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
     if(typeof key!=='string'||!key||typeof actionId!=='string'||!actionId)fail('INVALID_SELECTION','Selection key and actionId are required',{templateId,sessionKey,key});
     if(!FORMAL_SOURCES.has(source))fail('INVALID_SELECTION_SOURCE',`Invalid selection source: ${source}`,{source});
     current.selections[key]={actionId,source};
+    if(!isObject(details))details={};
+    const reason=typeof details.venueOverrideReason==='string'
+      ?details.venueOverrideReason.trim().slice(0,MAX_SELECTION_NOTE_LENGTH):'';
+    if(reason)current.selections[key].venueOverrideReason=reason;
     persist();
     return clone(current.selections[key]);
   }

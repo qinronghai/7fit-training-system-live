@@ -686,6 +686,24 @@ body{font-size:14px;line-height:1.55}
 .body-candidate-top b{font-size:15px}
 .body-candidate-top strong{font-size:13px;white-space:nowrap}
 .body-candidate-card button{min-height:44px;width:100%}
+.body-venue-current{margin:0;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5}
+.body-venue-current.override{background:#eefaf5;color:#176044}
+.body-venue-current.fallback{background:#fff7e6;color:#865b00}
+.body-venue-gate-details{border:1px solid #e8d7b0;border-radius:14px;background:#fffaf0;padding:0 12px}
+.body-venue-gate-details>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:13px;font-weight:850;color:#805900}
+.body-venue-gate-details>p{margin:0;padding:0 0 10px;font-size:12px;line-height:1.55;color:#6e5b38}
+.body-venue-gate-list{display:grid;gap:10px;padding:0 0 12px}
+.body-venue-blocked-card{display:grid;gap:7px;padding:12px;border:1px solid #eadbb8;border-radius:12px;background:#fff}
+.body-venue-blocked-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.body-venue-blocked-head b{font-size:15px}
+.body-venue-blocked-head span{font-size:11px;color:#8a6200;background:#fff0c9;border-radius:999px;padding:4px 7px;white-space:nowrap}
+.body-venue-blocked-card p,.body-venue-blocked-card small{margin:0;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.body-venue-blocked-card small{color:var(--muted)}
+.body-venue-reason{display:grid;gap:5px}
+.body-venue-reason span{font-size:12px;font-weight:800}
+.body-venue-reason input{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;padding:10px;font-size:12px;background:#fff}
+.body-venue-blocked-card button{min-height:44px}
+.body-venue-error{color:#a62828;font-size:12px;line-height:1.45}
 .body-advanced{margin-top:18px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .body-advanced>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;min-height:56px}
 .body-advanced>summary>div{display:grid;gap:3px}

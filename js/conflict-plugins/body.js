@@ -52,6 +52,7 @@
       slotKey,
       actionId:item.actionId,
       currentSelections:selectionMap(session),
+      includeVenueGate:false,
     });
   }
 

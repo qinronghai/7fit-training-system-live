@@ -84,7 +84,8 @@
     "hyroxBenchmarkResultContract": "hyrox.json",
     "hyroxScalingPolicy": "hyrox.json",
     "bodyTrainingModeIds": "body.json",
-    "bodyTrainingModes": "body.json"
+    "bodyTrainingModes": "body.json",
+    "venueCapabilityPolicy": "venue.json"
   },
   "topLevelOrder": [
     "actions",
@@ -105,6 +106,7 @@
     "bodyRoles",
     "bodyTrainingModeIds",
     "bodyTrainingModes",
+    "venueCapabilityPolicy",
     "bodyFamilyIds",
     "bodyFamilies",
     "bodyLevelPolicies",
