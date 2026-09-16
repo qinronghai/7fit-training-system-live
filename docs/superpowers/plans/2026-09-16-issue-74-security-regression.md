@@ -89,5 +89,5 @@
 
 - Focused runtime and browser regression tests passed after the red phase.
 - Full non-browser gates passed: Node runtime, JS syntax, Python 219 passed, V14.8 schema, system-data build check, artifact hygiene, and `git diff --check`.
-- Full Chromium initially exposed the independent #73 PREP failures; those were reproduced on the master baseline, fixed in stacked PR #115, and the #74-focused four tests remained green.
+- Full Chromium initially exposed the independent #73 PREP failures; those were reproduced on the master baseline, fixed in stacked PR #115, and the final stacked suite passed 47/47 after rebasing #74 onto #73.
 - In-app browser visual/AX evidence covered the local static build at 390px and desktop widths; no external test payloads were submitted.
