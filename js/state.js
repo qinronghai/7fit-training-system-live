@@ -6,6 +6,7 @@
   const MODE_KEY='7fit-v14-mode';
   const SCHEMA_VERSION=1;
   const SAVED_SESSION_SCHEMA_VERSION=1;
+  const MAX_SAVED_SESSION_NAME_LENGTH=120;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
@@ -86,6 +87,8 @@
     if(!templateId||!familyId||!level||!resolverVersion)return null;
     const createdAt=typeof value.createdAt==='string'&&value.createdAt?value.createdAt:'';
     const updatedAt=typeof value.updatedAt==='string'&&value.updatedAt?value.updatedAt:createdAt;
+    const fallbackName=`${familyId} · ${level}`;
+    const storedName=typeof value.name==='string'?value.name.trim():'';
     return {
       savedId,
       schemaVersion:Number.isInteger(value.schemaVersion)?value.schemaVersion:SAVED_SESSION_SCHEMA_VERSION,
@@ -98,7 +101,7 @@
       prepSelections:normalizeSelectionMap(value.prepSelections,true),
       createdAt,
       updatedAt,
-      name:typeof value.name==='string'&&value.name.trim()?value.name.trim():`${familyId} · ${level}`,
+      name:storedName&&storedName.length<=MAX_SAVED_SESSION_NAME_LENGTH?storedName:fallbackName,
     };
   }
 
@@ -336,6 +339,19 @@
     return new Date().toISOString();
   }
 
+  function savedSessionName(value,savedId){
+    const next=typeof value==='string'?value.trim():'';
+    if(!next)fail('INVALID_SAVED_SESSION_NAME','课程名称不能为空',{savedId});
+    if(next.length>MAX_SAVED_SESSION_NAME_LENGTH){
+      fail(
+        'INVALID_SAVED_SESSION_NAME',
+        `课程名称不能超过 ${MAX_SAVED_SESSION_NAME_LENGTH} 个字符`,
+        {savedId,maxLength:MAX_SAVED_SESSION_NAME_LENGTH,observedLength:next.length}
+      );
+    }
+    return next;
+  }
+
   function savedSessionId(now){
     const stamp=String(Date.parse(now)||Date.now()).toString(36);
     let id;
@@ -354,9 +370,9 @@
       ?options.savedId.trim()
       :savedSessionId(now);
     if(store.savedSessions[savedId])fail('SAVED_SESSION_EXISTS',`Saved session already exists: ${savedId}`,{savedId});
-    const name=typeof options.name==='string'&&options.name.trim()
-      ?options.name.trim()
-      :`${current.familyId} · ${current.level}`;
+    const name=options.name===undefined
+      ?`${current.familyId} · ${current.level}`
+      :savedSessionName(options.name,savedId);
     const record={
       savedId,
       schemaVersion:SAVED_SESSION_SCHEMA_VERSION,
@@ -390,8 +406,7 @@
   function renameSavedSession(savedId,name,options={}){
     const record=store.savedSessions?.[savedId];
     if(!record)fail('SAVED_SESSION_NOT_FOUND',`Unknown saved session: ${savedId}`,{savedId});
-    const next=typeof name==='string'?name.trim():'';
-    if(!next)fail('INVALID_SAVED_SESSION_NAME','Saved session name is required',{savedId});
+    const next=savedSessionName(name,savedId);
     record.name=next;
     record.updatedAt=nowIso(options.now);
     persist();
