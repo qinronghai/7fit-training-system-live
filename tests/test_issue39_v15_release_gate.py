@@ -29,7 +29,7 @@ def test_v15_release_matrix_artifacts_are_frozen():
     assert "composerCount,80" in f111.replace(" ", "")
 
     body = text("tests/body_resolver_baseline_test.js")
-    assert "8fa0030bfc1b1bfa658ad60ecca0287e0f3a09cc13f4314de3ad74b59eefdf3a" in body
+    assert "b4faf6725508050aa8567d00fcbed147af7c5cbb3059c23835d594e96a5962a5" in body
 
     conditioning = text("tests/conditioning_resolver_baseline_test.js")
     assert "ab9d49afb30577e3c1faa62ce04667b296aeeb756b10979d91616e8897e4d7da" in conditioning

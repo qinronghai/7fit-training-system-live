@@ -421,9 +421,9 @@ def validate_payload(data: dict) -> list[str]:
                     f"{map_name}.{record_id}.{id_field}: must equal map key {record_id}"
                 )
 
-    if not 40 <= len(body_action_meta) <= 60:
+    if not 40 <= len(body_action_meta) <= 72:
         errors.append(
-            f"bodyActionMeta: expected 40-60 candidates, got {len(body_action_meta)}"
+            f"bodyActionMeta: expected 40-72 curated candidates, got {len(body_action_meta)}"
         )
 
     valid_targets = set(body_target_ids)
@@ -485,7 +485,109 @@ def validate_payload(data: dict) -> list[str]:
         if len(intent_ids) != len(set(intent_ids)):
             errors.append(f"bodyFamilies.{family_id}.slotIntents: intentId values must be unique")
 
+        # #93 Family × Level pools and explicit progression / regression chains.
+        level_pools = family.get("levelPools", {})
+        if set(level_pools) != body_level_ids:
+            errors.append(
+                f"bodyFamilies.{family_id}.levelPools: must define exactly L1-L4"
+            )
+        progression_chains = family.get("progressionChains", {})
+        if not isinstance(progression_chains, dict) or len(progression_chains) < 2:
+            errors.append(
+                f"bodyFamilies.{family_id}.progressionChains: expected at least two formal chains"
+            )
+            progression_chains = {}
+
+        for chain_id, chain in progression_chains.items():
+            prefix = f"bodyFamilies.{family_id}.progressionChains.{chain_id}"
+            if not isinstance(chain, dict):
+                continue
+            if chain.get("chainId") != chain_id:
+                errors.append(f"{prefix}.chainId: must equal map key {chain_id}")
+            nodes = chain.get("nodes", [])
+            node_levels = [node.get("level") for node in nodes if isinstance(node, dict)]
+            if node_levels != ["L1", "L2", "L3", "L4"]:
+                errors.append(f"{prefix}.nodes: must be ordered exactly L1,L2,L3,L4")
+            for index, node in enumerate(nodes):
+                if not isinstance(node, dict):
+                    continue
+                action_id = node.get("actionId")
+                fallback_id = node.get("fallbackActionId")
+                if action_id not in body_action_meta:
+                    errors.append(f"{prefix}.nodes.{index}.actionId: unknown Body action {action_id}")
+                elif family_id not in body_action_meta[action_id].get("families", []):
+                    errors.append(f"{prefix}.nodes.{index}.actionId: {action_id} is not in {family_id}")
+                if fallback_id is not None:
+                    if fallback_id not in body_action_meta:
+                        errors.append(f"{prefix}.nodes.{index}.fallbackActionId: unknown Body action {fallback_id}")
+                    elif family_id not in body_action_meta[fallback_id].get("families", []):
+                        errors.append(f"{prefix}.nodes.{index}.fallbackActionId: {fallback_id} is not in {family_id}")
+
         level_policies = data.get("bodyLevelPolicies", {})
+        level_order = ["L1", "L2", "L3", "L4"]
+        for level in level_order:
+            pool = level_pools.get(level, {})
+            prefix = f"bodyFamilies.{family_id}.levelPools.{level}"
+            if not isinstance(pool, dict):
+                continue
+            if pool.get("level") != level:
+                errors.append(f"{prefix}.level: must equal map key {level}")
+            replacement_ids = pool.get("replacementActionIds", [])
+            replacement_set = set(replacement_ids)
+            introduced = set(pool.get("introducedActionIds", []))
+            retained = set(pool.get("retainedActionIds", []))
+            if introduced & retained:
+                errors.append(f"{prefix}: introducedActionIds and retainedActionIds must be disjoint")
+            if introduced | retained != replacement_set:
+                errors.append(f"{prefix}: introduced + retained must exactly partition replacementActionIds")
+            expected_downward = level_policies.get(level, {}).get("eligibleEntryLevels", [])
+            if pool.get("downwardCompatibleLevels") != expected_downward:
+                errors.append(
+                    f"{prefix}.downwardCompatibleLevels: must match Body Level Contract {expected_downward}"
+                )
+            if pool.get("fallbackLevel") != level_policies.get(level, {}).get("fallbackLevel"):
+                errors.append(f"{prefix}.fallbackLevel: must match Body Level Contract")
+            for chain_id in pool.get("progressionChainIds", []):
+                if chain_id not in progression_chains:
+                    errors.append(f"{prefix}.progressionChainIds: unknown chain {chain_id}")
+            for action_id in replacement_ids:
+                meta = body_action_meta.get(action_id)
+                if not isinstance(meta, dict):
+                    errors.append(f"{prefix}.replacementActionIds: unknown Body action {action_id}")
+                    continue
+                if family_id not in meta.get("families", []):
+                    errors.append(f"{prefix}.replacementActionIds: {action_id} not in family {family_id}")
+                if level not in meta.get("levels", []):
+                    errors.append(f"{prefix}.replacementActionIds: {action_id} not listed for {level}")
+                entry_level = next((x for x in level_order if x in meta.get("levels", [])), None)
+                if action_id in introduced and entry_level != level:
+                    errors.append(
+                        f"{prefix}.introducedActionIds: {action_id} entry level is {entry_level}, not {level}"
+                    )
+                if action_id in retained and entry_level == level:
+                    errors.append(
+                        f"{prefix}.retainedActionIds: {action_id} is newly introduced at {level}"
+                    )
+
+            preferred = pool.get("preferredBySlot", {})
+            for slot_key in body_slot_keys:
+                preferred_ids = preferred.get(slot_key, [])
+                active = level_policies.get(level, {}).get("defaultWorkingSets", {}).get(slot_key, 0) > 0
+                if active and not preferred_ids:
+                    errors.append(f"{prefix}.preferredBySlot.{slot_key}: active slot requires preferred actions")
+                role = family.get("slotPolicy", {}).get(slot_key)
+                for action_id in preferred_ids:
+                    if action_id not in replacement_set:
+                        errors.append(
+                            f"{prefix}.preferredBySlot.{slot_key}: {action_id} missing from replacementActionIds"
+                        )
+                        continue
+                    meta = body_action_meta.get(action_id, {})
+                    if role not in meta.get("roles", []):
+                        errors.append(
+                            f"{prefix}.preferredBySlot.{slot_key}: {action_id} does not support role {role}"
+                        )
+
         for level in sorted(body_level_ids):
             policy = level_policies.get(level, {})
             default_sets = policy.get("defaultWorkingSets", {}) if isinstance(policy, dict) else {}
@@ -495,8 +597,13 @@ def validate_payload(data: dict) -> list[str]:
                 role = family.get("slotPolicy", {}).get(slot_key)
                 intent = intents.get(slot_key, {})
                 legal = []
+                level_pool_ids = set(
+                    family.get("levelPools", {}).get(level, {}).get("replacementActionIds", [])
+                )
                 for action_id, meta in body_action_meta.items():
                     action = actions.get(action_id, {})
+                    if action_id not in level_pool_ids:
+                        continue
                     if not isinstance(meta, dict) or not isinstance(action, dict):
                         continue
                     if family_id not in meta.get("families", []) or level not in meta.get("levels", []):

@@ -67,6 +67,6 @@ def test_every_active_family_level_slot_has_static_candidate():
 
 def test_body_v2_candidate_inventory_remains_bounded_and_audited():
     data = payload()
-    assert len(data["bodyActionMeta"]) == 60
+    assert len(data["bodyActionMeta"]) == 68
     assert "V13_VP_SEATED_LIGHT_DB" in data["bodyActionMeta"]
     assert "SECONDARY" in data["bodyActionMeta"]["shanyan_tingshen"]["roles"]

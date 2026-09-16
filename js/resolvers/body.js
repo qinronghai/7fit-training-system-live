@@ -108,6 +108,27 @@
     return intent&&typeof intent==='object'?intent:null;
   }
 
+  function familyLevelPool(familyId,level){
+    const pool=D().bodyFamilies?.[familyId]?.levelPools?.[level];
+    return pool&&typeof pool==='object'?pool:null;
+  }
+
+  function progressionMembership(familyId,actionId){
+    const chains=D().bodyFamilies?.[familyId]?.progressionChains||{};
+    for(const [chainId,chain] of Object.entries(chains)){
+      const nodes=Array.isArray(chain?.nodes)?chain.nodes:[];
+      const index=nodes.findIndex(node=>node?.actionId===actionId);
+      if(index>=0)return {
+        chainId,
+        chainName:String(chain?.name||chainId),
+        index,
+        node:{...nodes[index]},
+        retentionPolicy:String(chain?.retentionPolicy||''),
+      };
+    }
+    return null;
+  }
+
   function exerciseFamilyOf(actionId){
     const meta=D().bodyActionMeta?.[actionId]||{};
     return String(meta.exerciseFamily||actionId||'');
@@ -120,6 +141,46 @@
 
   function loadingStyleOf(meta={}){
     return LOADING_STYLE_BY_PROFILE[meta.repProfile]||'';
+  }
+
+  function assessLevelPoolEligibility({familyId,level,slotKey,actionId}={}){
+    const pool=familyLevelPool(familyId,level),family=D().bodyFamilies?.[familyId];
+    if(!pool||!family||!actionId)return {
+      ok:false,reasons:['BODY_LEVEL_POOL_MISSING'],familyId:String(familyId||''),level:String(level||''),
+      slotKey:String(slotKey||''),actionId:String(actionId||''),preference:'excluded',priorityScore:0,reason:''
+    };
+    const replacement=Array.isArray(pool.replacementActionIds)?pool.replacementActionIds:[];
+    if(!replacement.includes(actionId))return {
+      ok:false,reasons:['BODY_LEVEL_POOL_EXCLUDED'],familyId,level,slotKey,actionId,
+      preference:'excluded',priorityScore:0,reason:`不在 ${familyId} ${level} 正式替换池`
+    };
+    const preferred=Array.isArray(pool.preferredBySlot?.[slotKey])?pool.preferredBySlot[slotKey]:[];
+    const preferredIndex=preferred.indexOf(actionId);
+    const introduced=(pool.introducedActionIds||[]).includes(actionId);
+    const retained=(pool.retainedActionIds||[]).includes(actionId);
+    const membership=progressionMembership(familyId,actionId);
+    let preference='replacement',priorityScore=0.08,reason='当前等级合法替换动作';
+    if(preferredIndex>=0){
+      preference='preferred';
+      priorityScore=preferredIndex===0?1:0.82;
+      reason=`当前 ${level} ${slotKey} 优先池第 ${preferredIndex+1} 位`;
+    }else if(introduced){
+      preference='introduced';
+      priorityScore=0.55;
+      reason=`当前 ${level} 新准入动作，可作为替换`;
+    }else if(retained){
+      preference='retained';
+      priorityScore=0.18;
+      reason=`低等级已掌握动作，${level} 明确保留为向下兼容替换`;
+    }
+    return {
+      ok:true,reasons:[],familyId,level,slotKey,actionId,preference,preferredIndex,
+      priorityScore,reason,
+      qualificationReason:String(pool.qualificationReason||''),
+      downwardCompatibleLevels:[...(pool.downwardCompatibleLevels||[])],
+      fallbackLevel:String(pool.fallbackLevel||''),
+      progression:membership,
+    };
   }
 
   function assessLevelEligibility({level,actionId}={}){
@@ -176,6 +237,8 @@
     if(!meta.families?.includes(familyId))reasons.push('BODY_FAMILY_DEVIATION');
     const levelEligibility=assessLevelEligibility({level,actionId});
     if(!levelEligibility.ok)reasons.push(...levelEligibility.reasons);
+    const levelPoolEligibility=assessLevelPoolEligibility({familyId,level,slotKey,actionId});
+    if(!levelPoolEligibility.ok)reasons.push(...levelPoolEligibility.reasons);
     if(!meta.roles?.includes(role))reasons.push('BODY_ROLE_DEVIATION');
     if(intent.role!==role||intent.slotKey!==slotKey)reasons.push('BODY_SLOT_INTENT_MISMATCH');
     if(action.status!=='可自动编排')reasons.push('BODY_STATUS_INVALID');
@@ -203,7 +266,7 @@
     if((disallowed.stabilityDemand||[]).includes(meta.stabilityDemand)){
       reasons.push('BODY_SLOT_INTENT_STABILITY');
     }
-    return {ok:reasons.length===0,reasons:[...new Set(reasons)],intent,meta,action,levelEligibility};
+    return {ok:reasons.length===0,reasons:[...new Set(reasons)],intent,meta,action,levelEligibility,levelPoolEligibility};
   }
 
   function pairSimilarity(actionId,otherActionId){
@@ -285,6 +348,9 @@
       actionId,
       pairSimilarity:pairReasons.length?pairReasons.map(code=>({code})):[],
       levelEligibility:base.levelEligibility||assessLevelEligibility({level:normalized.level,actionId}),
+      levelPoolEligibility:base.levelPoolEligibility||assessLevelPoolEligibility({
+        familyId:normalized.familyId,level:normalized.level,slotKey:normalized.slotKey,actionId
+      }),
     };
   }
 
@@ -400,12 +466,13 @@
       policy:{meaningfulDirectSets:policy.meaningfulDirectSets,excessiveShare:policy.excessiveShare},
     };
   }
-  function progressionScore(level,candidate){
+  function progressionScore(familyId,level,slotKey,candidate){
     const eligibility=candidate.levelEligibility||assessLevelEligibility({level,actionId:candidate.actionId});
-    if(!eligibility.ok)return 0;
-    const currentIndex=LEVEL_ORDER.indexOf(level),entryIndex=LEVEL_ORDER.indexOf(eligibility.actionEntryLevel||'');
-    const distance=currentIndex>=0&&entryIndex>=0?Math.max(0,currentIndex-entryIndex):0;
-    let value=distance===0?1:distance===1?0.9:distance===2?0.8:0.72;
+    const poolEligibility=candidate.levelPoolEligibility||assessLevelPoolEligibility({
+      familyId,level,slotKey,actionId:candidate.actionId
+    });
+    if(!eligibility.ok||!poolEligibility.ok)return 0;
+    let value=Number(poolEligibility.priorityScore||0);
     if(level==='L1'&&candidate.fatigueCost==='high')value-=0.2;
     if(level==='L2'&&candidate.fatigueCost==='high')value-=0.08;
     return clamp(value);
@@ -484,7 +551,7 @@
     const similarity=candidateSimilarity(candidate,currentSelections,level,slotKey);
     const fatigue=fatigueOverlapScore(candidate,currentSelections,level,slotKey);
     const sessionBalance=balanceScore(afterDistribution);
-    const progressionSuitability=progressionScore(level,candidate);
+    const progressionSuitability=progressionScore(familyId,level,slotKey,candidate);
     const components={
       slotFit:roundScore(weights.slotFit*slotFit),
       targetComplement:roundScore(weights.targetComplement*targetComplement),
@@ -501,7 +568,11 @@
     else if(improvedTargets.length)reasons.push({code:'TARGET_COMPLEMENT',text:`补充当前训练量：${improvedTargets.join('、')}`});
     if(patternNovelty>=0.9)reasons.push({code:'PATTERN_NOVELTY',text:`提供新的动作方向：${candidate.pattern||'未标模式'}`});
     if(sessionBalance>=0.75)reasons.push({code:'SESSION_BALANCE',text:'加入后整体肌群与动作结构更均衡'});
-    if(progressionSuitability>=0.9)reasons.push({code:'LEVEL_FIT',text:`能力要求与当前 ${level} 准入契约匹配`});
+    if(candidate.levelPoolEligibility?.preference==='preferred'){
+      reasons.push({code:'LEVEL_POOL_PREFERRED',text:candidate.levelPoolEligibility.reason});
+    }else if(progressionSuitability>=0.6){
+      reasons.push({code:'LEVEL_FIT',text:candidate.levelPoolEligibility?.reason||`能力要求与当前 ${level} 准入契约匹配`});
+    }
     if(similarity.value>=0.45)tradeoffs.push({code:'EXERCISE_SIMILARITY',text:'与已选动作存在较高相似度'});
     if(fatigue.value>=0.4)tradeoffs.push({code:'LOCAL_FATIGUE_OVERLAP',text:`局部疲劳有叠加：${fatigue.hotspots.slice(0,3).map(x=>x.target).join('、')}`});
     if(afterDistribution.excessive.length)tradeoffs.push({
@@ -689,9 +760,12 @@
         exerciseFamily,
         pattern:String(action.pattern||''),
         levelEligibility:assessment.levelEligibility,
-        levelReason:assessment.levelEligibility?.actionEntryLevel===level
-          ?'当前等级正式准入'
-          :'低等级已掌握动作，当前等级继续合法',
+        levelPoolEligibility:assessment.levelPoolEligibility,
+        levelReason:assessment.levelPoolEligibility?.reason||(
+          assessment.levelEligibility?.actionEntryLevel===level
+            ?'当前等级正式准入'
+            :'低等级已掌握动作，当前等级继续合法'
+        ),
       };
       Object.assign(candidate,Compatibility.scoreCandidate({
         familyId,level,slotKey,candidate,currentSelections,intent,
@@ -706,6 +780,7 @@
       recommended:items[0]?.actionId||'',
       slotIntent:intent?{slotKey,intentId:intent.intentId,role:intent.role}:null,
       levelContract:{...data.bodyLevelPolicies[level]},
+      levelPool:familyLevelPool(familyId,level)?{...familyLevelPool(familyId,level)}:null,
       candidates:items
     };
   }
@@ -831,7 +906,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,pairSimilarity};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessLevelEligibility,assessLevelPoolEligibility,pairSimilarity};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);
