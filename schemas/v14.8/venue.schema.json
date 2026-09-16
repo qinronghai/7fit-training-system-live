@@ -11,6 +11,7 @@
     "bodyLevelMinimumSystemLoadCeilingKg",
     "unknownEquipmentPolicy",
     "manualOverridePolicy",
+    "stationDiversityPolicy",
     "equipmentIds",
     "equipment",
     "actionIds"
@@ -39,6 +40,36 @@
         "requiresReason": {"const": true},
         "minimumReasonLength": {"type": "integer", "minimum": 1, "maximum": 300},
         "auditCode": {"type": "string", "minLength": 1}
+      }
+    },
+    "stationDiversityPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyVersion",
+        "formalRoles",
+        "defaultReuseMode",
+        "unknownStationMode",
+        "explicitReuseToken",
+        "stationGroups"
+      ],
+      "properties": {
+        "policyVersion": {"const": "body-station-v1"},
+        "formalRoles": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {"type": "string", "enum": ["PRIMARY", "SECONDARY", "ACCESSORY", "ISOLATION", "OPTIONAL"]}
+        },
+        "defaultReuseMode": {"const": "BLOCK"},
+        "unknownStationMode": {"const": "ALLOW_UNVERIFIED"},
+        "explicitReuseToken": {"const": "STATION_REUSE_ALLOWED"},
+        "stationGroups": {
+          "type": "object",
+          "required": ["cable-frame"],
+          "additionalProperties": {"$ref": "#/$defs/stationGroup"}
+        }
       }
     },
     "equipmentIds": {
@@ -88,6 +119,17 @@
         "venueAvailability": {"type": "string", "enum": ["AVAILABLE", "UNAVAILABLE", "UNKNOWN", "PENDING_VERIFICATION"]},
         "notes": {"type": "string", "minLength": 1},
         "constraintSource": {"type": "string", "minLength": 1}
+      }
+    },
+    "stationGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stationGroupId", "name", "maxFormalActions", "severity"],
+      "properties": {
+        "stationGroupId": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "maxFormalActions": {"type": "integer", "minimum": 1, "maximum": 6},
+        "severity": {"enum": ["warn", "info"]}
       }
     }
   }

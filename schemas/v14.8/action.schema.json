@@ -26,10 +26,9 @@
     "category": {"type": ["string", "null"]},
     "zone": {"type": ["string", "null"]},
     "equipmentId": {"type": ["string", "null"]},
-    "equipmentClass": {
-      "type": ["string", "null"],
-      "enum": ["fixed_machine", "cable_station", "free_weight", "bodyweight", "other", "unknown", null]
-    },
+      "equipmentClass": {"type": ["string", "null"], "enum": ["fixed_machine", "cable_station", "free_weight", "bodyweight", "other", "unknown", null]},
+      "stationId": {"type": ["string", "null"], "minLength": 1},
+      "stationGroup": {"type": ["string", "null"], "minLength": 1},
     "requiresEquipmentId": {
       "type": "array",
       "minItems": 1,

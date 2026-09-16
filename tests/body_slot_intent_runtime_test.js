@@ -49,7 +49,7 @@ const body04Secondary=Body.candidates({
 const body04SecondaryIds=body04Secondary.candidates.map(x=>x.actionId);
 assert(!body04SecondaryIds.includes('wotu_xiong_tui'),'same-direction flat press must be blocked beside machine chest press');
 assert(body04SecondaryIds.includes('shangxie_yaling_wotu'),'incline press should remain a legitimate changed-angle option');
-assert(body04SecondaryIds.includes('qixie_jian_tui'),'vertical press should remain a legitimate changed-direction option');
+assert(body04SecondaryIds.includes('yaling_jiantui'),'vertical press should remain a legitimate changed-direction option on a different station');
 
 // BODY-03 intentionally forms horizontal + vertical pulling directions.
 const body03Secondary=Body.candidates({

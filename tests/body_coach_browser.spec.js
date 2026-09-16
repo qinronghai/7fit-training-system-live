@@ -285,7 +285,14 @@ test('Body Coach-first default hierarchy keeps focus and primary in the mobile d
     await expect(page.locator('[data-body-risk]')).toBeVisible();
     const rerankedDetails=primaryCard.locator('.body-candidate-details');
     await rerankedDetails.locator('summary').click();
-    await expect(rerankedDetails).toContainText('为什么更合适：');
+    const hasBetterExplanation=(await rerankedDetails.textContent()||'').includes('为什么更合适：');
+    if(hasBetterExplanation){
+      await expect(rerankedDetails).toContainText('为什么更合适：');
+    }else{
+      const stationGate=primaryCard.locator('[data-body-station-gate]');
+      await expect(stationGate).toContainText('同一台物理器械');
+      await expect(stationGate).toContainText('器械胸推');
+    }
   }
 
   await expect390NoOverflow(page);

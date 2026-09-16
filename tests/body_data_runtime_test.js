@@ -4,6 +4,10 @@ global.window=global;
 vm.runInThisContext(fs.readFileSync(`${root}/data/system-data.js`,'utf8'),{filename:'data/system-data.js'});
 
 const D=window.V14_DATA;
+assert(D.venueCapabilityPolicy?.stationDiversityPolicy,'Body station diversity policy must be present in runtime data');
+assert.strictEqual(D.venueCapabilityPolicy.stationDiversityPolicy.defaultReuseMode,'BLOCK');
+assert.strictEqual(D.venueCapabilityPolicy.stationDiversityPolicy.explicitReuseToken,'STATION_REUSE_ALLOWED');
+assert.deepStrictEqual(Object.keys(D.venueCapabilityPolicy.stationDiversityPolicy.stationGroups),['cable-frame']);
 const BODY_KEYS=[
   'bodyTargetIds','bodyTargetCatalog','bodyRoleIds','bodyRoles','bodyTrainingModeIds','bodyTrainingModes','bodyFamilyIds','bodyFamilies',
   'bodyLevelPolicies','bodyPrescriptionProfiles','bodyActionMeta','bodyVolumePolicy','bodyConflictPolicy'
