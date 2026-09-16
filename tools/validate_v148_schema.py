@@ -13,6 +13,13 @@ FORMAL_SLOT_SUFFIXES = {"A", "B", "SUPPORT", "2", "3", "CORE"}
 FORMAL_ROUTES = {"1F_ONLY", "FLEX_1F_2F"}
 MAIN_TIERS = {"T1", "T2", "T3", "T4"}
 SESSION_ID_RE = re.compile(r"^F111-\d{2}-L[1-4]$")
+AUXILIARY_EQUIPMENT_CLASSES = {
+    "fixed_machine",
+    "cable_station",
+    "free_weight",
+    "bodyweight",
+    "other",
+}
 
 
 def load_runtime_data(path: Path) -> dict:
@@ -339,6 +346,12 @@ def validate_payload(data: dict) -> list[str]:
                     errors.append(
                         f"composer auxiliary {action_id}: D1/D2 auxiliary route must be 1F_ONLY, got {actions[action_id].get('route')}"
                     )
+                if action_id in actions:
+                    equipment_class = actions[action_id].get("equipmentClass")
+                    if equipment_class not in AUXILIARY_EQUIPMENT_CLASSES:
+                        errors.append(
+                            f"composer auxiliary {action_id}: equipmentClass must be explicit and supported, got {equipment_class!r}"
+                        )
 
     preset_map = composer.get("officialPresetMap", {})
     for preset_id, preset in preset_map.items():

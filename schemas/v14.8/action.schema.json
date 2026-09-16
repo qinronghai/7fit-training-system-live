@@ -25,7 +25,11 @@
     "pattern": {"type": ["string", "null"]},
     "category": {"type": ["string", "null"]},
     "zone": {"type": ["string", "null"]},
-    "equipmentId": {"type": ["string", "null"]}
+    "equipmentId": {"type": ["string", "null"]},
+    "equipmentClass": {
+      "type": ["string", "null"],
+      "enum": ["fixed_machine", "cable_station", "free_weight", "bodyweight", "other", "unknown", null]
+    }
   },
   "additionalProperties": true
 }
