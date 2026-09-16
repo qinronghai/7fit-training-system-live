@@ -13,6 +13,16 @@
     return M.ConditioningRecovery.payload(session);
   }
 
+  /** Foam-roll items, ranked by the muscle groups this session trained. */
+  function foamItems(session){
+    return M.Foam?.itemsForSession?M.Foam.itemsForSession(session,{level:session?.level||'L1'}):[];
+  }
+  function foamLines(items){
+    return (items||[]).length
+      ?(items||[]).map(item=>`- ${clean(item.name)}${clean(item.prescription)?`｜${clean(item.prescription)}`:''}${clean(item.muscles)?`｜${clean((item.muscles||[]).join(' · '))}`:''}`)
+      :['- 暂无泡沫轴建议'];
+  }
+
   function buildStations(session){
     const blocks=Array.isArray(session?.blocks)&&session.blocks.length
       ?session.blocks
@@ -74,6 +84,7 @@
         stations:buildStations({blocks:[block]}),
       })),
       prep,
+      foam:foamItems(session),
       stations:buildStations(session),
       anatomy:session.anatomyContext||{},
       conflicts:session.conflictContext||{status:'PASS',hardCount:0,warnCount:0,issues:[]},
@@ -123,6 +134,9 @@
       `Protocol：${clean(p.protocolName)}`,
       metricLine(p),
       `Station：${m.stationCount??(p.stations||[]).length} 站｜主块约 ${m.blockMinutes??'—'} 分钟｜整节预计 ${m.estimatedMinutes??'—'} 分钟`,
+      '',
+      '【泡沫轴松解】',
+      ...foamLines(p.foam),
       '',
       '【PREP / PRIMER】',
       ...prepLines(p.prep),

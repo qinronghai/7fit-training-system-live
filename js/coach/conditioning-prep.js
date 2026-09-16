@@ -72,6 +72,9 @@
   }
 
   function renderResolved(resolved,sessionKey,session){
+    const foam=session&&M.Foam?.foamRollCardsFor
+      ?M.Foam.foamRollCardsFor({session,level:session.level||'L1',subtitle:`${session.familyId||'Conditioning'} · ${session.level||'L1'}`})
+      :'';
     const power=session?.prepContext?.powerDemand;
     const primerNote=power==='high'
       ?'爆发功率课：动态活动与动作排演优先，Primer 只做提速与神经准备，不提前制造疲劳。'
@@ -84,7 +87,7 @@
       <p>${esc(slot.purpose||'')}</p>
       <div class="slot-actions"><select class="conditioning-prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：Conditioning 热身动作替换" data-conditioning-prep-session="${esc(sessionKey)}" data-conditioning-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>${emptyGuidance(slot,session)}
     </article>`).join('');
-    return `<section class="section-card conditioning-prep-section"><div class="section-head"><div><h2>PREP / PRIMER｜动态热身 · 动作排演</h2><p>${esc(primerNote)}</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}<div class="conditioning-prep-grid">${cards}</div></section>`;
+    return `<section class="section-card conditioning-prep-section"><div class="section-head"><div><h2>PREP / PRIMER｜动态热身 · 动作排演</h2><p>${esc(primerNote)}</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}${foam}<div class="conditioning-prep-grid">${cards}</div></section>`;
   }
 
   function render(session,sessionKey){

@@ -302,7 +302,7 @@
 
   function renderEditor(ctx){
     const session=ctx.session;
-    const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey):'';
+    const prepHtml=ctx.prep&&M.BodyPrep?.renderResolved?M.BodyPrep.renderResolved(ctx.prep,ctx.sessionKey,ctx.session):'';
     const mainBlock=trainingBlock(ctx,{kind:'main',title:'主训练',caption:'先完成今日主项，再进入第二训练方向。',keys:['PRIMARY','SECONDARY']});
     const accessoryBlock=trainingBlock(ctx,{kind:'accessory',title:'辅助塑形',caption:'补足目标刺激，不和主项抢同一训练职责。',keys:['ACCESSORY']});
     const isolationBlock=trainingBlock(ctx,{kind:'isolation',title:'局部补充',caption:'在主训练质量完成后，用孤立项补足局部训练量。',keys:['ISOLATION-1','ISOLATION-2','OPTIONAL']});

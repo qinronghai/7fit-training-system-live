@@ -33,6 +33,7 @@
       benchmarkHistory,
       metrics:session.main?.content?.metrics||{},
       prep:M.HyroxPrep?.items?M.HyroxPrep.items(prep):[],
+      foam:M.Foam?.itemsForSession?M.Foam.itemsForSession(session,{level:session?.level||'L1'}):[],
       stations:stationRows(session),
       conflicts:session.conflictContext||{status:'PASS',hardCount:0,warnCount:0,issues:[]},
       recovery:M.HyroxRecovery?.payload?M.HyroxRecovery.payload(session):{title:'恢复',items:[],boundary:''},
@@ -45,7 +46,7 @@
     const m=p.metrics||{},lines=['7Fit｜HYROX 教练训练单',clean(p.date),'类型：'+clean(p.sessionTypeName)+'｜'+clean(p.level)+'｜Load '+clean(p.loadLevel)];
     if(p.capacityFocus)lines.push('专项能力：'+clean(p.capacityFocus));
     if(p.benchmark)lines.push('Benchmark：'+clean(p.benchmark.protocolId)+'｜同协议、同工作量、同负重才直接比较成绩');
-    lines.push('结构：'+(m.stationCount??p.stations.length)+' Station｜Rounds '+(m.rounds??'—')+'｜Rest '+(m.restSeconds??'—')+'s｜Transition '+(m.transitionSeconds??'—')+'s｜RPE '+(m.targetRpe??'—'),'','【PREP】',...prepLines(p.prep),'','【HYROX MAIN】');
+    lines.push('结构：'+(m.stationCount??p.stations.length)+' Station｜Rounds '+(m.rounds??'—')+'｜Rest '+(m.restSeconds??'—')+'s｜Transition '+(m.transitionSeconds??'—')+'s｜RPE '+(m.targetRpe??'—'),'','【泡沫轴松解】',...(p.foam||[]).length?(p.foam||[]).map(function(x){return '- '+clean(x.name)+(x.prescription?'｜'+clean(x.prescription):'');}):['- 暂无泡沫轴建议'],'','【PREP】',...prepLines(p.prep),'','【HYROX MAIN】');
     (p.stations||[]).forEach(function(s){
       lines.push(s.order+'. '+s.stationId+'｜'+clean(s.name),clean(s.prescription));
       if(s.notes?.length)lines.push('观察重点：'+s.notes.join('；'));

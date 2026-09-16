@@ -18,6 +18,16 @@
     return M.BodyRecovery.payload(session);
   }
 
+  /** Foam-roll items, ranked by the muscle groups this session trained. */
+  function foamItems(session){
+    return M.Foam?.itemsForSession?M.Foam.itemsForSession(session,{level:session?.level||'L1'}):[];
+  }
+  function foamLines(items){
+    return (items||[]).length
+      ?(items||[]).map(item=>`- ${clean(item.name)}${clean(item.prescription)?`｜${clean(item.prescription)}`:''}${clean(item.muscles)?`｜${clean((item.muscles||[]).join(' · '))}`:''}`)
+      :['- 暂无泡沫轴建议'];
+  }
+
   function buildSlots(session){
     const domains=session?.domainContext?.slots||{};
     return (session?.main?.content||[]).map(slot=>{
@@ -54,6 +64,7 @@
       date:Shared().formatDate?Shared().formatDate(now):'',
       summary:session.summary||'',
       prep,
+      foam:foamItems(session),
       slots:buildSlots(session),
       anatomy:session.anatomyContext||{},
       volume:session.domainContext?.volume||{},
@@ -98,7 +109,7 @@
       `Level：${clean(p.level)}`,
     ];
     if(clean(p.summary))lines.push(`训练重点：${clean(p.summary)}`);
-    lines.push('','【PREP｜动态热身 / 激活】',...prepLines(p.prep),'','【BODY｜正式训练】');
+    lines.push('','【泡沫轴松解】',...foamLines(p.foam),'','【PREP｜动态热身 / 激活】',...prepLines(p.prep),'','【BODY｜正式训练】');
     (p.slots||[]).forEach(slot=>{
       lines.push(`${clean(slot.roleName)}｜${clean(slot.name)}`);
       lines.push(slotPrescription(slot));
@@ -136,7 +147,7 @@
       `训练主题：${clean(p.familyName)||'健美式塑形'}`,
     ];
     if(clean(p.summary))lines.push(`今日重点：${clean(p.summary)}`);
-    lines.push('','【训练前准备】',...prepLines(p.prep),'','【正式训练】');
+    lines.push('','【泡沫轴松解】',...foamLines(p.foam),'','【训练前准备】',...prepLines(p.prep),'','【正式训练】');
     (p.slots||[]).forEach((slot,index)=>{
       lines.push(`${index+1}. ${clean(slot.name)}${memberPurpose(slot)}`);
       lines.push(`${slot.sets??'—'} 组 × ${rangeText(slot.reps)}${slot.perSide?' / 侧':''}｜保留 ${rangeText(slot.rir)} 次余力｜组间休息 ${rangeText(slot.rest,' 秒')}`);

@@ -58,23 +58,23 @@
    * here rather than inferred. The first region is the station's main driver.
    * `label` is only used for diagnostics.
    */
-  const HYROX_STATION_REGIONS=Object.freeze({
-    H1:{label:'滑雪机',regions:['upper_back','glute','hip_flexor']},
-    H2:{label:'雪橇推',regions:['hip_flexor','glute','chest']},
-    H3:{label:'雪橇拉',regions:['upper_back','glute','hamstring']},
-    H4:{label:'波比跳远',regions:['glute','hip_flexor','chest']},
-    H5:{label:'划船机',regions:['upper_back','glute','hip_flexor']},
-    H6:{label:'农夫走',regions:['upper_back','glute']},
-    H7:{label:'负重行进弓步',regions:['glute','hip_flexor']},
-    H8:{label:'墙球',regions:['hip_flexor','glute','chest']},
+  const HYROX_STATIONS=Object.freeze({
+    H1:{label:'滑雪机',muscles:['背阔肌','臀大肌','股四头肌']},
+    H2:{label:'雪橇推',muscles:['股四头肌','臀大肌','三角肌前束']},
+    H3:{label:'雪橇拉',muscles:['背阔肌','臀大肌','腘绳肌']},
+    H4:{label:'波比跳远',muscles:['臀大肌','股四头肌','胸大肌']},
+    H5:{label:'划船机',muscles:['背阔肌','臀大肌','股四头肌']},
+    H6:{label:'农夫走',muscles:['背阔肌','臀大肌']},
+    H7:{label:'负重行进弓步',muscles:['臀大肌','股四头肌']},
+    H8:{label:'墙球',muscles:['股四头肌','臀大肌','三角肌前束']},
   });
 
   /** Fallback when a station id is outside the canonical H1–H8 list. */
-  const HYROX_MODALITY_REGIONS=Object.freeze({
-    ENGINE:{regions:['upper_back','glute']},
-    SLED:{regions:['hip_flexor','glute','chest']},
-    LOCOMOTION:{regions:['glute','hip_flexor']},
-    BALL:{regions:['hip_flexor','glute','chest']},
+  const HYROX_MODALITY_MUSCLES=Object.freeze({
+    ENGINE:['背阔肌','臀大肌'],
+    SLED:['股四头肌','臀大肌','三角肌前束'],
+    LOCOMOTION:['臀大肌','股四头肌'],
+    BALL:['股四头肌','臀大肌','三角肌前束'],
   });
 
   function regionForMuscle(muscle){
@@ -126,13 +126,23 @@
     return out;
   }
 
+  /** The muscles a HYROX station loads; the single source for regions and foam. */
+  function hyroxStationMuscles(station){
+    const table=HYROX_STATIONS[String(station.stationId||'')];
+    if(table)return {muscles:table.muscles,source:'station-table'};
+    const fallback=HYROX_MODALITY_MUSCLES[String(station.modality||'')];
+    return fallback?{muscles:fallback,source:'modality-fallback'}:null;
+  }
+
   function hyroxStationSignals(station){
-    const stationId=String(station.stationId||'');
-    const table=HYROX_STATION_REGIONS[stationId];
-    const demand=table||HYROX_MODALITY_REGIONS[String(station.modality||'')];
+    const demand=hyroxStationMuscles(station);
     if(!demand)return [];
-    return demand.regions.map((region,index)=>
-      emit(station.key,station.actionId,region,index===0?PRIMARY_WEIGHT:SECONDARY_WEIGHT,table?'station-table':'modality-fallback',{}));
+    const out=[];
+    demand.muscles.forEach(muscle=>{
+      const region=regionForMuscle(muscle);
+      if(region)out.push(emit(station.key,station.actionId,region,PRIMARY_WEIGHT,demand.source,{muscle}));
+    });
+    return out;
   }
 
   function protocolSignals(resolvedSession){
@@ -163,5 +173,34 @@
     return totals;
   }
 
-  window.V14RecoveryProtocolAdapter={signals,exposureByRegion,HYROX_STATION_REGIONS,MUSCLE_REGIONS};
+  /**
+   * Muscle-group exposure for a whole session, e.g. `{背阔肌:30,臀大肌:27}`.
+   * Lowercase-free muscle names from the curated anatomy layer; used by the foam
+   * roller picker, which is organised by muscle rather than by recovery region.
+   */
+  function muscleExposure(resolvedSession){
+    const add=(totals,muscles,weight)=>{
+      (muscles||[]).forEach(muscle=>{totals[muscle]=(totals[muscle]||0)+weight;});
+    };
+    const totals={};
+    if(resolvedSession?.main?.kind==='PROTOCOL'){
+      Object.values(resolvedSession?.domainContext?.stations||{}).filter(Boolean).forEach(station=>{
+        const hyrox=hyroxStationMuscles(station);
+        if(hyrox){add(totals,hyrox.muscles,PRIMARY_WEIGHT);return;}
+        const record=window.V14Anatomy?.get?.(station.actionId);
+        if(!record)return;
+        add(totals,record.primary,PRIMARY_WEIGHT);
+        add(totals,record.secondary,SECONDARY_WEIGHT);
+      });
+      return totals;
+    }
+    const context=resolvedSession?.anatomyContext;
+    if(!context)return totals;
+    add(totals,context.primary,PRIMARY_WEIGHT);
+    add(totals,context.secondary,SECONDARY_WEIGHT);
+    add(totals,context.stabilizers,STABILIZER_WEIGHT);
+    return totals;
+  }
+
+  window.V14RecoveryProtocolAdapter={signals,exposureByRegion,muscleExposure,HYROX_STATIONS,MUSCLE_REGIONS};
 })();

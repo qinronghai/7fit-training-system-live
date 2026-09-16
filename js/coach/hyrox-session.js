@@ -256,7 +256,7 @@
     return '<a class="back-link" href="#/coach/hyrox">← 返回 HYROX</a>'+
       '<section class="view-hero hyrox-session-hero"><span class="eyebrow">HYROX / '+esc(ctx.sessionType)+'</span><h1>'+esc(TYPE_LABEL[ctx.sessionType])+' · '+esc(ctx.level)+'</h1><p>'+esc(ctx.session.summary)+'</p><div class="chips"><span class="chip">'+esc(ctx.session.domainContext.orderedStations.length)+' Station</span><span class="chip">Turf '+esc(ctx.session.domainContext.turfLengthMeters)+'m</span><span class="chip">Load '+esc(ctx.session.domainContext.loadLevel)+'</span></div></section>'+
       controlPanel(ctx)+calibrationPanel(ctx)+summaryPanel(ctx)+
-      (M.HyroxPrep?.renderResolved?M.HyroxPrep.renderResolved(ctx.prep,ctx.sessionKey):'')+
+      (M.HyroxPrep?.renderResolved?M.HyroxPrep.renderResolved(ctx.prep,ctx.sessionKey,ctx.session):'')+
       mainTraining(ctx)+(ctx.sessionType==='BENCHMARK'&&M.HyroxBenchmarkUI?.render?M.HyroxBenchmarkUI.render(ctx.session):'')+conflictPanel(ctx)+(M.HyroxRecovery?.render?M.HyroxRecovery.render(ctx.session):'')+copyPanel()+
       (M.SavedSessionsUI?.controls?.(route)||'');
   }

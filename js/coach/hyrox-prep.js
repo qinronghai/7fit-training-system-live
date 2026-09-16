@@ -43,7 +43,10 @@
       return '<option value="'+esc(item.actionId)+'" '+(item.actionId===slot.actionId?'selected':'')+'>'+esc(item.prepGrade||'PREP')+'｜'+esc(item.name)+'</option>';
     }).join('');
   }
-  function renderResolved(result,sessionKey){
+  function renderResolved(result,sessionKey,session){
+    const foam=session&&M.Foam?.foamRollCardsFor
+      ?M.Foam.foamRollCardsFor({session,level:session.level||'L1',subtitle:`HYROX ${session.sessionType||''} · ${session.level||'L1'}`})
+      :'';
     const notice=(result?.fallbackSlots||[]).length?'<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：'+esc(result.fallbackSlots.join(' / '))+'</div>':'';
     const cards=(result?.slots||[]).map(function(slot){
       return '<article class="session-warmup-card prep-slot-card hyrox-prep-card" data-hyrox-prep-slot-card="'+esc(slot.slotKey)+'">'+
@@ -52,8 +55,8 @@
         '<div class="slot-actions"><select class="hyrox-prep-select" data-hyrox-prep-session="'+esc(sessionKey)+'" data-hyrox-prep-slot="'+esc(slot.slotKey)+'" '+(slot.candidates?.length?'':'disabled')+'>'+options(slot)+'</select>'+
         (slot.why?'<small>'+esc(slot.why)+'</small>':'')+'</div></article>';
     }).join('');
-    return '<section class="section-card hyrox-prep-section"><div class="section-head"><div><h2>PREP｜动态热身 · Station 准备</h2><p>由共享 PREP Resolver 根据本节实际 Station、等级、冲击与动作模式重新匹配。</p></div><span class="time-badge">约 10–12 分钟</span></div>'+notice+'<div class="hyrox-prep-grid">'+cards+'</div></section>';
+    return '<section class="section-card hyrox-prep-section"><div class="section-head"><div><h2>PREP｜动态热身 · Station 准备</h2><p>由共享 PREP Resolver 根据本节实际 Station、等级、冲击与动作模式重新匹配。</p></div><span class="time-badge">约 10–12 分钟</span></div>'+notice+foam+'<div class="hyrox-prep-grid">'+cards+'</div></section>';
   }
-  function render(session,sessionKey){return renderResolved(resolve(session,sessionKey),sessionKey);}
+  function render(session,sessionKey){return renderResolved(resolve(session,sessionKey),sessionKey,session);}
   M.HyroxPrep={prepContext,resolve,setSelection,items,renderResolved,render};
 })();

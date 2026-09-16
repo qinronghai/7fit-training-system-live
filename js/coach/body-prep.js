@@ -55,7 +55,8 @@
     return slot.candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.prepGrade||'PREP')}｜${esc(candidate.name)}</option>`).join('');
   }
 
-  function renderResolved(resolved,sessionKey){
+  function renderResolved(resolved,sessionKey,session){
+    const foam=foamRollCardsFor(session);
     const fallback=(resolved?.fallbackSlots||[]).length
       ?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=(resolved?.slots||[]).map(slot=>`<article class="session-warmup-card prep-slot-card body-prep-card" data-prep-slot-card="${esc(slot.slotKey)}">
@@ -64,10 +65,16 @@
       <p>${esc(slot.purpose||'')}</p>
       <div class="slot-actions"><select class="body-prep-select" data-body-prep-session="${esc(sessionKey)}" data-body-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>
     </article>`).join('');
-    return `<section class="section-card body-prep-section"><div class="section-head"><div><h2>PREP｜动态热身 / 激活</h2><p>五功能槽位来自共享 PREP Resolver V2；替换仅保存当前 Body Session 的 manual intent。</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}<div class="session-warmup-grid prep-slot-grid">${cards}</div></section>`;
+    return `<section class="section-card body-prep-section"><div class="section-head"><div><h2>PREP｜动态热身 / 激活</h2><p>五功能槽位来自共享 PREP Resolver V2；替换仅保存当前 Body Session 的 manual intent。</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}${foam}<div class="session-warmup-grid prep-slot-grid">${cards}</div></section>`;
   }
 
-  function render(session,sessionKey){return renderResolved(resolve(session,sessionKey),sessionKey);}
+  function foamRollCardsFor(session){
+    if(!session||!M.Foam?.foamRollCardsFor)return '';
+    const family=window.V14_DATA?.bodyFamilies?.[session.familyId]?.name||session.familyId||'Body';
+    return M.Foam.foamRollCardsFor({session,level:session.level||'L1',subtitle:`${family} · ${session.level||'L1'}`});
+  }
+
+  function render(session,sessionKey){return renderResolved(resolve(session,sessionKey),sessionKey,session);}
 
   M.BodyPrep={resolve,setSelection,items,render,renderResolved};
 })();
