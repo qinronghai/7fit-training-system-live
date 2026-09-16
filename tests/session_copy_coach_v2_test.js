@@ -92,7 +92,9 @@ assert(coach.includes('C 高位平板交替触肩：骨盆旋转 / 重心转移'
 assert(coach.includes('RECOVERY'));
 assert(coach.includes('臀部拉伸 / 背部拉伸'));
 assert(coach.includes('课后有氧｜约 30 分钟'));
-assert(coach.includes('跑步机爬坡 / 楼梯机 / 快走 / 其他有氧'));
+// Post-cardio now reports the member's selected machine instead of listing every
+// option: the block became a 器械 / 时长 / 平均心率 selector.
+assert(coach.includes('器械：跑步机'));
 assert(coach.includes('平均心率：130–140 bpm 左右（燃烧脂肪心率）'));
 for(const hidden of ['【本节主要训练肌群】','【系统提醒】','当前方案未发现替换后冲突。','POST CARDIO ONLY','eq-','actionId']){
   assert(!coach.includes(hidden),`coach copy leaked ${hidden}`);

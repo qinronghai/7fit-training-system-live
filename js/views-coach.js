@@ -30,6 +30,22 @@
     if(route.page==='template'||route.page==='template-compose')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
     return Home.render(route);
   }
+  /** POST CARDIO ONLY｜课后自主有氧 selector: 器械 / 时长 / 平均心率. */
+  function bindPostCardio(){
+    const select=window.V14CoachModules?.PostCardio;
+    if(!select)return;
+    document.querySelectorAll('.post-cardio-equipment').forEach(el=>el.addEventListener('change',()=>{
+      select.setSelection(el.dataset.postCardioEquipment,{actionId:el.value});rerender();
+    }));
+    document.querySelectorAll('.post-cardio-minutes').forEach(el=>el.addEventListener('change',()=>{
+      select.setSelection(el.dataset.postCardioMinutes,{minutes:el.value});rerender();
+    }));
+    document.querySelectorAll('.post-cardio-heart-rate').forEach(el=>el.addEventListener('change',()=>{
+      const [min,max]=String(el.value).split('-');
+      select.setSelection(el.dataset.postCardioHeartRate,{heartRateMin:min,heartRateMax:max});rerender();
+    }));
+  }
+
   function bind(route){
     const root=document.getElementById('app-main');
     const rerender=()=>{
@@ -75,6 +91,7 @@
       document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
+      bindPostCardio();
       bindSaved();
       bindFavorites();
       return;
@@ -106,6 +123,7 @@
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
+    bindPostCardio();
     bindSaved();
     bindFavorites();
   }

@@ -24,6 +24,12 @@
     {re:/水平拉|垂直拉|上肢拉/,title:'上肢拉',focus:'上肢拉力'}
   ];
   const CARDIO_TEXT='选择跑步机爬坡、爬楼梯机、快走或其他有氧，时间 30 分钟左右，平均心率 130 到 140 左右（燃烧脂肪心率）。';
+  /** Member post-cardio sentence; falls back to the shipped wording. */
+  function cardioText(p){
+    const mod=window.V14CoachModules?.PostCardio;
+    if(mod&&typeof mod.memberText==='function')return mod.memberText(p?.postCardioPlan||undefined);
+    return CARDIO_TEXT;
+  }
 
   function prepLines(items,prefix){
     if(!(items||[]).length)return [`${prefix}：—`];
@@ -247,7 +253,8 @@
       lines.push(`${i+1}. ${clean(x.name)}${rx?`｜${rx}`:''}`);
       if(purpose)lines.push(`   ${purpose}`);
     });
-    lines.push('','今日训练重点',theme.focus,'','训练后恢复',dotList(unique((p.recovery||[]).map(recoveryMemberName))),'','课后有氧｜约 30 分钟',CARDIO_TEXT);
+    const plan=p.postCardioPlan||null;
+    lines.push('','今日训练重点',theme.focus,'','训练后恢复',dotList(unique((p.recovery||[]).map(recoveryMemberName))),'',`课后有氧｜约 ${plan?plan.minutes:30} 分钟`,cardioText(p));
     return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
   }
   function fallbackCopy(text,doc){if(!doc?.body||typeof doc.createElement!=='function'||typeof doc.execCommand!=='function')return false;const area=doc.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';area.style.pointerEvents='none';doc.body.appendChild(area);area.focus();area.select();let ok=false;try{ok=doc.execCommand('copy');}catch(_){ok=false;}area.remove();return !!ok;}

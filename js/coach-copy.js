@@ -2,11 +2,19 @@
   const clean=x=>String(x??'').trim();
   const D=()=>window.V14_DATA||{};
   const LEVEL_LABELS={L1:'动作控制',L2:'基础负重',L3:'负重进阶',L4:'完整能力'};
-  const COACH_CARDIO_LINES=[
+  /** Post-cardio lines come from V14CoachModules.PostCardio so this formatter and
+   *  the member one can no longer drift; the fallback keeps the shipped wording
+   *  for payloads built before the selector existed. */
+  const COACH_CARDIO_FALLBACK=[
     '课后有氧｜约 30 分钟',
-    '跑步机爬坡 / 楼梯机 / 快走 / 其他有氧',
+    '器械：跑步机',
     '平均心率：130–140 bpm 左右（燃烧脂肪心率）'
   ];
+  function coachCardioLines(p){
+    const mod=window.V14CoachModules?.PostCardio;
+    if(mod&&typeof mod.copyLines==='function')return mod.copyLines(p?.postCardioPlan||undefined);
+    return COACH_CARDIO_FALLBACK;
+  }
 
   function base(){return window.V14SessionCopy||{};}
   function formatDate(now){return typeof base().formatDate==='function'?base().formatDate(now):'';}
@@ -147,7 +155,7 @@
     });
     const observations=observationItems(p);
     if(observations.length)lines.push('本节观察',...observations,'');
-    lines.push('RECOVERY',joinSlash(p?.recovery)||'—','',...COACH_CARDIO_LINES);
+    lines.push('RECOVERY',joinSlash(p?.recovery)||'—','',...coachCardioLines(p));
     return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
   }
 
