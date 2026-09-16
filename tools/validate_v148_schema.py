@@ -20,6 +20,27 @@ AUXILIARY_EQUIPMENT_CLASSES = {
     "bodyweight",
     "other",
 }
+CONTENT_REVIEW_FIELDS = ["source", "evidenceLevel", "reviewStatus", "reviewedAt", "reviewerNote"]
+CONTENT_REVIEW_STATUSES = {"reviewed", "pending", "experimental"}
+CONTENT_REVIEW_EVIDENCE_LEVELS = {"internal_curated", "source_referenced", "not_assessed"}
+CONTENT_REVIEW_DOMAINS = {
+    "actions": "actions",
+    "actionDetails": "actionDetails",
+    "sessions": "sessions",
+    "bodyFamilies": "bodyFamilies",
+    "conditioningFamilies": "conditioningFamilies",
+    "conditioningProtocols": "conditioningProtocols",
+    "hyroxSessionTypes": "hyroxSessionTypes",
+    "hyroxStations": "hyroxStations",
+    "hyroxBenchmarkProtocols": "hyroxBenchmarkProtocols",
+    "support": "supportDetails",
+    "core": "coreDetails",
+    "prep": "warmupDetails",
+    "foam": "foamRollDetails",
+    "templates": "templateRegistry",
+    "anatomy": "records",
+}
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def load_runtime_data(path: Path) -> dict:
@@ -27,6 +48,14 @@ def load_runtime_data(path: Path) -> dict:
     match = re.search(r"window\.V14_DATA\s*=\s*(\{.*\});\s*$", text, re.S)
     if not match:
         raise ValueError("window.V14_DATA payload missing")
+    return json.loads(match.group(1))
+
+
+def load_anatomy_data(path: Path) -> dict:
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"window\.V14_ANATOMY\s*=\s*(\{.*\});\s*$", text, re.S)
+    if not match:
+        raise ValueError("window.V14_ANATOMY payload missing")
     return json.loads(match.group(1))
 
 
@@ -76,13 +105,109 @@ def _session_slot_suffix(session_key: str, slot_key) -> str | None:
     return slot_key[len(prefix):]
 
 
-def validate_payload(data: dict) -> list[str]:
+def _content_review_sources(data: dict, anatomy: dict | None = None) -> dict[str, dict]:
+    sources = {domain: data.get(key, {}) for domain, key in CONTENT_REVIEW_DOMAINS.items()}
+    if anatomy is not None:
+        sources["anatomy"] = anatomy.get("records", {})
+    return {domain: source if isinstance(source, dict) else {} for domain, source in sources.items()}
+
+
+def _validate_review_metadata(errors: list[str], metadata, prefix: str, statuses, evidence_levels) -> None:
+    if not isinstance(metadata, dict):
+        errors.append(f"{prefix}: metadata must be an object")
+        return
+    for field in CONTENT_REVIEW_FIELDS:
+        if field not in metadata:
+            errors.append(f"{prefix}: missing required field {field}")
+    source = metadata.get("source")
+    if not isinstance(source, str) or not source.strip():
+        errors.append(f"{prefix}.source: must be a non-empty string")
+    if metadata.get("evidenceLevel") not in evidence_levels:
+        errors.append(f"{prefix}.evidenceLevel: unknown level {metadata.get('evidenceLevel')!r}")
+    status = metadata.get("reviewStatus")
+    if status not in statuses:
+        errors.append(f"{prefix}.reviewStatus: unknown status {status!r}")
+    reviewed_at = metadata.get("reviewedAt")
+    if reviewed_at is not None and (not isinstance(reviewed_at, str) or not DATE_RE.fullmatch(reviewed_at)):
+        errors.append(f"{prefix}.reviewedAt: must be null or YYYY-MM-DD")
+    if status == "reviewed" and reviewed_at is None:
+        errors.append(f"{prefix}.reviewedAt: reviewed content must have a review date")
+    note = metadata.get("reviewerNote")
+    if not isinstance(note, str) or not note.strip():
+        errors.append(f"{prefix}.reviewerNote: must be a non-empty string")
+
+
+def validate_content_review(data: dict, anatomy: dict | None = None) -> list[str]:
+    errors: list[str] = []
+    contract = data.get("contentReview")
+    if not isinstance(contract, dict):
+        return ["contentReview: required metadata contract is missing"]
+    if contract.get("schemaVersion") != 1:
+        errors.append("contentReview.schemaVersion: must be 1")
+
+    statuses = contract.get("statusValues")
+    if not isinstance(statuses, list) or set(statuses) != CONTENT_REVIEW_STATUSES:
+        errors.append("contentReview.statusValues: must contain reviewed, pending, experimental")
+        statuses = list(CONTENT_REVIEW_STATUSES)
+    evidence_levels = contract.get("evidenceLevels")
+    if not isinstance(evidence_levels, list) or set(evidence_levels) != CONTENT_REVIEW_EVIDENCE_LEVELS:
+        errors.append("contentReview.evidenceLevels: must contain internal_curated, source_referenced, not_assessed")
+        evidence_levels = list(CONTENT_REVIEW_EVIDENCE_LEVELS)
+    if contract.get("requiredFields") != CONTENT_REVIEW_FIELDS:
+        errors.append("contentReview.requiredFields: must declare the minimum five metadata fields in order")
+
+    domains = contract.get("requiredDomains")
+    if not isinstance(domains, list) or len(domains) != len(set(domains)) or not domains:
+        errors.append("contentReview.requiredDomains: must be a non-empty unique list")
+        domains = []
+    unknown_domains = sorted(set(domains) - set(CONTENT_REVIEW_DOMAINS))
+    if unknown_domains:
+        errors.append(f"contentReview.requiredDomains: unknown domains {unknown_domains}")
+
+    defaults = contract.get("domainDefaults")
+    if not isinstance(defaults, dict):
+        errors.append("contentReview.domainDefaults: must be an object")
+        defaults = {}
+    overrides = contract.get("overrides")
+    if not isinstance(overrides, dict):
+        errors.append("contentReview.overrides: must be an object")
+        overrides = {}
+    sources = _content_review_sources(data, anatomy)
+    for domain in domains:
+        default = defaults.get(domain)
+        _validate_review_metadata(errors, default, f"contentReview.domainDefaults.{domain}", set(statuses), set(evidence_levels))
+        domain_overrides = overrides.get(domain, {})
+        if domain_overrides is None:
+            domain_overrides = {}
+        if not isinstance(domain_overrides, dict):
+            errors.append(f"contentReview.overrides.{domain}: must be an object")
+            continue
+        if domain not in sources:
+            continue
+        known_ids = set(sources[domain])
+        for item_id, metadata in domain_overrides.items():
+            if domain != "anatomy" or anatomy is not None:
+                if item_id not in known_ids:
+                    errors.append(f"contentReview.overrides.{domain}.{item_id}: unknown content id")
+            _validate_review_metadata(errors, metadata, f"contentReview.overrides.{domain}.{item_id}", set(statuses), set(evidence_levels))
+    extra_defaults = sorted(set(defaults) - set(domains))
+    if extra_defaults:
+        errors.append(f"contentReview.domainDefaults: undeclared domains {extra_defaults}")
+    extra_overrides = sorted(set(overrides) - set(domains))
+    if extra_overrides:
+        errors.append(f"contentReview.overrides: undeclared domains {extra_overrides}")
+    return sorted(set(errors))
+
+
+def validate_payload(data: dict, anatomy: dict | None = None) -> list[str]:
     errors: list[str] = []
     actions = data.get("actions", {})
     sessions = data.get("sessions", {})
     composer = data.get("composer", {})
     template_ids = data.get("templateIds", [])
     template_registry = data.get("templateRegistry", {})
+
+    errors.extend(validate_content_review(data, anatomy))
 
     # JSON Schema contracts.
     for action_key, action in sorted(actions.items()):
@@ -1092,7 +1217,8 @@ def validate_payload(data: dict) -> list[str]:
 
 def validate_repository(root: Path = ROOT) -> list[str]:
     data = load_runtime_data(root / "data" / "system-data.js")
-    return validate_payload(data)
+    anatomy = load_anatomy_data(root / "data" / "anatomy-data.js")
+    return validate_payload(data, anatomy)
 
 
 def main() -> int:

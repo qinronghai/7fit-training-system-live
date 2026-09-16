@@ -3,6 +3,7 @@
     {date:'2026-09-14',time:'14:00',type:'功能',area:'训练体系',title:'新增 D1 / D2 辅助动作模块',detail:'系统模式新增 11｜上肢辅助动作与 12｜下肢固定器械动作模块；内容由 Composer 辅助动作池实时去重生成，并按显式 equipmentClass 展示固定器械与绳索 / 龙门架辅助。',issue:79,commit:''},
     {date:'2026-09-14',time:'15:00',type:'规则',area:'Body / Venue',title:'接入场馆最低负重 Gate',detail:'将哈克深蹲与六角杠的真实起始系统负重接入 Body Resolver；L1/L2 自动回退到安全候选，未知负重保持未核验，教练覆盖必须记录理由并进入审计。',issue:94,commit:''},
     {date:'2026-09-14',time:'14:17',type:'规则',area:'Body L1–L4',title:'建立 Family × Level 动作池与进阶链',detail:'为 4 个 Body Family × L1–L4 增加正式优先池、替换池、进阶/退阶链与向下兼容规则；补齐髋铰链、肩胛拉与高等级推拉端点，并保留 L4 稳定有效器械。',issue:93,commit:''},
+    {date:'2026-09-16',time:'22:20',type:'数据',area:'Content Review',title:'建立训练内容 Evidence / Review 元数据层',detail:'为正式 Actions、Templates、PREP、Body、Conditioning、HYROX 与 Anatomy 数据建立最小来源/证据/审核契约；系统维护页默认筛出待审核内容，CI 校验缺失或非法元数据。',issue:13,commit:''},
     {date:'2026-09-14',time:'13:38',type:'修复',area:'UI / Audit',title:'收口 V14.7 live 截图验收问题',detail:'修复 F111 PREP 详情 CTA 挤压、动作库筛选响应式与下拉可访问性；Conditioning 空 Primer 增加约束原因、可跳过与人工安排安全说明，并补齐多尺寸浏览器回归。',issue:71,commit:''},
     {date:'2026-09-14',time:'12:21',type:'功能',area:'Body 首页',title:'Body 首页重构为 Family-first 导航',detail:'新增 6 种真实数据训练模式、Family 详情 → L1–L4 导航，保留旧 Session 深链并强化自由编课入口。',issue:81,commit:'f75e190'},
     {date:'2026-09-14',time:'10:30',type:'体验',area:'Body Session',title:'训练页升级为 Coach-first 信息层级',detail:'优先展示今日重点、主项、风险与替换决策；完整诊断收进高级详情，移动端与保存/恢复行为保持不变。',issue:70,commit:'f18d6f8'},
