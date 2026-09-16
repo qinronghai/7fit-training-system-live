@@ -494,7 +494,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "recoveryEligible": true,
+      "recoveryRegion": "chest",
+      "recoveryRegionLabel": "胸前侧",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平推", "垂直推"],
+      "recoveryTargetLoadFamilies": ["上肢推"],
+      "recoveryPriority": 90,
+      "recoveryPrescription": "45 秒"
     },
     "kuanju_shenzhan": {
       "id": "kuanju_shenzhan",
@@ -609,7 +617,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "recoveryEligible": true,
+      "recoveryRegion": "glute",
+      "recoveryRegionLabel": "臀部",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["髋伸展", "蹲", "单腿拉", "髋铰链"],
+      "recoveryTargetLoadFamilies": ["后链 / 髋主导", "膝主导", "髋稳定"],
+      "recoveryPriority": 88,
+      "recoveryPrescription": "45 秒"
     },
     "lashen_huansheng": {
       "id": "lashen_huansheng",
@@ -628,7 +644,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "recoveryEligible": true,
+      "recoveryRegion": "hamstring",
+      "recoveryRegionLabel": "大腿后侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["单腿拉", "髋铰链", "髋伸展"],
+      "recoveryTargetLoadFamilies": ["后链 / 髋主导"],
+      "recoveryPriority": 84,
+      "recoveryPrescription": "45 秒"
     },
     "lashen_kuanju": {
       "id": "lashen_kuanju",
@@ -647,7 +671,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "recoveryEligible": true,
+      "recoveryRegion": "hip_flexor",
+      "recoveryRegionLabel": "髋前侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["蹲", "髋伸展", "单腿拉", "髋铰链"],
+      "recoveryTargetLoadFamilies": ["膝主导", "后链 / 髋主导"],
+      "recoveryPriority": 80,
+      "recoveryPrescription": "45 秒"
     },
     "danbi_yaling_huachuan": {
       "id": "danbi_yaling_huachuan",
@@ -879,7 +911,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 体能热身大厅"
+      "zone": "2F 体能热身大厅",
+      "recoveryEligible": true,
+      "recoveryRegion": "upper_back",
+      "recoveryRegionLabel": "上背与腋下",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平拉", "垂直拉"],
+      "recoveryTargetLoadFamilies": ["上肢拉"],
+      "recoveryPriority": 90,
+      "recoveryPrescription": "45 秒"
     },
     "huaxueji_wentai": {
       "id": "huaxueji_wentai",
@@ -2838,7 +2878,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "chest",
+      "recoveryRegionLabel": "胸前侧",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平推", "垂直推"],
+      "recoveryTargetLoadFamilies": ["上肢推"],
+      "recoveryPriority": 70,
+      "recoveryPrescription": "45 秒"
     },
     "passive_lat_stretch": {
       "id": "passive_lat_stretch",
@@ -2857,7 +2905,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "upper_back",
+      "recoveryRegionLabel": "上背与腋下",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平拉", "垂直拉"],
+      "recoveryTargetLoadFamilies": ["上肢拉"],
+      "recoveryPriority": 70,
+      "recoveryPrescription": "45 秒"
     },
     "passive_posterior_shoulder_stretch": {
       "id": "passive_posterior_shoulder_stretch",
@@ -2876,7 +2932,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "posterior_shoulder",
+      "recoveryRegionLabel": "肩后侧",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平拉", "垂直拉", "水平推", "垂直推"],
+      "recoveryTargetLoadFamilies": ["上肢拉", "上肢推"],
+      "recoveryPriority": 72,
+      "recoveryPrescription": "45 秒"
     },
     "passive_triceps_stretch": {
       "id": "passive_triceps_stretch",
@@ -2895,7 +2959,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "triceps",
+      "recoveryRegionLabel": "上臂后侧",
+      "recoveryRegionGroup": "upper",
+      "recoveryTargetPatterns": ["水平推", "垂直推"],
+      "recoveryTargetLoadFamilies": ["上肢推"],
+      "recoveryPriority": 68,
+      "recoveryPrescription": "45 秒"
     },
     "passive_glute_stretch": {
       "id": "passive_glute_stretch",
@@ -2914,7 +2986,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "glute",
+      "recoveryRegionLabel": "臀部",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["髋伸展", "蹲", "单腿拉", "髋铰链"],
+      "recoveryTargetLoadFamilies": ["后链 / 髋主导", "膝主导", "髋稳定"],
+      "recoveryPriority": 68,
+      "recoveryPrescription": "45 秒"
     },
     "passive_hamstring_stretch": {
       "id": "passive_hamstring_stretch",
@@ -2933,7 +3013,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "hamstring",
+      "recoveryRegionLabel": "大腿后侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["单腿拉", "髋铰链", "髋伸展"],
+      "recoveryTargetLoadFamilies": ["后链 / 髋主导"],
+      "recoveryPriority": 66,
+      "recoveryPrescription": "45 秒"
     },
     "passive_hip_flexor_stretch": {
       "id": "passive_hip_flexor_stretch",
@@ -2952,7 +3040,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "hip_flexor",
+      "recoveryRegionLabel": "髋前侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["蹲", "髋伸展", "单腿拉", "髋铰链"],
+      "recoveryTargetLoadFamilies": ["膝主导", "后链 / 髋主导"],
+      "recoveryPriority": 64,
+      "recoveryPrescription": "45 秒"
     },
     "passive_adductor_stretch": {
       "id": "passive_adductor_stretch",
@@ -2971,7 +3067,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "adductor",
+      "recoveryRegionLabel": "大腿内侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["蹲", "单腿拉", "髋外展"],
+      "recoveryTargetLoadFamilies": ["膝主导", "髋稳定"],
+      "recoveryPriority": 62,
+      "recoveryPrescription": "45 秒"
     },
     "passive_calf_stretch": {
       "id": "passive_calf_stretch",
@@ -2990,7 +3094,15 @@
       "isCore": false,
       "v11StandardTier": "",
       "category": "放松",
-      "zone": "2F 拉伸评估房"
+      "zone": "2F 拉伸评估房",
+      "recoveryEligible": true,
+      "recoveryRegion": "calf",
+      "recoveryRegionLabel": "小腿后侧",
+      "recoveryRegionGroup": "lower",
+      "recoveryTargetPatterns": ["蹲", "单腿拉"],
+      "recoveryTargetLoadFamilies": ["膝主导"],
+      "recoveryPriority": 60,
+      "recoveryPrescription": "45 秒"
     },
     "venue_treadmill_zone2": {
       "id": "venue_treadmill_zone2",
