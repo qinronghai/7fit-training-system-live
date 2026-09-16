@@ -140,9 +140,9 @@
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=(resolved.slots||[]).map(slot=>{
       const detail=slot.prepId?`<a class="prep-detail-link" href="#/system/prep?focus=${encodeURIComponent(slot.prepId)}">查看动作详情</a>`:'';
-      return `<div class="session-warmup-card prep-slot-card" data-prep-slot-card="${esc(slot.slotKey)}"><div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${esc(sourceLabel(slot.source))}</small></div><b>${esc(slot.name||'暂无合法候选')}</b><p>${esc(slot.purpose||'')}</p><div class="slot-actions"><select class="prep-slot-select" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select>${detail}${slot.why?`<small>${esc(slot.why)}</small>`:''}</div></div>`;
+      return `<div class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}"><div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${esc(sourceLabel(slot.source))}</small></div><b>${esc(slot.name||'暂无合法候选')}</b><p>${esc(slot.purpose||'')}</p><div class="slot-actions"><select class="prep-slot-select prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select>${detail}${slot.why?`<small>${esc(slot.why)}</small>`:''}</div></div>`;
     }).join('');
-    return `${fallback}<div class="session-warmup-grid prep-slot-grid">${cards}</div>`;
+    return `${fallback}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }
 
   function registerCopy(key,title,resolved){
@@ -168,7 +168,7 @@
     let foamCopy='';
     if(window.V14ModuleCopy){const fk=`composer-foam-${ctx.stateKey}`;window.V14ModuleCopy.register(fk,'foam',{title:`自由组合泡沫轴｜${title}`,items:foam.map(f=>({name:f.name,prescription:f.prescription,safety:f.safety}))});foamCopy=window.V14ModuleCopy.button(fk,'复制本模块');}
     const warmCopy=registerCopy(`composer-prep-${ctx.stateKey}`,`自由组合 PREP｜${title}`,resolved);
-    return `<section class="section-card"><div class="section-head"><div><h2>2F｜PREP</h2><p>五功能槽位由 PREP Resolver V2 统一计算；手动替换写入当前 F111 State，条件变化后仅保留仍合法的选择。</p></div><span class="time-badge">约 10–12 分钟</span></div><div class="session-prep-match session-foam-match"><div class="prep-match-head"><div><b>泡沫轴推荐</b><span>${esc(title)}</span></div><div class="prep-match-head-actions">${foamCopy}</div></div><div class="session-foam-grid">${foamCards}</div></div><div class="session-prep-match"><div class="prep-match-head"><div><b>动态热身 / 激活</b><span>${esc(title)} · PREP ${esc(grades.join(' → ')||'—')}</span></div><div class="prep-match-head-actions">${warmCopy}</div></div>${resolvedGrid(resolved,ctx.stateKey)}</div></section>`;
+    return `<section class="section-card prep-section"><div class="section-head"><div><h2>2F｜PREP</h2><p>五功能槽位由 PREP Resolver V2 统一计算；手动替换写入当前 F111 State，条件变化后仅保留仍合法的选择。</p></div><span class="time-badge">约 10–12 分钟</span></div><div class="session-prep-match session-foam-match"><div class="prep-match-head"><div><b>泡沫轴推荐</b><span>${esc(title)}</span></div><div class="prep-match-head-actions">${foamCopy}</div></div><div class="session-foam-grid">${foamCards}</div></div><div class="session-prep-match"><div class="prep-match-head"><div><b>动态热身 / 激活</b><span>${esc(title)} · PREP ${esc(grades.join(' → ')||'—')}</span></div><div class="prep-match-head-actions">${warmCopy}</div></div>${resolvedGrid(resolved,ctx.stateKey)}</div></section>`;
   }
 
   M.Prep={

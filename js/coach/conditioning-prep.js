@@ -81,13 +81,13 @@
       :'热身按本节 Station 的 Modality、冲击与动作需求匹配，避免在 PREP 阶段提前累积疲劳。';
     const fallback=(resolved?.fallbackSlots||[]).length
       ?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
-    const cards=(resolved?.slots||[]).map(slot=>`<article class="session-warmup-card prep-slot-card conditioning-prep-card" data-conditioning-prep-slot-card="${esc(slot.slotKey)}">
+    const cards=(resolved?.slots||[]).map(slot=>`<article class="session-warmup-card prep-slot-card conditioning-prep-card prep-card" data-conditioning-prep-slot-card="${esc(slot.slotKey)}">
       <div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
       <b>${esc(slot.name||'暂无合法候选')}</b>
       <p>${esc(slot.purpose||'')}</p>
-      <div class="slot-actions"><select class="conditioning-prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：Conditioning 热身动作替换" data-conditioning-prep-session="${esc(sessionKey)}" data-conditioning-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>${emptyGuidance(slot,session)}
+      <div class="slot-actions"><select class="conditioning-prep-select prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：Conditioning 热身动作替换" data-conditioning-prep-session="${esc(sessionKey)}" data-conditioning-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${optionHtml(slot)}</select>${slot.why?`<small>${esc(slot.why)}</small>`:''}</div>${emptyGuidance(slot,session)}
     </article>`).join('');
-    return `<section class="section-card conditioning-prep-section"><div class="section-head"><div><h2>PREP / PRIMER｜动态热身 · 动作排演</h2><p>${esc(primerNote)}</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}${foam}<div class="conditioning-prep-grid">${cards}</div></section>`;
+    return `<section class="section-card conditioning-prep-section prep-section"><div class="section-head"><div><h2>PREP / PRIMER｜动态热身 · 动作排演</h2><p>${esc(primerNote)}</p></div><span class="time-badge">约 10–12 分钟</span></div>${fallback}${foam}<div class="conditioning-prep-grid prep-grid">${cards}</div></section>`;
   }
 
   function render(session,sessionKey){

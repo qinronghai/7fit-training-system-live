@@ -6,6 +6,21 @@
         return ['编课中心',record?.name||'训练模板'];
       }
       if(route.page==='compose'||route.recipeId)return ['编课中心','F111 女性综合 1+1+1'];
+      // Family / session routes used to fall through to the generic placeholder, so
+      // every non-F111 page was titled 'Multi-Template Coach Center'.
+      if(route.page==='template-family'||route.page==='template-session'){
+        const data=window.V14_DATA||{},registry=data.templateRegistry||{};
+        const parts=[registry[route.templateId]?.name||'训练模板'];
+        if(route.familyId){
+          const families=route.templateId==='body'?data.bodyFamilies:data.conditioningFamilies;
+          parts.push(families?.[route.familyId]?.name||route.familyId);
+        }
+        if(route.sessionType){
+          parts.push(data.hyroxSessionTypes?.[route.sessionType]?.name||route.sessionType);
+        }
+        if(/^L[1-4]$/.test(route.level||''))parts.push(route.level);
+        return ['编课中心',parts.filter(Boolean).join(' · ')];
+      }
       return ['编课中心','Multi-Template Coach Center'];
     }
     const map={system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['搜索','动作、模板与编课入口'],maintenance:['系统维护','数据健康度与审计']};

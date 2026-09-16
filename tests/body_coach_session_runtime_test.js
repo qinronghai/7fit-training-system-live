@@ -7,10 +7,10 @@ for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
   'js/resolved-session.js','js/body-volume.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/body.js',
   'js/template-resolver.js','js/resolvers/body.js','js/coach/common.js','js/coach/template-ui.js',
-  'js/recovery-protocol-adapter.js','js/recovery-matcher.js'
+  'js/recovery-protocol-adapter.js','js/recovery-matcher.js','js/coach/foam.js'
 ]) load(file);
 
-for(const file of ['js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-recovery.js','js/coach/body-session.js']){
+for(const file of ['js/coach/body-home.js','js/coach/body-volume-view.js','js/coach/body-prep.js','js/coach/body-recovery.js','js/coach/body-session.js']){
   assert.strictEqual(fs.existsSync(file),true,`${file} must exist`);
   load(file);
 }
@@ -66,6 +66,12 @@ for(const familyId of D.bodyFamilyIds){
     const html=M.BodySession.render(route);
     assert(html.includes('ANATOMY｜动作涉及肌群'),'Body Anatomy label must be explicit');
     assert(html.includes('Direct Work Sets｜有效工作组'),'Body Direct Work Sets label must be explicit');
+    // The five PREP implementations (F111 preset / F111 composer / Body /
+    // Conditioning / HYROX) now share structural hooks so one selector reaches
+    // all of them; the template-specific classes stay for compatibility.
+    assert(html.includes('prep-section'),'PREP section must expose the shared prep-section hook');
+    assert(html.includes('prep-card'),'PREP cards must expose the shared prep-card hook');
+    assert(html.includes('prep-select'),'PREP selects must expose the shared prep-select hook');
     assert(html.includes('协同暴露（不计入 Direct Work Sets）'),'secondary exposure disclaimer missing');
     assert(html.includes('完成拉伸｜约 5–8 分钟'),'Body Session must display the shared Recovery title');
     assert.strictEqual((html.match(/data-recovery-card=/g)||[]).length,3,`Body Session must match three Recovery cards for ${familyId} ${level}`);

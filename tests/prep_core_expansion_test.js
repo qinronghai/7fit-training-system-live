@@ -42,7 +42,16 @@ const expected={
   'PREP-27':['BOSU球足端平板支撑','P4','warmup_bosu_feet_plank'],
   'PREP-28':['侧平板抬上侧腿','P4','SUP-S6-05'],
 };
-assert.strictEqual(D.warmupIds.length,52);
+// PREP-51 added the venue's ankle drill (踝关节前移 / 膝触墙) so the library stops
+// under-covering 踝 / 足 / 膝 — this gym's most common restriction.
+assert.strictEqual(D.warmupIds.length,53);
+const ankle=D.warmupDetails['PREP-51'];
+assert(ankle,'PREP-51 (踝关节前移) missing');
+assert.strictEqual(ankle.actionId,'huan_jie_qianyi');
+assert(['踝','足部','膝'].every(region=>ankle.regions.includes(region)),
+  'PREP-51 must cover the ankle, foot and knee it is there for');
+assert(D.actions['huan_jie_qianyi']?.warmupEligible===true,
+  'the ankle drill must be prep-eligible or the node can never be selected');
 for(const [prepId,[name,grade,actionId]] of Object.entries(expected)){
   const item=D.warmupDetails[prepId];
   assert(item,`${prepId} missing`);

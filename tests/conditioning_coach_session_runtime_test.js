@@ -49,6 +49,12 @@ for(const familyId of D.conditioningFamilyIds){
     assert(html.includes('Impact'),'impact summary missing');
     assert(html.includes('Coordination'),'coordination summary missing');
     assert(html.includes('NO POST CARDIO'),'full Conditioning must explicitly show NO POST CARDIO');
+    // The five PREP implementations (F111 preset / F111 composer / Body /
+    // Conditioning / HYROX) now share structural hooks so one selector reaches
+    // all of them; the template-specific classes stay for compatibility.
+    assert(html.includes('prep-section'),'PREP section must expose the shared prep-section hook');
+    assert(html.includes('prep-card'),'PREP cards must expose the shared prep-card hook');
+    assert(html.includes('prep-select'),'PREP selects must expose the shared prep-select hook');
     assert(html.includes('完成拉伸｜约 5–8 分钟'),'Recovery block missing');
     assert.strictEqual((html.match(/data-recovery-card=/g)||[]).length,3,'Conditioning must match three Recovery cards');
     for(const block of ctx.session.blocks)assert(html.includes(block.protocolName),`${familyId} ${level} protocol name must render from ResolvedSession`);

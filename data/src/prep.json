@@ -51,7 +51,8 @@
     "PREP-47",
     "PREP-48",
     "PREP-49",
-    "PREP-50"
+    "PREP-50",
+    "PREP-51"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -1943,6 +1944,41 @@
       "cue": "轻药球抱胸下蹲，站起后上举；保持动作流畅，不做爆发投掷。",
       "why": "作为 L4 高阶全身整合热身，强调多关节协调而不是疲劳。",
       "sourceStatus": "新增 PREP 动作",
+      "route": "2F_ONLY"
+    },
+    "PREP-51": {
+      "prepId": "PREP-51",
+      "name": "踝关节前移（膝触墙）",
+      "alias": "踝背屈膝触墙",
+      "actionId": "huan_jie_qianyi",
+      "prepGrade": "P1",
+      "role": "踝关节动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "踝",
+        "足部",
+        "膝"
+      ],
+      "equipment": "徒手 / 墙面",
+      "prescription": "1–2组 × 8–10次/侧",
+      "cue": "脚跟不离地，膝盖沿第二脚趾方向向前推过脚尖；骨盆保持中立，不靠塌腰或翻脚代偿。",
+      "why": "踝背屈可用范围直接决定深蹲深度、单腿稳定与落地缓冲；这是本馆女性会员最常见的限制之一，L1 就应建立。",
+      "sourceStatus": "复用馆内既有 2F 踝关节前移动作，仅开放 PREP 用途",
       "route": "2F_ONLY"
     }
   },
