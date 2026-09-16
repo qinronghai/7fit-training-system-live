@@ -44,6 +44,18 @@ def test_maintenance_view_contains_data_health_labels():
     for label in ['动作库总数', '待回写', '层级差异', 'Venue Overlay']:
         assert label in text
 
+def test_issue13_maintenance_exposes_content_review_filters():
+    html = (ROOT / 'index.html').read_text(encoding='utf-8')
+    system = (ROOT / 'data' / 'src' / 'system.json').read_text(encoding='utf-8')
+    review = (ROOT / 'js' / 'content-review.js').read_text(encoding='utf-8')
+    maintenance = (ROOT / 'js' / 'views-maintenance.js').read_text(encoding='utf-8')
+    for label in ['contentReview', 'requiredFields', 'reviewStatus', 'evidenceLevel']:
+        assert label in system
+    assert 'V14ContentReview' in review
+    for label in ['Content Review 元数据', 'data-content-review-filter="domain"', '待审核', '没有符合条件的内容']:
+        assert label in maintenance
+    assert 'js/content-review.js' in html
+
 def test_all_local_assets_exist():
     s = soup()
     refs = []

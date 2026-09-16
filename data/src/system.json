@@ -28,5 +28,34 @@
     "corePending": 13,
     "tierDiff": 14,
     "venueOverlay": 3
+  },
+  "contentReview": {
+    "schemaVersion": 1,
+    "statusValues": ["reviewed", "pending", "experimental"],
+    "evidenceLevels": ["internal_curated", "source_referenced", "not_assessed"],
+    "requiredFields": ["source", "evidenceLevel", "reviewStatus", "reviewedAt", "reviewerNote"],
+    "requiredDomains": [
+      "actions", "actionDetails", "sessions", "bodyFamilies", "conditioningFamilies",
+      "conditioningProtocols", "hyroxSessionTypes", "hyroxStations", "hyroxBenchmarkProtocols",
+      "support", "core", "prep", "foam", "templates", "anatomy"
+    ],
+    "domainDefaults": {
+      "actions": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史动作内容，待内容负责人审核"},
+      "actionDetails": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史动作详情，待内容负责人审核"},
+      "sessions": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史课程内容，待内容负责人审核"},
+      "bodyFamilies": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 Body 模式内容，待内容负责人审核"},
+      "conditioningFamilies": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 Conditioning 模式内容，待内容负责人审核"},
+      "conditioningProtocols": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 Conditioning 协议，待内容负责人审核"},
+      "hyroxSessionTypes": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 HYROX 课程类型，待内容负责人审核"},
+      "hyroxStations": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 HYROX 站点内容，待内容负责人审核"},
+      "hyroxBenchmarkProtocols": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 HYROX Benchmark 协议，待内容负责人审核"},
+      "support": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 SUPPORT 内容，待内容负责人审核"},
+      "core": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 CORE 内容，待内容负责人审核"},
+      "prep": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 PREP 内容，待内容负责人审核"},
+      "foam": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史泡沫轴内容，待内容负责人审核"},
+      "templates": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 Template 注册内容，待内容负责人审核"},
+      "anatomy": {"source": "legacy-import-v14.7", "evidenceLevel": "not_assessed", "reviewStatus": "pending", "reviewedAt": null, "reviewerNote": "历史 Anatomy 内容，待内容负责人审核"}
+    },
+    "overrides": {}
   }
 }
