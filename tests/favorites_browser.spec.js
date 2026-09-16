@@ -20,6 +20,9 @@ test('favorites persist, restore through current routes, and expose stale handli
   await expect(bodyFavorite).toHaveAttribute('aria-pressed','true');
 
   await page.reload();
+  await page.locator('#action-search').fill('BODY-02');
+  await page.locator('[data-filter="templateId"]').selectOption('body');
+  await page.locator('[data-filter="kind"]').selectOption('session');
   await expect(page.locator('[data-favorite-toggle][data-favorite-entry-id="body:BODY-02"]')).toHaveAttribute('aria-pressed','true');
 
   await page.goto('/#/library');
@@ -37,6 +40,8 @@ test('favorites persist, restore through current routes, and expose stale handli
   await expect(bodyCard).toBeVisible();
   await bodyCard.locator('[data-favorite-open]').click();
   await expect(page).toHaveURL(/#\/coach\/body\/compose\?family=BODY-02&level=L1/);
+  await expect(page.getByRole('heading',{name:'Body 自由编课'})).toBeVisible();
+  await expect(page.locator('#reset-body-session')).toBeVisible();
 
   await page.evaluate(()=>{
     window.V15State.setFavorite({
