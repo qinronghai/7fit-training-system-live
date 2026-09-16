@@ -1,139 +1,165 @@
 /**
- * PROTOCOL → Recovery signal adapter.
+ * Recovery region adapter.
  *
- * `V14RecoveryMatcher` scores RECOVERY_2F candidates against the training
- * actions of a session. That works directly for SLOT sessions (F111 1+1+1 and
- * Body) because every slot resolves to an action carrying `pattern` and
- * `loadFamily`.
+ * Recovery follows the coach's rule: look at which major muscle groups the main
+ * and accessory work loaded, stretch those, one action per region, about three
+ * in total. This module turns a resolved session into exactly that signal — the
+ * recovery regions it trained and how hard.
  *
- * Conditioning and HYROX resolve to `main.kind === 'PROTOCOL'` instead: their
- * work lives in `domainContext.stations`, and the station metadata is not
- * usable as-is —
- *   - Conditioning station actions fill `pattern` with a *modality* name
- *     (稳态 / 间歇) and leave `loadFamily` empty;
- *   - HYROX station ids (HYROX-H1 …) have no entry in the action table at all,
- *     so there is nothing to look up.
+ * Matching on movement patterns was the wrong signal. A 蹲 pattern put 大腿内侧
+ * (adductor) on the card for a session that never trained one, and anterior
+ * deltoid pressing put 胸 on the card. Both are pattern look-alikes, not loaded
+ * muscle groups.
  *
- * This module derives each station's recovery-relevant demand and emits it in
- * the exact vocabulary the RECOVERY_2F metadata declares, so the matcher can
- * score a protocol session with no rule changes:
- *   - Conditioning → the station's curated anatomy record (data-derived).
- *   - HYROX        → the canonical station table (the sport's station list is
- *     fixed and ordered H1–H8), with a modality fallback for unknown ids.
+ * Two sources, because the two session shapes expose different data:
+ *   - `main.kind === 'SLOT'` (F111 1+1+1, Body) → the session's curated
+ *     `anatomyContext`, which already aggregates the muscles its slots loaded.
+ *   - `main.kind === 'PROTOCOL'` (Conditioning, HYROX) → per-station data, since
+ *     their stations never reach `main.content`:
+ *       · Conditioning: the station's curated anatomy record (data-derived).
+ *       · HYROX: the canonical station table (the sport's station list is fixed
+ *         and ordered H1–H8), with a modality fallback for unknown ids.
+ *
+ * 小腿后侧 is mapped like every other muscle but this gym recovers it with the
+ * foam roller, so V14RecoveryMatcher keeps it off the stretch cards.
  */
 (function(){
   'use strict';
 
-  const esc=value=>String(value??'');
-
-  /** Exposure weights: a main mover outranks an assisting muscle. */
-  const PRIMARY_WEIGHT=5,SECONDARY_WEIGHT=2;
+  /** Exposure weights: a main mover outranks an assistant, which outranks a stabiliser. */
+  const PRIMARY_WEIGHT=5,SECONDARY_WEIGHT=2,STABILIZER_WEIGHT=1;
 
   /**
-   * Muscle keyword → recovery demand. First matching rule wins, so the more
-   * specific keywords (三角肌后 before 三角肌, 臀中 before generic) are listed
-   * first. Core / stabilizer muscles intentionally match nothing: RECOVERY_2F
-   * has no core stretch target, and inventing one would skew region selection.
+   * Muscle keyword → the recovery region that stretches it. First matching rule
+   * wins, so specific keywords (三角肌后, 臀中) precede the generic ones that
+   * would otherwise swallow them. Core / stabiliser muscles intentionally map to
+   * nothing: they have no stretch region, and inventing one would push a
+   * genuinely loaded region off the card set.
    */
-  const MUSCLE_DEMANDS=Object.freeze([
-    {match:['背阔','大圆','斜方','菱形','三角肌后','上背'],patterns:['水平拉','垂直拉'],loadFamilies:['上肢拉']},
-    {match:['肱二头','肱肌','肱桡','前臂握力'],patterns:['水平拉','垂直拉'],loadFamilies:['上肢拉']},
-    {match:['肩后侧'],patterns:['水平拉','垂直拉','水平推','垂直推'],loadFamilies:['上肢拉','上肢推']},
-    {match:['胸大','胸小','胸前侧','胸廓前'],patterns:['水平推','垂直推'],loadFamilies:['上肢推']},
-    {match:['三角肌前','三角肌中','三角肌'],patterns:['垂直推','水平推'],loadFamilies:['上肢推']},
-    {match:['肱三头'],patterns:['水平推','垂直推'],loadFamilies:['上肢推']},
-    {match:['臀大','臀中','臀小','臀肌','臀部深层'],patterns:['髋伸展','蹲','髋外展'],loadFamilies:['后链 / 髋主导','髋稳定']},
-    {match:['腘绳'],patterns:['髋铰链','单腿拉','髋伸展'],loadFamilies:['后链 / 髋主导']},
-    {match:['股四头','股直','股外侧','阔筋膜张','胫骨前'],patterns:['蹲'],loadFamilies:['膝主导']},
-    {match:['内收','股薄'],patterns:['蹲','单腿拉'],loadFamilies:['髋稳定']},
-    {match:['髂腰','髋屈'],patterns:['蹲','髋伸展'],loadFamilies:['膝主导']},
-    {match:['腓肠','比目鱼','足踝','足内在','小腿'],patterns:['蹲','单腿拉'],loadFamilies:['膝主导']},
+  const MUSCLE_REGIONS=Object.freeze([
+    {match:['背阔','大圆','斜方','菱形','三角肌后','上背'],region:'upper_back'},
+    {match:['肩后侧'],region:'posterior_shoulder'},
+    {match:['肱二头','肱肌','肱桡','前臂握力'],region:'upper_back'},
+    {match:['胸大','胸小','胸前侧','胸廓前'],region:'chest'},
+    {match:['三角肌前','三角肌中','三角肌'],region:'chest'},
+    {match:['肱三头'],region:'triceps'},
+    {match:['臀大','臀中','臀小','臀肌','臀部深层'],region:'glute'},
+    {match:['腘绳'],region:'hamstring'},
+    {match:['股四头','股直','股外侧','阔筋膜张','髂腰','髋屈'],region:'hip_flexor'},
+    {match:['内收','股薄'],region:'adductor'},
+    {match:['腓肠','比目鱼','足踝','足内在','小腿'],region:'calf'},
   ]);
 
   /**
-   * Canonical HYROX stations. HYROX ships no anatomy records, and the station
-   * list is a fixed property of the sport, so the demand is declared here
-   * rather than inferred. `label` is only used for diagnostics.
+   * Canonical HYROX stations. HYROX ships no anatomy records and the station
+   * list is a fixed property of the sport, so the loaded regions are declared
+   * here rather than inferred. The first region is the station's main driver.
+   * `label` is only used for diagnostics.
    */
-  const HYROX_STATION_DEMANDS=Object.freeze({
-    H1:{label:'滑雪机',patterns:['垂直拉','水平拉'],loadFamilies:['上肢拉','后链 / 髋主导']},
-    H2:{label:'雪橇推',patterns:['水平推','蹲'],loadFamilies:['上肢推','膝主导']},
-    H3:{label:'雪橇拉',patterns:['水平拉'],loadFamilies:['上肢拉','后链 / 髋主导']},
-    H4:{label:'波比跳远',patterns:['蹲','水平推'],loadFamilies:['膝主导','上肢推']},
-    H5:{label:'划船机',patterns:['水平拉','蹲'],loadFamilies:['上肢拉','膝主导','后链 / 髋主导']},
-    H6:{label:'农夫走',patterns:['单腿拉'],loadFamilies:['髋稳定','上肢拉']},
-    H7:{label:'负重行进弓步',patterns:['蹲','单腿拉'],loadFamilies:['膝主导','后链 / 髋主导']},
-    H8:{label:'墙球',patterns:['蹲','垂直推'],loadFamilies:['膝主导','上肢推']},
+  const HYROX_STATION_REGIONS=Object.freeze({
+    H1:{label:'滑雪机',regions:['upper_back','glute','hip_flexor']},
+    H2:{label:'雪橇推',regions:['hip_flexor','glute','chest']},
+    H3:{label:'雪橇拉',regions:['upper_back','glute','hamstring']},
+    H4:{label:'波比跳远',regions:['glute','hip_flexor','chest']},
+    H5:{label:'划船机',regions:['upper_back','glute','hip_flexor']},
+    H6:{label:'农夫走',regions:['upper_back','glute']},
+    H7:{label:'负重行进弓步',regions:['glute','hip_flexor']},
+    H8:{label:'墙球',regions:['hip_flexor','glute','chest']},
   });
 
   /** Fallback when a station id is outside the canonical H1–H8 list. */
-  const HYROX_MODALITY_DEMANDS=Object.freeze({
-    ENGINE:{patterns:['垂直拉','水平拉'],loadFamilies:['上肢拉']},
-    SLED:{patterns:['水平推','蹲'],loadFamilies:['上肢推','膝主导']},
-    LOCOMOTION:{patterns:['蹲','单腿拉'],loadFamilies:['膝主导','后链 / 髋主导']},
-    BALL:{patterns:['蹲','垂直推'],loadFamilies:['膝主导','上肢推']},
+  const HYROX_MODALITY_REGIONS=Object.freeze({
+    ENGINE:{regions:['upper_back','glute']},
+    SLED:{regions:['hip_flexor','glute','chest']},
+    LOCOMOTION:{regions:['glute','hip_flexor']},
+    BALL:{regions:['hip_flexor','glute','chest']},
   });
 
-  function demandsForMuscle(muscle){
+  function regionForMuscle(muscle){
     const name=String(muscle||'');
-    for(const rule of MUSCLE_DEMANDS){
-      if(rule.match.some(keyword=>name.includes(keyword)))return rule;
+    for(const rule of MUSCLE_REGIONS){
+      if(rule.match.some(keyword=>name.includes(keyword)))return rule.region;
     }
     return null;
   }
 
   /**
-   * One entry per demand term, so the matcher keeps matching single
-   * `pattern` / `loadFamily` strings. Empty terms never match a recovery
-   * target, so they are inert.
+   * One entry per loaded region. `pattern` / `loadFamily` stay empty so the
+   * matcher's slot-key contract is untouched — these entries are matched on
+   * `region`, which is exactly the signal the coach's rule needs.
    */
-  function emit(target,demand,weight,source,extra){
+  function emit(key,actionId,region,weight,source,extra){
+    return {key,actionId,region,weight,source,pattern:'',loadFamily:'',...extra};
+  }
+
+  /** Region signals from an aggregated anatomy context (SLOT sessions). */
+  function anatomyContextSignals(context){
+    if(!context)return [];
     const out=[];
-    (demand.patterns||[]).forEach(pattern=>out.push({key:target.key,actionId:target.actionId,pattern,loadFamily:'',weight,source,...extra}));
-    (demand.loadFamilies||[]).forEach(loadFamily=>out.push({key:target.key,actionId:target.actionId,pattern:'',loadFamily,weight,source,...extra}));
+    const push=(muscles,weight,tier)=>{
+      (muscles||[]).forEach(muscle=>{
+        const region=regionForMuscle(muscle);
+        if(region)out.push(emit('anatomy',`anatomy:${region}`,region,weight,tier,{muscle}));
+      });
+    };
+    push(context.primary,PRIMARY_WEIGHT,'anatomy:primary');
+    push(context.secondary,SECONDARY_WEIGHT,'anatomy:secondary');
+    push(context.stabilizers,STABILIZER_WEIGHT,'anatomy:stabilizer');
     return out;
   }
 
-  function anatomySignals(station){
+  /** Region signals from a Conditioning station's own anatomy record. */
+  function stationAnatomySignals(station){
     const record=window.V14Anatomy?.get?.(station.actionId);
     if(!record)return [];
     const out=[];
-    (record.primary||[]).forEach(muscle=>{
-      const demand=demandsForMuscle(muscle);
-      if(demand)out.push(...emit(station,demand,PRIMARY_WEIGHT,'anatomy:primary',{muscle}));
-    });
-    (record.secondary||[]).forEach(muscle=>{
-      const demand=demandsForMuscle(muscle);
-      if(demand)out.push(...emit(station,demand,SECONDARY_WEIGHT,'anatomy:secondary',{muscle}));
-    });
+    const push=(muscles,weight,tier)=>{
+      (muscles||[]).forEach(muscle=>{
+        const region=regionForMuscle(muscle);
+        if(region)out.push(emit(station.key,station.actionId,region,weight,tier,{muscle}));
+      });
+    };
+    push(record.primary,PRIMARY_WEIGHT,'anatomy:primary');
+    push(record.secondary,SECONDARY_WEIGHT,'anatomy:secondary');
     return out;
   }
 
-  function hyroxSignals(station){
+  function hyroxStationSignals(station){
     const stationId=String(station.stationId||'');
-    const demand=HYROX_STATION_DEMANDS[stationId]||HYROX_MODALITY_DEMANDS[String(station.modality||'')];
+    const table=HYROX_STATION_REGIONS[stationId];
+    const demand=table||HYROX_MODALITY_REGIONS[String(station.modality||'')];
     if(!demand)return [];
-    return emit(station,demand,PRIMARY_WEIGHT,HYROX_STATION_DEMANDS[stationId]?'station-table':'modality-fallback',{});
+    return demand.regions.map((region,index)=>
+      emit(station.key,station.actionId,region,index===0?PRIMARY_WEIGHT:SECONDARY_WEIGHT,table?'station-table':'modality-fallback',{}));
   }
 
-  function isHyroxStations(stations){
-    return stations.some(station=>typeof station?.stationId==='string'&&station.stationId!=='');
+  function protocolSignals(resolvedSession){
+    const stations=Object.values(resolvedSession?.domainContext?.stations||{}).filter(Boolean);
+    if(!stations.length)return [];
+    const isHyrox=stations.some(station=>typeof station?.stationId==='string'&&station.stationId!=='');
+    const out=[];
+    stations.forEach(station=>out.push(...(isHyrox?hyroxStationSignals(station):stationAnatomySignals(station))));
+    return out;
   }
 
   /**
-   * Derive recovery signals for a PROTOCOL session.
-   * @returns {Array<{key:string,actionId:string,pattern:string,loadFamily:string,weight:number}>}
-   *   An empty array means the protocol exposes no recovery-relevant demand, in
+   * Derive the recovery regions a session loaded.
+   * @returns {Array<{region:string,weight:number,muscle?:string}>}
+   *   An empty array means the session exposes no recoverable muscle group, in
    *   which case the matcher reports an explicit coach-arranged fallback.
    */
   function signals(resolvedSession){
-    const stations=Object.values(resolvedSession?.domainContext?.stations||{}).filter(Boolean);
-    if(!stations.length)return [];
-    const derive=isHyroxStations(stations)?hyroxSignals:anatomySignals;
-    const out=[];
-    stations.forEach(station=>out.push(...derive(station)));
-    return out;
+    if(!resolvedSession)return [];
+    if(resolvedSession.main?.kind==='PROTOCOL')return protocolSignals(resolvedSession);
+    return anatomyContextSignals(resolvedSession.anatomyContext);
   }
 
-  window.V14RecoveryProtocolAdapter={signals,HYROX_STATION_DEMANDS,MUSCLE_DEMANDS,esc};
+  /** Total exposure per region, e.g. `{glute:27,hip_flexor:22}`. */
+  function exposureByRegion(resolvedSession){
+    const totals={};
+    signals(resolvedSession).forEach(signal=>{totals[signal.region]=(totals[signal.region]||0)+signal.weight;});
+    return totals;
+  }
+
+  window.V14RecoveryProtocolAdapter={signals,exposureByRegion,HYROX_STATION_REGIONS,MUSCLE_REGIONS};
 })();

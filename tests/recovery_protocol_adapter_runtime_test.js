@@ -18,11 +18,29 @@ assert(A&&typeof A.signals==='function','recovery protocol adapter must expose s
 
 function regions(result){return result.items.map(item=>item.region);}
 function protocol(templateId,input){return M.match(R.resolve(templateId,input));}
+/**
+ * Assert the coach's rule held: the cards are the hardest-trained regions, so no
+ * region left off the card was trained harder than one that made it. Ties are
+ * allowed to resolve either way.
+ */
+function assertHardestTrained(session,picked,label){
+  assert.strictEqual(picked.length,3,`${label} must pick three regions`);
+  const exposure=A.exposureByRegion(session);
+  const leftOff=Object.entries(exposure)
+    .filter(([region])=>region!=='calf'&&!picked.includes(region))
+    .map(([,weight])=>weight);
+  const onCard=picked.map(region=>exposure[region]??0);
+  const lowestPicked=Math.min(...onCard);
+  const highestLeftOff=leftOff.length?Math.max(...leftOff):0;
+  assert(lowestPicked>=highestLeftOff,
+    `${label} picked ${picked.join('/')} but left a harder-trained region off the card`);
+}
+const FAMILIES=['CON-01','CON-02','CON-03','CON-04'];
+const LEVELS=['L1','L2','L3','L4'];
 
 // --- Protocol sessions resolve to three matched regions ---------------------
-const conditioning=protocol('conditioning',{familyId:'CON-01',level:'L3'});
-const hyrox=protocol('hyrox',{sessionType:'SKILL',level:'L3',protocolId:''});
-for(const [label,result] of [['conditioning',conditioning],['hyrox',hyrox]]){
+for(const [label,result] of [['conditioning',protocol('conditioning',{familyId:'CON-01',level:'L3'})],
+  ['hyrox',protocol('hyrox',{sessionType:'SKILL',level:'L3',protocolId:''})]]){
   assert.strictEqual(result.status,'complete',`${label} must resolve three Recovery cards`);
   assert.strictEqual(result.items.length,3,`${label} must produce exactly three cards`);
   assert.strictEqual(new Set(regions(result)).size,3,`${label} regions must be unique`);
@@ -30,71 +48,99 @@ for(const [label,result] of [['conditioning',conditioning],['hyrox',hyrox]]){
   assert(result.items.some(item=>item.regionGroup==='lower'),`${label} must cover a lower-body region`);
   assert(result.items.every(item=>D.actions[item.id]?.route==='RECOVERY_2F'),`${label} cards must be RECOVERY_2F actions`);
   assert(result.items.every(item=>item.reason&&item.detail),`${label} cards must explain the match`);
+  assert(result.items.every(item=>item.prescription==='45 秒'),`${label} cards must carry a prescription`);
 }
 
-// --- The adapter must actually differentiate sessions ------------------------
-// Summing every matching signal made all 24 Conditioning/HYROX family x level
-// sessions collapse onto the same three broadest cards; that regression is the
-// reason this test exists.
-const signatures=new Set();
-for(const familyId of ['CON-01','CON-02','CON-03','CON-04']){
-  for(const level of ['L1','L2','L3','L4']){
-    signatures.add(regions(protocol('conditioning',{familyId,level})).join(','));
+// --- Regions follow the muscle groups the session actually trained ----------
+// Recovery follows the coach's rule: stretch the major muscle groups the main
+// and accessory work loaded hardest, one action per region, about three in
+// total. So every selected region must carry real exposure, and no card may
+// come from a region the session never loaded.
+for(const familyId of FAMILIES){
+  for(const level of LEVELS){
+    const session=R.resolve('conditioning',{familyId,level});
+    const loaded=new Set(A.signals(session).map(signal=>signal.region));
+    const picked=regions(M.match(session));
+    for(const region of picked)assert(loaded.has(region),`${familyId} ${level} selected ${region} but never loaded it`);
+    assertHardestTrained(session,picked,`${familyId} ${level}`);
   }
 }
 for(const sessionType of ['SKILL','MIXED']){
-  for(const level of ['L1','L2','L3','L4']){
-    signatures.add(regions(protocol('hyrox',{sessionType,level,protocolId:''})).join(','));
+  for(const level of LEVELS){
+    const session=R.resolve('hyrox',{sessionType,level,protocolId:''});
+    const loaded=new Set(A.signals(session).map(signal=>signal.region));
+    const picked=regions(M.match(session));
+    for(const region of picked)assert(loaded.has(region),`HYROX ${sessionType} ${level} selected ${region} but never loaded it`);
+    assertHardestTrained(session,picked,`HYROX ${sessionType} ${level}`);
   }
 }
-assert(signatures.size>=5,`protocol Recovery must differ per session, saw ${signatures.size} distinct result(s)`);
 
-// A rowing / ski session is pull-dominant, so it must not select the chest.
+// A rowing / ski session is lat-dominant, so it must not select the chest.
 assert(regions(protocol('conditioning',{familyId:'CON-01',level:'L3'})).includes('upper_back'),
   'rowing / ski Conditioning must expose an upper-back Recovery target');
 
-// 臀部 is the hardest-loaded region in every protocol family and must never be
-// squeezed off the sheet by a narrower specialist card.
-const gluteRows=['CON-01','CON-02','CON-03','CON-04'].flatMap(familyId=>
-  ['L1','L2','L3','L4'].filter(level=>regions(protocol('conditioning',{familyId,level})).includes('glute')));
-assert.strictEqual(gluteRows.length,16,`臀部 must appear in every Conditioning session, saw ${gluteRows.length}/16`);
+// --- 小腿后侧 is foam-rolled, never stretched --------------------------------
+// The action exists in RECOVERY_2F, but this gym recovers the calf with the foam
+// roller during PREP, so it must not take one of the three stretch cards.
+for(const familyId of FAMILIES){
+  for(const level of LEVELS){
+    assert(!regions(protocol('conditioning',{familyId,level})).includes('calf'),
+      `Conditioning ${familyId} ${level} must not stretch 小腿后侧`);
+  }
+}
 for(const sessionType of ['SKILL','MIXED']){
-  for(const level of ['L1','L2','L3','L4']){
-    assert(regions(protocol('hyrox',{sessionType,level,protocolId:''})).includes('glute'),
-      `臀部 must appear in HYROX ${sessionType} ${level}`);
+  for(const level of LEVELS){
+    assert(!regions(protocol('hyrox',{sessionType,level,protocolId:''})).includes('calf'),
+      `HYROX ${sessionType} ${level} must not stretch 小腿后侧`);
   }
 }
 
-// 小腿后侧 is a routine part of this gym's practice, so it must be able to win a
-// lower slot on load-dominant sessions rather than being locked out.
-const calfRows=['CON-01','CON-02','CON-03','CON-04'].flatMap(familyId=>
-  ['L1','L2','L3','L4'].filter(level=>regions(protocol('conditioning',{familyId,level})).includes('calf')));
-assert(calfRows.length>=4,`小腿后侧 must be selectable on load-dominant sessions, saw ${calfRows.length}/16`);
-
-// --- Adapter signals are derived, weighted, and inert for SLOT --------------
-const conditioningSession=R.resolve('conditioning',{familyId:'CON-01',level:'L3'});
-const signals=A.signals(conditioningSession);
-assert(signals.length>0,'Conditioning must yield derived demand signals');
+// --- Adapter reports muscle-derived regions ---------------------------------
+const signals=A.signals(R.resolve('conditioning',{familyId:'CON-04',level:'L3'}));
+assert(signals.length>0,'Conditioning must yield derived region signals');
 assert(signals.every(signal=>signal.key&&signal.actionId),'signals must carry the station identity');
+assert(signals.every(signal=>typeof signal.region==='string'&&signal.region),'signals must name a recovery region');
 assert(signals.every(signal=>Number.isFinite(signal.weight)&&signal.weight>0),'signals must carry an exposure weight');
 assert(signals.some(signal=>signal.weight===5)&&signals.some(signal=>signal.weight===2),
   'primary movers must outweigh assisting muscles');
-assert(signals.every(signal=>!(signal.pattern&&signal.loadFamily)),
-  'each signal carries a single demand term so the matcher keeps its single-term contract');
-assert.strictEqual(A.signals(R.resolve('body',{familyId:'BODY-01',level:'L3'})).length,0,
-  'SLOT sessions must not produce adapter signals');
+assert(signals.every(signal=>signal.pattern===''&&signal.loadFamily===''),
+  'region signals must not smuggle movement patterns back into the protocol path');
+
+// CON-04 loads 臀大肌 / 股四头肌 hardest and only brushes the adductor as a KB
+// swing stabiliser. Movement-pattern matching used to put 大腿内侧 on the card
+// off a 蹲 pattern alone; muscle-derived exposure must keep it off, because its
+// exposure is far below the regions that actually carried the session.
+const con04=protocol('conditioning',{familyId:'CON-04',level:'L3'});
+assert.strictEqual(con04.items.some(item=>item.region==='adductor'),false,
+  '大腿内侧 must not be stretched when it was only a light stabiliser');
+assertHardestTrained(R.resolve('conditioning',{familyId:'CON-04',level:'L3'}),regions(con04),'CON-04 L3');
+
+// SLOT sessions are handled from their own aggregated anatomy context.
+const bodySignals=A.signals(R.resolve('body',{familyId:'BODY-01',level:'L3'}));
+assert(bodySignals.length>0,'SLOT sessions must yield region signals from their anatomy context');
+assert(bodySignals.every(signal=>signal.region&&signal.weight>0),'SLOT signals must name weighted regions');
+// BODY-01 is 臀腿｜股四主导 and trains no upper body at all, so prescribing a
+// 背阔肌 stretch for it — which the pattern-matched selection used to do — is the
+// defect this rule exists to prevent.
+assert(!bodySignals.some(signal=>signal.region==='upper_back'),
+  'BODY-01 trains no upper body, so it must report no upper-back exposure');
 assert.strictEqual(A.signals({main:{kind:'PROTOCOL'}}).length,0,'a protocol without stations must yield nothing');
+assert.strictEqual(A.signals({main:{kind:'SLOT'},anatomyContext:{primary:[],secondary:[],stabilizers:[]}}).length,0,
+  'a session with no measured muscle exposure must yield nothing');
 
 // --- SLOT behaviour is untouched -------------------------------------------
-// The adapter path is additive: F111 / Body must keep the exact matching they
-// shipped with (#118), including the pull/push distinction.
 const pull=protocol('f111',{mode:'preset',recipeId:'F111-01',level:'L3'});
 const push=protocol('f111',{mode:'preset',recipeId:'F111-06',level:'L3'});
 assert(regions(pull).includes('upper_back'),'horizontal pull must still expose upper_back');
 assert(regions(push).includes('chest'),'horizontal push must still expose chest');
 assert.notDeepStrictEqual(regions(pull),regions(push),'pull and push must differ');
-assert.strictEqual(regions(protocol('body',{familyId:'BODY-01',level:'L3'})).join(','),'upper_back,glute,hip_flexor',
-  'Body L3 must keep the #118 matching result');
+// Body is a SLOT session too, so its cards follow its own trained muscles:
+// BODY-01 (臀腿｜股四主导) is a legs-only day and must not carry a 背阔肌 stretch,
+// while BODY-04 (胸肩臂) must not carry a leg stretch.
+assert.strictEqual(regions(protocol('body',{familyId:'BODY-01',level:'L3'})).join(','),'glute,hamstring,hip_flexor',
+  'BODY-01 trains only legs, so it must stretch only legs');
+assert(!regions(protocol('body',{familyId:'BODY-04',level:'L3'})).some(region=>region==='hamstring'||region==='glute'),
+  'BODY-04 trains no legs, so it must not stretch them');
 assert.deepStrictEqual(regions(protocol('f111',{mode:'preset',recipeId:'F111-01',level:'L3'})),regions(pull),
   'SLOT matching must stay deterministic');
 

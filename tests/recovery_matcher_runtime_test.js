@@ -10,7 +10,8 @@ for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js',
   'js/prep-resolver.js','js/composer.js','js/resolved-session.js','js/conflict-core.js',
   'js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js',
-  'js/template-resolver.js','js/resolvers/f111.js','js/recovery-matcher.js'
+  'js/template-resolver.js','js/resolvers/f111.js',
+  'js/recovery-protocol-adapter.js','js/recovery-matcher.js'
 ])load(file);
 
 const D=window.V14_DATA;
