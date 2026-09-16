@@ -48,12 +48,13 @@ test('Issue 71: F111 PREP CTA stays horizontal and pages have no literal newline
   await expectClean(diag);
 });
 
-test('Issue 71: native PREP select exposes AX name and persists a replacement',async({page})=>{
+test('Issue 71: native PREP select exposes AX name and applies replacement selection',async({page})=>{
   const diag=diagnostics(page);
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/f111/f111-06/l3');
   const selects=page.locator('.prep-slot-select:not([disabled])');
   let target=null;
+  let targetSelect=null;
   for(let i=0;i<await selects.count();i+=1){
     const select=selects.nth(i);
     const values=await select.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value).filter(Boolean));
@@ -63,15 +64,17 @@ test('Issue 71: native PREP select exposes AX name and persists a replacement',a
     const direction=index<values.length-1?'ArrowDown':'ArrowUp';
     const expected=direction==='ArrowDown'?values[index+1]:values[index-1];
     target={slotKey:await select.getAttribute('data-prep-slot'),direction,expected};
+    targetSelect=select;
     await expect(select).toHaveAttribute('aria-label',/热身动作替换/);
     await select.focus();
-    // Headless Chromium does not open a native <select> popup for Arrow keys.
-    // The headed Computer Use smoke covers the real keyboard path; selectOption
-    // keeps this CI assertion deterministic while still exercising change + rerender.
-    await select.selectOption(expected);
     break;
   }
-  expect(target,'expected one keyboard-replaceable PREP select').toBeTruthy();
+  expect(target,'expected one replaceable PREP select').toBeTruthy();
+  await expect(targetSelect).toBeFocused();
+  // Headless Chromium cannot commit the OS select popup with ArrowDown/ArrowUp
+  // consistently across platforms. selectOption exercises the native select's
+  // change event, which is the same state-save and rerender path as a commit.
+  await targetSelect.selectOption(target.expected);
   const refreshed=page.locator('.prep-slot-select[data-prep-slot="'+target.slotKey+'"]');
   await expect(refreshed).toHaveValue(target.expected);
   await expectNoOverflow(page,390);

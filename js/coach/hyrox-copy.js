@@ -11,6 +11,17 @@
   function buildPayload(session,prep,now){
     if(!session||session.templateId!=='hyrox')throw new Error('HyroxCopy requires HYROX ResolvedSession');
     const type=D().hyroxSessionTypes?.[session.domainContext?.sessionType]||{};
+    let benchmarkHistory=null;
+    if(session.domainContext?.sessionType==='BENCHMARK'&&window.V15HyroxBenchmarkHistory){
+      const H=window.V15HyroxBenchmarkHistory,athleteRef=H.getLastAthleteRef();
+      if(athleteRef){
+        const benchmark=session.domainContext.benchmarkContext||{};
+        const summary=H.summary({athleteRef,protocolId:benchmark.protocolId,comparisonKey:benchmark.comparisonKey});
+        const profile=H.abilityProfile(summary),recommendation=H.recommendation(profile,session.level);
+        const latest=H.list({athleteRef,protocolId:benchmark.protocolId}).at(-1)||null;
+        benchmarkHistory={athleteRef,summary,profile,recommendation,latest};
+      }
+    }
     return {
       date:Shared().formatDate?Shared().formatDate(now):'',
       sessionType:session.domainContext.sessionType,
@@ -19,6 +30,7 @@
       loadLevel:session.domainContext.loadLevel,
       capacityFocus:session.domainContext.capacityFocus||'',
       benchmark:session.domainContext.benchmarkContext||null,
+      benchmarkHistory,
       metrics:session.main?.content?.metrics||{},
       prep:M.HyroxPrep?.items?M.HyroxPrep.items(prep):[],
       stations:stationRows(session),
@@ -42,7 +54,15 @@
     lines.push('','【风险检查】','状态：'+clean(p.conflicts.status)+'｜硬冲突 '+Number(p.conflicts.hardCount||0)+'｜警告 '+Number(p.conflicts.warnCount||0));
     (p.conflicts.issues||[]).forEach(function(i){lines.push('- '+clean(i.title)+'｜'+clean(i.text));});
     lines.push('','【'+clean(p.recovery.title)+'】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}),clean(p.recovery.boundary));
-    if(p.benchmark)lines.push('','本次 Benchmark 成绩：待记录（成绩历史由 Benchmark 模块统一管理）');
+    if(p.benchmark){
+      const H=window.V15HyroxBenchmarkHistory,h=p.benchmarkHistory;
+      if(h?.latest){
+        lines.push('','【Benchmark 成绩】','会员：'+clean(h.athleteRef),'本次：'+H.formatDuration(h.latest.totalTimeMs)+'｜'+clean(h.latest.validityStatus));
+        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious)+'｜PB：'+H.formatDuration(h.summary.pb?.totalTimeMs));
+        (h.latest.stationResults||[]).forEach(function(s){if(s.timeMs)lines.push('- '+clean(s.stationId)+' '+clean((D().hyroxStations?.[s.stationId]||{}).zhName||s.stationId)+'｜'+H.formatDuration(s.timeMs));});
+        if(h.recommendation?.message)lines.push('下一阶段：'+clean(h.recommendation.message));
+      }else lines.push('','本次 Benchmark 成绩：待记录');
+    }
     return lines.join('\n').trim();
   }
   function formatMember(p){
@@ -51,7 +71,15 @@
     if(p.benchmark)lines.push('测试协议：'+clean(p.benchmark.protocolId)+'（固定 8 个 Station）');
     lines.push('目标强度：RPE '+(m.targetRpe??'—'),'','【训练前准备】',...prepLines(p.prep),'','【主要训练】');
     (p.stations||[]).forEach(function(s){lines.push(s.order+'. '+clean(s.name)+'｜'+clean(s.prescription));});
-    if(p.benchmark)lines.push('','本次成绩：待记录','只有训练规格与负重一致时，才与上次成绩直接比较。');
+    if(p.benchmark){
+      const H=window.V15HyroxBenchmarkHistory,h=p.benchmarkHistory;
+      if(h?.latest){
+        lines.push('','【本次 Benchmark】','会员：'+clean(h.athleteRef),'本次成绩：'+H.formatDuration(h.latest.totalTimeMs));
+        if(h.summary?.previous&&h.summary?.current)lines.push('较上次：'+H.formatDelta(h.summary.deltaVsPrevious),'PB：'+H.formatDuration(h.summary.pb?.totalTimeMs));
+        if(h.recommendation?.message)lines.push('下一阶段重点：'+clean(h.recommendation.message));
+      }else lines.push('','本次成绩：待记录');
+      lines.push('只有训练规格与负重一致时，才与上次成绩直接比较。');
+    }
     lines.push('','【训练后恢复】',...(p.recovery.items||[]).map(function(x){return '- '+clean(x);}));
     return lines.join('\n').trim();
   }
