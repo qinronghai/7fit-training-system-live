@@ -187,10 +187,25 @@
       }catch(error){if(status)status.textContent=error?.message||'保存失败';}
     });
     root.querySelectorAll('[data-hyrox-history-delete]').forEach(function(button){
-      button.addEventListener('click',function(){H().deleteRecord(button.dataset.hyroxHistoryDelete);rerender();});
+      button.addEventListener('click',function(){
+        if(typeof window.confirm==='function'&&!window.confirm('确定删除这条 Benchmark 记录吗？删除后可在“已删除记录”中恢复。'))return;
+        if(!H().deleteRecord(button.dataset.hyroxHistoryDelete)){
+          const status=root.querySelector('[data-hyrox-history-status]');
+          if(status)status.textContent='删除失败：记录不存在或已被删除。';
+          return;
+        }
+        rerender();
+      });
     });
     root.querySelectorAll('[data-hyrox-history-restore]').forEach(function(button){
-      button.addEventListener('click',function(){H().restoreRecord(button.dataset.hyroxHistoryRestore);rerender();});
+      button.addEventListener('click',function(){
+        if(!H().restoreRecord(button.dataset.hyroxHistoryRestore)){
+          const status=root.querySelector('[data-hyrox-history-status]');
+          if(status)status.textContent='恢复失败：记录不存在或已恢复。';
+          return;
+        }
+        rerender();
+      });
     });
   }
 

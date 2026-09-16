@@ -147,4 +147,13 @@ assert.strictEqual(legacy.legacy,true);
 assert.strictEqual(legacy.validityStatus,'INVALID_PROTOCOL');
 assert.strictEqual(H.eligible(legacy),false);
 
+H.clear();
+const invalidRecord=plain(first);
+invalidRecord.recordId='invalid-duplicate-station';
+invalidRecord.validityStatus='VALID_COMPARABLE';
+invalidRecord.stationResults=invalidRecord.stationResults.slice(0,7);
+invalidRecord.stationResults.push({...invalidRecord.stationResults[0],stationId:'H1'});
+assert.throws(()=>H.saveRecord(invalidRecord),error=>error.code==='HYROX_HISTORY_RECORD_INVALID');
+assert.deepStrictEqual(plain(H.list({})),[],'invalid canonical records must not enter history');
+
 console.log('hyrox_benchmark_history_test: PASS');

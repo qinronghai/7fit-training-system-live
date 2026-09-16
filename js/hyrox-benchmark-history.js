@@ -5,6 +5,8 @@
   const PREF_KEY='7fit-hyrox-benchmark-last-athlete-v1';
   const SCHEMA_VERSION=1;
   const ELIGIBLE_STATUSES=new Set(['VALID_NEW_BASELINE','VALID_COMPARABLE']);
+  const VALIDITY_STATUSES=new Set(['VALID_NEW_BASELINE','VALID_COMPARABLE','SCALED','INCOMPLETE','INVALID_PROTOCOL']);
+  const STATION_IDS=new Set(['H1','H2','H3','H4','H5','H6','H7','H8']);
   const GROUPS=Object.freeze({
     ENGINE:Object.freeze(['H1','H5']),
     SLED:Object.freeze(['H2','H3']),
@@ -84,6 +86,36 @@
     };
   }
 
+  function validateRecord(record){
+    const errors=[];
+    if(!record||typeof record!=='object')return {ok:false,errors:['record must be an object']};
+    for(const key of ['recordId','athleteRef','completedAt','protocolId','protocolVersion','level','comparisonKey']){
+      if(!cleanText(record[key]))errors.push(key+' is required');
+    }
+    if(!VALIDITY_STATUSES.has(cleanText(record.validityStatus)))errors.push('validityStatus is invalid');
+    if(!Array.isArray(record.stationResults))errors.push('stationResults must be an array');
+    const seen=new Set(),stations=Array.isArray(record.stationResults)?record.stationResults:[];
+    stations.forEach(function(item,index){
+      const stationId=cleanText(item?.stationId).toUpperCase();
+      if(!STATION_IDS.has(stationId))errors.push('stationResults['+index+'].stationId is invalid');
+      if(seen.has(stationId))errors.push('stationResults contains duplicate '+stationId);
+      seen.add(stationId);
+      if(item?.timeMs!=null&&!(Number.isFinite(Number(item.timeMs))&&Number(item.timeMs)>0))errors.push('stationResults['+index+'].timeMs is invalid');
+    });
+    const canonical=cleanText(record.validityStatus)==='VALID_NEW_BASELINE'||cleanText(record.validityStatus)==='VALID_COMPARABLE';
+    if(canonical){
+      if(record.legacy===true)errors.push('canonical records cannot be legacy');
+      if(stations.length!==8)errors.push('canonical records require all 8 stations');
+      if(stations.some(item=>!(Number(item?.timeMs)>0)))errors.push('canonical records require all station times');
+      if(!(Number(record.totalTimeMs)>0))errors.push('canonical records require totalTimeMs');
+    }
+    if(record.totalTimeMs!=null&&Number(record.totalTimeMs)>0&&stations.length&&stations.every(item=>Number(item?.timeMs)>0)){
+      const stationSum=stations.reduce((total,item)=>total+Number(item.timeMs),0);
+      if(Number(record.totalTimeMs)<stationSum)errors.push('totalTimeMs cannot be less than station time sum');
+    }
+    return {ok:errors.length===0,errors};
+  }
+
   function migrate(raw){
     if(!raw)return emptyStore();
     let source=raw;
@@ -136,7 +168,7 @@
   }
 
   function eligible(record){
-    return !record.deletedAt&&!record.legacy&&ELIGIBLE_STATUSES.has(record.validityStatus)&&record.totalTimeMs>0&&record.stationResults.length===8&&record.stationResults.every(function(item){return item.timeMs>0;});
+    return validateRecord(record).ok&&!record.deletedAt&&!record.legacy&&ELIGIBLE_STATUSES.has(record.validityStatus)&&record.totalTimeMs>0&&record.stationResults.length===8&&record.stationResults.every(function(item){return item.timeMs>0;});
   }
 
   function workComparableSnapshot(record){
@@ -245,7 +277,8 @@
 
   function saveRecord(record){
     const normalized=normalizeRecord(record,record?.recordId||'');
-    if(!normalized.recordId)throw Object.assign(new Error('Benchmark recordId is required'),{code:'HYROX_HISTORY_RECORD_INVALID'});
+    const validation=validateRecord(normalized);
+    if(!validation.ok)throw Object.assign(new Error('Benchmark record validation failed: '+validation.errors.join('; ')),{code:'HYROX_HISTORY_RECORD_INVALID',details:validation.errors});
     const data=read();
     data.records[normalized.recordId]=normalized;
     write(data);
@@ -387,7 +420,7 @@
     read,write,migrate,exportData,importData,clear,
     list:activeRecords,eligible,createRecord,saveRecord,saveSessionResult,deleteRecord,restoreRecord,
     summary,abilityProfile,recommendation,baselineReasonLabel,
-    formatDuration,formatDelta,parseDuration,getLastAthleteRef,setLastAthleteRef,
+    formatDuration,formatDelta,parseDuration,getLastAthleteRef,setLastAthleteRef,validateRecord,
     workComparableSnapshot,
   };
 })();

@@ -787,7 +787,7 @@ body{font-size:14px;line-height:1.55}
 
 
 /* ISSUE 71 LIVE AUDIT HARDENING */
-.prep-slot-card .slot-actions{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.prep-slot-card .slot-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
 .prep-slot-card .slot-actions>small{grid-column:1/-1}
 .prep-detail-link{display:inline-flex;align-items:center;justify-content:center;min-width:88px;min-height:34px;padding:6px 8px;border:1px solid var(--purple-soft);border-radius:8px;background:#fff;color:var(--purple-dark)!important;font-size:10.5px!important;font-weight:900!important;line-height:1.2;white-space:nowrap}
 .template-search-controls{grid-template-columns:repeat(4,minmax(0,1fr))}

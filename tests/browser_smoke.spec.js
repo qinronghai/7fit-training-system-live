@@ -345,6 +345,26 @@ test('390px HYROX Benchmark history persists PB, deltas and weakness profile', a
   await expect(page.locator('.hyrox-history-row')).toHaveCount(2);
   await expect(page.locator('.hyrox-benchmark-kpi-grid')).toContainText('14:30');
 
+  const dismissDelete = page.waitForEvent('dialog').then(async dialog => {
+    expect(dialog.message()).toContain('删除');
+    expect(dialog.message()).toContain('恢复');
+    await dialog.dismiss();
+  });
+  await page.locator('[data-hyrox-history-delete]').first().click();
+  await dismissDelete;
+  await expect(page.locator('.hyrox-history-row')).toHaveCount(2);
+
+  const activeHistoryRows=page.locator('.hyrox-history-list > .hyrox-history-rows > .hyrox-history-row');
+  const acceptDelete = page.waitForEvent('dialog').then(dialog => dialog.accept());
+  await page.locator('[data-hyrox-history-delete]').first().click();
+  await acceptDelete;
+  await expect(activeHistoryRows).toHaveCount(1);
+  await expect(page.locator('.hyrox-history-deleted')).toContainText('已删除记录');
+
+  await page.locator('.hyrox-history-deleted summary').click();
+  await page.locator('[data-hyrox-history-restore]').first().click();
+  await expect(activeHistoryRows).toHaveCount(2);
+
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
