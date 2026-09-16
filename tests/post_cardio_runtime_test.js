@@ -96,7 +96,8 @@ for(const file of ['js/coach/session.js','js/coach/composer-view.js']){
 }
 const bindings=fs.readFileSync(`${root}/js/views-coach.js`,'utf8');
 assert(bindings.includes('bindPostCardio'),'views-coach must bind the selector');
-assert.strictEqual((bindings.match(/bindPostCardio\(\);/g)||[]).length,2,'both F111 preset and composer must bind it');
+assert.strictEqual((bindings.match(/bindPostCardio\(rerender\);/g)||[]).length,2,'both F111 preset and composer must bind it with the render callback');
+assert(/function bindPostCardio\(rerender\)/.test(bindings),'the handler must receive the render callback it needs to repaint');
 for(const control of ['post-cardio-equipment','post-cardio-minutes','post-cardio-heart-rate']){
   assert(bindings.includes(control),`views-coach must handle ${control}`);
 }

@@ -31,7 +31,7 @@
     return Home.render(route);
   }
   /** POST CARDIO ONLY｜课后自主有氧 selector: 器械 / 时长 / 平均心率. */
-  function bindPostCardio(){
+  function bindPostCardio(rerender){
     const select=window.V14CoachModules?.PostCardio;
     if(!select)return;
     document.querySelectorAll('.post-cardio-equipment').forEach(el=>el.addEventListener('change',()=>{
@@ -91,7 +91,7 @@
       document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
-      bindPostCardio();
+      bindPostCardio(rerender);
       bindSaved();
       bindFavorites();
       return;
@@ -123,7 +123,7 @@
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
-    bindPostCardio();
+    bindPostCardio(rerender);
     bindSaved();
     bindFavorites();
   }
