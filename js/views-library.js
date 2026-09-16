@@ -4,6 +4,7 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const D=()=>window.V14_DATA||{};
   const S=()=>window.V15TemplateSearch;
+  const F=()=>window.V15Favorites;
   let filters={q:'',templateId:'',kind:'',pattern:'',tier:'',zone:'',equipment:'',category:'',status:''};
 
   function uniq(key){return [...new Set(Object.values(D().actions||{}).map(a=>a[key]).filter(Boolean))].sort();}
@@ -36,17 +37,25 @@
     return entry.templates.map(id=>`<span>${esc(registry[id]?.shortName||id)}</span>`).join('');
   }
 
+  function favoriteTemplate(entry){
+    return F()?.templateContext?.(entry,filters.templateId)||((entry.templates||[])[0]||'shared');
+  }
+  function favoriteButton(entry){
+    const templateId=favoriteTemplate(entry),active=!!F()?.isFavorite?.(entry,templateId);
+    return `<button class="favorite-toggle ${active?'active':''}" type="button" data-favorite-toggle data-favorite-entry-kind="${esc(entry.kind)}" data-favorite-entry-id="${esc(entry.id)}" data-favorite-template="${esc(templateId)}" aria-pressed="${active?'true':'false'}">${active?'★ 已收藏':'☆ 收藏'}</button>`;
+  }
   function resultRow(entry){
+    const favorite=favoriteButton(entry);
     if(entry.kind==='action'){
-      return `<button class="action-row search-result-row" type="button" data-search-result-id="${esc(entry.id)}" data-search-result-kind="action">
+      return `<div class="search-result-wrap"><button class="action-row search-result-row" type="button" data-search-result-id="${esc(entry.id)}" data-search-result-kind="action">
         <div><b>${esc(entry.title)}</b><span>${esc(entry.subtitle||'动作')}</span><div class="search-template-chips">${templateChips(entry)}</div></div>
         <div class="action-row-meta"><span>动作</span><small>查看详情</small></div>
-      </button>`;
+      </button>${favorite}</div>`;
     }
-    return `<a class="action-row search-result-row search-session-row" href="${esc(entry.href)}" data-search-result-id="${esc(entry.id)}" data-search-result-kind="${esc(entry.kind)}">
+    return `<div class="search-result-wrap"><a class="action-row search-result-row search-session-row" href="${esc(entry.href)}" data-search-result-id="${esc(entry.id)}" data-search-result-kind="${esc(entry.kind)}">
       <div><b>${esc(entry.title)}</b><span>${esc(entry.subtitle||'编课入口')}</span><div class="search-template-chips">${templateChips(entry)}</div></div>
       <div class="action-row-meta"><span>编课</span><small>进入 Composer</small></div>
-    </a>`;
+    </a>${favorite}</div>`;
   }
 
   function groupKey(entry){
@@ -139,6 +148,16 @@
     function bindRows(){
       document.querySelectorAll('[data-search-result-kind="action"]').forEach(button=>button.addEventListener('click',()=>{
         window.V14ActionDetail.open(button.dataset.searchResultId,{systemMode:window.V14State.getMode()==='system'});
+      }));
+      document.querySelectorAll('[data-favorite-toggle]').forEach(button=>button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        F()?.toggleByIdentity?.(
+          button.dataset.favoriteEntryKind,
+          button.dataset.favoriteEntryId,
+          {templateId:button.dataset.favoriteTemplate}
+        );
+        rerender();
       }));
     }
 

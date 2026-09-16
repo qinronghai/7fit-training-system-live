@@ -28,6 +28,7 @@
       </div>
     </section>`+
       `<section class="section-card"><div class="section-head"><div><h2>训练模板</h2><p>模板身份、状态、能力与入口全部来自 Training Template Registry；新增模板不再修改 Coach Center 的业务分支。</p></div></div><div class="recipe-grid template-grid">${cards}</div></section>`+
+      (M.FavoritesUI?.section?.()||'')+
       (M.SavedSessionsUI?.librarySection?.()||'');
   }
   M.Home={render};
