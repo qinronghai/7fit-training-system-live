@@ -31,28 +31,29 @@ for(const name of ['ensureState','resolveState','setFormalSelection','reset']){
 }
 assert(Prep&&typeof Prep.resolve==='function'&&typeof Prep.render==='function'&&typeof Prep.setSelection==='function');
 
-const familyId='CON-03',level='L2',protocolId='CIRCUIT',sessionKey='CON-03-L2-CIRCUIT';
-UI.ensureState(familyId,level,protocolId);
+const familyId='CON-03',level='L2',variantId='A',sessionKey='CON-03-L2-BLUEPRINT-A';
+UI.ensureState(familyId,level,variantId);
 assert.deepStrictEqual(plain(S.getSession('conditioning',sessionKey)),{
-  templateId:'conditioning',familyId,level,resolverVersion:'conditioning-v1',
-  input:{familyId,level,protocolId},selections:{},prepSelections:{}
+  templateId:'conditioning',familyId,level,resolverVersion:'conditioning-v2',
+  input:{familyId,level,variantId,sessionBlueprintId:'CON-03-L2-A'},selections:{},prepSelections:{}
 });
 
-const baseline=UI.resolveState(familyId,level,protocolId);
-const stationKey='STATION-1';
+const baseline=UI.resolveState(familyId,level,variantId);
+const stationKey='BLOCK-B/STATION-1';
 const station=baseline.domainContext.stations[stationKey];
 const current=Object.fromEntries(Object.values(baseline.domainContext.stations).map(x=>[x.key,x.actionId]));
-const alternate=Cond.candidates({familyId,level,protocolId,stationKey,currentSelections:current}).candidates.find(x=>x.actionId!==station.actionId);
-assert(alternate,'CON-03 L2 CIRCUIT needs a legal alternate STATION-1');
+const mainBlock=baseline.blocks.find(block=>block.key==='BLOCK-B');
+const alternate=Cond.candidates({familyId,level,protocolId:mainBlock.protocolId,stationKey,currentSelections:current}).candidates.find(x=>x.actionId!==station.actionId);
+assert(alternate,'CON-03 L2 main block needs a legal alternate');
 
-UI.setFormalSelection(familyId,level,protocolId,stationKey,alternate.actionId);
-const manual=UI.resolveState(familyId,level,protocolId);
+UI.setFormalSelection(familyId,level,variantId,stationKey,alternate.actionId);
+const manual=UI.resolveState(familyId,level,variantId);
 assert.strictEqual(manual.domainContext.stations[stationKey].actionId,alternate.actionId);
 assert.strictEqual(manual.domainContext.stations[stationKey].source,'manual');
 assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)[stationKey]),{actionId:alternate.actionId,source:'manual'});
 assert.deepStrictEqual(plain(manual.domainContext.metrics),plain(baseline.domainContext.metrics),'same Protocol station swap should re-derive but preserve Protocol timing');
 assert.deepStrictEqual(plain(manual.conflictContext),plain(R.resolve('conditioning',{
-  familyId,level,protocolId,selections:S.getSelections('conditioning',sessionKey)
+  familyId,level,variantId,selections:S.getSelections('conditioning',sessionKey)
 }).conflictContext),'Conflict must be derived from current station intent');
 
 let html=UI.render({area:'coach',page:'template-session',templateId:'conditioning',familyId,level,query:{}});
@@ -97,12 +98,12 @@ for(const slot of Prep.resolve(manual,sessionKey).slots){
   assert(html.includes(slot.slotKey),`${slot.slotKey} missing from PREP render`);
 }
 
-UI.reset(familyId,level,protocolId);
-const reset=UI.resolveState(familyId,level,protocolId);
+UI.reset(familyId,level,variantId);
+const reset=UI.resolveState(familyId,level,variantId);
 assert(Object.values(reset.domainContext.stations).every(item=>item.source==='auto'));
 assert.deepStrictEqual(plain(S.getSelections('conditioning',sessionKey)),{});
 assert.deepStrictEqual(plain(S.getPrepSelections('conditioning',sessionKey)),{});
-assert.deepStrictEqual(plain(reset),plain(R.resolve('conditioning',{familyId,level,protocolId,selections:{}})));
+assert.deepStrictEqual(plain(reset),plain(R.resolve('conditioning',{familyId,level,variantId,selections:{}})));
 
 
 const emptyPrimerHtml=Prep.renderResolved({

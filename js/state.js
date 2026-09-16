@@ -6,6 +6,7 @@
   const MODE_KEY='7fit-v14-mode';
   const SCHEMA_VERSION=1;
   const SAVED_SESSION_SCHEMA_VERSION=1;
+  const MAX_SAVED_SESSION_NAME_LENGTH=120;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
   const FORMAL_SOURCES=new Set(['baseline','auto','manual']);
   const PREP_SOURCES=new Set(['auto','manual']);
@@ -65,6 +66,20 @@
     return out;
   }
 
+  function normalizedSavedName(value,fallback){
+    const name=typeof value==='string'?value.trim():'';
+    return name?name.slice(0,MAX_SAVED_SESSION_NAME_LENGTH):fallback;
+  }
+
+  function savedName(value,savedId,fallback){
+    const name=typeof value==='string'?value.trim():'';
+    if(!name)return fallback;
+    if(name.length>MAX_SAVED_SESSION_NAME_LENGTH){
+      fail('INVALID_SAVED_SESSION_NAME',`Saved session name must be ${MAX_SAVED_SESSION_NAME_LENGTH} characters or fewer`,{savedId,maxLength:MAX_SAVED_SESSION_NAME_LENGTH});
+    }
+    return name;
+  }
+
   function normalizeSession(templateId,value={}){
     return {
       templateId,
@@ -98,7 +113,7 @@
       prepSelections:normalizeSelectionMap(value.prepSelections,true),
       createdAt,
       updatedAt,
-      name:typeof value.name==='string'&&value.name.trim()?value.name.trim():`${familyId} · ${level}`,
+      name:normalizedSavedName(value.name,`${familyId} · ${level}`),
     };
   }
 
@@ -354,9 +369,7 @@
       ?options.savedId.trim()
       :savedSessionId(now);
     if(store.savedSessions[savedId])fail('SAVED_SESSION_EXISTS',`Saved session already exists: ${savedId}`,{savedId});
-    const name=typeof options.name==='string'&&options.name.trim()
-      ?options.name.trim()
-      :`${current.familyId} · ${current.level}`;
+    const name=savedName(options.name, savedId, `${current.familyId} · ${current.level}`);
     const record={
       savedId,
       schemaVersion:SAVED_SESSION_SCHEMA_VERSION,
@@ -390,7 +403,7 @@
   function renameSavedSession(savedId,name,options={}){
     const record=store.savedSessions?.[savedId];
     if(!record)fail('SAVED_SESSION_NOT_FOUND',`Unknown saved session: ${savedId}`,{savedId});
-    const next=typeof name==='string'?name.trim():'';
+    const next=savedName(name,savedId,'');
     if(!next)fail('INVALID_SAVED_SESSION_NAME','Saved session name is required',{savedId});
     record.name=next;
     record.updatedAt=nowIso(options.now);
@@ -493,6 +506,7 @@
     getSession,ensureSession,patchSession,setSelection,getSelections,
     setPrepSelection,getPrepSelections,resetSession,reconcileSession,
     createSavedSession,getSavedSession,listSavedSessions,renameSavedSession,deleteSavedSession,
+    getMaxSavedSessionNameLength(){return MAX_SAVED_SESSION_NAME_LENGTH;},
     recordRecentAction,listRecentActions,clearRecentActions,
     clear,
   };

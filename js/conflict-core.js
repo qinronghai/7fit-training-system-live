@@ -32,10 +32,16 @@
   }
 
   function actionRefs(session){
-    if(session.main.kind==='SLOT')return session.main.content.map((item,index)=>({actionId:item.actionId,index,key:item.key||`S${index+1}`}));
+    if(session.main.kind==='SLOT')return session.main.content.map((item,index)=>({
+      actionId:item.actionId,index,key:item.key||`S${index+1}`,
+      allowRepeatedAction:item.allowRepeatedAction===true,
+    }));
     const refs=[];
     session.main.content.blocks.forEach((block,blockIndex)=>{
-      block.items.forEach((item,itemIndex)=>refs.push({actionId:item.actionId,index:refs.length,key:`${block.key||blockIndex}:${itemIndex}`}));
+      block.items.forEach((item,itemIndex)=>refs.push({
+        actionId:item.actionId,index:refs.length,key:`${block.key||blockIndex}:${itemIndex}`,
+        allowRepeatedAction:item.allowRepeatedAction===true,
+      }));
     });
     return refs;
   }
@@ -69,7 +75,8 @@
     });
     let sequence=0;
     counts.forEach((count,actionId)=>{
-      if(count>1){
+      const repeatedRefs=refs.filter(ref=>ref.actionId===actionId);
+      if(count>1&&!repeatedRefs.every(ref=>ref.allowRepeatedAction)){
         const action=data.actions?.[actionId]||{},name=action.name||actionId,index=firstIndex.get(actionId)||0;
         issues.push(issueFor(policy,'duplicate',{actionId,action,name,count,index,sequence:sequence++},{severity:'hard',title:'动作重复',text:`${name} 在正式训练内容中出现 ${count} 次。`,code:'SHARED_DUPLICATE_ACTION'}));
       }

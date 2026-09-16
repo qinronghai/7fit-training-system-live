@@ -3,6 +3,19 @@
   const Recent=()=>window.V15RecentActions;
   const selectCandidates=select=>Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
   const selectHas=(select,actionId)=>selectCandidates(select).some(candidate=>candidate.actionId===actionId);
+  function bindPrepKeyboard(select){
+    select.addEventListener('keydown',event=>{
+      if(event.defaultPrevented||event.altKey||event.ctrlKey||event.metaKey)return;
+      if(event.key!=='ArrowDown'&&event.key!=='ArrowUp')return;
+      const options=Array.from(select.options).filter(option=>option.value&&!option.disabled),index=options.findIndex(option=>option.value===select.value);
+      if(index<0)return;
+      const nextIndex=event.key==='ArrowDown'?index+1:index-1;
+      if(nextIndex<0||nextIndex>=options.length)return;
+      event.preventDefault();
+      select.value=options[nextIndex].value;
+      select.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+  }
   function templateAdapter(route){
     if(!route?.templateId||route.templateId==='f111')return null;
     const adapter=M.TemplateUI?.get?.(route.templateId);
@@ -52,7 +65,7 @@
         window.V14State.setComposerSelection(ctx.stateKey,slotKey,actionId);
         rerender();
       }));
-      document.querySelectorAll('.prep-slot-select').forEach(sel=>sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
+      document.querySelectorAll('.prep-slot-select').forEach(sel=>{bindPrepKeyboard(sel);sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();});});
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
       const status=document.getElementById('copy-session-status');
       const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
@@ -82,7 +95,7 @@
       window.V14State.setSelection(sessionId,slotKey,actionId);
       rerender();
     }));
-    document.querySelectorAll('.prep-slot-select').forEach(sel=>sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
+    document.querySelectorAll('.prep-slot-select').forEach(sel=>{bindPrepKeyboard(sel);sel.addEventListener('change',()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();});});
     const status=document.getElementById('copy-session-status');
     const doCopy=async audience=>{const payload=Session.buildCopyPayload(sessionId,route.recipeId,route.level),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function'||typeof window.V14SessionCopy?.copyText!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';setTimeout(()=>{if(status.textContent==='已复制，可直接发送'){status.textContent='';status.className='';}},1800);}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));

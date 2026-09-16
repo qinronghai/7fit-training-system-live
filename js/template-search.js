@@ -180,13 +180,18 @@
       const family=data.conditioningFamilies?.[familyId]||{};
       for(const protocolId of family.protocolEligibility||[]){
         const protocol=data.conditioningProtocols?.[protocolId]||{};
+        const variants=data.conditioningBlueprints?.[familyId]?.L1||{};
+        const variant=Object.entries(variants).find(([,blueprint])=>
+          blueprint?.blocks?.some(block=>block.protocolId===protocolId)
+        )?.[0];
+        const query=new URLSearchParams({family:familyId,level:'L1',...(variant?{variant}:{protocol:protocolId})}).toString();
         items.push({
           kind:'conditioning-protocol',
           id:`conditioning:${familyId}:${protocolId}`,
           title:`${family.name||familyId}｜${protocol.name||protocolId}`,
           subtitle:`${familyId} · ${protocolId}`,
           templates:['conditioning'],
-          href:`#/coach/conditioning/compose?family=${encodeURIComponent(familyId)}&level=L1&protocol=${encodeURIComponent(protocolId)}`,
+          href:`#/coach/conditioning/compose?${query}`,
           searchText:lower([
             familyId,family.name,family.goal,family.description,
             protocolId,protocol.name,protocol.description,

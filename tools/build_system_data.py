@@ -19,6 +19,7 @@ REQUIRED_SOURCE_FILES = (
     "templates.json",
     "body.json",
     "conditioning.json",
+    "conditioning-blueprints.json",
     "hyrox.json",
     "support.json",
     "core.json",

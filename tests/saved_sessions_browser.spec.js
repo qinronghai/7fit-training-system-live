@@ -116,10 +116,10 @@ test('Body saved session restores current manual slot intent at 390px',async({pa
   expect(errors,`unexpected Body Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });
 
-test('Conditioning saved session restores Protocol route and Station intent at 390px',async({page})=>{
+test('Conditioning saved session restores blueprint variant and Station intent at 390px',async({page})=>{
   const errors=capturePageErrors(page);
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/#/coach/conditioning/compose?family=CON-03&level=L2&protocol=CIRCUIT');
+  await page.goto('/#/coach/conditioning/compose?family=CON-03&level=L2&variant=A');
 
   const station=await firstReplaceable(page,'.conditioning-station-select');
   expect(station,'Conditioning needs a replaceable Station').toBeTruthy();
@@ -129,18 +129,40 @@ test('Conditioning saved session restores Protocol route and Station intent at 3
   await page.locator('[data-save-current-session]').click();
   await expect(page.locator('.saved-session-card h3')).toHaveText('Conditioning Circuit 保存课');
 
-  await page.locator('[data-conditioning-compose-protocol]').selectOption('DENSITY');
-  await expect(page).toHaveURL(/protocol=DENSITY/);
-  await expect(page.locator('[data-conditioning-compose-protocol]')).toHaveValue('DENSITY');
+  await page.locator('[data-conditioning-compose-variant]').selectOption('B');
+  await expect(page).toHaveURL(/variant=B/);
+  await expect(page.locator('[data-conditioning-compose-variant]')).toHaveValue('B');
 
   await page.locator('[data-saved-restore]').click();
-  await expect(page).toHaveURL(/family=CON-03&level=L2&protocol=CIRCUIT/);
-  await expect(page.locator('[data-conditioning-compose-protocol]')).toHaveValue('CIRCUIT');
+  await expect(page).toHaveURL(/family=CON-03&level=L2&variant=A/);
+  await expect(page.locator('[data-conditioning-compose-variant]')).toHaveValue('A');
   const restored=page.locator('.conditioning-station-select').filter({has:page.locator(`option[value="${station.target}"]`)}).first();
   await expect(restored).toHaveValue(station.target);
-  await expect(restored.locator('xpath=ancestor::article[contains(@class,"conditioning-station-card")]').locator('.conditioning-station-head small')).toHaveText('手动选择');
+  await expect(restored.locator('xpath=ancestor::article[contains(@class,"conditioning-station-card")]').locator('.conditioning-station-head > small')).toHaveText('手动选择');
   await expect(page.locator('.saved-session-notice')).toBeVisible();
   await expect(page.getByText('NO POST CARDIO',{exact:false}).first()).toBeVisible();
   await expect390NoOverflow(page);
   expect(errors,`unexpected Conditioning Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
+});
+
+test('Conditioning session-surface save/restore keeps the selected B variant at 390px',async({page})=>{
+  const errors=capturePageErrors(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/conditioning/con-03/l2?variant=B');
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('C');
+
+  await page.locator('[data-save-session-name]').fill('Conditioning B Session 保存课');
+  await page.locator('[data-save-current-session]').click();
+  await expect(page.locator('.saved-session-card h3')).toHaveText('Conditioning B Session 保存课');
+  await expect(page.locator('[data-saved-restore]')).toContainText('恢复到 Conditioning L2');
+
+  await page.locator('[data-conditioning-next-variant]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2\?variant=C/);
+  await page.locator('[data-saved-restore]').click();
+  await expect(page).toHaveURL(/#\/coach\/conditioning\/con-03\/l2\?variant=B/);
+  await expect(page.locator('.conditioning-session-hero')).toContainText('B 变体');
+  await expect(page.locator('.saved-session-notice')).toContainText('Conditioning · L2');
+  await expect(page.locator('[data-conditioning-next-variant]')).toContainText('C');
+  await expect390NoOverflow(page);
+  expect(errors,`unexpected Conditioning session Save/Restore pageerror(s): ${errors.join(' | ')}`).toEqual([]);
 });

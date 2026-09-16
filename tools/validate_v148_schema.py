@@ -187,6 +187,7 @@ def validate_payload(data: dict) -> list[str]:
         "conditioningActionMeta",
         "conditioningTransitionPolicy",
         "conditioningConflictPolicy",
+        "conditioningBlueprints",
     )
     conditioning = {key: data.get(key) for key in conditioning_keys}
     errors.extend(_schema_errors(conditioning, "conditioning", "conditioning"))
@@ -579,6 +580,7 @@ def validate_payload(data: dict) -> list[str]:
     conditioning_modalities = data.get("conditioningModalities", {})
     conditioning_level_policies = data.get("conditioningLevelPolicies", {})
     conditioning_protocol_policies = data.get("conditioningProtocolPolicies", {})
+    conditioning_blueprints = data.get("conditioningBlueprints", {})
 
     for map_name, id_field, ids in (
         ("conditioningFamilies", "familyId", conditioning_family_ids),
@@ -736,6 +738,109 @@ def validate_payload(data: dict) -> list[str]:
             errors.append(
                 f"conditioningModalities.{modality_id}: RESERVED modality must not have formal V1 candidates"
             )
+
+    # Conditioning Class Blueprint identity, block references, and teaching fields.
+    expected_block_counts = {"L1": 2, "L2": 3, "L3": 3, "L4": 3}
+    expected_variants = {"A", "B", "C"}
+    expected_roles = ["BUILD", "MAIN", "CHALLENGE"]
+    for family_id in conditioning_family_ids:
+        family_blueprints = conditioning_blueprints.get(family_id, {})
+        if set(family_blueprints) != conditioning_level_ids:
+            errors.append(
+                f"conditioningBlueprints.{family_id}: keys must be exactly L1/L2/L3/L4"
+            )
+            continue
+        for level in ("L1", "L2", "L3", "L4"):
+            variants = family_blueprints.get(level, {})
+            if set(variants) != expected_variants:
+                errors.append(
+                    f"conditioningBlueprints.{family_id}.{level}: variants must be exactly A/B/C"
+                )
+                continue
+            for variant_id, blueprint in sorted(variants.items()):
+                prefix = f"conditioningBlueprints.{family_id}.{level}.{variant_id}"
+                if not isinstance(blueprint, dict):
+                    errors.append(f"{prefix}: must be an object")
+                    continue
+                if blueprint.get("sessionBlueprintId") != f"{family_id}-{level}-{variant_id}":
+                    errors.append(f"{prefix}.sessionBlueprintId: identity does not match map path")
+                if blueprint.get("familyId") != family_id or blueprint.get("level") != level:
+                    errors.append(f"{prefix}: familyId/level does not match map path")
+                if blueprint.get("variantId") != variant_id:
+                    errors.append(f"{prefix}.variantId: must equal map key {variant_id}")
+                blocks = blueprint.get("blocks", [])
+                if len(blocks) != expected_block_counts[level]:
+                    errors.append(
+                        f"{prefix}.blocks: expected {expected_block_counts[level]}, got {len(blocks)}"
+                    )
+                seen_keys = []
+                flattened_actions = []
+                for index, block in enumerate(blocks if isinstance(blocks, list) else []):
+                    block_prefix = f"{prefix}.blocks.{index}"
+                    if not isinstance(block, dict):
+                        errors.append(f"{block_prefix}: must be an object")
+                        continue
+                    if block.get("key") != f"BLOCK-{chr(65 + index)}":
+                        errors.append(f"{block_prefix}.key: must follow BLOCK-A/B/C order")
+                    seen_keys.append(block.get("key"))
+                    if index >= len(expected_roles) or block.get("role") != expected_roles[index]:
+                        errors.append(f"{block_prefix}.role: invalid role for block position")
+                    protocol_id = block.get("protocolId")
+                    if protocol_id not in valid_conditioning_protocols:
+                        errors.append(f"{block_prefix}.protocolId: unknown protocol {protocol_id}")
+                    elif protocol_id not in conditioning_families.get(family_id, {}).get("protocolEligibility", []):
+                        errors.append(f"{block_prefix}.protocolId: {protocol_id} is not legal for {family_id}")
+                    for field in (
+                        "goal", "prescription", "completionMetric", "zone", "setup",
+                    ):
+                        if not isinstance(block.get(field), str) or not block[field].strip():
+                            errors.append(f"{block_prefix}.{field}: must be non-empty")
+                    for field in ("coachingCues", "scaleRules", "stopCriteria", "equipment"):
+                        values = block.get(field)
+                        if not isinstance(values, list) or not values or not all(isinstance(item, str) and item.strip() for item in values):
+                            errors.append(f"{block_prefix}.{field}: must be a non-empty string array")
+                    stations = block.get("stations", [])
+                    if not isinstance(stations, list) or not stations:
+                        errors.append(f"{block_prefix}.stations: must be a non-empty array")
+                        continue
+                    protocol = conditioning_protocols.get(protocol_id, {})
+                    station_range = protocol.get("stationCountRange", []) if isinstance(protocol, dict) else []
+                    if isinstance(station_range, list) and len(station_range) == 2 and not (station_range[0] <= len(stations) <= station_range[1]):
+                        errors.append(
+                            f"{block_prefix}.stations: count {len(stations)} outside {protocol_id} range {station_range}"
+                        )
+                    for station_index, station in enumerate(stations):
+                        station_prefix = f"{block_prefix}.stations.{station_index}"
+                        if not isinstance(station, dict):
+                            errors.append(f"{station_prefix}: must be an object")
+                            continue
+                        action_id = station.get("actionId")
+                        action = actions.get(action_id, {})
+                        action_meta = conditioning_action_meta.get(action_id, {})
+                        flattened_actions.append(action_id)
+                        for field in ("actionId", "taskLabel", "setup", "equipment", "zone"):
+                            if not isinstance(station.get(field), str) or not station[field].strip():
+                                errors.append(f"{station_prefix}.{field}: must be non-empty")
+                        if action_id not in actions or action_id not in conditioning_action_meta:
+                            errors.append(f"{station_prefix}.actionId: unknown Conditioning action {action_id}")
+                            continue
+                        if action.get("route") != "CONDITIONING_2F" or action.get("status") != "可自动编排":
+                            errors.append(f"{station_prefix}.actionId: action must be formal CONDITIONING_2F and 可自动编排")
+                        if family_id not in action_meta.get("families", []) or level not in action_meta.get("levels", []):
+                            errors.append(f"{station_prefix}.actionId: action is not legal for {family_id}/{level}")
+                        if protocol_id not in action_meta.get("protocolEligibility", []):
+                            errors.append(f"{station_prefix}.actionId: action is not legal for protocol {protocol_id}")
+                if seen_keys != [f"BLOCK-{chr(65 + index)}" for index in range(expected_block_counts[level])]:
+                    errors.append(f"{prefix}.blocks: keys must be ordered and contiguous")
+                if blueprint.get("repeatPolicy") == "UNIQUE_ACTIONS" and len(flattened_actions) != len(set(flattened_actions)):
+                    errors.append(f"{prefix}.repeatPolicy: UNIQUE_ACTIONS cannot repeat an action")
+                transitions = sum(
+                    block.get("transitionAfterSeconds", 0)
+                    for block in blocks
+                    if isinstance(block, dict) and isinstance(block.get("transitionAfterSeconds", 0), (int, float))
+                )
+                if blueprint.get("totalTransitionSeconds") != transitions:
+                    errors.append(f"{prefix}.totalTransitionSeconds: must equal block transition sum")
 
     # Every Family × Level must be resolvable later by #37 without inventing candidates.
     for family_id in conditioning_family_ids:
