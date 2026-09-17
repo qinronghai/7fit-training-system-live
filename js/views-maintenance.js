@@ -8,7 +8,8 @@
   function kpi(value,label,note=''){return `<article class="health-kpi"><b>${esc(value)}</b><span>${esc(label)}</span><small>${esc(note)}</small></article>`;}
   function changeTypeClass(type){return {'功能':'feature','修复':'fix','规则':'rule','数据':'data','架构':'arch','体验':'ux','部署':'deploy'}[type]||'other';}
   function changelogPanel(){
-    const items=CHANGELOG();
+    const items=[...CHANGELOG()].sort((a,b)=>
+      `${b.date} ${b.time||''}`.localeCompare(`${a.date} ${a.time||''}`));
     if(!items.length)return '';
     const dates=[...new Set(items.map(item=>item.date))];
     const groups=dates.map((date,index)=>{

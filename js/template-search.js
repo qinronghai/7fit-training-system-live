@@ -2,6 +2,8 @@
   'use strict';
 
   const D=()=>window.V14_DATA||{};
+  const MAX_QUERY_LENGTH=200;
+  const normalizeQuery=value=>String(value??'').slice(0,MAX_QUERY_LENGTH);
   const clean=value=>String(value??'').trim();
   const lower=value=>clean(value).toLowerCase();
   const unique=values=>[...new Set((Array.isArray(values)?values:[]).filter(Boolean))];
@@ -266,7 +268,7 @@
   }
 
   function search(options={}){
-    const q=lower(options.q||''),templateId=clean(options.templateId||''),kind=clean(options.kind||'');
+    const q=lower(normalizeQuery(options.q)),templateId=clean(options.templateId||''),kind=clean(options.kind||'');
     const limit=Number.isInteger(options.limit)&&options.limit>0?options.limit:240;
     return buildIndex().filter(entry=>{
       if(q&&!entry.searchText.includes(q))return false;
@@ -295,6 +297,8 @@
   }
 
   window.V15TemplateSearch={
+    MAX_QUERY_LENGTH,
+    normalizeQuery,
     buildIndex,
     search,
     templatesForAction,

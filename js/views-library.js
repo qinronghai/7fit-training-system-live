@@ -95,7 +95,7 @@
     return `<section class="view-hero compact"><span class="eyebrow">TEMPLATE-AWARE SEARCH</span><h1>动作与编课搜索</h1><p>统一搜索 Action、F111 组合、Body Family/Role、Conditioning Family/Protocol 与 HYROX Session；搜索只负责发现与跳转，课程合法性仍由各 Template Resolver 决定。</p></section>
       <section class="section-card">
         <div class="library-controls template-search-controls">
-          <input id="action-search" aria-label="搜索动作与编课" type="search" placeholder="搜索动作 / 肌群 / 器械 / Family / Protocol" value="${esc(filters.q)}">
+          <input id="action-search" aria-label="搜索动作与编课" type="search" maxlength="${S().MAX_QUERY_LENGTH}" placeholder="搜索动作 / 肌群 / 器械 / Family / Protocol" value="${esc(S().normalizeQuery(filters.q))}">
           <select aria-label="模板筛选" data-filter="templateId">${templateOpts()}</select>
           <select aria-label="结果类型筛选" data-filter="kind">${kindOpts()}</select>
           <select aria-label="动作模式筛选" data-filter="pattern">${opts(uniq('pattern'),'全部模式')}</select>
@@ -135,8 +135,13 @@
 
     const search=document.getElementById('action-search');
     if(search){
+      filters.q=S().normalizeQuery(filters.q);
       search.value=filters.q;
-      search.addEventListener('input',event=>{filters.q=event.target.value;rerender();});
+      search.addEventListener('input',event=>{
+        filters.q=S().normalizeQuery(event.target.value);
+        event.target.value=filters.q;
+        rerender();
+      });
     }
 
     document.querySelectorAll('[data-filter]').forEach(select=>{

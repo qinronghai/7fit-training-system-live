@@ -20,6 +20,10 @@ for(const file of [
 
 const S=window.V15TemplateSearch;
 assert(S,'V15TemplateSearch must exist');
+assert.strictEqual(S.normalizeQuery('x'.repeat(3000)).length,200,'Oversized queries must be bounded');
+const boundaryQuery='滑雪机'+' '.repeat(197);
+assert.deepStrictEqual(S.search({q:boundaryQuery+'ignored suffix'}),S.search({q:'滑雪机'}),
+  'Search must apply the same bound as the visible input before matching');
 
 const index=S.buildIndex();
 assert(index.length>0,'search index must not be empty');
