@@ -15,7 +15,7 @@ const api = context.window.V14AuxiliaryModules;
 assert(api, 'auxiliary module API must be exposed');
 
 const upper = api.catalog('upper');
-assert.strictEqual(upper.total, 9, 'upper auxiliary pool should deduplicate to 9 actions');
+assert.strictEqual(upper.total, 19, 'upper auxiliary pool should deduplicate to 19 actions');
 assert.deepStrictEqual(
   [...upper.entries.map(entry => entry.id)],
   [
@@ -23,16 +23,37 @@ assert.deepStrictEqual(
     'mianla',
     'shengsuo_ertou_wanju',
     'shengsuo_jianwai_xuanzhuan',
+    'fushen_y_ju',
+    'xieban_ytw_jinjie',
+    'hudieji_fanxiang_feiniao',
+    'feiji_labei_xiaba',
+    'dixie_mianla_shangju',
     'zhibi_xiala',
+    'shengsuo_mianla',
+    'shuanggang_zhicheng',
     'shengsuo_santou_xiaya',
     'xiongjia_jiaxiong',
     'shengsuo_jiaxiong_zhongwei',
+    'shengsuo_jiaxiong_gaowei',
+    'pecdeck_unilateral_press_main',
+    'qixie_xiong_tui_zhaiwo',
     'shengsuo_cepingju',
   ],
 );
-assert.strictEqual(upper.classCounts.cable_station, 7);
-assert.strictEqual(upper.classCounts.fixed_machine, 1);
-assert.strictEqual(upper.classCounts.free_weight, 1);
+assert.strictEqual(upper.classCounts.cable_station, 10);
+assert.strictEqual(upper.classCounts.fixed_machine, 6);
+assert.strictEqual(upper.classCounts.free_weight, 2);
+assert.strictEqual(upper.classCounts.bodyweight, 1);
+// D2 must supplement A/B instead of restating the tiered main windows.
+assert(
+  upper.entries.every(entry => !entry.action.tier),
+  'upper auxiliary catalog must stay free of tiered main-window actions',
+);
+assert(
+  upper.entries.every(entry => entry.detailState.complete),
+  'every upper auxiliary action must ship complete coach detail',
+);
+assert.strictEqual(api.equipmentClassLabel('bodyweight'), '自重');
 assert.strictEqual(api.equipmentClassLabel('cable_station'), '绳索 / 龙门架辅助');
 assert.strictEqual(api.equipmentClassLabel('fixed_machine'), '固定器械');
 

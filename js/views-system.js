@@ -41,7 +41,9 @@
     const api=window.V14AuxiliaryModules;if(!api)return '';
     const cfg=api.configs[side],catalog=api.catalog(side),systemMode=window.V14State?.getMode?.()==='system';
     const pool=String(route.query?.pool||''),equipmentClass=String(route.query?.equipmentClass||'');
-    const classKeys=side==='lower'?['fixed_machine','cable_station']:['fixed_machine','cable_station','free_weight'];
+    // Filter options follow the data: a pool that gains a bodyweight or
+    // free-weight accessory must not silently lose its equipment-class filter.
+    const classKeys=['fixed_machine','cable_station','free_weight','bodyweight','other','unknown'].filter(key=>catalog.classCounts?.[key]);
     const poolOptions=cfg.poolKeys.map(key=>`<option value="${esc(key)}" ${pool===key?'selected':''}>${esc(cfg.poolLabels[key])}</option>`).join('');
     const classOptions=classKeys.filter(key=>catalog.classCounts?.[key]).map(key=>`<option value="${esc(key)}" ${equipmentClass===key?'selected':''}>${esc(api.equipmentClassLabel(key))}</option>`).join('');
     const poolSummary=`<div class="auxiliary-pool-overview">${cfg.poolKeys.map(key=>{const count=catalog.entries.filter(entry=>entry.sourcePoolKeys.includes(key)).length;return `<button type="button" class="auxiliary-pool-chip" data-aux-pool-button="${esc(key)}" aria-pressed="${pool===key?'true':'false'}"><span>${esc(cfg.poolLabels[key])}</span><b>${count} 个</b></button>`;}).join('')}</div>`;

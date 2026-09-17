@@ -438,25 +438,45 @@
           "houzu_sanji",
           "mianla",
           "shengsuo_ertou_wanju",
-          "shengsuo_jianwai_xuanzhuan"
+          "shengsuo_jianwai_xuanzhuan",
+          "fushen_y_ju",
+          "xieban_ytw_jinjie",
+          "hudieji_fanxiang_feiniao",
+          "feiji_labei_xiaba",
+          "dixie_mianla_shangju"
         ],
         "vertical_pull": [
           "shengsuo_ertou_wanju",
           "zhibi_xiala",
           "mianla",
-          "houzu_sanji"
+          "houzu_sanji",
+          "feiji_labei_xiaba",
+          "fushen_y_ju",
+          "xieban_ytw_jinjie",
+          "hudieji_fanxiang_feiniao",
+          "shengsuo_mianla",
+          "shuanggang_zhicheng",
+          "dixie_mianla_shangju"
         ],
         "horizontal_push": [
           "shengsuo_santou_xiaya",
           "xiongjia_jiaxiong",
           "shengsuo_jiaxiong_zhongwei",
-          "shengsuo_jianwai_xuanzhuan"
+          "shengsuo_jianwai_xuanzhuan",
+          "shengsuo_jiaxiong_gaowei",
+          "pecdeck_unilateral_press_main",
+          "qixie_xiong_tui_zhaiwo"
         ],
         "vertical_push": [
           "shengsuo_cepingju",
           "shengsuo_santou_xiaya",
           "mianla",
-          "shengsuo_jianwai_xuanzhuan"
+          "shengsuo_jianwai_xuanzhuan",
+          "shuanggang_zhicheng",
+          "fushen_y_ju",
+          "xieban_ytw_jinjie",
+          "shengsuo_mianla",
+          "dixie_mianla_shangju"
         ]
       }
     },

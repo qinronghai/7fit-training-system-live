@@ -46,7 +46,7 @@ test('Issue 79: upper auxiliary module deduplicates source pools and supports fi
   await page.goto('/#/system/patterns?focus=aux-upper');
   const module=page.locator('[data-auxiliary-module="aux-upper"]');
   await expect(module).toBeVisible();
-  await expect(module.locator('[data-aux-entry]')).toHaveCount(9);
+  await expect(module.locator('[data-aux-entry]')).toHaveCount(19);
   await expect(module).toContainText('同一动作只展示一次');
   const facePull=module.locator('[data-aux-entry="mianla"]');
   await expect(facePull.locator('[data-aux-pool="horizontal_pull"]')).toBeVisible();
@@ -55,8 +55,15 @@ test('Issue 79: upper auxiliary module deduplicates source pools and supports fi
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('');
   await module.locator('[data-aux-pool-button="horizontal_pull"]').click();
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('horizontal_pull');
-  await expect(module.locator('[data-aux-visible-count]')).toHaveText('4 个');
-  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(4);
+  await expect(module.locator('[data-aux-visible-count]')).toHaveText('9 个');
+  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(9);
+  // 俯身Y举 is bodyweight: its class must reach the filter instead of being dropped.
+  await expect(module.locator('[data-aux-filter="equipmentClass"] option[value="bodyweight"]')).toHaveCount(1);
+  await module.locator('[data-aux-filter="pool"]').selectOption('');
+  await module.locator('[data-aux-filter="equipmentClass"]').selectOption('bodyweight');
+  await expect(module.locator('[data-aux-visible-count]')).toHaveText('1 个');
+  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(1);
+  await expect(module.locator('[data-aux-entry="fushen_y_ju"]')).toBeVisible();
   await expectNoOverflow(page,390);
   await expectClean(diag);
 });
@@ -87,7 +94,7 @@ test('Issue 79: coach/system mode and detail links preserve data provenance',asy
   await expect(module.locator('.auxiliary-mode-meta')).toHaveCount(0);
   await page.locator('#mode-toggle').click();
   await expect(module.locator('.auxiliary-source-note')).toHaveText('数据源：composer.auxiliaryRules.upper');
-  await expect(module.locator('.auxiliary-mode-meta')).toHaveCount(9);
+  await expect(module.locator('.auxiliary-mode-meta')).toHaveCount(19);
   await expect(module.locator('.auxiliary-mode-meta').first()).toContainText('equipmentClass');
   const detailLink=module.locator('[data-aux-entry="houzu_sanji"] .auxiliary-detail-link');
   await expect(detailLink).toHaveAttribute('href','#/library?focus=houzu_sanji');

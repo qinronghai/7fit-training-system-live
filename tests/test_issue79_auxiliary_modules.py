@@ -24,11 +24,19 @@ def unique_rule_ids(data, side):
     return seen
 
 
+def venue_equipment_ids(data):
+    """Equipment ids from the 7Fit 器械清单 that ships inside system.legacyHtml."""
+    html = data.get("legacyHtml", {}).get("equipment", "")
+    ids = re.findall(r"eq-[a-z0-9-]+", html)
+    assert ids, "the venue equipment inventory must stay present in the runtime data"
+    return set(ids)
+
+
 def test_issue79_auxiliary_inventory_and_explicit_equipment_classes():
     data = payload()
     upper_ids = unique_rule_ids(data, "upper")
     lower_ids = unique_rule_ids(data, "lower")
-    assert len(upper_ids) == 9
+    assert len(upper_ids) == 19
     assert len(lower_ids) == 6
     assert len(data["tenPatternCatalog"]) == 10
     assert set(upper_ids) | set(lower_ids) <= set(data["actions"])
@@ -45,6 +53,34 @@ def test_issue79_auxiliary_inventory_and_explicit_equipment_classes():
         "cable_station",
     }
     assert data["actions"]["houzu_sanji"]["equipmentClass"] == "free_weight"
+
+
+def test_upper_auxiliary_actions_are_implementable_with_the_venue_equipment_list():
+    data = payload()
+    venue_ids = venue_equipment_ids(data)
+    upper_ids = unique_rule_ids(data, "upper")
+
+    for action_id in upper_ids:
+        action = data["actions"][action_id]
+        # D2 supplements the tiered A/B main windows instead of restating them.
+        assert action["tier"] == "", f"upper auxiliary must not be a tiered main action: {action_id}"
+        equipment_ids = [
+            item.strip() for item in (action.get("equipmentId") or "").split("、") if item.strip()
+        ]
+        unknown = [item for item in equipment_ids if item not in venue_ids]
+        assert not unknown, f"{action_id} uses equipment outside the venue list: {unknown}"
+        details = data["actionDetails"][action_id]["fields"]
+        missing = [
+            field
+            for field in ("训练目标", "教练口令", "执行步骤", "常见错误", "禁忌 / 限制")
+            if not str(details.get(field, "")).strip()
+        ]
+        assert not missing, f"{action_id} would render as 待补齐 in module 11: {missing}"
+
+    # Every upper pool keeps at least one candidate and never repeats an action.
+    for pool_key, ids in data["composer"]["auxiliaryRules"]["upper"].items():
+        assert ids, f"upper auxiliary pool {pool_key} must not be empty"
+        assert len(ids) == len(set(ids)), f"upper auxiliary pool {pool_key} must not repeat an action"
 
 
 def test_issue79_schema_declares_equipment_class_enum_and_validator_enforces_auxiliary_data():
