@@ -10,8 +10,8 @@ assert.strictEqual(C.combinations().length,20);
 assert.strictEqual(new Set(C.combinations().map(x=>x.id)).size,20);
 assert.deepStrictEqual(Array.from(C.mainTierWindow('L1').normal),['T1']);
 assert.deepStrictEqual(Array.from(C.mainTierWindow('L2').normal),['T1','T2']);
-assert.deepStrictEqual(Array.from(C.mainTierWindow('L3').normal),['T2','T3']);
-assert.deepStrictEqual(Array.from(C.mainTierWindow('L4').normal),['T3','T4']);
+assert.deepStrictEqual(Array.from(C.mainTierWindow('L3').normal),['T1','T2','T3']);
+assert.deepStrictEqual(Array.from(C.mainTierWindow('L4').normal),['T1','T2','T3','T4']);
 assert.strictEqual(C.supportWindow('L3').recommended,'SUP-S3');
 assert.deepStrictEqual(Array.from(C.supportWindow('L3').normal),['SUP-S2','SUP-S3','SUP-S4']);
 assert.deepStrictEqual(Array.from(C.supportWindow('L3').expanded),['SUP-S5']);
@@ -43,6 +43,29 @@ for(const level of ['L1','L2','L3','L4']){
       const full=C.resolve({level,lowerMode,upperMode,coreDemand:'anti_extension'});
       assert.strictEqual(full.slots.length,6,`${level} ${lowerMode} ${upperMode}: slot count`);
       assert(full.slots.every(x=>x.actionId),`${level} ${lowerMode} ${upperMode}: missing formal slot`);
+      for(const [slot,mode] of [['A',D.composer.lowerModes[lowerMode]],['B',D.composer.upperModes[upperMode]]]){
+        for(const candidate of mode.candidates){
+          if(Number(candidate.tier.slice(1))>Number(level.slice(1)))continue;
+          const action=D.actions[candidate.id];
+          if(action.status!=='可自动编排'||!['1F_ONLY','FLEX_1F_2F'].includes(action.route))continue;
+          assert(full.slotOptions[slot].some(option=>option.id===candidate.id),`${level} ${lowerMode} ${upperMode}: missing lower-tier ${candidate.id}`);
+          const manual=C.resolve({level,lowerMode,upperMode,coreDemand:'anti_extension',selections:{[slot]:candidate.id}});
+          assert.strictEqual(manual.slots.find(x=>x.slotKey===slot).actionId,candidate.id);
+        }
+      }
+    }
+  }
+}
+// Every preset must expose the same legal downward mode chain as the composer.
+for(const [recipe,modes] of Object.entries(D.composer.officialPresetMap)){
+  for(const level of ['L1','L2','L3','L4']){
+    const id=`${recipe}-${level}`;
+    for(const [slot,mode] of [['A',D.composer.lowerModes[modes[0]]],['B',D.composer.upperModes[modes[1]]]]){
+      for(const candidate of mode.candidates){
+        const action=D.actions[candidate.id];
+        if(Number(candidate.tier.slice(1))>Number(level.slice(1))||action.status!=='可自动编排'||!['1F_ONLY','FLEX_1F_2F'].includes(action.route))continue;
+        assert(D.sessionViews[id].slotOptions[`${id}__${slot}`].some(option=>option.id===candidate.id),`${id} ${slot}: missing ${candidate.tier} ${candidate.id}`);
+      }
     }
   }
 }

@@ -18,7 +18,7 @@
     if(slotKey==='CORE'){const w=resolved.windows.core;return `推荐 ${(w.recommended||[]).join(' / ')}｜常规 ${(w.normal||[]).join('–')}`;}
     return '系统按主项互补、动作暴露和场馆路由推荐';
   }
-  function composerCard(ctx,slot){
+  function composerCard(ctx,slot,controls=''){
     const data=D(),opts=ctx.resolved.slotOptions[slot.slotKey]||[],a=data.actions[slot.actionId]||{};
     const optionHtml=opts.map(o=>{const grade=o.tier||o.grade||'';return `<option value="${esc(o.id)}" ${o.id===slot.actionId?'selected':''}>${esc([grade,o.name].filter(Boolean).join('｜'))}</option>`;}).join('');
     const grade=slot.tier||slot.grade||'';
@@ -29,7 +29,7 @@
       lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,level:ctx.level,coreDemand:ctx.coreDemand,slotKey:slot.slotKey,
     })||'';
     const quick=Recent?.renderButtons?.({templateId:'f111',contextKey,candidates:opts,currentActionId:slot.actionId})||'';
-    return `<article class="composer-slot-card" data-composer-slot="${esc(slot.slotKey)}"><div class="composer-slot-head"><span>${esc(slot.slotName)}</span><b>${esc(grade||'辅助')}</b></div><h3>${esc(slot.name||'暂无候选')}</h3><p>${esc(windowText(slot.slotKey,ctx.resolved))}</p>${rx}${tierNote}<div class="composer-slot-actions"><a href="${detailRoute}">查看动作</a><select class="composer-slot-select" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select>${quick}</div></article>`;
+    return `<article class="composer-slot-card" data-composer-slot="${esc(slot.slotKey)}"><div class="composer-slot-head"><span>${esc(slot.slotName)}</span><b>${esc(grade||'辅助')}</b></div>${controls}<h3>${esc(slot.name||'暂无候选')}</h3><p>${esc(windowText(slot.slotKey,ctx.resolved))}</p>${rx}${tierNote}<div class="composer-slot-actions"><a href="${detailRoute}">查看动作</a><select class="composer-slot-select" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select>${quick}</div></article>`;
   }
   M.Slot={sessionCard,composerCard,windowText};
 })();

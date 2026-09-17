@@ -2898,6 +2898,11 @@
             "id": "gangling_shendun",
             "label": "杠铃深蹲｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-01-L3__B": [
@@ -2935,6 +2940,11 @@
             "id": "gangling_huachuan",
             "label": "杠铃划船｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-01-L3__SUPPORT": [
@@ -3135,6 +3145,16 @@
             "id": "hake_shendun",
             "label": "哈克深蹲｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "V13_SQ_DB_GOBLET",
+            "label": "哑铃高脚杯深蹲｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-01-L4__B": [
@@ -3147,6 +3167,16 @@
             "id": "zuozi_huachuan_bianshi",
             "label": "坐姿划船（变式）｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "feiji_labei_zhongba",
+            "label": "飞机拉背中把位｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-01-L4__SUPPORT": [
@@ -3781,6 +3811,11 @@
             "id": "gangling_shendun",
             "label": "杠铃深蹲｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-02-L3__B": [
@@ -3803,6 +3838,11 @@
             "id": "movement_bodyweight_pullup",
             "label": "自重引体向上｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-02-L3__SUPPORT": [
@@ -3998,6 +4038,16 @@
             "id": "hake_shendun",
             "label": "哈克深蹲｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "V13_SQ_DB_GOBLET",
+            "label": "哑铃高脚杯深蹲｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-02-L4__B": [
@@ -4010,6 +4060,16 @@
             "id": "fuzhu_yinti_xiangshang",
             "label": "辅助引体向上｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "gaowei_xiala_vba",
+            "label": "高位下拉-V把正手｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-02-L4__SUPPORT": [
@@ -4644,6 +4704,11 @@
             "id": "gangling_yingla",
             "label": "杠铃硬拉｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "movement_dowel_hip_hinge",
+            "label": "三点杆髋铰链｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-03-L3__B": [
@@ -4681,6 +4746,11 @@
             "id": "gangling_huachuan",
             "label": "杠铃划船｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-03-L3__SUPPORT": [
@@ -4881,6 +4951,16 @@
             "id": "liujiao_gantui_yingla",
             "label": "六角杠硬拉｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "movement_dowel_hip_hinge",
+            "label": "三点杆髋铰链｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "yaling_luomaniya_yingla",
+            "label": "哑铃罗马尼亚硬拉｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-03-L4__B": [
@@ -4893,6 +4973,16 @@
             "id": "zuozi_huachuan_bianshi",
             "label": "坐姿划船（变式）｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "feiji_labei_zhongba",
+            "label": "飞机拉背中把位｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-03-L4__SUPPORT": [
@@ -5507,6 +5597,11 @@
             "id": "hipthrust_pause_main",
             "label": "超程臀推机高阶处方（同 base）｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "tunqiao",
+            "label": "臀桥｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-04-L3__B": [
@@ -5529,6 +5624,11 @@
             "id": "movement_bodyweight_pullup",
             "label": "自重引体向上｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-04-L3__SUPPORT": [
@@ -5734,6 +5834,16 @@
             "id": "hipthrust_pause_main",
             "label": "臀推停顿主项｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "tunqiao",
+            "label": "臀桥｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "tun_tui",
+            "label": "臀推机｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-04-L4__B": [
@@ -5746,6 +5856,16 @@
             "id": "fuzhu_yinti_xiangshang",
             "label": "辅助引体向上｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "gaowei_xiala_vba",
+            "label": "高位下拉-V把正手｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-04-L4__SUPPORT": [
@@ -6375,6 +6495,11 @@
             "id": "baojiayali_fentundun",
             "label": "保加利亚分腿蹲｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "movement_supported_split_squat",
+            "label": "扶持分腿蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-05-L3__B": [
@@ -6412,6 +6537,11 @@
             "id": "gangling_huachuan",
             "label": "杠铃划船｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-05-L3__SUPPORT": [
@@ -6617,6 +6747,16 @@
             "id": "movement_dumbbell_reverse_lunge",
             "label": "哑铃反向箭步蹲｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "movement_supported_split_squat",
+            "label": "扶持分腿蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "movement_bodyweight_split_squat",
+            "label": "徒手分腿蹲｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-05-L4__B": [
@@ -6629,6 +6769,16 @@
             "id": "zuozi_huachuan_bianshi",
             "label": "坐姿划船（变式）｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "V13_HR_SCAP_ROW",
+            "label": "基础肩胛划船（轻重量）｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "feiji_labei_zhongba",
+            "label": "飞机拉背中把位｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-05-L4__SUPPORT": [
@@ -7273,6 +7423,11 @@
             "id": "gangling_shendun",
             "label": "杠铃深蹲｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-06-L3__B": [
@@ -7295,6 +7450,11 @@
             "id": "gangling_wotu",
             "label": "杠铃卧推｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "movement_incline_pushup",
+            "label": "上斜俯卧撑｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-06-L3__SUPPORT": [
@@ -7505,6 +7665,16 @@
             "id": "hake_shendun",
             "label": "哈克深蹲｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "tushen_shendun",
+            "label": "徒手深蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "V13_SQ_DB_GOBLET",
+            "label": "哑铃高脚杯深蹲｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-06-L4__B": [
@@ -7517,6 +7687,16 @@
             "id": "wotu_xiong_tui",
             "label": "哑铃卧推｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "movement_incline_pushup",
+            "label": "上斜俯卧撑｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "qixie_xiongtui",
+            "label": "器械胸推｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-06-L4__SUPPORT": [
@@ -8156,6 +8336,11 @@
             "id": "gangling_yingla",
             "label": "杠铃硬拉｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "movement_dowel_hip_hinge",
+            "label": "三点杆髋铰链｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-07-L3__B": [
@@ -8178,6 +8363,11 @@
             "id": "movement_barbell_overhead_press",
             "label": "杠铃站姿推举｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "V13_VP_SEATED_LIGHT_DB",
+            "label": "坐姿轻哑铃肩推｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-07-L3__SUPPORT": [
@@ -8373,6 +8563,16 @@
             "id": "liujiao_gantui_yingla",
             "label": "六角杠硬拉｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "movement_dowel_hip_hinge",
+            "label": "三点杆髋铰链｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "yaling_luomaniya_yingla",
+            "label": "哑铃罗马尼亚硬拉｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-07-L4__B": [
@@ -8385,6 +8585,16 @@
             "id": "movement_halfkneeling_landmine_press",
             "label": "半跪姿地雷杆推举｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "V13_VP_SEATED_LIGHT_DB",
+            "label": "坐姿轻哑铃肩推｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "qixie_jian_tui",
+            "label": "器械推肩｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-07-L4__SUPPORT": [
@@ -9024,6 +9234,11 @@
             "id": "baojiayali_fentundun",
             "label": "保加利亚分腿蹲｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "movement_supported_split_squat",
+            "label": "扶持分腿蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-08-L3__B": [
@@ -9046,6 +9261,11 @@
             "id": "movement_bodyweight_pullup",
             "label": "自重引体向上｜T4｜推荐进阶",
             "kind": "推荐进阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-08-L3__SUPPORT": [
@@ -9241,6 +9461,16 @@
             "id": "movement_dumbbell_reverse_lunge",
             "label": "哑铃反向箭步蹲｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "movement_supported_split_squat",
+            "label": "扶持分腿蹲｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "movement_bodyweight_split_squat",
+            "label": "徒手分腿蹲｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-08-L4__B": [
@@ -9253,6 +9483,16 @@
             "id": "fuzhu_yinti_xiangshang",
             "label": "辅助引体向上｜T3｜推荐退阶",
             "kind": "推荐退阶"
+          },
+          {
+            "id": "fuzhu_yinti_jianjia_xiachen",
+            "label": "辅助引体肩胛下沉｜T1｜可选退阶",
+            "kind": "可选退阶"
+          },
+          {
+            "id": "gaowei_xiala_vba",
+            "label": "高位下拉-V把正手｜T2｜可选退阶",
+            "kind": "可选退阶"
           }
         ],
         "F111-08-L4__SUPPORT": [

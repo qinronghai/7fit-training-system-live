@@ -250,23 +250,21 @@
       "L3": {
         "recommended": "T3",
         "normal": [
+          "T1",
           "T2",
           "T3"
         ],
-        "expanded": [
-          "T1"
-        ]
+        "expanded": []
       },
       "L4": {
         "recommended": "T4",
         "normal": [
+          "T1",
+          "T2",
           "T3",
           "T4"
         ],
-        "expanded": [
-          "T1",
-          "T2"
-        ]
+        "expanded": []
       }
     },
     "supportMap": {
