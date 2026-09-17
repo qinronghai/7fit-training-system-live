@@ -81,7 +81,7 @@
     const name=typeof value==='string'?value.trim():'';
     if(!name)return fallback;
     if(name.length>MAX_SAVED_SESSION_NAME_LENGTH){
-      fail('INVALID_SAVED_SESSION_NAME',`Saved session name must be ${MAX_SAVED_SESSION_NAME_LENGTH} characters or fewer`,{savedId,maxLength:MAX_SAVED_SESSION_NAME_LENGTH});
+      fail('INVALID_SAVED_SESSION_NAME',`课程名称不能超过 ${MAX_SAVED_SESSION_NAME_LENGTH} 个字符`,{savedId,maxLength:MAX_SAVED_SESSION_NAME_LENGTH});
     }
     return name;
   }
@@ -394,6 +394,13 @@
     return id;
   }
 
+  function commitSavedSessions(next){
+    const nextStore={...store,savedSessions:next};
+    try{sessionStorage.setItem(V15_KEY,JSON.stringify(nextStore));}
+    catch(_){fail('STORAGE_WRITE_FAILED','浏览器存储写入失败，原保存记录未修改。请检查存储空间或浏览器权限后重试。');}
+    store.savedSessions=next;
+  }
+
   function createSavedSession(templateId,sessionKey,options={}){
     const current=sessionRef(templateId,sessionKey);
     if(!current)fail('SESSION_NOT_FOUND',`Unknown session: ${sessionKey}`,{templateId,sessionKey});
@@ -417,8 +424,7 @@
       updatedAt:now,
       name,
     };
-    store.savedSessions[savedId]=record;
-    persist();
+    commitSavedSessions({...store.savedSessions,[savedId]:record});
     return clone(record);
   }
 
@@ -438,16 +444,16 @@
     if(!record)fail('SAVED_SESSION_NOT_FOUND',`Unknown saved session: ${savedId}`,{savedId});
     const next=savedName(name,savedId,'');
     if(!next)fail('INVALID_SAVED_SESSION_NAME','Saved session name is required',{savedId});
-    record.name=next;
-    record.updatedAt=nowIso(options.now);
-    persist();
-    return clone(record);
+    const updated={...record,name:next,updatedAt:nowIso(options.now)};
+    commitSavedSessions({...store.savedSessions,[savedId]:updated});
+    return clone(updated);
   }
 
   function deleteSavedSession(savedId){
     if(!store.savedSessions?.[savedId])return false;
-    delete store.savedSessions[savedId];
-    persist();
+    const next={...store.savedSessions};
+    delete next[savedId];
+    commitSavedSessions(next);
     return true;
   }
 
