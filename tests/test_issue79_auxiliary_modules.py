@@ -36,7 +36,7 @@ def test_issue79_auxiliary_inventory_and_explicit_equipment_classes():
     data = payload()
     upper_ids = unique_rule_ids(data, "upper")
     lower_ids = unique_rule_ids(data, "lower")
-    assert len(upper_ids) == 19
+    assert len(upper_ids) == 21
     assert len(lower_ids) == 6
     assert len(data["tenPatternCatalog"]) == 10
     assert set(upper_ids) | set(lower_ids) <= set(data["actions"])
@@ -62,25 +62,78 @@ def test_upper_auxiliary_actions_are_implementable_with_the_venue_equipment_list
 
     for action_id in upper_ids:
         action = data["actions"][action_id]
-        # D2 supplements the tiered A/B main windows instead of restating them.
-        assert action["tier"] == "", f"upper auxiliary must not be a tiered main action: {action_id}"
         equipment_ids = [
             item.strip() for item in (action.get("equipmentId") or "").split("、") if item.strip()
         ]
         unknown = [item for item in equipment_ids if item not in venue_ids]
         assert not unknown, f"{action_id} uses equipment outside the venue list: {unknown}"
+        if action["tier"]:
+            # D2 supplements the tiered A/B main windows instead of restating
+            # them. The only exception is an explicit venue overlay used for
+            # T1 light-load mode learning (基础肩胛划船（轻重量）/ 坐姿轻哑铃肩推);
+            # it must carry its venue note, and the resolver still blocks any
+            # action already used by A/B before it offers D2.
+            assert action.get("isVenueOverlay") is True, (
+                f"upper auxiliary must not be a tiered main action: {action_id}"
+            )
+            assert str(action.get("note", "")).strip(), (
+                f"tiered venue overlay {action_id} must document why it is legal in D2"
+            )
         details = data["actionDetails"][action_id]["fields"]
         missing = [
             field
             for field in ("训练目标", "教练口令", "执行步骤", "常见错误", "禁忌 / 限制")
             if not str(details.get(field, "")).strip()
         ]
-        assert not missing, f"{action_id} would render as 待补齐 in module 11: {missing}"
+        if missing:
+            # The module renders 动作详情待补齐 instead of inventing coach copy;
+            # only the venue overlays are allowed to sit in that state.
+            assert action.get("isVenueOverlay") is True, (
+                f"{action_id} would render as 待补齐 in module 11: {missing}"
+            )
 
     # Every upper pool keeps at least one candidate and never repeats an action.
     for pool_key, ids in data["composer"]["auxiliaryRules"]["upper"].items():
         assert ids, f"upper auxiliary pool {pool_key} must not be empty"
         assert len(ids) == len(set(ids)), f"upper auxiliary pool {pool_key} must not repeat an action"
+
+
+def test_f111_presets_offer_exactly_the_composer_auxiliary_pools():
+    """Preset D1/D2 must offer the composer pools, not a V10 leftover list."""
+    data = payload()
+    rules = data["composer"]["auxiliaryRules"]
+    preset_map = data["composer"]["officialPresetMap"]
+    sessions = data["sessions"]
+    views = data["sessionViews"]
+
+    checked = 0
+    for recipe, (lower_mode, upper_mode) in sorted(preset_map.items()):
+        for level in ("L1", "L2", "L3", "L4"):
+            session_id = f"{recipe}-{level}"
+            slots = {slot["slotKey"].rsplit("__", 1)[-1]: slot for slot in sessions[session_id]["slots"]}
+            for suffix, pool, side in (("2", rules["lower"][lower_mode], "lower"), ("3", rules["upper"][upper_mode], "upper")):
+                key = f"{session_id}__{suffix}"
+                baseline = slots[suffix]["baselineId"]
+                assert baseline in pool, f"{key}: baseline {baseline} is not in the {side} pool"
+                options = views[session_id]["slotOptions"][key]
+                expected = [baseline] + [item for item in pool if item != baseline]
+                assert [option["id"] for option in options] == expected, f"{key}: options must mirror the pool"
+                assert options[0]["kind"] == "当前默认"
+                assert {option["kind"] for option in options[1:]} <= {"同级替换"}
+                assert all(option["id"] in data["actions"] for option in options)
+                statuses = {data["actions"][option["id"]]["route"] for option in options}
+                assert statuses == {"1F_ONLY"}, f"{key}: D1/D2 options must stay 1F_ONLY"
+                checked += 1
+    assert checked == 64
+
+    # The legacy labels are gone: the preset slots use the V14.7 D1/D2 names.
+    names = {
+        slot["slotName"]
+        for session in sessions.values()
+        for slot in session["slots"]
+        if slot["slotKey"].endswith(("__2", "__3"))
+    }
+    assert names == {"D1｜下肢辅助", "D2｜上肢辅助"}
 
 
 def test_issue79_schema_declares_equipment_class_enum_and_validator_enforces_auxiliary_data():

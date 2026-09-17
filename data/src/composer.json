@@ -443,7 +443,8 @@
           "xieban_ytw_jinjie",
           "hudieji_fanxiang_feiniao",
           "feiji_labei_xiaba",
-          "dixie_mianla_shangju"
+          "dixie_mianla_shangju",
+          "V13_HR_SCAP_ROW"
         ],
         "vertical_pull": [
           "shengsuo_ertou_wanju",
@@ -456,7 +457,8 @@
           "hudieji_fanxiang_feiniao",
           "shengsuo_mianla",
           "shuanggang_zhicheng",
-          "dixie_mianla_shangju"
+          "dixie_mianla_shangju",
+          "V13_HR_SCAP_ROW"
         ],
         "horizontal_push": [
           "shengsuo_santou_xiaya",
@@ -465,7 +467,9 @@
           "shengsuo_jianwai_xuanzhuan",
           "shengsuo_jiaxiong_gaowei",
           "pecdeck_unilateral_press_main",
-          "qixie_xiong_tui_zhaiwo"
+          "qixie_xiong_tui_zhaiwo",
+          "shengsuo_cepingju",
+          "V13_VP_SEATED_LIGHT_DB"
         ],
         "vertical_push": [
           "shengsuo_cepingju",
@@ -476,7 +480,8 @@
           "fushen_y_ju",
           "xieban_ytw_jinjie",
           "shengsuo_mianla",
-          "dixie_mianla_shangju"
+          "dixie_mianla_shangju",
+          "V13_VP_SEATED_LIGHT_DB"
         ]
       }
     },

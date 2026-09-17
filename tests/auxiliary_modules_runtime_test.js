@@ -15,7 +15,7 @@ const api = context.window.V14AuxiliaryModules;
 assert(api, 'auxiliary module API must be exposed');
 
 const upper = api.catalog('upper');
-assert.strictEqual(upper.total, 19, 'upper auxiliary pool should deduplicate to 19 actions');
+assert.strictEqual(upper.total, 21, 'upper auxiliary pool should deduplicate to 21 actions');
 assert.deepStrictEqual(
   [...upper.entries.map(entry => entry.id)],
   [
@@ -28,6 +28,7 @@ assert.deepStrictEqual(
     'hudieji_fanxiang_feiniao',
     'feiji_labei_xiaba',
     'dixie_mianla_shangju',
+    'V13_HR_SCAP_ROW',
     'zhibi_xiala',
     'shengsuo_mianla',
     'shuanggang_zhicheng',
@@ -38,20 +39,27 @@ assert.deepStrictEqual(
     'pecdeck_unilateral_press_main',
     'qixie_xiong_tui_zhaiwo',
     'shengsuo_cepingju',
+    'V13_VP_SEATED_LIGHT_DB',
   ],
 );
 assert.strictEqual(upper.classCounts.cable_station, 10);
-assert.strictEqual(upper.classCounts.fixed_machine, 6);
-assert.strictEqual(upper.classCounts.free_weight, 2);
+assert.strictEqual(upper.classCounts.fixed_machine, 7);
+assert.strictEqual(upper.classCounts.free_weight, 3);
 assert.strictEqual(upper.classCounts.bodyweight, 1);
-// D2 must supplement A/B instead of restating the tiered main windows.
+// D2 must supplement A/B instead of restating the tiered main windows: only an
+// explicit venue overlay may carry a tier, and it stays visibly 待补齐 until the
+// coach copy exists.
+const tieredOverlays = upper.entries.filter(entry => entry.action.tier);
+assert.deepStrictEqual([...tieredOverlays.map(entry => entry.id)], ['V13_HR_SCAP_ROW', 'V13_VP_SEATED_LIGHT_DB']);
 assert(
-  upper.entries.every(entry => !entry.action.tier),
-  'upper auxiliary catalog must stay free of tiered main-window actions',
+  tieredOverlays.every(entry => entry.action.isVenueOverlay === true && String(entry.action.note || '').trim()),
+  'a tiered D2 candidate must be a documented venue overlay',
 );
-assert(
-  upper.entries.every(entry => entry.detailState.complete),
-  'every upper auxiliary action must ship complete coach detail',
+const pendingDetail = upper.entries.filter(entry => !entry.detailState.complete);
+assert.deepStrictEqual(
+  [...pendingDetail.map(entry => entry.id)],
+  [...tieredOverlays.map(entry => entry.id)],
+  'detail-pending entries are exactly the venue overlays; the module shows 动作详情待补齐',
 );
 assert.strictEqual(api.equipmentClassLabel('bodyweight'), '自重');
 assert.strictEqual(api.equipmentClassLabel('cable_station'), '绳索 / 龙门架辅助');
