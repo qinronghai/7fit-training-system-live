@@ -29,7 +29,11 @@ for(const familyId of D.bodyFamilyIds){
   assert(home.includes(familyId),`${familyId} card missing`);
   assert(home.includes(family.name),`${familyId} name missing`);
   assert(home.includes(`#/coach/body/${familyId.toLowerCase()}`),`${familyId} Family entry missing`);
-  assert(!home.includes(`#/coach/body/${familyId.toLowerCase()}/l1`),`${familyId} must not expose Level links on home`);
+  // Family × Level is decided on the home now: Body used to be the only template
+  // where reaching a session took three clicks.
+  for(const level of ['l1','l2','l3','l4']){
+    assert(home.includes(`#/coach/body/${familyId.toLowerCase()}/${level}`),`${familyId} must expose the ${level.toUpperCase()} entry on home`);
+  }
   for(const targetId of family.primaryTargets){
     const targetName=D.bodyTargetCatalog[targetId].name;
     assert(home.includes(targetName),`${familyId} primary target ${targetName} missing`);

@@ -1020,3 +1020,6 @@ body{font-size:14px;line-height:1.55}
 .post-cardio-field select{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:8px 9px;font-size:12px}
 .post-cardio-summary{margin:0;font-size:12px;font-weight:850;color:var(--purple-dark)}
 @media(max-width:620px){.post-cardio-controls{grid-template-columns:1fr}}
+
+/* Body home: Family card carries the level choice directly (2-step entry) */
+.body-family-card .body-family-enter{margin-top:10px;min-height:40px;font-size:12px;border-color:var(--line);color:var(--muted)}

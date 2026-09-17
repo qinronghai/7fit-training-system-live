@@ -98,7 +98,9 @@ test('Body, Conditioning and HYROX homes are active while Posture remains future
   await expect(page.getByRole('heading', { name: '健美式塑形' })).toBeVisible();
   await expect(page.locator('[data-body-mode]')).toHaveCount(6);
   await expect(page.locator('.body-family-card')).toHaveCount(4);
-  await expect(page.getByText('先选择本节训练 Family', { exact: true })).toBeVisible();
+  // Body picks Family × Level on this page; it is no longer the only template
+  // that needs a separate Family page before a session.
+  await expect(page.getByText('选择本节训练 Family 与等级', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: /进入 Body 自由编课/ })).toBeVisible();
 
   await page.goto('/#/coach/conditioning');

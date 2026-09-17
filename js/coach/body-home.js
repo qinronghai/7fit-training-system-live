@@ -44,7 +44,8 @@
       <div class="body-family-top"><div><span class="recipe-code">${esc(familyId)}</span><h3>${esc(family.name)}</h3></div><span class="body-family-count">${esc(modes.length)} 个训练模式</span></div>
       <div class="body-family-targets"><div><small>主要训练目标</small><b>${esc(primary.join(' · ')||'—')}</b></div><div><small>辅助与平衡</small><span>${esc(secondary.join(' · ')||'—')}</span></div></div>
       <div class="body-family-mode-tags">${modes.map(mode=>`<span>${esc(mode.name)}</span>`).join('')}</div>
-      <a class="body-family-enter" href="#/coach/body/${familyId.toLowerCase()}">查看 ${esc(family.name)} →</a>
+      <div class="level-links">${['L1','L2','L3','L4'].map(level=>`<a class="body-family-level" data-body-family-level="${esc(familyId)}-${esc(level)}" href="#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}">${esc(level)}</a>`).join('')}</div>
+      <a class="body-family-enter" href="#/coach/body/${familyId.toLowerCase()}">查看 ${esc(family.name)} 详情 →</a>
     </article>`;
   }
 
@@ -56,12 +57,12 @@
         <span class="eyebrow">COACH CENTER / BODY</span>
         <h1>健美式塑形</h1>
         <p class="coach-home-lead">面向女性长期塑形的力量训练系统：用明确的主项、第二训练方向、辅助塑形与局部补充，围绕臀腿、背肩、胸臂建立可持续的有效工作组，而不是单纯追求疲劳或热量消耗。</p>
-        <p class="body-home-principle">教练先选择本节训练 Family，再按会员当前能力进入 L1–L4。等级决定动作准入与训练能力，Resolver 决定合法动作，Compatibility Score 决定当前 Session 中更合适的候选。</p>
+        <p class="body-home-principle">教练在这一页直接选定本节训练 Family 与会员当前能力等级，两次点击即可进入课程。等级决定动作准入与训练能力，Resolver 决定合法动作，Compatibility Score 决定当前 Session 中更合适的候选。</p>
         <div class="chips"><span class="chip">4 个训练 Family</span><span class="chip">6 个正式训练模式</span><span class="chip">L1–L4 能力进阶</span><span class="chip">Coach-first Session</span></div>
         <div class="body-home-actions"><a class="body-home-primary-cta" href="#/coach/body/compose?family=BODY-01&level=L1">进入 Body 自由编课 →</a><span>适合需要直接切换 Family / Level 的教练</span></div>
       </section>
       <section class="section-card body-mode-section" data-body-mode-section><div class="section-head"><div><span class="eyebrow">TRAINING MODES</span><h2>6 个正式训练模式</h2><p>这是 Body 动作库在女性塑形中的六条主要训练路径；每个模式都绑定真实动作模式、目标肌群、槽位职责与可用 Family。</p></div></div><div class="body-mode-grid">${modes}</div></section>
-      <section class="section-card body-family-section" data-body-family-section><div class="section-head"><div><span class="eyebrow">CHOOSE FAMILY</span><h2>先选择本节训练 Family</h2><p>Family 决定今天主要训练什么；L1–L4 放到下一页选择，避免首页同时承载两层决策。</p></div></div><div class="recipe-grid body-family-grid">${cards}</div></section>`;
+      <section class="section-card body-family-section" data-body-family-section><div class="section-head"><div><span class="eyebrow">CHOOSE FAMILY × LEVEL</span><h2>选择本节训练 Family 与等级</h2><p>Family 决定今天主要训练什么，L1–L4 决定会员当前能力；两者在这一页一次选完，直接进入课程。需要先看动作池与进阶链时可进入 Family 详情。</p></div></div><div class="recipe-grid body-family-grid">${cards}</div></section>`;
   }
 
   function levelCard(familyId,level){

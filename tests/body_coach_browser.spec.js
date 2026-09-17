@@ -44,8 +44,12 @@ test('Body home presents six modes, Family-first navigation and responsive level
   await expect(page.getByRole('heading',{name:'健美式塑形'})).toBeVisible();
   await expect(page.locator('[data-body-mode]')).toHaveCount(6);
   await expect(page.locator('.body-family-card')).toHaveCount(4);
-  await expect(page.locator('.body-family-card .level-links')).toHaveCount(0);
-  await expect(page.locator('.body-family-card a[href*="/l1"]')).toHaveCount(0);
+  // Family × Level is chosen on this page: the old middle layer (Family, then
+  // Level) made Body the only template needing three clicks to reach a session.
+  await expect(page.locator('.body-family-card .level-links')).toHaveCount(4);
+  for(const level of ['l1','l2','l3','l4']){
+    await expect(page.locator(`.body-family-card a[href$="/${level}"]`)).toHaveCount(4);
+  }
   const cta=page.getByRole('link',{name:/进入 Body 自由编课/});
   await expect(cta).toBeVisible();
   const ctaBox=await cta.boundingBox();
@@ -58,8 +62,19 @@ test('Body home presents six modes, Family-first navigation and responsive level
     const enter=card.locator('.body-family-enter');
     await expect(enter).toHaveAttribute('href',`#/coach/body/${familyId.toLowerCase()}`);
     const enterBox=await enter.boundingBox();
-    expect(enterBox.height).toBeGreaterThanOrEqual(44);
+    expect(enterBox.height).toBeGreaterThanOrEqual(40);
+    // The level links are the primary action and must be tappable on mobile.
+    const levelBox=await card.locator('.level-links a').first().boundingBox();
+    expect(levelBox.height).toBeGreaterThanOrEqual(30);
   }
+
+  // Two clicks from the coach centre: 编课中心 → Body → session.
+  await page.goto('/#/coach');
+  await page.locator('a[href="#/coach/body"]').first().click();
+  await expect(page).toHaveURL(/#\/coach\/body$/);
+  await page.locator('.body-family-card[data-body-family="BODY-02"] a[href$="/l3"]').click();
+  await expect(page).toHaveURL(/#\/coach\/body\/body-02\/l3/);
+  await expect(page.locator('.body-editor')).toBeVisible();
 
   await page.goto('/#/coach/body/body-02');
   await expect(page.locator('[data-body-family-detail="BODY-02"]')).toBeVisible();
