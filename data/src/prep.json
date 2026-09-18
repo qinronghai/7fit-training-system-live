@@ -799,6 +799,7 @@
       "name": "高位平板支撑",
       "alias": "直臂平板支撑",
       "actionId": "SUP-S1-04",
+      "movementFamily": "plank-static",
       "prepGrade": "P1",
       "role": "核心抗伸展 / 高位支撑",
       "sessionLevels": [
@@ -839,6 +840,7 @@
       "name": "前臂平板支撑",
       "alias": "肘撑平板支撑",
       "actionId": "SUP-S1-05",
+      "movementFamily": "plank-static",
       "prepGrade": "P1",
       "role": "核心抗伸展 / 前臂支撑",
       "sessionLevels": [
@@ -997,6 +999,7 @@
       "name": "瑜伽球前臂平板支撑",
       "alias": "瑜伽球平板支撑",
       "actionId": "warmup_stability_ball_forearm_plank",
+      "movementFamily": "plank-static",
       "prepGrade": "P3",
       "role": "核心抗伸展 / 不稳定支撑",
       "sessionLevels": [
@@ -1115,6 +1118,7 @@
       "name": "BOSU球足端平板支撑",
       "alias": "BOSU垫脚平板支撑",
       "actionId": "warmup_bosu_feet_plank",
+      "movementFamily": "plank-static",
       "prepGrade": "P4",
       "role": "高阶核心抗伸展 / 不稳定支撑",
       "sessionLevels": [

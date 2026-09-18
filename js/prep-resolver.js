@@ -145,6 +145,7 @@
       prepId:w.prepId,
       actionId:w.actionId,
       name:w.name||w.actionId,
+      movementFamily:w.movementFamily||'',
       sequencePhase:w.sequencePhase||'',
       prepGrade:w.prepGrade||'',
       role:w.role||'',
@@ -155,6 +156,10 @@
       why:w.why||'',
       caLevel:caLevelFor(w),
     };
+  }
+
+  function candidateFamily(candidate){
+    return candidate?.movementFamily||`action:${candidate?.actionId||''}`;
   }
 
   /**
@@ -419,13 +424,14 @@
     const candidateMap={};
     SLOT_ORDER.forEach(slotKey=>{candidateMap[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:5});});
 
-    const used=new Set(),resolvedMap={};
+    const used=new Set(),usedFamilies=new Set(),resolvedMap={};
     SLOT_ORDER.forEach(slotKey=>{
       const selected=normalizedSelections[slotKey];
       if(!selected||selected.source!=='manual')return;
       const candidate=candidateMap[slotKey].find(c=>c.actionId===selected.actionId);
-      if(candidate&&!used.has(candidate.actionId)){
+      if(candidate&&!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate))){
         used.add(candidate.actionId);
+        usedFamilies.add(candidateFamily(candidate));
         resolvedMap[slotKey]={candidate,source:'manual',fallbackReason:''};
       }else{
         resolvedMap[slotKey]={candidate:null,source:'auto',fallbackReason:'manual-selection-ineligible'};
@@ -434,8 +440,11 @@
 
     SLOT_ORDER.forEach(slotKey=>{
       if(resolvedMap[slotKey]?.candidate)return;
-      const candidate=candidateMap[slotKey].find(c=>!used.has(c.actionId))||null;
-      if(candidate)used.add(candidate.actionId);
+      const candidate=candidateMap[slotKey].find(c=>!used.has(c.actionId)&&!usedFamilies.has(candidateFamily(c)))||null;
+      if(candidate){
+        used.add(candidate.actionId);
+        usedFamilies.add(candidateFamily(candidate));
+      }
       const fallbackReason=resolvedMap[slotKey]?.fallbackReason||(!candidate?'no-eligible-candidate':'');
       resolvedMap[slotKey]={candidate,source:'auto',fallbackReason};
     });
