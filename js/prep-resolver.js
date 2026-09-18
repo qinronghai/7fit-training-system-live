@@ -20,6 +20,8 @@
   const LOWER_RE=/髋|踝|腘绳|内收|臀|股四|小腿|下肢|后侧链/;
   const UPPER_RE=/胸椎|肩|上背|胸廓|肩胛|肩袖|上肢/;
   const MOBILITY_RE=/活动|伸展|旋转|绕环|捞月/;
+  const LOWER_PATTERNS=new Set(['蹲','髋铰链','髋伸展','单腿','单腿拉']);
+  const UPPER_PATTERNS=new Set(['水平推','垂直推','水平拉','垂直拉']);
   /**
    * Region gates for the two mobility slots. `textOf` includes the node's free-text
    * `why`, so matching only on text let core work into a hip/ankle slot: 平板支撑交替抬腿
@@ -209,9 +211,12 @@
    * pattern only a few nodes prepare for count for more than 蹲, which half the
    * library claims to cover.
    */
-  function patternRarity(){
-    const details=D().warmupDetails||{},total=Math.max(1,(D().warmupIds||[]).length),frequency=new Map();
-    (D().warmupIds||[]).forEach(prepId=>{
+  function patternRarity(level){
+    const details=D().warmupDetails||{},gradeApi=G(),eligible=(prepId)=>{
+      const detail=details[prepId];
+      return !level||!gradeApi||gradeApi.isAllowed(level,detail?.prepGrade);
+    },eligibleIds=(D().warmupIds||[]).filter(eligible),total=Math.max(1,eligibleIds.length),frequency=new Map();
+    eligibleIds.forEach(prepId=>{
       (details[prepId]?.targetPatterns||[]).forEach(pattern=>frequency.set(pattern,(frequency.get(pattern)||0)+1));
     });
     const rarity=new Map();
@@ -227,7 +232,11 @@
     // everything cannot win on breadth alone.
     const regionFit=hit?hit/Math.max(1,(candidate.regions||[]).length):0;
     const patterns=(candidate.targetPatterns||[]).filter(pattern=>(ctx.mainPatterns||[]).includes(pattern));
-    const patternFit=patterns.reduce((sum,pattern)=>sum+(args.rarity?.get(pattern)??1),0);
+    // A node that declares all eight patterns must not beat a focused node just
+    // because it has more opportunities to overlap. Reward focused coverage;
+    // the integrated slot has its own multi-pattern affinity below.
+    const patternFit=patterns.reduce((sum,pattern)=>sum+(args.rarity?.get(pattern)??1),0)
+      /Math.max(1,(candidate.targetPatterns||[]).length);
     const tierFit=(candidate.mainTiers||[]).some(tier=>(args.mainTiers||[]).includes(tier))?1:0;
     return regionFit*100+patternFit*6+tierFit*4;
   }
@@ -235,6 +244,17 @@
   function patternOverlap(candidate,ctx){
     const wanted=new Set(ctx.mainPatterns||[]);
     return (candidate.targetPatterns||[]).reduce((sum,p)=>sum+(wanted.has(p)?1:0),0);
+  }
+
+  function patternCount(candidate,patterns){
+    const wanted=new Set(patterns||[]);
+    return (candidate.targetPatterns||[]).filter(pattern=>wanted.has(pattern)).length;
+  }
+
+  function mainPatternsFor(ctx,group){
+    const patterns=ctx.mainPatterns||[];
+    const wanted=group==='lower'?LOWER_PATTERNS:UPPER_PATTERNS;
+    return patterns.filter(pattern=>wanted.has(pattern));
   }
 
   function anatomyOverlap(candidate,ctx){
@@ -246,6 +266,8 @@
 
   function slotAffinity(candidate,slotKey,ctx){
     const text=textOf(candidate),patterns=patternOverlap(candidate,ctx),regionText=(candidate.regions||[]).join(' ');
+    const lowerPatterns=mainPatternsFor(ctx,'lower'),upperPatterns=mainPatternsFor(ctx,'upper');
+    const lowerHits=patternCount(candidate,lowerPatterns),upperHits=patternCount(candidate,upperPatterns);
     // `role` is the node's authoritative purpose, and it is what separates a hip
     // mobility drill from core work that merely mentions 臀部 in its regions.
     const role=String(candidate.role||'');
@@ -261,7 +283,10 @@
     }
     if(slotKey==='PRIMER'){
       if(!patterns||!PRIMER_RE.test(text)||CORE_RE.test(candidate.role||''))return null;
-      return 7+patterns*2+(candidate.role.includes('动作模式')?3:0);
+      // When the session has a lower-body main mode, PRIMER belongs to that
+      // mode. Upper-body-only primers remain available for upper-only adapters.
+      if(lowerPatterns.length&&!lowerHits)return null;
+      return 7+lowerHits*4+upperHits+(candidate.role.includes('动作模式')?3:0);
     }
     if(slotKey==='CORE-ACT'){
       const ca=caLevelFor(candidate),allowed=CA_WINDOWS[ctx.level]||[];
@@ -271,7 +296,11 @@
     if(slotKey==='INTEGRATED'){
       const broad=(candidate.targetPatterns||[]).length>=4&&(candidate.regions||[]).length>=2;
       if(!INTEGRATED_RE.test(text)&&!(broad&&(/动态|支撑/.test(text))))return null;
-      return 6+(INTEGRATED_RE.test(text)?5:0)+Math.min(3,(candidate.targetPatterns||[]).length)+Math.min(2,(candidate.regions||[]).length);
+      if((ctx.mainPatterns||[]).length&&!patterns)return null;
+      return 6+(INTEGRATED_RE.test(text)?5:0)
+        +Math.min(3,patterns)
+        +Math.min(2,(candidate.regions||[]).length)
+        +(lowerHits&&upperHits?3:0);
     }
     return null;
   }
@@ -285,13 +314,16 @@
     return best;
   }
 
-  /**
-   * Where each slot should sit inside the level's grade window, so the five slots
-   * build low → high instead of all five landing on the top grade (every L3 slot
-   * used to resolve to P3, which is also why L3 had the least variety).
-   * 0 = the level's highest grade.
-   */
-  const SLOT_GRADE_TARGET=Object.freeze({'MOB-L':0,'MOB-U':0,'PRIMER':0,'CORE-ACT':0,'INTEGRATED':0});
+  /** 0 = the level's highest legal grade (P3 for L3, P4 for L4). */
+  const SLOT_GRADE_TARGET=Object.freeze({
+    // Mobility and integration stay one rung below the session ceiling so the
+    // warm-up still ramps into the main work instead of making every card P3/P4.
+    'MOB-L':1,
+    'MOB-U':1,
+    'PRIMER':0,
+    'CORE-ACT':0,
+    'INTEGRATED':1,
+  });
 
   function gradeDistance(slotKey,ctx,grade){
     const gradeApi=G();if(!gradeApi)return 0;
@@ -301,6 +333,20 @@
     return Math.abs(gradeApi.gradeRank(ctx.level,grade)-target);
   }
 
+  function stableHash(value){
+    let hash=2166136261;
+    for(let i=0;i<String(value).length;i++){
+      hash^=String(value).charCodeAt(i);
+      hash=Math.imul(hash,16777619);
+    }
+    return hash>>>0;
+  }
+
+  function rotationRank(candidate,slotKey,ctx){
+    const seed=[ctx.recipeId||ctx.template,ctx.level,slotKey,...(ctx.mainPatterns||[])].join('|');
+    return stableHash(`${seed}|${candidate.actionId}`);
+  }
+
   function rankSlotCandidates(slotKey,ctx,{limit=5}={}){
     const data=D(),gradeApi=G(),formal=new Set(ctx.formalActionIds||[]),items=[];
     // Tiers are read from the main lifts here rather than stored on the context:
@@ -308,7 +354,7 @@
     // an extra key.
     const fitArgs={
       anatomy:A()?.aggregate?.(ctx.mainActionIds||[]),
-      rarity:patternRarity(),
+      rarity:patternRarity(ctx.level),
       mainTiers:unique((ctx.mainActionIds||[]).map(id=>D().actions?.[id]?.tier).filter(Boolean)),
     };
     (data.warmupIds||[]).forEach(prepId=>{
@@ -325,15 +371,18 @@
         slotScore:affinity+anatomyOverlap(candidate,ctx),
         fit:sessionFit(candidate,ctx,fitArgs),
         gradeRank:gradeApi?gradeApi.gradeRank(ctx.level,candidate.prepGrade):0,
+        fitBand:Math.floor(sessionFit(candidate,ctx,fitArgs)/8),
         curatedPriority:curatedPriority(candidate,ctx),
       });
     });
-    // Session fit first: which movement the member is about to train has to beat
-    // "this node happens to sit at the session's grade". Grade now breaks ties
-    // (aimed at the slot's target for a low → high ramp), then the curated table.
-    items.sort((a,b)=>b.fit-a.fit
-      ||gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
-      ||a.gradeRank-b.gradeRank
+    // Progression is an explicit default signal: L3 should lead with P3 and L4
+    // with P4/P3. Within the same grade band, movement fit still wins; close
+    // candidates rotate by recipe/level so a global curated first item cannot
+    // monopolise every template. The hash keeps the result deterministic.
+    items.sort((a,b)=>gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
+      ||b.fitBand-a.fitBand
+      ||rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx)
+      ||b.fit-a.fit
       ||b.slotScore-a.slotScore
       ||a.curatedPriority-b.curatedPriority
       ||a.prepId.localeCompare(b.prepId));

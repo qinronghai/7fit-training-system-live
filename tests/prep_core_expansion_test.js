@@ -44,7 +44,7 @@ const expected={
 };
 // PREP-51 added the venue's ankle drill (踝关节前移 / 膝触墙) so the library stops
 // under-covering 踝 / 足 / 膝 — this gym's most common restriction.
-assert.strictEqual(D.warmupIds.length,53);
+assert.strictEqual(D.warmupIds.length,56);
 const ankle=D.warmupDetails['PREP-51'];
 assert(ankle,'PREP-51 (踝关节前移) missing');
 assert.strictEqual(ankle.actionId,'huan_jie_qianyi');
