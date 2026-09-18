@@ -162,6 +162,11 @@
     });
     return groups;
   }
+  function orderedMemberWarmups(items){
+    return (items||[])
+      .filter(x=>x&&typeof x==='object'&&clean(x.sequencePhase))
+      .map(warmupMemberName);
+  }
   function memberPrescription(p){
     let s=window.V14ModuleCopy?.memberPrescription?window.V14ModuleCopy.memberPrescription(p):clean(p).replace(/\s*[｜|]\s*RIR[^｜|\n]*/ig,'').replace(/RIR[^｜|\n]*/ig,'').trim().replace(/[｜|]\s*$/,'');
     s=s.replace(/(\d+(?:[–-]\d+)?)\s*组\s*×\s*/g,'$1 × ');
@@ -239,14 +244,17 @@
     return itemName(x).replace(/臀大肌|臀肌/g,'臀部').replace(/胸大肌|胸肌/g,'胸部').replace(/肱三头肌/g,'手臂后侧').replace(/背阔肌/g,'背部');
   }
   function formatMember(p,options={}){
-    const theme=memberTheme(p),level=clean(p.level),meta=levelMeta(level),groups=prepGroups(p);
+    const theme=memberTheme(p),level=clean(p.level),meta=levelMeta(level),groups=prepGroups(p),orderedWarmups=orderedMemberWarmups(p.warmups);
     const lines=[formatDate(options.now),`${clean(p.brand)||'7Fit'}｜今日训练`,'',theme.title,`${level||'L'}｜${meta.label}`,'',memberReason(theme,level),'','课前准备｜约 10–12 分钟'];
     if(groups.foam.length)lines.push(`泡沫轴放松：${lineList(groups.foam)}`);
-    if(groups.hip.length)lines.push(`髋部活动：${lineList(groups.hip)}`);
-    if(groups.upper.length)lines.push(`上肢活动：${lineList(groups.upper)}`);
-    if(groups.dynamic.length)lines.push(`动态活动：${lineList(groups.dynamic)}`);
-    if(groups.core.length)lines.push(`核心激活：${lineList(groups.core)}`);
-    if(!groups.foam.length&&!groups.hip.length&&!groups.upper.length&&!groups.dynamic.length&&!groups.core.length)lines.push('按当天状态完成课程热身');
+    if(orderedWarmups.length)lines.push('热身顺序：',...orderedWarmups.map((name,index)=>`${index+1}. ${name}`));
+    else {
+      if(groups.hip.length)lines.push(`髋部活动：${lineList(groups.hip)}`);
+      if(groups.upper.length)lines.push(`上肢活动：${lineList(groups.upper)}`);
+      if(groups.dynamic.length)lines.push(`动态活动：${lineList(groups.dynamic)}`);
+      if(groups.core.length)lines.push(`核心激活：${lineList(groups.core)}`);
+    }
+    if(!groups.foam.length&&!orderedWarmups.length&&!groups.hip.length&&!groups.upper.length&&!groups.dynamic.length&&!groups.core.length)lines.push('按当天状态完成课程热身');
     lines.push('','主要训练');
     (p.slots||[]).forEach((x,i)=>{
       const rx=memberPrescription(x.prescription),purpose=memberPurpose(x,theme);

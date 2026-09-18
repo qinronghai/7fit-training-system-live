@@ -6,6 +6,7 @@
   const R=()=>window.V14PrepResolver||null;
   const S=()=>window.V15State||null;
   const F111_RESOLVER_VERSION='f111-adapter-v1';
+  const PREP_SEQUENCE_RANK=Object.freeze({floor:10,'floor-tool':20,standing:30,'standing-dynamic':40});
 
   function legacyMatchedWarmups(recipeId,level){
     const data=D(),gradeApi=G();
@@ -130,15 +131,23 @@
     return slot.candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.prepGrade||'PREP')}｜${esc(candidate.name)}</option>`).join('');
   }
 
+  function orderedSlots(resolved){
+    return (resolved?.slots||[]).map((slot,index)=>({slot,index})).sort((a,b)=>{
+      const aRank=PREP_SEQUENCE_RANK[a.slot.sequencePhase]??Number.MAX_SAFE_INTEGER;
+      const bRank=PREP_SEQUENCE_RANK[b.slot.sequencePhase]??Number.MAX_SAFE_INTEGER;
+      return aRank-bRank||a.index-b.index;
+    }).map(entry=>entry.slot);
+  }
+
   function resolvedItems(resolved){
-    return (resolved?.slots||[]).filter(slot=>slot.actionId).map(slot=>({
-      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,
+    return orderedSlots(resolved).filter(slot=>slot.actionId).map(slot=>({
+      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,
     }));
   }
 
   function resolvedGrid(resolved,sessionKey){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
-    const cards=(resolved.slots||[]).map(slot=>{
+    const cards=orderedSlots(resolved).map(slot=>{
       const detail=slot.prepId?`<a class="prep-detail-link" href="#/system/prep?focus=${encodeURIComponent(slot.prepId)}">查看动作详情</a>`:'';
       return `<div class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}"><div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${esc(sourceLabel(slot.source))}</small></div><b>${esc(slot.name||'暂无合法候选')}</b><p>${esc(slot.purpose||'')}</p><div class="slot-actions"><select class="prep-slot-select prep-select" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select>${detail}${slot.why?`<small>${esc(slot.why)}</small>`:''}</div></div>`;
     }).join('');
@@ -173,6 +182,6 @@
 
   M.Prep={
     legacyMatchedWarmups,matchedWarmups,warmupCards,composerPrepItems,composerPrepHtml,
-    resolvePresetPrep,resolveComposerPrep,setPrepSelection,resolvedItems,resolvedGrid,
+    resolvePresetPrep,resolveComposerPrep,setPrepSelection,orderedSlots,resolvedItems,resolvedGrid,
   };
 })();

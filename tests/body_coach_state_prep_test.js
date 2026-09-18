@@ -63,6 +63,10 @@ const prepAuto=Prep.resolve(manual,sessionKey);
 assert.strictEqual(prepAuto.slots.length,5,'Body PREP V2 must expose five functional slots');
 const directAuto=PrepResolver.resolve(manual.prepContext,{selections:S.getPrepSelections('body',sessionKey)});
 assert.deepStrictEqual(plain(prepAuto.slots.map(x=>x.actionId)),plain(directAuto.slots.map(x=>x.actionId)),'Body PREP helper must be a shared-resolver adapter, not a second algorithm');
+assert.strictEqual(typeof Prep.orderedSlots,'function','Body PREP must expose the shared physical-sequence ordering helper');
+const phaseRank={floor:10,'floor-tool':20,standing:30,'standing-dynamic':40};
+const expectedBodyPrepOrder=prepAuto.slots.slice().sort((a,b)=>(phaseRank[a.sequencePhase]??Number.MAX_SAFE_INTEGER)-(phaseRank[b.sequencePhase]??Number.MAX_SAFE_INTEGER)).map(slot=>slot.actionId);
+assert.deepStrictEqual(plain(Prep.items(prepAuto).map(x=>x.actionId)),plain(expectedBodyPrepOrder),'Body PREP copy items must follow floor → tool → standing → dynamic order');
 
 const replaceable=prepAuto.slots.find(slot=>(slot.candidates||[]).some(candidate=>candidate.actionId!==slot.actionId));
 assert(replaceable,'BODY-02 L3 needs one replaceable PREP slot');
@@ -86,9 +90,16 @@ assert.notStrictEqual(fallbackSlot.actionId,prepAlternate.actionId);
 
 html=Prep.render(manual,sessionKey);
 assert(html.includes('PREP｜动态热身 / 激活'),'Body PREP section title missing');
+let previousIndex=-1;
 for(const slot of Prep.resolve(manual,sessionKey).slots){
   assert(html.includes(slot.slotKey),`${slot.slotKey} missing from Body PREP render`);
   assert(html.includes(slot.name||'暂无合法候选'),`${slot.slotKey} action missing from Body PREP render`);
+}
+for(const actionId of expectedBodyPrepOrder){
+  const slot=prepAuto.slots.find(entry=>entry.actionId===actionId);
+  const index=html.indexOf(`data-prep-slot-card="${slot?.slotKey}"`);
+  assert(index>previousIndex,`Body PREP render must follow physical sequence for ${slot?.name}`);
+  previousIndex=index;
 }
 
 UI.reset(familyId,level);

@@ -92,7 +92,8 @@
       "cue": "双手在肩下、双膝在髋下；轻收肋，背部保持稳定，均匀呼吸。",
       "why": "建立最基础的四点支撑和躯干控制，适合进入多数训练前作为低门槛准备。",
       "sourceStatus": "系统已有 SUPPORT 节点，建议回写动作库",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-02": {
       "prepId": "PREP-02",
@@ -128,7 +129,8 @@
       "cue": "骨盆尽量稳定，让胸椎带动旋转；不要用腰椎硬拧。",
       "why": "提高胸椎旋转和上背活动，为推、拉及需要上背稳定的深蹲做准备。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-03": {
       "prepId": "PREP-03",
@@ -168,7 +170,8 @@
       "cue": "先稳定弓步，再完成胸椎旋转；动作连续但不要抢速度。",
       "why": "一次整合髋、踝、胸椎和后侧链活动，适合中高等级全身课前动态准备。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-04": {
       "prepId": "PREP-04",
@@ -204,7 +207,8 @@
       "cue": "握距宁宽勿硬拉；肋骨保持稳定，在无痛范围前后绕过头顶。",
       "why": "用低负荷完成肩屈、外展和旋转组合，为上肢推拉建立活动范围。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-05": {
       "prepId": "PREP-05",
@@ -240,7 +244,8 @@
       "cue": "手臂保持张力，肩胛随动作自然滑动；不要耸肩或用腰转代偿。",
       "why": "作为肩带多方向动态活动，帮助上肢训练前建立肩胛与肱骨配合。",
       "sourceStatus": "V14.3 新增动作；具体轨迹以后可按馆内示范视频锁定",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-06": {
       "prepId": "PREP-06",
@@ -275,7 +280,8 @@
       "cue": "肘贴近身体，前臂向外打开；肩膀不要耸起，动作小而稳。",
       "why": "低门槛激活肩袖，适合上肢推拉前建立肱骨头控制。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-07": {
       "prepId": "PREP-07",
@@ -312,7 +318,8 @@
       "cue": "手臂保持在前方可控高度，外旋时肩胛稳定；不要用腰椎后仰。",
       "why": "比贴体外旋更接近手臂抬高位，对推举和拉背前的肩胛控制要求更高。",
       "sourceStatus": "V14.3 新增动作；前臂高度以后按馆内示范视频锁定",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-08": {
       "prepId": "PREP-08",
@@ -352,7 +359,8 @@
       "cue": "收肋、夹臀，头到脚保持一条线；持续呼吸，不把时间撑到动作变形。",
       "why": "在主训练前建立躯干抗伸展和全身张力，但不应做至疲劳。",
       "sourceStatus": "动作库已有",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-09A": {
       "prepId": "PREP-09A",
@@ -390,7 +398,8 @@
       "cue": "髋膝保持90°，呼气时肋骨回收；腰盆稳定，不用力压腰。",
       "why": "死虫系列的最低门槛版本，先建立呼吸、腹壁张力和骨盆控制。",
       "sourceStatus": "系统已有 CORE 节点，建议回写动作库",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-09B": {
       "prepId": "PREP-09B",
@@ -427,7 +436,8 @@
       "cue": "腿保持90/90不动，单臂缓慢向头顶方向伸展；肋骨不要翻起。",
       "why": "在静态死虫基础上增加上肢长杠杆，适合上肢训练前做核心与肩带协同。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-09C": {
       "prepId": "PREP-09C",
@@ -462,7 +472,8 @@
       "cue": "双臂保持稳定，单腿缓慢向远处伸；动作幅度服从腰盆稳定。",
       "why": "把核心控制与下肢移动连接起来，适合臀腿、深蹲、硬拉类训练前。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-10": {
       "prepId": "PREP-10",
@@ -496,7 +507,8 @@
       "cue": "前腿伸直、脚尖勾起，臀部向后；双手沿脚尖方向做捞取动作，保持背部自然。",
       "why": "动态提高后侧链活动度，尤其适合硬拉、RDL 和单腿训练前。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-11": {
       "prepId": "PREP-11",
@@ -530,7 +542,8 @@
       "cue": "双膝打开到舒适范围，骨盆保持中立；不要靠塌腰换取幅度。",
       "why": "改善大腿内侧和髋外展位活动，为深蹲、单腿和臀部训练做准备。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-12": {
       "prepId": "PREP-12",
@@ -565,7 +578,8 @@
       "cue": "前后腿保持90/90，躯干从髋部向前倾；不要塌腰追求更低。",
       "why": "重点改善前侧髋外旋位和臀部活动，适合多数下肢训练前。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-13": {
       "prepId": "PREP-13",
@@ -601,7 +615,8 @@
       "cue": "双膝在可控范围左右转换，躯干尽量稳定；不靠甩腿抢幅度。",
       "why": "比静态90/90增加主动髋旋转控制，适合中级以上下肢训练前。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-14": {
       "prepId": "PREP-14",
@@ -634,7 +649,8 @@
       "cue": "一侧膝外展，另一侧保持支撑；骨盆尽量正，不用腰椎旋转代偿。",
       "why": "增加单侧内收肌和髋活动要求，适合已有基础控制的下肢会员。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-15": {
       "prepId": "PREP-15",
@@ -667,7 +683,8 @@
       "cue": "臀部向后，脊柱保持中立；先感受后侧链，再进入负重动作。",
       "why": "会员对髋铰链不熟悉时，用作硬拉/RDL前的模式复习，也可服务俯身划船的躯干姿势准备。",
       "sourceStatus": "动作库已有",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-16": {
       "prepId": "PREP-16",
@@ -701,7 +718,8 @@
       "cue": "骨盆轻后倾，再小幅向前移动；不要靠腰椎前凸追求幅度。",
       "why": "改善髋伸展位，为深蹲、臀推和单腿训练前的髋部活动做准备。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-17": {
       "prepId": "PREP-17",
@@ -735,7 +753,8 @@
       "cue": "膝盖对准脚尖，骨盆保持稳定；小步横移，不要左右摆胯。",
       "why": "提高髋外展与骨盆稳定，适合深蹲、单腿和臀部主训练前。",
       "sourceStatus": "动作库已有弹力带侧走，统一作为“螃蟹行走”标准动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     },
     "PREP-18": {
       "prepId": "PREP-18",
@@ -769,7 +788,8 @@
       "cue": "支撑脚压地，骨盆保持水平；顶峰用臀发力，不要用腰顶高。",
       "why": "在双腿臀桥基础上增加单侧骨盆控制，适合作为较高等级臀腿训练前激活。",
       "sourceStatus": "V14.3 新增动作",
-      "route": "2F PREP"
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     },
     "PREP-19": {
       "prepId": "PREP-19",
@@ -808,7 +828,8 @@
       "cue": "手掌主动推地，收肋夹臀，头到脚保持一条线并持续呼吸。",
       "why": "以完整直臂闭链支撑建立基础躯干抗伸展和肩胛稳定，适合多数课程作为低疲劳核心准备。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S1-04",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-20": {
       "prepId": "PREP-20",
@@ -847,7 +868,8 @@
       "cue": "肘在肩下，收肋夹臀，骨盆保持中立，不用憋气换时间。",
       "why": "用前臂支撑降低腕部负担，建立基础腹壁张力和全身等长控制。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S1-05",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-21": {
       "prepId": "PREP-21",
@@ -886,7 +908,8 @@
       "cue": "先收肋稳骨盆，再把双腿伸直保持；腿的高度服从腰盆稳定。",
       "why": "在不需要上肢承重的情况下建立腹壁张力和骨盆控制，适合支撑动作不方便时替换。",
       "sourceStatus": "新增 PREP / CORE 准备动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-22": {
       "prepId": "PREP-22",
@@ -924,7 +947,8 @@
       "cue": "双脚适度分开，单手触肩时骨盆尽量不转，支撑手主动推地。",
       "why": "在高位平板基础上减少支点，增加抗旋转与单臂肩胛稳定要求。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S3-02",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-23": {
       "prepId": "PREP-23",
@@ -962,7 +986,8 @@
       "cue": "腿只抬到骨盆还能保持水平的位置，夹臀但不要用腰椎顶高。",
       "why": "把平板抗伸展与交替髋伸连接起来，适合臀腿和全身训练前的核心—骨盆协同。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S3-03",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-24": {
       "prepId": "PREP-24",
@@ -1000,7 +1025,8 @@
       "cue": "前臂压球，收肋夹臀；允许球轻微移动，但骨盆保持稳定。",
       "why": "在标准前臂平板上增加不稳定表面，对肩胛和躯干共同稳定提出更高要求。",
       "sourceStatus": "新增 PREP / CORE 准备动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-25": {
       "prepId": "PREP-25",
@@ -1039,7 +1065,8 @@
       "cue": "先把侧撑稳定，再让上臂穿针旋转；骨盆保持抬起，不用腰椎硬拧。",
       "why": "把单侧支撑与胸椎旋转结合，训练旋转中的肩胛—躯干—骨盆整合控制。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S5-05",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-26": {
       "prepId": "PREP-26",
@@ -1077,7 +1104,8 @@
       "cue": "支撑肩稳定，髋部控制下降再主动抬起，躯干保持在同一平面。",
       "why": "在侧平板基础上加入髋部升降，提高侧链耐力、骨盆控制与动态抗侧屈能力。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S6-04",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-27": {
       "prepId": "PREP-27",
@@ -1114,7 +1142,8 @@
       "cue": "双脚稳定在BOSU，双手主动推地；骨盆不要随足端晃动。",
       "why": "通过足端不稳定表面提高全身张力与近端稳定要求，属于高阶专项核心准备。",
       "sourceStatus": "新增 PREP / CORE 准备动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-28": {
       "prepId": "PREP-28",
@@ -1151,7 +1180,8 @@
       "cue": "先把侧平板锁稳，再抬上侧腿；骨盆不要后倒，支撑肩保持稳定。",
       "why": "在单侧支撑中叠加髋外展，显著增加侧链、臀中肌和骨盆稳定需求，作为 L4 高阶核心准备。",
       "sourceStatus": "复用正式 SUPPORT 节点 SUP-S6-05",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-29": {
       "prepId": "PREP-29",
@@ -1187,7 +1217,8 @@
       "cue": "吸气延展、呼气屈曲，动作从胸椎和骨盆协同完成，不甩头。",
       "why": "用低门槛屈伸活动唤醒脊柱与肩胛，适合多数课程开场。",
       "sourceStatus": "复用现有热身动作节点",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-30": {
       "prepId": "PREP-30",
@@ -1222,7 +1253,8 @@
       "cue": "泡沫轴横放上背，支撑头颈，胸椎轻柔伸展；不要把幅度压到腰椎。",
       "why": "提高胸椎伸展可用范围，为推举、拉背与肩胛上旋准备。",
       "sourceStatus": "复用现有 REVIEW 热身节点",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-31": {
       "prepId": "PREP-31",
@@ -1258,7 +1290,8 @@
       "cue": "肋骨保持稳定，双臂沿头顶方向上举；幅度服从肩和胸椎，不用腰椎补。",
       "why": "同时准备肩屈、背阔肌长度与胸椎伸展，适合上肢推拉。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-32": {
       "prepId": "PREP-32",
@@ -1293,7 +1326,8 @@
       "cue": "双手支撑，臀部向后坐，腋后侧拉长；回程主动控制，不塌腰。",
       "why": "低门槛改善背阔肌和肩屈可用范围，适合垂直推拉前。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-33": {
       "prepId": "PREP-33",
@@ -1328,7 +1362,8 @@
       "cue": "前臂沿墙上滑，顶端轻离墙；肋骨保持回收，不耸肩。",
       "why": "把肩屈、肩胛上旋和胸廓控制整合起来，适合较高等级上肢训练。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing"
     },
     "PREP-34": {
       "prepId": "PREP-34",
@@ -1368,7 +1403,8 @@
       "cue": "对侧手腿伸长，骨盆保持正，腰椎不过伸；每次回到稳定四足位。",
       "why": "增加对侧肢体协调和抗旋转控制，是死虫与平板之外的重要核心准备。",
       "sourceStatus": "复用现有核心动作节点",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-35": {
       "prepId": "PREP-35",
@@ -1401,7 +1437,8 @@
       "cue": "脚跟压地，膝盖沿第二脚趾方向向前移动，不塌足弓。",
       "why": "补足当前下肢热身最缺的踝背屈准备，直接服务深蹲和单腿动作。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-36": {
       "prepId": "PREP-36",
@@ -1436,7 +1473,8 @@
       "cue": "一腿侧伸，臀部向后坐，脊柱保持自然；不靠骨盆旋转换幅度。",
       "why": "比静态青蛙趴更动态，适合深蹲、单腿与髋伸前准备内收肌。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-37": {
       "prepId": "PREP-37",
@@ -1470,7 +1508,8 @@
       "cue": "进入可控底位后轻微左右移重心，膝盖跟随脚尖，脚掌完整着地。",
       "why": "把髋踝活动度直接放进深蹲姿势中，提高动作专项性。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-38": {
       "prepId": "PREP-38",
@@ -1510,7 +1549,8 @@
       "cue": "后撤弓步同时双臂上举，骨盆保持正，站起回位后换侧。",
       "why": "把下肢单腿、髋伸和上肢上举连接起来，适合作为全身动态准备。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-39": {
       "prepId": "PREP-39",
@@ -1543,7 +1583,8 @@
       "cue": "左右换边时控制重心，支撑脚完整着地，膝盖与脚尖方向一致。",
       "why": "补充额状面下肢活动，增加髋内收肌和单腿控制选择。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-40": {
       "prepId": "PREP-40",
@@ -1575,7 +1616,8 @@
       "cue": "支撑腿微屈，髋铰链后骨盆小幅开合；平衡失控就缩小幅度。",
       "why": "作为 L4 高阶单腿准备，训练髋稳定、骨盆控制与足踝平衡。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-41": {
       "prepId": "PREP-41",
@@ -1610,7 +1652,8 @@
       "cue": "脚掌压地，收肋后顶髋，顶端夹臀但不要用腰继续顶高。",
       "why": "提供最低门槛的臀大肌和髋伸激活，与单腿臀桥形成清晰进阶。",
       "sourceStatus": "复用现有 T1 臀桥节点",
-      "route": "FLEX_1F_2F"
+      "route": "FLEX_1F_2F",
+      "sequencePhase": "floor"
     },
     "PREP-42": {
       "prepId": "PREP-42",
@@ -1644,7 +1687,8 @@
       "cue": "双脚并拢，骨盆不后滚，膝盖小幅打开后控制回落。",
       "why": "给臀中肌和髋外旋提供低门槛激活，适合初级下肢课程。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-43": {
       "prepId": "PREP-43",
@@ -1678,7 +1722,8 @@
       "cue": "骨盆保持正，腿向后延伸或屈膝后抬，幅度不要超过腰盆稳定。",
       "why": "把臀部激活与四足核心稳定结合，作为臀桥之后的动态选择。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor"
     },
     "PREP-44": {
       "prepId": "PREP-44",
@@ -1713,7 +1758,8 @@
       "cue": "桥顶保持，双膝轻向外推弹力带；不要让骨盆下沉或腰椎过伸。",
       "why": "同时激活臀大肌和臀中肌，适合臀腿课前提高髋稳定。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-45": {
       "prepId": "PREP-45",
@@ -1745,7 +1791,8 @@
       "cue": "单脚压地顶髋，同时保持弹力带外展张力，骨盆始终水平。",
       "why": "在单腿臀桥上叠加外展阻力，作为 L4 高阶臀部激活。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "floor-tool"
     },
     "PREP-46": {
       "prepId": "PREP-46",
@@ -1786,7 +1833,8 @@
       "cue": "节奏轻松，先腿后髋再拉手；回程顺序相反，不追求功率。",
       "why": "利用二楼划船机提高全身温度和动作节奏，作为低疲劳整合准备。",
       "sourceStatus": "复用 Conditioning 稳态节点，仅开放 PREP 用途",
-      "route": "CONDITIONING_2F"
+      "route": "CONDITIONING_2F",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-47": {
       "prepId": "PREP-47",
@@ -1826,7 +1874,8 @@
       "cue": "手臂下压配合轻微髋屈伸，保持呼吸，不做冲刺。",
       "why": "利用滑雪机完成上肢—核心—髋的连续低强度整合热身。",
       "sourceStatus": "复用 Conditioning 稳态节点，仅开放 PREP 用途",
-      "route": "CONDITIONING_2F"
+      "route": "CONDITIONING_2F",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-48": {
       "prepId": "PREP-48",
@@ -1865,7 +1914,8 @@
       "cue": "轻量药球，从半蹲到站立推举；连续但不追求速度和疲劳。",
       "why": "用低负荷把下肢伸展、核心传力和上肢推举连接起来。",
       "sourceStatus": "新增 PREP 动作，不复用间歇版",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-49": {
       "prepId": "PREP-49",
@@ -1905,7 +1955,8 @@
       "cue": "轻壶铃高脚杯下蹲，站起后完成轻量推举；保持收肋。",
       "why": "用二楼壶铃整合蹲、核心稳定和推举，适合中高等级全身准备。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-50": {
       "prepId": "PREP-50",
@@ -1944,7 +1995,8 @@
       "cue": "轻药球抱胸下蹲，站起后上举；保持动作流畅，不做爆发投掷。",
       "why": "作为 L4 高阶全身整合热身，强调多关节协调而不是疲劳。",
       "sourceStatus": "新增 PREP 动作",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     },
     "PREP-51": {
       "prepId": "PREP-51",
@@ -1979,7 +2031,8 @@
       "cue": "脚跟不离地，膝盖沿第二脚趾方向向前推过脚尖；骨盆保持中立，不靠塌腰或翻脚代偿。",
       "why": "踝背屈可用范围直接决定深蹲深度、单腿稳定与落地缓冲；这是本馆女性会员最常见的限制之一，L1 就应建立。",
       "sourceStatus": "复用馆内既有 2F 踝关节前移动作，仅开放 PREP 用途",
-      "route": "2F_ONLY"
+      "route": "2F_ONLY",
+      "sequencePhase": "standing-dynamic"
     }
   },
   "warmupGradeMeta": {

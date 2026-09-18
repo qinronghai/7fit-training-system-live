@@ -22,7 +22,7 @@
     const resolvedSession=resolveResolvedSession(sessionId,recipeId,level),selected=resolvedSession.main.content.map(slot=>slot.actionId),groups=selectedTrainingIds(sessionId,selected),result=resolvedSession.conflictContext;
     const foam=M.Foam.matchedFoamRolls(recipeId,level,groups.foam).map(x=>({name:x.name,prescription:x.prescription}));
     const prepResolved=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
-    const warmups=M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription}));
+    const warmups=M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription,sequencePhase:x.sequencePhase}));
     const slots=(s?.slots||[]).map((slot,i)=>{
       const actionId=selected[i],a=data.actions[actionId]||{};
       const tier=window.V14ModuleCopy?.tierForAction?.(actionId)||(/^T[1-4]$/.test(a.tier||'')?a.tier:'');

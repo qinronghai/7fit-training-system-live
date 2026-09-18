@@ -9,6 +9,16 @@
     return {resolver,state};
   }
 
+  const PREP_SEQUENCE_RANK=Object.freeze({floor:10,'floor-tool':20,standing:30,'standing-dynamic':40});
+
+  function orderedSlots(resolved){
+    return (resolved?.slots||[]).map((slot,index)=>({slot,index})).sort((a,b)=>{
+      const aRank=PREP_SEQUENCE_RANK[a.slot.sequencePhase]??Number.MAX_SAFE_INTEGER;
+      const bRank=PREP_SEQUENCE_RANK[b.slot.sequencePhase]??Number.MAX_SAFE_INTEGER;
+      return aRank-bRank||a.index-b.index;
+    }).map(entry=>entry.slot);
+  }
+
   function resolve(session,sessionKey){
     if(!session?.prepContext)throw new Error('Body PREP requires ResolvedSession.prepContext');
     const {resolver,state}=services();
@@ -38,7 +48,7 @@
   }
 
   function items(resolved){
-    return (resolved?.slots||[]).filter(slot=>slot.actionId).map(slot=>({
+    return orderedSlots(resolved).filter(slot=>slot.actionId).map(slot=>({
       slotKey:slot.slotKey,
       actionId:slot.actionId,
       prepId:slot.prepId,
@@ -47,6 +57,7 @@
       prescription:slot.prescription,
       why:slot.why,
       source:slot.source,
+      sequencePhase:slot.sequencePhase,
     }));
   }
 
@@ -59,7 +70,7 @@
     const foam=foamRollCardsFor(session);
     const fallback=(resolved?.fallbackSlots||[]).length
       ?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
-    const cards=(resolved?.slots||[]).map(slot=>`<article class="session-warmup-card prep-slot-card body-prep-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}">
+    const cards=orderedSlots(resolved).map(slot=>`<article class="session-warmup-card prep-slot-card body-prep-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}">
       <div><span>${esc(slot.prepGrade||'—')}</span><small>${esc(slot.slotKey)} · ${slot.source==='manual'?'手动选择':'系统推荐'}</small></div>
       <b>${esc(slot.name||'暂无合法候选')}</b>
       <p>${esc(slot.purpose||'')}</p>
@@ -76,5 +87,5 @@
 
   function render(session,sessionKey){return renderResolved(resolve(session,sessionKey),sessionKey,session);}
 
-  M.BodyPrep={resolve,setSelection,items,render,renderResolved};
+  M.BodyPrep={resolve,setSelection,items,orderedSlots,render,renderResolved};
 })();
