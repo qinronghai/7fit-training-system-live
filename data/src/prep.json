@@ -52,7 +52,10 @@
     "PREP-48",
     "PREP-49",
     "PREP-50",
-    "PREP-51"
+    "PREP-51",
+    "PREP-52",
+    "PREP-53",
+    "PREP-54"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -2033,6 +2036,112 @@
       "sourceStatus": "复用馆内既有 2F 踝关节前移动作，仅开放 PREP 用途",
       "route": "2F_ONLY",
       "sequencePhase": "standing-dynamic"
+    },
+    "PREP-52": {
+      "prepId": "PREP-52",
+      "name": "娃娃蹲",
+      "alias": "娃娃蹲",
+      "actionId": "warmup_doll_squat",
+      "prepGrade": "P1",
+      "role": "髋踝动态活动 / 深蹲模式准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "踝",
+        "内收肌",
+        "腘绳肌"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1–2组 × 5–8次",
+      "cue": "从站姿髋折叠进入可控深蹲底位，再站起；保持脚掌完整着地，不用腰椎塌腰换深度。",
+      "why": "把后侧链动态活动、髋踝打开和深蹲模式复习放在同一个低负荷动作里，适合蹲模式的 L1 基础准备。",
+      "sourceStatus": "新增 PREP 动作；动作幅度按会员可控范围调整",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-53": {
+      "prepId": "PREP-53",
+      "name": "单腿燕子平衡",
+      "alias": "燕子平衡",
+      "actionId": "warmup_single_leg_swallow_balance",
+      "prepGrade": "P3",
+      "role": "单腿髋稳定 / 骨盆控制",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿",
+        "髋铰链"
+      ],
+      "regions": [
+        "髋",
+        "臀中肌",
+        "骨盆",
+        "核心",
+        "足踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–6次/侧",
+      "cue": "支撑腿微屈，髋折叠时躯干和后腿向两端延展；先扶稳再逐步减少支撑。",
+      "why": "补充蹲模式容易被忽略的单腿髋稳定、骨盆控制和足踝平衡，作为 L3–L4 进阶准备。",
+      "sourceStatus": "新增 PREP 动作；平衡失控时退阶为扶持单腿髋折叠",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-54": {
+      "prepId": "PREP-54",
+      "name": "单腿动态捞月（猴子捞月进阶）",
+      "alias": "单腿捞月",
+      "actionId": "warmup_single_leg_hamstring_scoop",
+      "prepGrade": "P3",
+      "role": "后侧链动态伸展 / 单腿控制",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "单腿"
+      ],
+      "regions": [
+        "腘绳肌",
+        "小腿后侧",
+        "髋",
+        "足踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–6次/侧",
+      "cue": "以支撑腿髋铰链带动动作，前腿/浮腿沿脚尖方向做捞取；保持骨盆稳定，不追求手触地。",
+      "why": "在猴子捞月的后侧链动态活动上增加单腿平衡与髋铰链控制，服务硬拉、RDL 和单腿拉模式，不作为蹲模式固定热身。",
+      "sourceStatus": "新增 PREP 动作；动作失稳时退回双脚站姿猴子捞月",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
     }
   },
   "warmupGradeMeta": {
@@ -2100,7 +2209,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-52",
+      "PREP-53"
     ],
     "髋铰链": [
       "PREP-01",
@@ -2135,7 +2246,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-53",
+      "PREP-54"
     ],
     "髋伸展": [
       "PREP-01",
@@ -2214,7 +2327,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-53",
+      "PREP-54"
     ],
     "水平推": [
       "PREP-01",

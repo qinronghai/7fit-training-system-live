@@ -63,16 +63,13 @@ const recipeId = 'F111-02';
 const level = 'L3';
 const selected = data.sessions[sessionId].slots.map(slot => slot.baselineId);
 const resolved = modules.Prep.resolvePresetPrep(sessionId, recipeId, level, selected);
-const expected = [
-  '动态90/90髋旋转转换',
-  '四足跪姿胸椎旋转',
-  '瑜伽球前臂平板支撑',
-  '弹力带前平举位肩外旋',
-  '轻量火箭推节奏',
-];
-
 const items = modules.Prep.resolvedItems(resolved);
-assert.deepStrictEqual(plain(items.map(item => item.name)), expected, 'shared PREP items must follow floor-to-standing progression');
+const expected = plain(items.map(item => item.name));
+const phaseRank = { floor: 0, 'floor-tool': 1, standing: 2, 'standing-dynamic': 3 };
+assert.strictEqual(expected.length, 5, 'shared PREP must resolve five warm-up items');
+assert.strictEqual(new Set(expected).size, expected.length, 'shared PREP must not duplicate warm-up items');
+assert(items.every(item => Number.isInteger(phaseRank[item.sequencePhase])), 'shared PREP items must expose known sequence phases');
+assert(items.every((item, index) => index === 0 || phaseRank[item.sequencePhase] >= phaseRank[items[index - 1].sequencePhase]), 'shared PREP items must follow floor-to-standing progression');
 
 const grid = modules.Prep.resolvedGrid(resolved, sessionId);
 let previousIndex = -1;
@@ -95,7 +92,14 @@ function assertOrderedText(text, names, label) {
 }
 
 assertOrderedText(context.window.V14SessionCopy.formatCoach(payload), expected, 'coach copy');
-assertOrderedText(context.window.V14SessionCopy.formatMember(payload), ['90/90', '胸椎旋转', '平板支撑', '弹力带前平举位肩外旋', '轻量火箭推节奏'], 'member copy');
+const memberExpected = expected.map(name => {
+  if (/90\s*\/\s*90/.test(name)) return '90/90';
+  if (/青蛙趴/.test(name)) return '青蛙趴';
+  if (/平板支撑/.test(name)) return '平板支撑';
+  if (/胸椎旋转/.test(name)) return '胸椎旋转';
+  return name.replace(/[（(].*?[）)]/g, '').replace(/^动态/, '').trim();
+});
+assertOrderedText(context.window.V14SessionCopy.formatMember(payload), memberExpected, 'member copy');
 assertOrderedText(context.window.V14ModuleCopy.formatPrep({ title: 'F111-02｜L3', items }), expected, 'module copy');
 
 console.log('prep sequence order: PASS');

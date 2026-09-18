@@ -4543,6 +4543,72 @@
       ],
       "isWarmupNew": true
     },
+    "warmup_doll_squat": {
+      "id": "warmup_doll_squat",
+      "name": "娃娃蹲",
+      "pattern": "动态蹲",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "自重 / 场地",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "蹲模式",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_single_leg_swallow_balance": {
+      "id": "warmup_single_leg_swallow_balance",
+      "name": "单腿燕子平衡",
+      "pattern": "单腿",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "自重 / 场地",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "髋稳定",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_single_leg_hamstring_scoop": {
+      "id": "warmup_single_leg_hamstring_scoop",
+      "name": "单腿动态捞月（猴子捞月进阶）",
+      "pattern": "动态伸展",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "自重 / 场地",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "后侧链 / 单腿",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ],
+      "isWarmupNew": true
+    },
     "warmup_frog_stretch": {
       "id": "warmup_frog_stretch",
       "name": "青蛙趴内收肌伸展",
@@ -8814,6 +8880,66 @@
         "禁忌 / 限制": "出现疼痛、明显不适或无法保持基本控制时退阶或更换动作。",
         "退阶 ID": "—",
         "同级替代 ID": "—",
+        "进阶 ID": "—"
+      }
+    },
+    "warmup_doll_squat": {
+      "summary": "娃娃蹲 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_doll_squat",
+        "来源动作模式": "动态蹲",
+        "来源层级": "入门",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "动态复习深蹲模式，同时打开髋、踝和内收肌活动范围，作为蹲模式 L1–L4 的基础准备。",
+        "来源处方 / RPE": "1–2组 × 5–8次｜RPE 2–4",
+        "教练口令": "脚掌完整着地，髋部向后坐入可控深度；保持躯干自然，不用塌腰换深度。",
+        "执行步骤": "按标准起始位建立稳定姿势，在无痛和可控活动范围内完成；动作速度以控制为先。",
+        "常见错误": "追求深度导致脚跟离地、膝盖塌向内或腰椎代偿。",
+        "禁忌 / 限制": "出现疼痛、明显不适或无法保持基本控制时退阶或缩小幅度。",
+        "退阶 ID": "—",
+        "同级替代 ID": "PREP-16",
+        "进阶 ID": "PREP-51"
+      }
+    },
+    "warmup_single_leg_swallow_balance": {
+      "summary": "单腿燕子平衡 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_single_leg_swallow_balance",
+        "来源动作模式": "单腿",
+        "来源层级": "整合",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "建立单腿支撑、骨盆控制和足踝平衡，为 L3–L4 蹲与单腿模式增加髋稳定准备。",
+        "来源处方 / RPE": "1组 × 4–6次/侧｜RPE 2–4",
+        "教练口令": "支撑腿微屈，躯干和后腿向两端延展；先扶稳，再逐步减少支撑。",
+        "执行步骤": "按标准起始位建立稳定姿势，在无痛和可控活动范围内完成；动作速度以控制为先。",
+        "常见错误": "骨盆打开、支撑膝内扣或为了触地而失去脊柱与髋部控制。",
+        "禁忌 / 限制": "平衡失控或出现疼痛时退阶为扶持单腿髋折叠。",
+        "退阶 ID": "—",
+        "同级替代 ID": "PREP-40",
+        "进阶 ID": "PREP-10"
+      }
+    },
+    "warmup_single_leg_hamstring_scoop": {
+      "summary": "单腿动态捞月（猴子捞月进阶） 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_single_leg_hamstring_scoop",
+        "来源动作模式": "动态伸展",
+        "来源层级": "整合",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "在猴子捞月的后侧链动态活动上增加单腿平衡与髋铰链控制，服务硬拉、RDL 和单腿拉模式。",
+        "来源处方 / RPE": "1组 × 4–6次/侧｜RPE 2–4",
+        "教练口令": "以支撑腿髋铰链带动动作，沿脚尖方向做捞取；保持骨盆稳定，不追求手触地。",
+        "执行步骤": "按标准起始位建立稳定姿势，在无痛和可控活动范围内完成；动作速度以控制为先。",
+        "常见错误": "为了触地而旋转骨盆、塌腰或快速甩动后侧链。",
+        "禁忌 / 限制": "动作失稳或出现疼痛时退回双脚站姿猴子捞月。",
+        "退阶 ID": "warmup_hamstring_scoop",
+        "同级替代 ID": "PREP-10",
         "进阶 ID": "—"
       }
     },

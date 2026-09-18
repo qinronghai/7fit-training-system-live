@@ -123,6 +123,8 @@
       const w=data.warmupDetails?.[prepId]; if(!w)return;
       const legal=gradeApi?gradeApi.isAllowed(level,w.prepGrade):w.sessionLevels?.includes(level);
       if(level&&!legal)return;
+      const hasPatternMatch=(w.targetPatterns||[]).some(pattern=>patterns.includes(pattern));
+      if(patterns.length && (w.targetPatterns||[]).length && !hasPatternMatch)return;
       const rec=get(w.actionId);
       let score=0;
       if(rec){
@@ -130,7 +132,7 @@
         for(const muscle of candidateMuscles){if(targetMuscles.has(muscle)){score+=2;break;}}
         if(asArray(rec.joints).some(j=>targetJoints.has(j)))score+=1;
       }
-      if((w.targetPatterns||[]).some(p=>patterns.includes(p)))score+=1;
+      if(hasPatternMatch)score+=1;
       if((w.regions||[]).some(region=>targetRegions.has(region)))score+=1;
       scored.push({
         prepId,
