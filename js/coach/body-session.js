@@ -214,7 +214,12 @@
     const stationBlockedCandidates=result.stationBlockedCandidates||[];
     const currentBlocked=blockedCandidates.find(candidate=>candidate.actionId===slot.actionId);
     const selectCandidates=currentBlocked?[currentBlocked,...candidates]:candidates;
-    const options=selectCandidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.name)}${candidate.requiresVenueOverride?'｜场馆 Gate 已覆盖':''}</option>`).join('');
+    const options=selectCandidates.map(candidate=>{
+      const reasons=(candidate.reasons||[]).map(item=>item.text).filter(Boolean).join('；');
+      const tradeoffs=(candidate.tradeoffs||[]).map(item=>item.text).filter(Boolean).join('；');
+      const targets=targetNames(candidate.directTargets).slice(0,3).join(' · ');
+      return `<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''} data-score="${esc(candidate.recommendationScore??'')}" data-family="${esc(targets)}" data-role="${esc(coachRoleLabel(slot.key))}" data-reasons="${esc(reasons)}" data-tradeoffs="${esc(tradeoffs)}">${esc(candidate.name)}${candidate.requiresVenueOverride?'｜场馆 Gate 已覆盖':''}</option>`;
+    }).join('');
     const current=candidates.find(candidate=>candidate.actionId===slot.actionId)||null;
     const currentScore=Number(current?.recommendationScore||0);
     const candidateCards=candidates.slice(0,4).map((candidate,index)=>{
@@ -255,7 +260,8 @@
     const lowerCatalogIds=new Set((window.V15LowerAssistance?.catalog?.().entries||[]).map(entry=>entry.id));
     const hasLowerAssistance=slot.key!=='PRIMARY'&&candidates.some(candidate=>lowerCatalogIds.has(candidate.actionId));
     const lowerBrowse=hasLowerAssistance?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=body&family=${encodeURIComponent(ctx.familyId)}&level=${encodeURIComponent(ctx.level)}&slotKey=${encodeURIComponent(slot.key)}">查看全部下肢辅助与容量动作 →</a>`:'';
-    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}${stationAuditHtml}${lowerBrowse}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${stationBlockedHtml}${blockedHtml}${quick}</div>`;
+    const lowerDrawer=hasLowerAssistance?`<button type="button" class="lower-assistance-drawer-open" data-replacement-drawer data-replacement-select=".body-slot-select" data-replacement-title="${esc(coachRoleLabel(slot.key))}｜下肢替换" data-replacement-subtitle="${esc(ctx.familyId)} · ${esc(ctx.level)} · 仅显示 Body Resolver 通过 Gate 的候选">打开替换抽屉</button>`:'';
+    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}${stationAuditHtml}${lowerDrawer}${lowerBrowse}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${stationBlockedHtml}${blockedHtml}${quick}</div>`;
   }
 
   function slotCard(ctx,slot){
