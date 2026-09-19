@@ -251,6 +251,11 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expect(desktopDrawer).toBeVisible();
   await expect(desktopDrawer).not.toHaveAttribute('aria-modal', 'true');
   await expect(desktopTrigger).toHaveAttribute('aria-selected', 'true');
+  const desktopMatrix = page.locator('[data-f111-preset-matrix-shell]');
+  await expect(desktopMatrix).toBeVisible();
+  await expect(desktopMatrix.locator('[data-f111-recipe-row]')).toHaveCount(8);
+  await expect(desktopMatrix.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expectNoOverflow(page, 1280);
 
   const desktopPreview = await desktopDrawer.locator('[data-preview-slot]').evaluateAll(nodes =>
     nodes.map(node => ({
