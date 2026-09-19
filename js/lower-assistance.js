@@ -49,10 +49,13 @@
     const explicit=clean(action.equipmentClass);
     if(EQUIPMENT_CLASS_LABELS[explicit])return explicit;
     if(clean(action.stationGroup)==='cable-frame')return 'cable_station';
+    const equipmentIds=clean(action.equipmentId).split(/[、,，]/).map(value=>value.trim()).filter(Boolean);
+    if(equipmentIds.includes('eq-dumbbell'))return 'free_weight';
+    if(equipmentIds.includes('eq-backext'))return 'fixed_machine';
     if(meta.repProfile==='compound_freeweight')return 'free_weight';
     if(meta.repProfile==='compound_machine')return 'fixed_machine';
-    if(action.route==='CONDITIONING_2F'&&/雪橇/.test(clean(action.name)+clean(action.equipment)))return 'sled_turf';
-    if(meta.repProfile==='accessory_compound'&&/徒手|场地/.test(clean(action.equipment)))return 'bodyweight';
+    if(meta.repProfile==='single_leg_compound'&&(equipmentIds.includes('eq-bench')||equipmentIds.includes('eq-rack')||equipmentIds.length===0))return 'bodyweight';
+    if(meta.repProfile==='accessory_compound'&&equipmentIds.length===0)return 'bodyweight';
     return 'unknown';
   }
 
