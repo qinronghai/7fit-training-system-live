@@ -96,6 +96,9 @@ test('desktop F111 preset cell opens detail drawer without leaving browser conte
   await expect(page.locator('#global-drawer .f111-preset-drawer-actions')).toContainText('开始课程');
   await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('aria-selected','true');
 
+  await page.locator('[data-f111-preset-close]').click();
+  await expect(page.locator('#global-drawer')).toBeHidden();
+
   const second = page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]');
   await second.click();
   await expect(page.locator('#global-drawer')).toContainText('F111-07 · L3');
