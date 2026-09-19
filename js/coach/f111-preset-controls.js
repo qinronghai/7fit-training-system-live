@@ -81,7 +81,7 @@
     for(const item of value){
       const recipeId=clean(item?.recipeId),level=clean(item?.level),usedAt=clean(item?.usedAt);
       const key=`${recipeId}:${level}`;
-      if(!recipeId||!level||!usedAt||seen.has(key)||!Browser.find(recipeId,level))continue;
+      if(!recipeId||!level||!usedAt||Number.isNaN(Date.parse(usedAt))||seen.has(key)||!Browser.find(recipeId,level))continue;
       seen.add(key);
       out.push({recipeId,level,usedAt});
     }
