@@ -25,12 +25,12 @@
     lower:{
       key:'lower',
       moduleId:'aux-lower',
-      title:'12｜下肢固定器械动作',
-      eyebrow:'D1｜下肢辅助',
-      sourceLabel:'composer.auxiliaryRules.lower',
-      intro:'从 Composer D1 下肢辅助规则实时汇总动作；固定器械与绳索 / 龙门架辅助按显式 equipmentClass 分组。',
+      title:'12｜下肢辅助与容量动作',
+      eyebrow:'D1 / Body｜下肢辅助',
+      sourceLabel:'V15LowerAssistance / bodyActionMeta',
+      intro:'统一展示 7Fit 已审计的下肢辅助与容量动作；固定器械只是器械筛选，不再是体系边界。',
       poolKeys:['squat','hinge','hip_extension','single_leg_squat','single_leg_hinge'],
-      poolLabels:{squat:'蹲',hinge:'髋铰链',hip_extension:'髋伸展',single_leg_squat:'单腿蹲',single_leg_hinge:'单腿拉'}
+      poolLabels:{squat:'蹲来源',hinge:'髋铰链来源',hip_extension:'髋伸来源',single_leg_squat:'单腿蹲来源',single_leg_hinge:'单腿拉来源'}
     }
   };
 
@@ -59,6 +59,30 @@
     const cfg=configFor(side);
     if(!cfg)return {side:null,entries:[],total:0,classCounts:{},missingRefs:[],poolKeys:[],poolLabels:{}};
     const data=D();
+    if(side==='lower'&&window.V15LowerAssistance?.catalog){
+      const domain=window.V15LowerAssistance.catalog();
+      const entries=(domain.entries||[]).map(entry=>({
+        ...entry,
+        sourcePools:[...(entry.sourcePools||[])],
+        sourcePoolKeys:[...(entry.sourcePoolKeys||[])],
+        detailState:detailState(entry.id,data),
+      }));
+      return {
+        ...cfg,
+        ...domain,
+        title:cfg.title,
+        moduleId:cfg.moduleId,
+        eyebrow:cfg.eyebrow,
+        intro:cfg.intro,
+        sourceLabel:cfg.sourceLabel,
+        entries,
+        missingRefs:[],
+        poolKeys:cfg.poolKeys,
+        poolLabels:cfg.poolLabels,
+        equipmentClassLabels:EQUIPMENT_CLASS_LABELS,
+        detailFields:DETAIL_FIELDS,
+      };
+    }
     const rules=data.composer?.auxiliaryRules?.[side]||{};
     const actions=data.actions||{};
     const entriesById=new Map();

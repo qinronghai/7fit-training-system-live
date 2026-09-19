@@ -57,7 +57,27 @@
     const list=matched.length?matched:base;
     return list.sort((a,b)=>(recommended.has(a.grade)?-1:0)-(recommended.has(b.grade)?-1:0));
   }
-  function auxCandidates(kind,modeKey,selectedIds=[]){
+  function auxCandidates(kind,modeKey,selectedIds=[],context={}){
+    if(kind==='lower'&&window.V15LowerAssistance?.candidates){
+      const result=window.V15LowerAssistance.candidates({
+        consumer:'F111_D1',
+        level:context.level||'L1',
+        lowerMode:modeKey,
+        currentActionIds:selectedIds,
+        currentSelections:context.currentSelections||{},
+      });
+      return (result.candidates||[]).map(candidate=>{
+        const view=actionView(candidate.actionId);
+        view.recommendationScore=candidate.recommendationScore;
+        view.recommendationReasons=candidate.reasons||[];
+        view.recommendationTradeoffs=candidate.tradeoffs||[];
+        view.functionalFamily=candidate.functionalFamily||'';
+        view.functionalFamilyLabel=candidate.functionalFamilyLabel||'';
+        view.trainingRoles=candidate.trainingRoles||[];
+        view.localFatigueImpact=candidate.localFatigueImpact||{};
+        return view;
+      }).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
+    }
     const ids=cfg().auxiliaryRules?.[kind]?.[modeKey]||[],blocked=new Set(selectedIds||[]);
     return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
   }
@@ -70,7 +90,7 @@
     const Aopts=mainCandidates('lower',lowerMode,level,!!input.includeExpandedMain), Bopts=mainCandidates('upper',upperMode,level,!!input.includeExpandedMain);
     const A=chooseById(Aopts,selections.A),B=chooseById(Bopts,selections.B);
     const Copts=supportCandidates(level,!!input.includeExpandedSupport),C=chooseById(Copts,selections.C);
-    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id]),D1=chooseById(D1opts,selections.D1);
+    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:C?.id}}),D1=chooseById(D1opts,selections.D1);
     const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
     const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
     const COREopts=coreCandidates(level,coreDemand,!!input.includeExpandedCore),CORE=chooseById(COREopts,selections.CORE);

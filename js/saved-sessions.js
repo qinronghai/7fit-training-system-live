@@ -249,7 +249,14 @@
       const options=view.slotOptions?.[slot.slotKey]||[];
       const allowed=new Set(options.map(x=>x.id).filter(Boolean));
       allowed.add(slot.baselineId);
-      if(data.actions?.[entry.actionId]&&allowed.has(entry.actionId)){
+      if(key==='D1'&&window.V15LowerAssistance?.isF111SelectionValid){
+        const lowerMode=data.composer?.officialPresetMap?.[recipeId]?.[0]||'';
+        const otherIds=(session.slots||[]).filter((_,candidateIndex)=>candidateIndex!==index).map((peer,peerIndex)=>requested[normalizeSlotKey(peer,peerIndex)]?.actionId||peer.baselineId).filter(Boolean);
+        if(window.V15LowerAssistance.isF111SelectionValid({actionId:entry.actionId,level,lowerMode,currentActionIds:otherIds})){
+          accepted[key]=entry;
+          return entry.actionId;
+        }
+      }else if(data.actions?.[entry.actionId]&&allowed.has(entry.actionId)){
         accepted[key]=entry;
         return entry.actionId;
       }

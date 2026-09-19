@@ -89,12 +89,25 @@
     const session=data.sessions?.[sessionId],recipe=data.recipes?.[recipeId]||{},view=data.sessionViews?.[sessionId]||{};
     if(!session)fail(`Unknown F111 preset session: ${sessionId}`,{sessionId});
     const explicit=Array.isArray(input.selections)?input.selections:[];
+    const preliminary=session.slots.map((slot,index)=>{
+      const requested=explicit[index];
+      return typeof requested==='string'&&data.actions?.[requested]?requested:slot.baselineId;
+    });
+    const lowerMode=data.composer?.officialPresetMap?.[recipeId]?.[0]||'';
     const slots=session.slots.map((slot,index)=>{
       const baselineId=slot.baselineId;
-      const requested=explicit[index];
-      const actionId=typeof requested==='string'&&data.actions?.[requested]?requested:baselineId;
+      const key=slotKey(slot,index);
+      const requested=preliminary[index];
+      let actionId=requested;
+      if(key==='D1'&&requested!==baselineId&&window.V15LowerAssistance?.isF111SelectionValid){
+        const otherIds=preliminary.filter((_,candidateIndex)=>candidateIndex!==index);
+        const legal=window.V15LowerAssistance.isF111SelectionValid({
+          actionId:requested,level,lowerMode,currentActionIds:otherIds
+        });
+        if(!legal)actionId=baselineId;
+      }
       const source=actionId===baselineId?'baseline':'manual';
-      return publicSlot(slotKey(slot,index),slot.slotName,actionId,source);
+      return publicSlot(key,slot.slotName,actionId,source);
     });
     const title=`${recipeId}｜${recipe.name||recipeId}`;
     const summary=String(view.summary||'');

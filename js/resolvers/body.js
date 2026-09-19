@@ -1221,7 +1221,7 @@
     return session;
   }
 
-  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessEquipmentStation,assessLevelEligibility,assessLevelPoolEligibility,assessVenueEligibility,pairSimilarity};
+  const api={resolve,candidates,isSelectionValid,assessSlotIntent,assessEquipmentStation,assessLevelEligibility,assessLevelPoolEligibility,assessVenueEligibility,pairSimilarity,actionStationRecord};
   window.V15BodyResolver=api;
   if(!window.V15TemplateResolver?.register)throw new Error('Template Resolver Dispatcher is unavailable');
   window.V15TemplateResolver.register('body',resolve);

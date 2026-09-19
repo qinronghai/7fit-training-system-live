@@ -167,10 +167,15 @@ def test_issue79_ui_contract_is_loaded_and_derived_from_auxiliary_api():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     view = (ROOT / "js/views-system.js").read_text(encoding="utf-8")
     helper = (ROOT / "js/auxiliary-modules.js").read_text(encoding="utf-8")
+    lower_domain = (ROOT / "js/lower-assistance.js").read_text(encoding="utf-8")
     changelog = (ROOT / "data/change-log.js").read_text(encoding="utf-8")
 
+    assert "js/lower-assistance.js" in html
     assert "js/auxiliary-modules.js" in html
-    assert html.index("js/auxiliary-modules.js") < html.index("js/views-system.js")
+    assert html.index("js/resolvers/body.js") < html.index("js/lower-assistance.js")
+    assert html.index("js/lower-assistance.js") < html.index("js/auxiliary-modules.js") < html.index("js/views-system.js")
+    assert "12｜下肢辅助与容量动作" in helper
+    assert "V15LowerAssistance" in lower_domain
     for marker in ["V14AuxiliaryModules", "aux-upper", "aux-lower", "data-aux-filter", "auxiliary-subgroup", "data-aux-pool-button"]:
         assert marker in view or marker in helper
     assert re.search(r"issue\s*:\s*79", changelog)

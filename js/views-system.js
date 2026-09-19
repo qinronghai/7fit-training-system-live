@@ -21,40 +21,93 @@
       <div class="auxiliary-index-facts"><b>${catalog.total} 个唯一动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
       <footer>查看模块 →</footer>
     </a>`;
-    return `<section class="section-card auxiliary-index"><div class="section-head"><div><h2>辅助动作模块</h2><p>模块内容直接来自 Composer D1 / D2 辅助动作池；动作变更后，数量、来源与器械分类会随数据重新生成。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','按水平 / 垂直拉推动作池查看 D2 上肢辅助动作。')}${card(lower,'lower','按下肢动作池查看 D1 辅助动作，并明确区分固定器械与绳索 / 龙门架辅助。')}</div></section>`;
+    return `<section class="section-card auxiliary-index"><div class="section-head"><div><h2>辅助动作模块</h2><p>上肢模块继续消费 D2 规则；下肢模块由统一 Lower Body Assistance & Capacity Domain 派生，供 F111 D1 与 Body 共用。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','按水平 / 垂直拉推动作池查看 D2 上肢辅助动作。')}${card(lower,'lower','按膝伸、膝屈、髋伸、髋外展、髋内收、单腿等功能家族浏览；固定器械只是筛选条件。')}</div></section>`;
   }
-  function auxiliaryCard(entry,cfg,systemMode,api){
+  function lowerReplacementContext(route){
+    if(!window.V15LowerAssistance?.candidates)return null;
+    const templateId=String(route.query?.template||'');
+    const slotKey=String(route.query?.slotKey||''),level=String(route.query?.level||'').toUpperCase();
+    if(!slotKey||!/^L[1-4]$/.test(level))return null;
+
+    if(templateId==='f111'){
+      const data=D(),sessionId=String(route.query?.sessionId||''),session=data.sessions?.[sessionId],lowerMode=String(route.query?.lower||'');
+      if(!session)return null;
+      const otherIds=(session.slots||[]).filter(slot=>slot.slotKey!==slotKey).map(slot=>window.V14State?.getSelection?.(sessionId,slot.slotKey)||slot.baselineId).filter(Boolean);
+      const result=window.V15LowerAssistance.candidates({consumer:'F111_D1',level,lowerMode,currentActionIds:otherIds});
+      const match=sessionId.match(/^(F111-\d+)-(L[1-4])$/);
+      return {
+        templateId:'f111',sessionId,slotKey,level,lowerMode,result,
+        candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
+        returnHash:match?`#/coach/f111/${match[1].toLowerCase()}/${match[2].toLowerCase()}`:'#/coach/f111',
+      };
+    }
+
+    if(templateId==='body'){
+      const familyId=String(route.query?.family||'').toUpperCase();
+      const bodySession=window.V14CoachModules?.BodySession;
+      if(!D().bodyFamilies?.[familyId]||!bodySession?.context)return null;
+      const ctx=bodySession.context({templateId:'body',page:'template-session',familyId,level,query:{}});
+      const currentSelections=Object.fromEntries((ctx.session?.main?.content||[]).map(item=>[item.key,item.actionId]));
+      const result=window.V15LowerAssistance.candidates({
+        consumer:'BODY',familyId,level,slotKey,currentSelections,includeVenueBlocked:false
+      });
+      return {
+        templateId:'body',familyId,sessionId:ctx.sessionKey,slotKey,level,result,
+        candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
+        returnHash:`#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}`,
+      };
+    }
+    return null;
+  }
+  function auxiliaryCard(entry,cfg,systemMode,api,replaceContext=null){
     const action=entry.action||{};
     const detail=entry.detailState||{complete:false,missing:[],fields:{}};
-    const sourceTags=entry.sourcePools.map(pool=>`<span class="auxiliary-pool-tag" data-aux-pool="${esc(pool.key)}">${esc(pool.label)}</span>`).join('');
+    const sourceTags=(entry.sourcePools||[]).map(pool=>`<span class="auxiliary-pool-tag" data-aux-pool="${esc(pool.key)}">${esc(pool.label)}</span>`).join('');
+    const family=entry.functionalFamilyLabel||action.pattern||'辅助动作';
+    const roleLabels=(entry.trainingRoles||[]).map(role=>window.V15LowerAssistance?.trainingRoles?.[role]||role);
+    const consumerTags=entry.consumers?`<div class="auxiliary-consumers"><small>适用入口</small><div>${entry.consumers.f111D1?'<span>F111 D1</span>':''}${entry.consumers.body?'<span>Body</span>':''}</div></div>`:'';
     const preview=detail.complete?`<div class="auxiliary-detail-preview"><div><small>训练目标</small><p>${esc(detail.fields['训练目标'])}</p></div><div><small>教练口令</small><p>${esc(detail.fields['教练口令'])}</p></div></div>`:`<p class="auxiliary-detail-pending">待补齐：${esc(detail.missing?.join('、')||'动作详情')}</p>`;
-    const modeMeta=systemMode?`<div class="auxiliary-mode-meta"><div><small>标准 ID</small><b>${esc(entry.id)}</b></div><div><small>equipmentClass</small><b>${esc(entry.equipmentClass)}</b></div><div><small>数据源</small><b>${esc(cfg.sourceLabel)}</b></div></div>`:'';
-    return `<article class="auxiliary-action-card" data-aux-entry="${esc(entry.id)}" data-aux-pools="${esc(entry.sourcePoolKeys.join(','))}" data-aux-equipment-class="${esc(entry.equipmentClass)}">
-      <div class="auxiliary-card-eyebrow"><span>${esc(action.pattern||'辅助动作')}</span><span class="auxiliary-detail-status ${detail.complete?'is-ready':'is-pending'}">${detail.complete?'详情已录入':'动作详情待补齐'}</span></div>
+    const modeMeta=systemMode?`<div class="auxiliary-mode-meta"><div><small>标准 ID</small><b>${esc(entry.id)}</b></div><div><small>Functional Family</small><b>${esc(entry.functionalFamily||action.pattern||'—')}</b></div><div><small>equipmentClass</small><b>${esc(entry.equipmentClass)}</b></div></div>`:'';
+    const candidate=replaceContext?.candidateMap?.get(entry.id);
+    const decision=candidate?`<div class="auxiliary-candidate-reason"><b>推荐分 ${esc(candidate.recommendationScore)}</b><span>${esc(candidate.reasons?.map(item=>item.text).join(' · ')||'符合当前 D1 资格')}</span>${candidate.tradeoffs?.length?`<small>${esc(candidate.tradeoffs.map(item=>item.text).join(' · '))}</small>`:''}</div>`:'';
+    const selectAction=candidate?`<button type="button" class="auxiliary-select-action" data-aux-select-action="${esc(entry.id)}">选用此动作并返回课程</button>`:'';
+    return `<article class="auxiliary-action-card" data-aux-entry="${esc(entry.id)}" data-aux-pools="${esc((entry.sourcePoolKeys||[]).join(','))}" data-aux-equipment-class="${esc(entry.equipmentClass)}" data-aux-family="${esc(entry.functionalFamily||'')}" data-aux-levels="${esc((entry.levels||[]).join(','))}" data-aux-roles="${esc((entry.trainingRoles||[]).join(','))}">
+      <div class="auxiliary-card-eyebrow"><span>${esc(family)}</span><span class="auxiliary-detail-status ${detail.complete?'is-ready':'is-pending'}">${detail.complete?'详情已录入':'动作详情待补齐'}</span></div>
       <h3>${esc(action.name||entry.id)}</h3>
-      <div class="auxiliary-card-facts"><div><small>器械</small><b>${esc(action.equipment||'—')}</b></div><div><small>分类</small><b>${esc(api.equipmentClassLabel(entry.equipmentClass))}</b></div><div><small>路由</small><b>${esc(action.routeLabel||action.route||'—')}</b></div><div><small>状态</small><b>${esc(action.status||'—')}</b></div></div>
-      <div class="auxiliary-pool-tags"><small>来源动作池</small><div>${sourceTags||'<span class="empty-inline">—</span>'}</div></div>
-      ${preview}${modeMeta}<a class="text-link auxiliary-detail-link" href="#/library?focus=${encodeURIComponent(entry.id)}">查看动作详情 →</a>
+      <div class="auxiliary-card-facts"><div><small>器械</small><b>${esc(action.equipment||'—')}</b></div><div><small>分类</small><b>${esc(api.equipmentClassLabel(entry.equipmentClass))}</b></div><div><small>等级</small><b>${esc((entry.levels||[]).join(' / ')||'—')}</b></div><div><small>训练角色</small><b>${esc(roleLabels.join(' / ')||'辅助')}</b></div></div>
+      ${consumerTags}
+      ${sourceTags?`<div class="auxiliary-pool-tags"><small>Legacy / 来源映射</small><div>${sourceTags}</div></div>`:''}
+      ${decision}${preview}${modeMeta}<div class="auxiliary-card-actions"><a class="text-link auxiliary-detail-link" href="#/library?focus=${encodeURIComponent(entry.id)}">查看动作详情 →</a>${selectAction}</div>
     </article>`;
   }
   function auxiliaryModule(route,side){
     const api=window.V14AuxiliaryModules;if(!api)return '';
     const cfg=api.configs[side],catalog=api.catalog(side),systemMode=window.V14State?.getMode?.()==='system';
+    const replaceContext=side==='lower'?lowerReplacementContext(route):null;
     const pool=String(route.query?.pool||''),equipmentClass=String(route.query?.equipmentClass||'');
-    // Filter options follow the data: a pool that gains a bodyweight or
-    // free-weight accessory must not silently lose its equipment-class filter.
+    const family=String(route.query?.family||''),level=String(route.query?.level||''),role=String(route.query?.role||'');
     const classKeys=['fixed_machine','cable_station','free_weight','bodyweight','other','unknown'].filter(key=>catalog.classCounts?.[key]);
+    const baseEntries=replaceContext?catalog.entries.filter(entry=>replaceContext.candidateMap.has(entry.id)):catalog.entries;
     const poolOptions=cfg.poolKeys.map(key=>`<option value="${esc(key)}" ${pool===key?'selected':''}>${esc(cfg.poolLabels[key])}</option>`).join('');
-    const classOptions=classKeys.filter(key=>catalog.classCounts?.[key]).map(key=>`<option value="${esc(key)}" ${equipmentClass===key?'selected':''}>${esc(api.equipmentClassLabel(key))}</option>`).join('');
-    const poolSummary=`<div class="auxiliary-pool-overview">${cfg.poolKeys.map(key=>{const count=catalog.entries.filter(entry=>entry.sourcePoolKeys.includes(key)).length;return `<button type="button" class="auxiliary-pool-chip" data-aux-pool-button="${esc(key)}" aria-pressed="${pool===key?'true':'false'}"><span>${esc(cfg.poolLabels[key])}</span><b>${count} 个</b></button>`;}).join('')}</div>`;
-    const cards=side==='lower'?classKeys.filter(key=>catalog.classCounts?.[key]).map(key=>`<section class="auxiliary-subgroup" data-auxiliary-subgroup="${esc(key)}"><div class="auxiliary-subgroup-head"><div><h3>${esc(api.equipmentClassLabel(key))}</h3><p>${key==='fixed_machine'?'固定器械动作：腿部固定器械与髋内收外展器械。':'绳索 / 龙门架辅助：保留在 D1 辅助池中，但不伪装成固定器械。'}</p></div><b>${catalog.classCounts[key]} 个</b></div><div class="auxiliary-action-grid">${catalog.entries.filter(entry=>entry.equipmentClass===key).map(entry=>auxiliaryCard(entry,cfg,systemMode,api)).join('')}</div></section>`).join(''):catalog.entries.map(entry=>auxiliaryCard(entry,cfg,systemMode,api)).join('');
-    const missingRefs=catalog.missingRefs.length?`<p class="auxiliary-data-warning">规则引用了 ${catalog.missingRefs.length} 个动作库缺失 ID：${esc(catalog.missingRefs.map(item=>item.id).join('、'))}</p>`:'';
+    const classOptions=classKeys.map(key=>`<option value="${esc(key)}" ${equipmentClass===key?'selected':''}>${esc(api.equipmentClassLabel(key))}</option>`).join('');
+    const familyDefs=catalog.functionalFamilies||{};
+    const familyOptions=Object.entries(familyDefs).map(([key,item])=>`<option value="${esc(key)}" ${family===key?'selected':''}>${esc(item.label)}（${catalog.familyCounts?.[key]||0}）</option>`).join('');
+    const roleOptions=Object.entries(catalog.trainingRoleLabels||{}).map(([key,label])=>`<option value="${esc(key)}" ${role===key?'selected':''}>${esc(label)}</option>`).join('');
+    const lowerFamilySummary=side==='lower'?`<div class="auxiliary-pool-overview auxiliary-family-overview">${Object.entries(familyDefs).map(([key,item])=>`<button type="button" class="auxiliary-pool-chip" data-aux-family-button="${esc(key)}" aria-pressed="${family===key?'true':'false'}"><span>${esc(item.label)}</span><b>${catalog.familyCounts?.[key]||0} 个</b></button>`).join('')}</div>`:'';
+    const upperPoolSummary=side==='upper'?`<div class="auxiliary-pool-overview">${cfg.poolKeys.map(key=>{const count=catalog.entries.filter(entry=>entry.sourcePoolKeys.includes(key)).length;return `<button type="button" class="auxiliary-pool-chip" data-aux-pool-button="${esc(key)}" aria-pressed="${pool===key?'true':'false'}"><span>${esc(cfg.poolLabels[key])}</span><b>${count} 个</b></button>`;}).join('')}</div>`:'';
+    const groupKeys=side==='lower'?Object.keys(familyDefs).filter(key=>baseEntries.some(entry=>entry.functionalFamily===key)):classKeys;
+    const cards=side==='lower'?groupKeys.map(key=>`<section class="auxiliary-subgroup" data-auxiliary-subgroup="${esc(key)}"><div class="auxiliary-subgroup-head"><div><h3>${esc(familyDefs[key]?.label||key)}</h3><p>Functional Family｜同一功能家族内再按器械、Level 与 Training Role 筛选。</p></div><b>${baseEntries.filter(entry=>entry.functionalFamily===key).length} 个</b></div><div class="auxiliary-action-grid">${baseEntries.filter(entry=>entry.functionalFamily===key).map(entry=>auxiliaryCard(entry,cfg,systemMode,api,replaceContext)).join('')}</div></section>`).join(''):baseEntries.map(entry=>auxiliaryCard(entry,cfg,systemMode,api,null)).join('');
+    const missingRefs=catalog.missingRefs?.length?`<p class="auxiliary-data-warning">规则引用了 ${catalog.missingRefs.length} 个动作库缺失 ID：${esc(catalog.missingRefs.map(item=>item.id).join('、'))}</p>`:'';
+    const contextBanner=replaceContext?`<div class="auxiliary-replacement-context"><b>${esc(replaceContext.templateId==='body'?'Body '+replaceContext.slotKey:'F111 D1')}｜替换模式</b><span>${esc(replaceContext.sessionId)} · ${esc(replaceContext.level)} · 当前显示 ${baseEntries.length} 个通过 Gate 的候选</span><a href="${replaceContext.returnHash}">返回当前课程</a></div>`:'';
+    const controls=side==='lower'
+      ?`<div class="auxiliary-module-controls lower-assistance-controls"><label>Functional Family<select data-aux-filter="family" aria-label="Functional Family"><option value="">全部功能家族</option>${familyOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><label>等级<select data-aux-filter="level" aria-label="等级"><option value="">全部等级</option>${['L1','L2','L3','L4'].map(x=>`<option value="${x}" ${level===x?'selected':''}>${x}</option>`).join('')}</select></label><label>Training Role<select data-aux-filter="role" aria-label="Training Role"><option value="">全部训练角色</option>${roleOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：显示训练语义，隐藏底层 ID'}</span></div>`
+      :`<div class="auxiliary-module-controls"><label>来源动作池<select data-aux-filter="pool" aria-label="来源动作池"><option value="">全部动作池</option>${poolOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：隐藏标准 ID 与审计字段'}</span></div>`;
+    const thirdSummary=side==='lower'?`${Object.values(catalog.familyCounts||{}).filter(Boolean).length} 个 Family`:`${cfg.poolKeys.length} 个`;
     return tabs('patterns')+`<a class="back-link" href="#/system/patterns">← 返回十大模式</a>`+hero(cfg.title,`${cfg.eyebrow}｜${cfg.intro}`)+
-      `<section class="section-card auxiliary-module" data-auxiliary-module="${esc(cfg.moduleId)}" data-auxiliary-side="${esc(side)}">
-        <div class="section-head"><div><h2>${esc(cfg.title)}</h2><p>${esc(cfg.intro)}</p></div><a class="text-link" href="#/library?kind=action">在动作库中查看全部 →</a></div>
-        <div class="auxiliary-summary-strip"><div><small>唯一动作</small><b data-aux-visible-count>${catalog.total} 个</b></div><div><small>器械分类</small><b>${esc(auxiliaryClassSummary(catalog,api))}</b></div><div><small>来源动作池</small><b>${cfg.poolKeys.length} 个</b></div></div>
-        ${poolSummary}
-        <div class="auxiliary-module-controls"><label>来源动作池<select data-aux-filter="pool" aria-label="来源动作池"><option value="">全部动作池</option>${poolOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：隐藏标准 ID 与审计字段'}</span></div>
+      `<section class="section-card auxiliary-module" data-auxiliary-module="${esc(cfg.moduleId)}" data-auxiliary-side="${esc(side)}" ${replaceContext?`data-replacement-template="${esc(replaceContext.templateId)}" data-replacement-session="${esc(replaceContext.sessionId)}" data-replacement-slot="${esc(replaceContext.slotKey)}" data-replacement-family="${esc(replaceContext.familyId||'')}" data-replacement-level="${esc(replaceContext.level)}" data-return-hash="${esc(replaceContext.returnHash)}"`:''}>
+        ${contextBanner}<div class="section-head"><div><h2>${esc(cfg.title)}</h2><p>${esc(cfg.intro)}</p></div><a class="text-link" href="#/library?kind=action">在动作库中查看全部 →</a></div>
+        <div class="auxiliary-summary-strip"><div><small>当前体系动作</small><b data-aux-visible-count>${baseEntries.length} 个</b></div><div><small>器械分类</small><b>${esc(auxiliaryClassSummary(catalog,api))}</b></div><div><small>${side==='lower'?'功能家族':'来源动作池'}</small><b>${thirdSummary}</b></div></div>
+        ${lowerFamilySummary}${upperPoolSummary}${controls}
         ${missingRefs}${side==='lower'?cards:`<div class="auxiliary-action-grid">${cards||'<p class="no-results">当前规则暂无动作。</p>'}</div>`}<p class="auxiliary-empty no-results" hidden>当前筛选暂无动作。</p>
       </section>`;
   }
@@ -209,27 +262,49 @@
       if(!module)return;
       const poolControl=module.querySelector('[data-aux-filter="pool"]');
       const classControl=module.querySelector('[data-aux-filter="equipmentClass"]');
+      const familyControl=module.querySelector('[data-aux-filter="family"]');
+      const levelControl=module.querySelector('[data-aux-filter="level"]');
+      const roleControl=module.querySelector('[data-aux-filter="role"]');
       const poolButtons=module.querySelectorAll('[data-aux-pool-button]');
+      const familyButtons=module.querySelectorAll('[data-aux-family-button]');
       const count=module.querySelector('[data-aux-visible-count]');
       const empty=module.querySelector('.auxiliary-empty');
       const apply=()=>{
-        const pool=poolControl?.value||'',equipmentClass=classControl?.value||'';
+        const pool=poolControl?.value||'',equipmentClass=classControl?.value||'',family=familyControl?.value||'',level=levelControl?.value||'',role=roleControl?.value||'';
         let visible=0;
         module.querySelectorAll('[data-aux-entry]').forEach(card=>{
           const pools=String(card.dataset.auxPools||'').split(',').filter(Boolean);
-          const matches=(!pool||pools.includes(pool))&&(!equipmentClass||card.dataset.auxEquipmentClass===equipmentClass);
+          const levels=String(card.dataset.auxLevels||'').split(',').filter(Boolean);
+          const roles=String(card.dataset.auxRoles||'').split(',').filter(Boolean);
+          const matches=(!pool||pools.includes(pool))
+            &&(!equipmentClass||card.dataset.auxEquipmentClass===equipmentClass)
+            &&(!family||card.dataset.auxFamily===family)
+            &&(!level||levels.includes(level))
+            &&(!role||roles.includes(role));
           card.hidden=!matches;if(matches)visible+=1;
         });
-        module.querySelectorAll('[data-auxiliary-subgroup]').forEach(group=>{
-          group.hidden=!group.querySelector('[data-aux-entry]:not([hidden])');
-        });
+        module.querySelectorAll('[data-auxiliary-subgroup]').forEach(group=>{group.hidden=!group.querySelector('[data-aux-entry]:not([hidden])');});
         poolButtons.forEach(button=>button.setAttribute('aria-pressed',String((poolControl?.value||'')===button.dataset.auxPoolButton)));
+        familyButtons.forEach(button=>button.setAttribute('aria-pressed',String((familyControl?.value||'')===button.dataset.auxFamilyButton)));
         if(count)count.textContent=`${visible} 个`;
         if(empty)empty.hidden=visible!==0;
       };
-      poolControl?.addEventListener('change',apply);
-      classControl?.addEventListener('change',apply);
+      [poolControl,classControl,familyControl,levelControl,roleControl].filter(Boolean).forEach(control=>control.addEventListener('change',apply));
       poolButtons.forEach(button=>button.addEventListener('click',()=>{if(poolControl)poolControl.value=button.dataset.auxPoolButton||'';apply();}));
+      familyButtons.forEach(button=>button.addEventListener('click',()=>{if(familyControl)familyControl.value=button.dataset.auxFamilyButton||'';apply();}));
+      module.querySelectorAll('[data-aux-select-action]').forEach(button=>button.addEventListener('click',()=>{
+        const templateId=module.dataset.replacementTemplate,sessionId=module.dataset.replacementSession,slotKey=module.dataset.replacementSlot,actionId=button.dataset.auxSelectAction;
+        if(!templateId||!sessionId||!slotKey||!actionId)return;
+        if(templateId==='f111'){
+          if(!window.V14State?.setSelection)return;
+          window.V14State.setSelection(sessionId,slotKey,actionId);
+        }else if(templateId==='body'){
+          const familyId=module.dataset.replacementFamily,level=module.dataset.replacementLevel;
+          if(!familyId||!level||!window.V14CoachModules?.BodySession?.setFormalSelection)return;
+          window.V14CoachModules.BodySession.setFormalSelection(familyId,level,slotKey,actionId);
+        }else return;
+        location.hash=module.dataset.returnHash||'#/coach';
+      }));
       apply();
       return;
     }

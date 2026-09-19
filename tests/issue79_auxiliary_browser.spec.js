@@ -32,10 +32,10 @@ test('Issue 79: system index exposes two data-derived auxiliary modules without 
     await expect(index).toBeVisible();
     await expect(index.locator('.auxiliary-module-card')).toHaveCount(2);
     await expect(index).toContainText('11｜上肢辅助动作');
-    await expect(index).toContainText('12｜下肢固定器械动作');
+    await expect(index).toContainText('12｜下肢辅助与容量动作');
     await expect(index).toContainText('21 个唯一动作');
     await expect(index).toContainText('固定器械 7 · 绳索 / 龙门架辅助 10 · 自由重量 3 · 自重 1');
-    await expect(index).toContainText('6 个唯一动作');
+    await expect(index).toContainText('23 个唯一动作');
     await expectNoOverflow(page,width);
   }
   await expectClean(diag);
@@ -69,19 +69,26 @@ test('Issue 79: upper auxiliary module deduplicates source pools and supports fi
   await expectClean(diag);
 });
 
-test('Issue 79: lower auxiliary module separates fixed machines from cable assistance',async({page})=>{
+test('Issues 79/122: lower module is organized by functional family and equipment is a filter',async({page})=>{
   const diag=diagnostics(page);
   await page.setViewportSize({width:1080,height:844});
   await page.goto('/#/system/patterns?focus=aux-lower');
   const module=page.locator('[data-auxiliary-module="aux-lower"]');
   await expect(module).toBeVisible();
-  await expect(module.locator('[data-auxiliary-subgroup="fixed_machine"]')).toContainText('4 个');
-  await expect(module.locator('[data-auxiliary-subgroup="cable_station"]')).toContainText('2 个');
-  await expect(module.locator('[data-aux-filter="equipmentClass"]')).toHaveValue('');
+  await expect(module.locator('[data-aux-entry]')).toHaveCount(23);
+  await expect(module).toContainText('固定器械只是器械筛选');
+  await expect(module.locator('[data-auxiliary-subgroup="KNEE_FLEXION"]')).toContainText('膝屈');
+  await expect(module.locator('[data-aux-entry="tui_wanju"]')).toBeVisible();
+  await expect(module.locator('[data-aux-filter="family"]')).toHaveValue('');
+  await module.locator('[data-aux-filter="family"]').selectOption('KNEE_FLEXION');
+  await expect(module.locator('[data-aux-visible-count]')).toHaveText('1 个');
+  await expect(module.locator('[data-aux-entry="tui_wanju"]')).toBeVisible();
+  await expect(module.locator('[data-aux-entry="tui_qushen"]')).toBeHidden();
+  await module.locator('[data-aux-filter="family"]').selectOption('');
   await module.locator('[data-aux-filter="equipmentClass"]').selectOption('cable_station');
-  await expect(module.locator('[data-aux-visible-count]')).toHaveText('2 个');
-  await expect(module.locator('[data-auxiliary-subgroup="fixed_machine"]')).toBeHidden();
-  await expect(module.locator('[data-auxiliary-subgroup="cable_station"]')).toBeVisible();
+  const visibleCable=module.locator('[data-aux-entry]:not([hidden])');
+  expect(await visibleCable.count()).toBeGreaterThanOrEqual(2);
+  await expect(module.locator('[data-aux-entry="xiao_longmen_wai_zhan"]')).toBeVisible();
   await expectNoOverflow(page,1080);
   await expectClean(diag);
 });
@@ -106,7 +113,7 @@ test('Issue 79: coach/system mode and detail links preserve data provenance',asy
   await expectClean(diag);
 });
 
-test('Issue 79: F111 preset D1/D2 offer the composer auxiliary pools, not the V10 leftover list',async({page})=>{
+test('Issues 79/122: F111 D1 consumes shared lower candidates while D2 keeps its upper pool',async({page})=>{
   const diag=diagnostics(page);
   await page.setViewportSize({width:1080,height:844});
   await page.goto('/#/coach/f111/f111-01/l3');
@@ -127,9 +134,70 @@ test('Issue 79: F111 preset D1/D2 offer the composer auxiliary pools, not the V1
   const d1Options=await d1.locator('select option').evaluateAll(nodes=>nodes.map(node=>node.value));
   expect(d1Options[0]).toBe('tui_qushen');
   expect(d1Options).toContain('tunbu_houti');
-  // 哈克深蹲 is a T2 main lift: the legacy V10 list offered it as a D1 swap.
+  expect(d1Options).toContain('shengsuo_kuan_neishou');
+  expect(d1Options).toContain('tui_wanju');
+  // Main-only / high-fatigue lower lifts must not leak into D1.
   expect(d1Options).not.toContain('hake_shendun');
+  expect(d1Options).not.toContain('gangling_yingla');
+  await expect(d1.locator('.lower-assistance-browse')).toBeVisible();
 
   await expectNoOverflow(page,1080);
   await expectClean(diag,'F111 preset D slots');
+});
+
+
+test('Issues 79/122: F111 D1 can enter module 12, choose a legal action, and return',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:1080,height:844});
+  await page.goto('/#/coach/f111/f111-01/l3');
+  const d1=page.locator('.session-slot[data-slot="F111-01-L3__2"]');
+  await d1.locator('.lower-assistance-browse').click();
+
+  const module=page.locator('[data-auxiliary-module="aux-lower"]');
+  await expect(module).toBeVisible();
+  await expect(module.locator('.auxiliary-replacement-context')).toContainText('F111 D1｜替换模式');
+  await expect(module).toHaveAttribute('data-replacement-session','F111-01-L3');
+
+  const candidate=module.locator('[data-aux-entry="shengsuo_kuan_neishou"]');
+  await expect(candidate).toBeVisible();
+  await expect(candidate.locator('[data-aux-select-action="shengsuo_kuan_neishou"]')).toBeVisible();
+  await candidate.locator('[data-aux-select-action="shengsuo_kuan_neishou"]').click();
+
+  await expect(page).toHaveURL(/#\/coach\/f111\/f111-01\/l3$/);
+  await expect(page.locator('.session-swap[data-slot-key="F111-01-L3__2"]')).toHaveValue('shengsuo_kuan_neishou');
+  await expectNoOverflow(page,1080);
+  await expectClean(diag);
+});
+
+
+test('Issues 79/122: Body lower slot can enter module 12, choose a legal action, and return',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:1080,height:844});
+  await page.goto('/#/coach/body/body-01/l3');
+
+  const slot=page.locator('.body-slot-card[data-body-slot="ACCESSORY"]');
+  const current=await slot.locator('.body-slot-select').inputValue();
+  await expect(slot.locator('.lower-assistance-browse')).toBeVisible();
+  await slot.locator('.lower-assistance-browse').click();
+
+  const module=page.locator('[data-auxiliary-module="aux-lower"]');
+  await expect(module).toBeVisible();
+  await expect(module.locator('.auxiliary-replacement-context')).toContainText('Body ACCESSORY｜替换模式');
+  await expect(module).toHaveAttribute('data-replacement-template','body');
+  await expect(module).toHaveAttribute('data-replacement-family','BODY-01');
+
+  const buttons=module.locator('[data-aux-select-action]');
+  expect(await buttons.count()).toBeGreaterThan(1);
+  let target='';
+  for(let i=0;i<await buttons.count();i+=1){
+    const id=await buttons.nth(i).getAttribute('data-aux-select-action');
+    if(id&&id!==current){target=id;await buttons.nth(i).click();break;}
+  }
+  expect(target,'Body ACCESSORY needs a second legal lower-assistance candidate').toBeTruthy();
+
+  await expect(page).toHaveURL(/#\/coach\/body\/body-01\/l3$/);
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-select')).toHaveValue(target);
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-head small')).toHaveText('手动选择');
+  await expectNoOverflow(page,1080);
+  await expectClean(diag);
 });
