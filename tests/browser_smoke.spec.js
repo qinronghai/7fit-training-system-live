@@ -79,6 +79,35 @@ test('desktop F111 preset browser renders 8x4 matrix without horizontal overflow
   await expectNoPageErrors(errors);
 });
 
+test('desktop F111 preset cell opens detail drawer without leaving browser context', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  const first = page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]');
+  await first.click();
+
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('#global-drawer[data-f111-preset-drawer]')).toBeVisible();
+  await expect(page.locator('#global-drawer')).toContainText('F111-03 · L2');
+  await expect(page.locator('#global-drawer')).toContainText('髋铰链｜水平拉｜支撑');
+  await expect(page.locator('#global-drawer [data-preview-slot="A"]')).toBeVisible();
+  await expect(page.locator('#global-drawer [data-preview-slot="B"]')).toBeVisible();
+  await expect(page.locator('#global-drawer .f111-preset-drawer-actions')).toContainText('开始课程');
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('aria-selected','true');
+
+  const second = page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]');
+  await second.click();
+  await expect(page.locator('#global-drawer')).toContainText('F111-07 · L3');
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]')).toHaveAttribute('aria-selected','true');
+
+  await page.locator('[data-f111-preset-close]').click();
+  await expect(page.locator('#global-drawer')).toBeHidden();
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]')).toBeFocused();
+  await expectNoPageErrors(errors);
+});
+
 test('F111 preset page keeps legacy UI while new dispatcher resolves the same public session', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/f111-06/l3');
