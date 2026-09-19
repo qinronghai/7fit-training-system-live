@@ -125,17 +125,75 @@
     </div>`;
   }
 
-  function mobileCards(filtered){
-    const data=D(),byRecipe=new Map();
-    filtered.forEach(state=>{
-      if(!byRecipe.has(state.recipeId))byRecipe.set(state.recipeId,[]);
-      byRecipe.get(state.recipeId).push(state);
+  function mobileList(filtered){
+    const Browser=M.F111PresetBrowser,Controls=M.F111PresetControls;
+    if(!Browser?.recipeRows)return '';
+    const state=Controls?.snapshot?.()||{level:'ALL'};
+    const matchKeys=new Set((filtered||[]).map(item=>item.key));
+    const rows=Browser.recipeRows().filter(row=>row.states.some(item=>matchKeys.has(item.key)));
+    if(!rows.length)return '';
+
+    const groups=[];
+    const byLower=new Map();
+    rows.forEach(row=>{
+      const key=row.patterns.lower||'其他';
+      if(!byLower.has(key)){
+        const group={key,rows:[]};
+        byLower.set(key,group);
+        groups.push(group);
+      }
+      byLower.get(key).rows.push(row);
     });
-    return (data.recipeIds||[]).filter(id=>byRecipe.has(id)).map(id=>{
-      const r=data.recipes[id]||{},states=byRecipe.get(id)||[];
-      const levels=states.map(state=>`<a href="${esc(state.href)}">${esc(state.level)}</a>`).join('');
-      return `<article class="recipe-card"><div class="recipe-code">${esc(id)}</div><h3>${esc(r.name||id)}</h3><div class="recipe-tags"><span>${esc(r.lower||'')}</span><span>${esc(r.upper||'')}</span><span>${esc(r.support||'')}</span></div><div class="level-links">${levels}</div></article>`;
+
+    const groupHtml=groups.map(group=>{
+      const rowHtml=group.rows.map(row=>{
+        const matchedStates=row.states.filter(item=>matchKeys.has(item.key));
+        if(!matchedStates.length)return '';
+
+        if(state.level!=='ALL'){
+          const item=matchedStates.find(entry=>entry.level===state.level);
+          if(!item)return '';
+          return `<button type="button"
+            class="f111-mobile-preset-row"
+            data-f111-mobile-row
+            data-f111-mobile-preset
+            data-recipe-id="${esc(item.recipeId)}"
+            data-level="${esc(item.level)}">
+            <div class="f111-mobile-preset-main">
+              <span class="f111-mobile-preset-code">${esc(item.recipeId)}</span>
+              <b>${esc(item.patterns.upper)} · ${esc(item.patterns.support)}</b>
+            </div>
+            <div class="f111-mobile-preset-meta">
+              <span>${esc(item.level)}</span>
+              <i aria-hidden="true">›</i>
+            </div>
+          </button>`;
+        }
+
+        const levelButtons=matchedStates.map(item=>`
+          <button type="button"
+            class="f111-mobile-level-button"
+            data-f111-mobile-preset
+            data-recipe-id="${esc(item.recipeId)}"
+            data-level="${esc(item.level)}"
+            aria-label="${esc(`${item.recipeId} ${item.level} ${item.label}`)}">${esc(item.level)}</button>`).join('');
+
+        return `<div class="f111-mobile-preset-row f111-mobile-preset-row-all" data-f111-mobile-row>
+          <div class="f111-mobile-preset-main">
+            <span class="f111-mobile-preset-code">${esc(row.recipeId)}</span>
+            <b>${esc(row.patterns.upper)} · ${esc(row.patterns.support)}</b>
+          </div>
+          <div class="f111-mobile-levels" aria-label="${esc(row.recipeId)} 等级">${levelButtons}</div>
+        </div>`;
+      }).join('');
+
+      return `<section class="f111-mobile-preset-group" data-f111-mobile-group="${esc(group.key)}">
+        <div class="f111-mobile-preset-group-head"><b>${esc(group.key)}</b><small>${esc(group.rows.length)} 个 Recipe</small></div>
+        <div class="f111-mobile-preset-group-list">${rowHtml}</div>
+      </section>`;
     }).join('');
+
+    return `<div class="f111-preset-mobile-list" data-f111-mobile-list>${groupHtml}</div>`;
   }
 
   function emptyState(){
@@ -155,7 +213,7 @@
         </div>
         ${controlsPanel(filtered.length,total)}
         ${filtered.length?matrix(filtered):emptyState()}
-        <div class="recipe-grid f111-preset-mobile-fallback" data-f111-mobile-fallback>${filtered.length?mobileCards(filtered):''}</div>
+        ${filtered.length?mobileList(filtered):''}
       </section>`;
   }
 
@@ -175,6 +233,10 @@
     }));
 
     root?.querySelectorAll?.('[data-f111-recent]').forEach(button=>button.addEventListener('click',()=>{
+      openPreset(button.dataset.recipeId,button.dataset.level,rerender);
+    }));
+
+    root?.querySelectorAll?.('[data-f111-mobile-preset]').forEach(button=>button.addEventListener('click',()=>{
       openPreset(button.dataset.recipeId,button.dataset.level,rerender);
     }));
 
