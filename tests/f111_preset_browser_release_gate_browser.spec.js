@@ -167,6 +167,76 @@ test('F111 Preset Browser V2 has no page overflow at required desktop and mobile
   await expectClean(diag);
 });
 
+test('Issue #149 Desktop UI Polish improves F111 readability without changing the mobile layout', async ({ page }) => {
+  const diag = diagnostics(page);
+
+  for (const width of [1080, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#/coach/f111');
+
+    const metrics = await page.evaluate(() => {
+      const computed = selector => getComputedStyle(document.querySelector(selector));
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      const main = rect('#app-main');
+      const appColumn = rect('.app-column');
+      const chip = rect('[data-f111-filter-group="level"][data-f111-filter-value="L2"]');
+      const row = rect('[data-f111-recipe-row]');
+      return {
+        mainWidth: main.width,
+        appColumnWidth: appColumn.width,
+        chipHeight: chip.height,
+        matrixRowHeight: row.height,
+        styles: {
+          body: computed('body').fontSize,
+          search: computed('.f111-preset-search input').fontSize,
+          chip: computed('.f111-preset-filter-chip').fontSize,
+          recipeId: computed('.f111-preset-recipe span').fontSize,
+          recipe: computed('.f111-preset-recipe strong').fontSize,
+          level: computed('.f111-preset-level-head b').fontSize,
+          levelHint: computed('.f111-preset-level-head small').fontSize,
+          cell: computed('.f111-preset-cell').fontSize,
+        },
+      };
+    });
+
+    expect(metrics.mainWidth).toBeGreaterThanOrEqual(metrics.appColumnWidth - 32);
+    expect(metrics.chipHeight).toBeGreaterThanOrEqual(32);
+    expect(metrics.chipHeight).toBeLessThanOrEqual(36);
+    expect(metrics.matrixRowHeight).toBeGreaterThanOrEqual(48);
+    expect(metrics.matrixRowHeight).toBeLessThanOrEqual(54);
+    expect(parseFloat(metrics.styles.body)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.search)).toBeGreaterThanOrEqual(12);
+    expect(parseFloat(metrics.styles.chip)).toBeGreaterThanOrEqual(11);
+    expect(parseFloat(metrics.styles.recipeId)).toBeGreaterThanOrEqual(10.5);
+    expect(parseFloat(metrics.styles.recipe)).toBeGreaterThanOrEqual(12);
+    expect(parseFloat(metrics.styles.level)).toBeGreaterThanOrEqual(12);
+    expect(parseFloat(metrics.styles.levelHint)).toBeGreaterThanOrEqual(9.5);
+    expect(parseFloat(metrics.styles.cell)).toBeGreaterThanOrEqual(12);
+
+    const chip = page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]');
+    await chip.click();
+    await expect(chip).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-f111-result-count] b')).toContainText('共 8 套预设');
+    await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(8);
+    await expectNoOverflow(page, width);
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+  const mobileMetrics = await page.evaluate(() => ({
+    matrixDisplay: getComputedStyle(document.querySelector('[data-f111-preset-matrix-shell]')).display,
+    mobileListDisplay: getComputedStyle(document.querySelector('[data-f111-mobile-list]')).display,
+    chipHeight: document.querySelector('[data-f111-filter-group="level"][data-f111-filter-value="L2"]').getBoundingClientRect().height,
+    mobileRowHeight: document.querySelector('[data-f111-mobile-row]').getBoundingClientRect().height,
+  }));
+  expect(mobileMetrics.matrixDisplay).toBe('none');
+  expect(mobileMetrics.mobileListDisplay).toBe('grid');
+  expect(mobileMetrics.chipHeight).toBeGreaterThanOrEqual(34);
+  expect(mobileMetrics.mobileRowHeight).toBeGreaterThanOrEqual(50);
+  await expectNoOverflow(page, 390);
+  await expectClean(diag);
+});
+
 test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset preview', async ({ page }) => {
   const diag = diagnostics(page);
 
@@ -181,6 +251,11 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expect(desktopDrawer).toBeVisible();
   await expect(desktopDrawer).not.toHaveAttribute('aria-modal', 'true');
   await expect(desktopTrigger).toHaveAttribute('aria-selected', 'true');
+  const desktopMatrix = page.locator('[data-f111-preset-matrix-shell]');
+  await expect(desktopMatrix).toBeVisible();
+  await expect(desktopMatrix.locator('[data-f111-recipe-row]')).toHaveCount(8);
+  await expect(desktopMatrix.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expectNoOverflow(page, 1280);
 
   const desktopPreview = await desktopDrawer.locator('[data-preview-slot]').evaluateAll(nodes =>
     nodes.map(node => ({
