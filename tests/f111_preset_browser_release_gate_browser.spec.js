@@ -320,6 +320,35 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expectClean(diag);
 });
 
+test('Issue #149 Desktop Drawer leaves the full Matrix visible beside the panel', async ({ page }) => {
+  const diag = diagnostics(page);
+
+  for (const width of [1080, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#/coach/f111');
+    await page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]').click();
+
+    const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+    const drawerPanel = drawer.locator('.f111-preset-drawer-body');
+    const matrix = page.locator('[data-f111-preset-matrix-shell]');
+    await expect(drawer).toBeVisible();
+    await expect(matrix).toBeVisible();
+    await expect(matrix.locator('[data-f111-preset-cell]')).toHaveCount(32);
+
+    const matrixBox = await matrix.boundingBox();
+    const drawerBox = await drawerPanel.boundingBox();
+    expect(matrixBox).not.toBeNull();
+    expect(drawerBox).not.toBeNull();
+    expect(matrixBox.x + matrixBox.width).toBeLessThanOrEqual(drawerBox.x - 8);
+    await expectNoOverflow(page, width);
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+  }
+
+  await expectClean(diag);
+});
+
 test('Preset Browser V2 recent-use recovery and canonical handoff remain safe', async ({ page }) => {
   const diag = diagnostics(page);
   await page.setViewportSize({ width: 1280, height: 900 });
