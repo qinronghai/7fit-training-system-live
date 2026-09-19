@@ -35,6 +35,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
 
   await page.goto('/assets/real-results/?admin=1');
   await page.waitForSelector('#openUpload');
+  await page.waitForFunction(() => document.documentElement.dataset.casePatchReady === '1');
   await page.click('#openUpload');
   await expect(page.locator('#modal')).toBeVisible();
 
