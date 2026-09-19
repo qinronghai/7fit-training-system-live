@@ -252,7 +252,10 @@
         ?`<p class="body-station-audit explicit">器械站点：已按明确复用 policy 放行，请确认 protocol 与会员体验。</p>`:'';
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.body?.({familyId:ctx.familyId,level:ctx.level,slotKey:slot.key})||'';
     const quick=Recent?.renderButtons?.({templateId:'body',contextKey,candidates,currentActionId:slot.actionId})||'';
-    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}${stationAuditHtml}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${stationBlockedHtml}${blockedHtml}${quick}</div>`;
+    const lowerCatalogIds=new Set((window.V15LowerAssistance?.catalog?.().entries||[]).map(entry=>entry.id));
+    const hasLowerAssistance=slot.key!=='PRIMARY'&&candidates.some(candidate=>lowerCatalogIds.has(candidate.actionId));
+    const lowerBrowse=hasLowerAssistance?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=body&family=${encodeURIComponent(ctx.familyId)}&level=${encodeURIComponent(ctx.level)}&slotKey=${encodeURIComponent(slot.key)}">查看全部下肢辅助与容量动作 →</a>`:'';
+    return `<div class="body-slot-swap-zone"><label class="body-slot-swap"><span>替换动作</span><select class="body-slot-select" data-body-session="${esc(ctx.sessionKey)}" data-body-slot="${esc(slot.key)}">${options}</select></label>${venueStatus}${stationAuditHtml}${lowerBrowse}<details class="body-candidate-details"><summary>查看推荐替换与理由</summary><div class="body-candidate-list">${candidateCards}</div></details>${stationBlockedHtml}${blockedHtml}${quick}</div>`;
   }
 
   function slotCard(ctx,slot){
