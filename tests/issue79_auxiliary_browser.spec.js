@@ -217,7 +217,7 @@ test('Issue 79: F111 D1 replacement drawer is responsive at 390 / 1080 / 1280 / 
     await expect(drawer).toBeVisible();
     await expect(drawer.locator('#replacement-drawer-title')).toHaveText('D1｜下肢辅助替换');
     await expect(drawer.locator('[data-replacement-option]')).toHaveCount(await d1.locator('.session-swap option').count());
-    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('绳索髋内收');
+    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('绳索站姿髋内收');
     await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('推荐原因');
     await expectNoOverflow(page,width);
 
