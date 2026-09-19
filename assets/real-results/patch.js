@@ -244,8 +244,23 @@
     const btn=document.querySelector("#form .primary");
     if(btn) btn.textContent=label;
   }
+  function ensureExistingPreviewHost(view){
+    let host=document.querySelector('#form [data-existing="'+view+'"]');
+    if(host) return host;
+    const inputName={front:"frontImage",side:"sideImage",back:"backImage"}[view];
+    const input=document.querySelector('#form input[name="'+inputName+'"]');
+    if(!input) return null;
+    host=document.createElement("div");
+    host.className="keepnote";
+    host.dataset.existing=view;
+    input.insertAdjacentElement("afterend",host);
+    return host;
+  }
   function clearExistingComparisonPreviews(){
-    document.querySelectorAll('#form [data-existing]').forEach(el=>el.replaceChildren());
+    for(const view of ["front","side","back"]){
+      const host=ensureExistingPreviewHost(view);
+      if(host) host.replaceChildren();
+    }
   }
   function renderExistingComparisonPreviews(c){
     const views=[
@@ -254,7 +269,7 @@
       ["back","背面"]
     ];
     for(const [view,label] of views){
-      const host=document.querySelector('#form [data-existing="'+view+'"]');
+      const host=ensureExistingPreviewHost(view);
       if(!host) continue;
       host.replaceChildren();
       const src=c?.comparisons?.[view]?.image||"";
