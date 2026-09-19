@@ -100,8 +100,7 @@
       const detail=M.F111PresetDetail;
       if(!detail?.open)return;
       event.preventDefault();
-      detail.open({recipeId:cell.dataset.recipeId,level:cell.dataset.level,trigger:cell});
-      if(typeof rerender==='function')rerender();
+      detail.open({recipeId:cell.dataset.recipeId,level:cell.dataset.level,rerender});
     }));
   }
 
