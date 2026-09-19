@@ -444,6 +444,7 @@
     }
   };
 
+  document.documentElement.dataset.casePatchReady="1";
   cases=[];
   render();
   loadCloud();
