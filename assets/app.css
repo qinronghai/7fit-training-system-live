@@ -1312,3 +1312,37 @@ body{font-size:14px;line-height:1.55}
   .f111-preset-cta.primary{grid-column:1/-1;grid-row:1;min-height:48px}
   body.drawer-open{overflow:hidden}
 }
+
+/* ISSUE 149 / F111 PRESET BROWSER DESKTOP UI POLISH */
+@media(min-width:980px){
+  #app-main:has(.f111-preset-browser-section){
+    width:min(1280px,calc(100% - 32px));
+  }
+
+  .f111-preset-tools{gap:12px;padding:14px}
+  .f111-preset-search>span,.f111-preset-tool-label b,.f111-preset-filter-group>span{font-size:12px;line-height:1.4}
+  .f111-preset-tool-label small{font-size:10px;line-height:1.45}
+  .f111-preset-search input{min-height:40px;padding:9px 11px;font-size:13px;line-height:1.4}
+  .f111-preset-clear{min-height:40px;padding:8px 12px;font-size:12px}
+  .f111-preset-filter-stack{gap:8px}
+  .f111-preset-filter-group{grid-template-columns:56px minmax(0,1fr);gap:8px}
+  .f111-preset-filter-group>div{gap:6px}
+  .f111-preset-filter-chip{min-height:34px;padding:7px 11px;font-size:12px;line-height:1.25}
+  .f111-preset-result-context{padding-top:9px}
+  .f111-preset-result-context b{font-size:12px}
+  .f111-preset-result-context span{font-size:10px}
+
+  .f111-preset-matrix-row{grid-template-columns:minmax(300px,1fr) repeat(4,minmax(72px,88px));min-height:52px}
+  .f111-preset-recipe-head,.f111-preset-recipe{padding:12px 14px}
+  .f111-preset-recipe-head b{font-size:12px}
+  .f111-preset-recipe-head small{font-size:10px}
+  .f111-preset-recipe{grid-template-columns:72px minmax(0,1fr);gap:10px}
+  .f111-preset-recipe span{font-size:11px}
+  .f111-preset-recipe strong{font-size:13px;line-height:1.45}
+  .f111-preset-level-head{padding:10px 6px;gap:3px}
+  .f111-preset-level-head b{font-size:12px}
+  .f111-preset-level-head small{font-size:10px}
+  .f111-preset-cell{min-height:52px;font-size:12px;line-height:1.35}
+  .f111-preset-recent-card span{font-size:10px}
+  .f111-preset-recent-card b{font-size:11px;line-height:1.4}
+}
