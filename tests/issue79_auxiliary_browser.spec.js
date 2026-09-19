@@ -168,3 +168,36 @@ test('Issues 79/122: F111 D1 can enter module 12, choose a legal action, and ret
   await expectNoOverflow(page,1080);
   await expectClean(diag);
 });
+
+
+test('Issues 79/122: Body lower slot can enter module 12, choose a legal action, and return',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:1080,height:844});
+  await page.goto('/#/coach/body/body-01/l3');
+
+  const slot=page.locator('.body-slot-card[data-body-slot="ACCESSORY"]');
+  const current=await slot.locator('.body-slot-select').inputValue();
+  await expect(slot.locator('.lower-assistance-browse')).toBeVisible();
+  await slot.locator('.lower-assistance-browse').click();
+
+  const module=page.locator('[data-auxiliary-module="aux-lower"]');
+  await expect(module).toBeVisible();
+  await expect(module.locator('.auxiliary-replacement-context')).toContainText('Body ACCESSORY｜替换模式');
+  await expect(module).toHaveAttribute('data-replacement-template','body');
+  await expect(module).toHaveAttribute('data-replacement-family','BODY-01');
+
+  const buttons=module.locator('[data-aux-select-action]');
+  expect(await buttons.count()).toBeGreaterThan(1);
+  let target='';
+  for(let i=0;i<await buttons.count();i+=1){
+    const id=await buttons.nth(i).getAttribute('data-aux-select-action');
+    if(id&&id!==current){target=id;await buttons.nth(i).click();break;}
+  }
+  expect(target,'Body ACCESSORY needs a second legal lower-assistance candidate').toBeTruthy();
+
+  await expect(page).toHaveURL(/#\/coach\/body\/body-01\/l3$/);
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-select')).toHaveValue(target);
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-head small')).toHaveText('手动选择');
+  await expectNoOverflow(page,1080);
+  await expectClean(diag);
+});
