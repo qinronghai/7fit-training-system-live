@@ -56,9 +56,11 @@
     };
     const bindSaved=()=>M.SavedSessionsUI?.bind?.(route,root,rerender);
     const bindFavorites=()=>M.FavoritesUI?.bind?.(root,rerender);
+    const bindReplacementDrawer=()=>M.ReplacementDrawer?.bind?.(root);
     const adapter=templateAdapter(route);
     if(adapter){
       adapter.bind(route,root,rerender);
+      bindReplacementDrawer();
       bindSaved();
       bindFavorites();
       return;
@@ -92,11 +94,13 @@
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindPostCardio(rerender);
+      bindReplacementDrawer();
       bindSaved();
       bindFavorites();
       return;
     }
     if(!route.recipeId){
+      bindReplacementDrawer();
       bindSaved();
       bindFavorites();
       return;
@@ -124,6 +128,7 @@
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
     bindPostCardio(rerender);
+    bindReplacementDrawer();
     bindSaved();
     bindFavorites();
   }
