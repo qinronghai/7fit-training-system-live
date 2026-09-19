@@ -99,7 +99,7 @@
       .up3{grid-template-columns:1fr}
       .upbox{padding:10px}
       .actions{gap:7px;padding-top:14px}
-      .primary,.secondary{padding:9px 13px;font-size:11px}
+      .primary,.secondary{padding:9px 13px;font-size:11px;min-height:40px;touch-action:manipulation}
       .add{padding:8px 10px;font-size:10px}
       .mrow{grid-template-columns:1fr 1fr 1fr 28px;gap:5px}
       .mrow input{padding:8px 7px;font-size:11px}
@@ -357,6 +357,9 @@
   const modal=document.querySelector("#modal");if(modal)modal.addEventListener("click",e=>{if(e.target===modal)editingCaseId=null},false);
 
   const form=document.querySelector("#form");
+  form.noValidate=true;
+  form.querySelectorAll("[required]").forEach(el=>el.removeAttribute("required"));
+  form.addEventListener("invalid",e=>e.preventDefault(),true);
   form.onsubmit=async e=>{
     e.preventDefault();
     if(!(await verifyAdmin(true)))return;
@@ -364,26 +367,66 @@
     const oldSubmitText=submitBtn?.textContent||"保存案例";
     if(submitBtn){submitBtn.disabled=true;submitBtn.textContent="正在保存…";}
     const fd=new FormData(f),wasEditing=!!editingCaseId,existing=editingCaseId?cases.find(x=>x.id===editingCaseId):null;
+    const displayName=String(fd.get("name")||"").trim();
+    if(!displayName){
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
+      toast("请先填写会员显示名称");
+      f.elements.name?.focus();
+      f.elements.name?.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
     const metrics=[...document.querySelectorAll(".mrow")].map(r=>({name:r.children[0].value.trim(),before:r.children[1].value.trim(),after:r.children[2].value.trim()})).filter(x=>x.name&&(x.before||x.after));
-    const coverView=fd.get("coverView")||existing?.coverView||"front";
+    const selectedCover=fd.get("coverView")||existing?.coverView||"";
+    if(!selectedCover){
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
+      toast("请选择一张对比图作为首页封面");
+      document.querySelector(".up3")?.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
+    const coverView=selectedCover;
     const chosenInput={front:f.elements.frontImage,side:f.elements.sideImage,back:f.elements.backImage}[coverView];
     const existingCover=existing?.comparisons?.[coverView]?.image;
-    if(!(chosenInput?.files?.[0])&&!existingCover){toast("请选择一张已经上传的对比图作为首页封面");return}
+    if(!(chosenInput?.files?.[0])&&!existingCover){
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
+      toast("你选择的首页封面方向还没有上传对比图");
+      document.querySelector(".up3")?.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
 
     try{
-      showCloudState();state.textContent=wasEditing?"正在更新云端案例…":"正在创建云端案例…";
+      showCloudState();
+      state.textContent=wasEditing?"正在准备更新案例…":"正在创建云端案例…";
+      if(submitBtn)submitBtn.textContent=wasEditing?"正在更新…":"正在创建…";
       const draft=await api("save-case",{method:"POST",body:{
-        id:editingCaseId||undefined,display_name:fd.get("name"),category:fd.get("category"),
+        id:editingCaseId||undefined,display_name:displayName,category:fd.get("category"),
         height_cm:(fd.get("height")||"").trim(),start_weight_kg:(fd.get("startWeight")||"").trim(),age:(fd.get("age")||"").trim(),
         cover_view:coverView,process_text:fd.get("processText")||"",metrics,status:wasEditing?"published":"draft"
       }});
       const caseId=draft.case.id;
-      const comparisonInputs=[["front","comparison_front",f.elements.frontImage],["side","comparison_side",f.elements.sideImage],["back","comparison_back",f.elements.backImage]];
-      for(const [view,kind,input] of comparisonInputs){if(input?.files?.[0])await uploadFile(caseId,kind,input.files[0],true)}
-      for(const file of [...(f.elements.processImages.files||[])])await uploadFile(caseId,"process",file,false);
-      for(const file of [...(f.elements.chatImages.files||[])])await uploadFile(caseId,"chat",file,false);
+      const comparisonInputs=[["正面","comparison_front",f.elements.frontImage],["侧面","comparison_side",f.elements.sideImage],["背面","comparison_back",f.elements.backImage]];
+      for(const [label,kind,input] of comparisonInputs){
+        if(input?.files?.[0]){
+          state.textContent="正在上传"+label+"对比图…";
+          if(submitBtn)submitBtn.textContent="上传"+label+"图…";
+          await uploadFile(caseId,kind,input.files[0],true);
+        }
+      }
+      const processFiles=[...(f.elements.processImages.files||[])];
+      for(let i=0;i<processFiles.length;i++){
+        state.textContent="正在上传训练照片 "+(i+1)+"/"+processFiles.length;
+        if(submitBtn)submitBtn.textContent="上传训练照片…";
+        await uploadFile(caseId,"process",processFiles[i],false);
+      }
+      const chatFiles=[...(f.elements.chatImages.files||[])];
+      for(let i=0;i<chatFiles.length;i++){
+        state.textContent="正在上传反馈截图 "+(i+1)+"/"+chatFiles.length;
+        if(submitBtn)submitBtn.textContent="上传反馈截图…";
+        await uploadFile(caseId,"chat",chatFiles[i],false);
+      }
+      state.textContent="正在完成保存…";
+      if(submitBtn)submitBtn.textContent="正在完成…";
       await api("save-case",{method:"POST",body:{
-        id:caseId,display_name:fd.get("name"),category:fd.get("category"),
+        id:caseId,display_name:displayName,category:fd.get("category"),
         height_cm:(fd.get("height")||"").trim(),start_weight_kg:(fd.get("startWeight")||"").trim(),age:(fd.get("age")||"").trim(),
         cover_view:coverView,process_text:fd.get("processText")||"",metrics,status:"published"
       }});
