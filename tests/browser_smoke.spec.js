@@ -173,6 +173,65 @@ test('F111 preset recent use persists, dedupes and drops stale entries', async (
   await expectNoPageErrors(errors);
 });
 
+test('390px F111 preset browser uses Level-first grouped list without horizontal overflow', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+
+  await expect(page.locator('[data-f111-preset-matrix-shell]')).toBeHidden();
+  await expect(page.locator('[data-f111-mobile-list]')).toBeVisible();
+  await expect(page.locator('[data-f111-mobile-row]')).toHaveCount(8);
+  await expect(page.locator('[data-f111-mobile-preset]')).toHaveCount(32);
+  await expect(page.locator('[data-f111-mobile-group]')).toHaveCount(4);
+
+  let widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
+
+  await page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]').click();
+  await expect(page.locator('[data-f111-mobile-row]')).toHaveCount(8);
+  await expect(page.locator('[data-f111-mobile-preset]')).toHaveCount(8);
+  expect(await page.locator('[data-f111-mobile-preset]').evaluateAll(nodes => nodes.every(node => node.dataset.level === 'L2'))).toBeTruthy();
+
+  const target = page.locator('[data-f111-mobile-preset][data-recipe-id="F111-03"][data-level="L2"]');
+  await expect(target).toContainText('水平拉 · 支撑');
+  await target.click();
+
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('#global-drawer[data-f111-preset-drawer]')).toBeVisible();
+  await expect(page.locator('#global-drawer')).toContainText('F111-03 · L2');
+  await page.locator('[data-f111-preset-close]').click();
+
+  widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  await expectNoPageErrors(errors);
+});
+
+test('360px F111 preset browser keeps compact ALL-level rows usable', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/#/coach/f111');
+
+  await expect(page.locator('[data-f111-mobile-row]')).toHaveCount(8);
+  await expect(page.locator('[data-f111-mobile-preset]')).toHaveCount(32);
+  const firstRow = page.locator('[data-f111-mobile-row]').first();
+  await expect(firstRow.locator('[data-f111-mobile-preset]')).toHaveCount(4);
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(360);
+  await expectNoPageErrors(errors);
+});
+
 test('F111 preset page keeps legacy UI while new dispatcher resolves the same public session', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/f111-06/l3');
