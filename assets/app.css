@@ -958,7 +958,6 @@ body{font-size:14px;line-height:1.55}
   .auxiliary-mode-meta{grid-template-columns:1fr}
   .auxiliary-detail-link{width:100%;justify-content:center;min-height:42px;border:1px solid var(--purple-soft);border-radius:9px;background:#fff}
 }
-
 /* Favorites */
 .search-result-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;border-bottom:1px solid var(--line);min-width:0}
 .search-result-wrap:last-child{border-bottom:0}
