@@ -445,14 +445,10 @@
     }
   };
 
-  const explicitSaveButton=form.querySelector('button[type="submit"], .primary');
+  const explicitSaveButton=form.querySelector(".primary");
   if(explicitSaveButton){
-    explicitSaveButton.type="button";
-    explicitSaveButton.addEventListener("click",e=>{
-      e.preventDefault();
-      e.stopPropagation();
-      form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
-    });
+    explicitSaveButton.type="submit";
+    explicitSaveButton.removeAttribute("formnovalidate");
   }
 
   document.documentElement.dataset.casePatchReady="1";
