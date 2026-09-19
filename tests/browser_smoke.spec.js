@@ -59,6 +59,120 @@ test('F111 template landing preserves legacy presets and composer entry', async 
   await expectNoPageErrors(errors);
 });
 
+test('desktop F111 preset browser renders 8x4 matrix without horizontal overflow', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  await expect(page.locator('[data-f111-preset-matrix-shell]')).toBeVisible();
+  await expect(page.locator('[data-f111-recipe-row]')).toHaveCount(8);
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('href', '#/coach/f111/f111-03/l2');
+  await expect(page.locator('[data-f111-recipe-row="F111-03"]')).toContainText('髋铰链｜水平拉｜支撑');
+  await expect(page.locator('[data-f111-mobile-fallback]')).toBeHidden();
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  await expectNoPageErrors(errors);
+});
+
+test('desktop F111 preset cell opens detail drawer without leaving browser context', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  const first = page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]');
+  await first.click();
+
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('#global-drawer[data-f111-preset-drawer]')).toBeVisible();
+  await expect(page.locator('#global-drawer')).toContainText('F111-03 · L2');
+  await expect(page.locator('#global-drawer')).toContainText('髋铰链｜水平拉｜支撑');
+  await expect(page.locator('#global-drawer [data-preview-slot="A"]')).toBeVisible();
+  await expect(page.locator('#global-drawer [data-preview-slot="B"]')).toBeVisible();
+  await expect(page.locator('#global-drawer .f111-preset-drawer-actions')).toContainText('开始课程');
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('aria-selected','true');
+
+  const second = page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]');
+  await second.click();
+  await expect(page.locator('#global-drawer')).toContainText('F111-07 · L3');
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]')).toHaveAttribute('aria-selected','true');
+
+  await page.locator('[data-f111-preset-close]').click();
+  await expect(page.locator('#global-drawer')).toBeHidden();
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]')).toBeFocused();
+  await expectNoPageErrors(errors);
+});
+
+test('F111 preset filters combine Level and pattern groups deterministically', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  await expect(page.locator('[data-f111-result-count]')).toContainText('共 32 套预设');
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(32);
+
+  await page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]').click();
+  await expect(page.locator('[data-f111-result-count]')).toContainText('L2 · 共 8 套预设');
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(8);
+
+  await page.locator('[data-f111-filter-group="lower"][data-f111-filter-value="髋铰链"]').click();
+  await expect(page.locator('[data-f111-result-count]')).toContainText('L2 + 髋铰链 · 共 2 套预设');
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(2);
+  await expect(page.locator('[data-f111-recipe-row]')).toHaveCount(2);
+
+  await page.locator('[data-f111-filter-group="upper"][data-f111-filter-value="垂直推"]').click();
+  await expect(page.locator('[data-f111-result-count]')).toContainText('共 1 套预设');
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(1);
+  await expect(page.locator('[data-f111-recipe-row="F111-07"]')).toBeVisible();
+
+  await page.locator('#f111-preset-search').fill('F111-03');
+  await expect(page.locator('[data-f111-preset-empty]')).toBeVisible();
+  await expect(page.locator('[data-f111-result-count]')).toContainText('共 0 套预设');
+
+  await page.locator('[data-f111-filter-clear]').first().click();
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expect(page.locator('[data-f111-result-count]')).toContainText('共 32 套预设');
+  await expectNoPageErrors(errors);
+});
+
+test('F111 preset recent use persists, dedupes and drops stale entries', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  const cell = page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]');
+  await cell.click();
+  await expect(page.locator('[data-f111-recent][data-recipe-id="F111-03"][data-level="L2"]')).toBeVisible();
+  await page.locator('[data-f111-preset-close]').click();
+
+  await cell.click();
+  await page.locator('[data-f111-preset-close]').click();
+  let recent = await page.evaluate(() => JSON.parse(localStorage.getItem(window.V14CoachModules.F111PresetControls.STORAGE_KEY) || '[]'));
+  expect(recent.filter(item => item.recipeId === 'F111-03' && item.level === 'L2')).toHaveLength(1);
+
+  await page.reload();
+  await expect(page.locator('[data-f111-recent][data-recipe-id="F111-03"][data-level="L2"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    const key = window.V14CoachModules.F111PresetControls.STORAGE_KEY;
+    localStorage.setItem(key, JSON.stringify([
+      { recipeId: 'F111-99', level: 'L2', usedAt: '2099-01-01T00:00:00.000Z' },
+      { recipeId: 'F111-03', level: 'L2', usedAt: '2026-09-19T00:00:00.000Z' },
+    ]));
+  });
+  await page.reload();
+  await expect(page.locator('[data-f111-recent]')).toHaveCount(1);
+  recent = await page.evaluate(() => JSON.parse(localStorage.getItem(window.V14CoachModules.F111PresetControls.STORAGE_KEY) || '[]'));
+  expect(recent).toHaveLength(1);
+  expect(recent[0].recipeId).toBe('F111-03');
+  await expectNoPageErrors(errors);
+});
+
 test('F111 preset page keeps legacy UI while new dispatcher resolves the same public session', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/f111-06/l3');
