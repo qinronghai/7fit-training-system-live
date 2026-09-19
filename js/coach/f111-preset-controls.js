@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const M=window.V14CoachModules=window.V14CoachModules=window.V14CoachModules||{};
+  const M=window.V14CoachModules=window.V14CoachModules||{};
   const STORAGE_KEY='7fit-f111-preset-recent-v1';
   const MAX_RECENT=8;
   const GROUPS=new Set(['lower','upper','support']);
