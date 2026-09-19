@@ -97,6 +97,7 @@
       return;
     }
     if(!route.recipeId){
+      if(route.templateId==='f111'&&route.page==='template')F111Home?.bind?.(root,rerender);
       bindSaved();
       bindFavorites();
       return;

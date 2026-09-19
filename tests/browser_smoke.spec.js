@@ -59,6 +59,26 @@ test('F111 template landing preserves legacy presets and composer entry', async 
   await expectNoPageErrors(errors);
 });
 
+test('desktop F111 preset browser renders 8x4 matrix without horizontal overflow', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+
+  await expect(page.locator('[data-f111-preset-matrix-shell]')).toBeVisible();
+  await expect(page.locator('[data-f111-recipe-row]')).toHaveCount(8);
+  await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('href', '#/coach/f111/f111-03/l2');
+  await expect(page.locator('[data-f111-recipe-row="F111-03"]')).toContainText('髋铰链｜水平拉｜支撑');
+  await expect(page.locator('[data-f111-mobile-fallback]')).toBeHidden();
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  await expectNoPageErrors(errors);
+});
+
 test('F111 preset page keeps legacy UI while new dispatcher resolves the same public session', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/f111-06/l3');
