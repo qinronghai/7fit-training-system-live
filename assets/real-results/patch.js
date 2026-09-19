@@ -444,6 +444,16 @@
     }
   };
 
+  const explicitSaveButton=form.querySelector('button[type="submit"], .primary');
+  if(explicitSaveButton){
+    explicitSaveButton.type="button";
+    explicitSaveButton.addEventListener("click",e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    });
+  }
+
   document.documentElement.dataset.casePatchReady="1";
   cases=[];
   render();
