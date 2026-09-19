@@ -201,3 +201,81 @@ test('Issues 79/122: Body lower slot can enter module 12, choose a legal action,
   await expectNoOverflow(page,1080);
   await expectClean(diag);
 });
+
+
+test('Issue 79: F111 D1 replacement drawer is responsive at 390 / 1080 / 1280 / 1440',async({page})=>{
+  const diag=diagnostics(page);
+  for(const width of [390,1080,1280,1440]){
+    await page.setViewportSize({width,height:844});
+    await page.goto('/#/coach/f111/f111-01/l3');
+    const d1=page.locator('.session-slot[data-slot="F111-01-L3__2"]');
+    const opener=d1.locator('[data-replacement-drawer]');
+    await expect(opener).toBeVisible();
+    await opener.click();
+
+    const drawer=page.locator('#replacement-drawer');
+    await expect(drawer).toBeVisible();
+    await expect(drawer.locator('#replacement-drawer-title')).toHaveText('D1｜下肢辅助替换');
+    await expect(drawer.locator('[data-replacement-option]')).toHaveCount(await d1.locator('.session-swap option').count());
+    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('绳索髋内收');
+    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('推荐原因');
+    await expectNoOverflow(page,width);
+
+    const box=await drawer.locator('.replacement-drawer-panel').boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(width+1);
+
+    await drawer.locator('[data-replacement-close]').last().click();
+    await expect(drawer).toBeHidden();
+    await expectNoOverflow(page,width);
+  }
+  await expectClean(diag);
+});
+
+test('Issue 79: F111 drawer selection reuses the existing select change gate',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/f111/f111-01/l3');
+
+  const d1=page.locator('.session-slot[data-slot="F111-01-L3__2"]');
+  await d1.locator('[data-replacement-drawer]').click();
+  const drawer=page.locator('#replacement-drawer');
+  const target=drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]');
+  await expect(target).toContainText('髋内收');
+  await target.locator('[data-replacement-choose="shengsuo_kuan_neishou"]').click();
+
+  await expect(drawer).toBeHidden();
+  await expect(page.locator('.session-swap[data-slot-key="F111-01-L3__2"]')).toHaveValue('shengsuo_kuan_neishou');
+  await expect(page.locator('.session-slot[data-slot="F111-01-L3__2"] h3')).toContainText('髋内收');
+  await expectNoOverflow(page,390);
+  await expectClean(diag);
+});
+
+test('Issue 79: Body lower replacement drawer updates the slot through Body Resolver gate',async({page})=>{
+  const diag=diagnostics(page);
+  await page.setViewportSize({width:1080,height:844});
+  await page.goto('/#/coach/body/body-01/l3');
+
+  const slot=page.locator('.body-slot-card[data-body-slot="ACCESSORY"]');
+  const select=slot.locator('.body-slot-select');
+  const before=await select.inputValue();
+  await expect(slot.locator('[data-replacement-drawer]')).toBeVisible();
+  await slot.locator('[data-replacement-drawer]').click();
+
+  const drawer=page.locator('#replacement-drawer');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('#replacement-drawer-title')).toContainText('辅助塑形');
+  const choices=drawer.locator('[data-replacement-choose]:not([disabled])');
+  expect(await choices.count()).toBeGreaterThan(0);
+  const target=await choices.first().getAttribute('data-replacement-choose');
+  expect(target).toBeTruthy();
+  expect(target).not.toBe(before);
+  await choices.first().click();
+
+  await expect(drawer).toBeHidden();
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-select')).toHaveValue(target);
+  await expect(page.locator('.body-slot-card[data-body-slot="ACCESSORY"] .body-slot-head small')).toHaveText('手动选择');
+  await expectNoOverflow(page,1080);
+  await expectClean(diag);
+});
