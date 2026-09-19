@@ -75,7 +75,7 @@
         ${group('upper','上肢',facets.upper)}
         ${group('support','支撑',facets.support)}
       </div>
-      <div class="f111-preset-result-context" data-f111-result-count><b>${esc(Controls.summary(filteredCount,total))}</b><span>筛选只改变浏览结果，不改变课程 Resolver。</span></div>
+      <div class="f111-preset-result-context" data-f111-result-count><b>${esc(Controls.summary(filteredCount,total))}</b><span>筛选只缩小预设范围，不会改变课程内容。</span></div>
     </div>`;
   }
 
