@@ -1,7 +1,17 @@
 (function(){
   const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
   const {esc,D}=C;
-  function modeSwitch(){return `<nav class="coach-mode-switch"><a class="active" href="#/coach/f111">7Fit 推荐预设</a><a href="#/coach/f111/compose">自由组合编课</a></nav>`;}
+  const LEVEL_META=Object.freeze({
+    L1:'动作控制',
+    L2:'基础负重',
+    L3:'负重进阶',
+    L4:'完整能力',
+  });
+
+  function modeSwitch(){
+    return '<nav class="coach-mode-switch"><a class="active" href="#/coach/f111">7Fit 推荐预设</a><a href="#/coach/f111/compose">自由组合编课</a></nav>';
+  }
+
   function homeHero(){
     return `<section class="view-hero coach-home-hero">
       <div class="coach-home-hero-main">
@@ -21,15 +31,67 @@
       </div>
     </section>`;
   }
-  function render(){
+
+  function legacyCards(){
     const data=D();
-    const cards=data.recipeIds.map(id=>{
-      const r=data.recipes[id];
+    return (data.recipeIds||[]).map(id=>{
+      const r=data.recipes[id]||{};
       const levels=[1,2,3,4].map(n=>`<a href="#/coach/f111/${id.toLowerCase()}/l${n}">L${n}</a>`).join('');
-      return `<article class="recipe-card"><div class="recipe-code">${id}</div><h3>${esc(r.name)}</h3><div class="recipe-tags"><span>${esc(r.lower)}</span><span>${esc(r.upper)}</span><span>${esc(r.support)}</span></div><div class="level-links">${levels}</div></article>`;
+      return `<article class="recipe-card"><div class="recipe-code">${esc(id)}</div><h3>${esc(r.name||id)}</h3><div class="recipe-tags"><span>${esc(r.lower||'')}</span><span>${esc(r.upper||'')}</span><span>${esc(r.support||'')}</span></div><div class="level-links">${levels}</div></article>`;
     }).join('');
-    return modeSwitch()+homeHero()+
-      `<section class="section-card"><div class="section-head"><div><h2>7Fit 推荐预设</h2><p>保留原 8 个 Recipe Family 和 32 套 L1–L4 课程；新教练可直接使用，熟悉体系后可进入自由组合。</p></div><a class="section-action-link" href="#/coach/f111/compose">进入自由组合编课 →</a></div><div class="recipe-grid">${cards}</div></section>`;
   }
+
+  function matrix(){
+    const Browser=M.F111PresetBrowser;
+    if(!Browser?.recipeRows)return '';
+    const rows=Browser.recipeRows();
+    const levelHeaders=Browser.LEVELS.map(level=>`
+      <div class="f111-preset-level-head" role="columnheader">
+        <b>${esc(level)}</b><small>${esc(LEVEL_META[level]||'')}</small>
+      </div>`).join('');
+    const body=rows.map(row=>{
+      const states=row.states.map(state=>`
+        <a class="f111-preset-cell"
+           href="${esc(state.href)}"
+           data-f111-preset-cell
+           data-recipe-id="${esc(state.recipeId)}"
+           data-level="${esc(state.level)}"
+           role="gridcell"
+           aria-label="${esc(`${state.recipeId} ${state.level} ${state.label}`)}">
+          <span>${esc(state.level)}</span>
+        </a>`).join('');
+      return `<div class="f111-preset-matrix-row" role="row" data-f111-recipe-row="${esc(row.recipeId)}">
+        <div class="f111-preset-recipe" role="rowheader">
+          <span>${esc(row.recipeId)}</span>
+          <strong>${esc(row.label)}</strong>
+        </div>
+        ${states}
+      </div>`;
+    }).join('');
+    return `<div class="f111-preset-matrix-shell" data-f111-preset-matrix-shell>
+      <div class="f111-preset-matrix" role="grid" aria-label="F111 32 套推荐预设">
+        <div class="f111-preset-matrix-row f111-preset-matrix-head" role="row">
+          <div class="f111-preset-recipe-head" role="columnheader"><b>Recipe Family</b><small>动作模式组合</small></div>
+          ${levelHeaders}
+        </div>
+        ${body}
+      </div>
+    </div>`;
+  }
+
+  function render(){
+    const Browser=M.F111PresetBrowser;
+    const total=Browser?.buildIndex?.().length||32;
+    return modeSwitch()+homeHero()+
+      `<section class="section-card f111-preset-browser-section" data-f111-preset-browser>
+        <div class="section-head f111-preset-browser-head">
+          <div><h2>7Fit 推荐预设</h2><p>8 个 Recipe Family × 4 个等级，共 ${esc(total)} 套标准课程。桌面端用矩阵快速定位；手机端暂保留紧凑列表，后续升级为 Level-first 浏览。</p></div>
+          <div class="f111-preset-head-actions"><span class="f111-preset-count">${esc(total)} 套预设</span><a class="section-action-link" href="#/coach/f111/compose">进入自由组合编课 →</a></div>
+        </div>
+        ${matrix()}
+        <div class="recipe-grid f111-preset-mobile-fallback" data-f111-mobile-fallback>${legacyCards()}</div>
+      </section>`;
+  }
+
   M.F111Home={render};
 })();
