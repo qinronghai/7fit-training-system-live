@@ -15,7 +15,7 @@
   const isMobile=()=>typeof window.matchMedia==='function'&&window.matchMedia('(max-width:620px)').matches;
 
   function setMobileBackgroundInert(active){
-    if(!isMobile()&&!active)return;
+    if(active&&!isMobile())return;
     const shell=document.querySelector('.app-shell'),nav=document.getElementById('mobile-nav');
     if(shell)shell.toggleAttribute('inert',!!active);
     if(nav)nav.toggleAttribute('inert',!!active);
@@ -149,6 +149,11 @@
     </div>`;
   }
 
+  function focusables(drawer){
+    return Array.from(drawer.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+      .filter(node=>!node.hidden&&node.getAttribute('aria-hidden')!=='true');
+  }
+
   function cleanupListeners(){
     if(keyHandler)document.removeEventListener('keydown',keyHandler);
     if(hashHandler)window.removeEventListener('hashchange',hashHandler);
@@ -201,6 +206,15 @@
         event.preventDefault();
         close();
         return;
+      }
+      if(event.key!=='Tab'||!isMobile())return;
+      const nodes=focusables(drawer);
+      if(!nodes.length)return;
+      const first=nodes[0],last=nodes[nodes.length-1];
+      if(event.shiftKey&&document.activeElement===first){
+        event.preventDefault();last.focus();
+      }else if(!event.shiftKey&&document.activeElement===last){
+        event.preventDefault();first.focus();
       }
     };
     document.addEventListener('keydown',keyHandler);
