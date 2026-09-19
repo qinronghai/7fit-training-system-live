@@ -342,7 +342,7 @@ test('Issue #149 Desktop Drawer leaves the full Matrix visible beside the panel'
     expect(matrixBox.x + matrixBox.width).toBeLessThanOrEqual(drawerBox.x - 8);
     const matrixClientWidth = await matrix.evaluate(node => node.clientWidth);
     const matrixScrollWidth = await matrix.evaluate(node => node.scrollWidth);
-    expect(matrixScrollWidth).toBeLessThanOrEqual(matrixClientWidth + 1);
+    expect(matrixScrollWidth).toBeLessThanOrEqual(matrixClientWidth);
     for (const cell of await matrix.locator('[data-f111-preset-cell]').evaluateAll(nodes => nodes.map(node => {
       const box = node.getBoundingClientRect();
       return { left: box.left, right: box.right };
