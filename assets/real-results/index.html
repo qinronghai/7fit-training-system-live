@@ -10,7 +10,8 @@ Promise.all([...partRequests,patchRequest]).then(all=>{
   for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
   let page=new TextDecoder("utf-8").decode(bytes);
   const safePatch=patch.replace(/<\/script/gi,"<\\/script");
-  page=page.replace("</body>","<script>"+safePatch+"<\\/script></body>");
+  const closeScript="<"+"/script>";
+  page=page.replace("</body>","<script>"+safePatch+closeScript+"</body>");
   document.open();
   document.write(page);
   document.close();
