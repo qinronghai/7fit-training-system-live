@@ -340,6 +340,16 @@ test('Issue #149 Desktop Drawer leaves the full Matrix visible beside the panel'
     expect(matrixBox).not.toBeNull();
     expect(drawerBox).not.toBeNull();
     expect(matrixBox.x + matrixBox.width).toBeLessThanOrEqual(drawerBox.x - 8);
+    const matrixClientWidth = await matrix.evaluate(node => node.clientWidth);
+    const matrixScrollWidth = await matrix.evaluate(node => node.scrollWidth);
+    expect(matrixScrollWidth).toBeLessThanOrEqual(matrixClientWidth + 1);
+    for (const cell of await matrix.locator('[data-f111-preset-cell]').evaluateAll(nodes => nodes.map(node => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, right: box.right };
+    }))) {
+      expect(cell.left).toBeGreaterThanOrEqual(matrixBox.x - 1);
+      expect(cell.right).toBeLessThanOrEqual(matrixBox.x + matrixBox.width + 1);
+    }
     await expectNoOverflow(page, width);
 
     await page.keyboard.press('Escape');

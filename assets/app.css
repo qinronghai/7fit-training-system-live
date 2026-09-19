@@ -1362,7 +1362,7 @@ body{font-size:14px;line-height:1.55}
   .f111-preset-cell{min-height:60px;font-size:13px;line-height:1.4;font-weight:950}
 
   body:has(#global-drawer[data-f111-preset-drawer]:not([hidden])) #app-main:has(.f111-preset-browser-section) .f111-preset-matrix-shell{
-    width:calc(100% - min(540px,46vw) - 24px);
+    width:max(305px,calc(100% - min(540px,46vw) - 24px));
   }
   body:has(#global-drawer[data-f111-preset-drawer]:not([hidden])) #app-main:has(.f111-preset-browser-section) .f111-preset-matrix-row{
     grid-template-columns:minmax(176px,1fr) repeat(4,minmax(32px,52px));
