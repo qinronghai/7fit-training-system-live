@@ -1313,36 +1313,51 @@ body{font-size:14px;line-height:1.55}
   body.drawer-open{overflow:hidden}
 }
 
-/* ISSUE 149 / F111 PRESET BROWSER DESKTOP UI POLISH */
+/* ISSUE 149 / F111 PRESET BROWSER DESKTOP VISUAL SCALE */
 @media(min-width:980px){
   #app-main:has(.f111-preset-browser-section){
     width:min(1280px,calc(100% - 32px));
   }
 
-  .f111-preset-tools{gap:12px;padding:14px}
-  .f111-preset-search>span,.f111-preset-tool-label b,.f111-preset-filter-group>span{font-size:12px;line-height:1.4}
-  .f111-preset-tool-label small{font-size:10px;line-height:1.45}
-  .f111-preset-search input{min-height:40px;padding:9px 11px;font-size:13px;line-height:1.4}
-  .f111-preset-clear{min-height:40px;padding:8px 12px;font-size:12px}
-  .f111-preset-filter-stack{gap:8px}
-  .f111-preset-filter-group{grid-template-columns:56px minmax(0,1fr);gap:8px}
-  .f111-preset-filter-group>div{gap:6px}
-  .f111-preset-filter-chip{min-height:34px;padding:7px 11px;font-size:12px;line-height:1.25}
-  .f111-preset-result-context{padding-top:9px}
-  .f111-preset-result-context b{font-size:12px}
-  .f111-preset-result-context span{font-size:10px}
+  #app-main:has(.f111-preset-browser-section) .f111-preset-browser-section{font-size:15px}
+  #app-main:has(.f111-preset-browser-section) .coach-home-lead{font-size:15px!important;line-height:1.45}
+  #app-main:has(.f111-preset-browser-section) .intro-head span{font-size:13px}
+  #app-main:has(.f111-preset-browser-section) .intro-head b{font-size:16px}
+  #app-main:has(.f111-preset-browser-section) .coach-home-intro{padding:20px 22px}
+  #app-main:has(.f111-preset-browser-section) .coach-home-intro .intro-summary{font-size:14px;line-height:1.7}
+  #app-main:has(.f111-preset-browser-section) .intro-points{gap:12px}
+  #app-main:has(.f111-preset-browser-section) .intro-points article{padding:14px 15px}
+  #app-main:has(.f111-preset-browser-section) .intro-points article>b{font-size:14px;line-height:1.45}
+  #app-main:has(.f111-preset-browser-section) .intro-points article p{font-size:13px!important;line-height:1.7!important}
 
-  .f111-preset-matrix-row{grid-template-columns:minmax(300px,1fr) repeat(4,minmax(72px,88px));min-height:52px}
-  .f111-preset-recipe-head,.f111-preset-recipe{padding:12px 14px}
-  .f111-preset-recipe-head b{font-size:12px}
-  .f111-preset-recipe-head small{font-size:10px}
-  .f111-preset-recipe{grid-template-columns:72px minmax(0,1fr);gap:10px}
-  .f111-preset-recipe span{font-size:11px}
-  .f111-preset-recipe strong{font-size:13px;line-height:1.45}
-  .f111-preset-level-head{padding:10px 6px;gap:3px}
-  .f111-preset-level-head b{font-size:12px}
-  .f111-preset-level-head small{font-size:10px}
-  .f111-preset-cell{min-height:52px;font-size:12px;line-height:1.35}
-  .f111-preset-recent-card span{font-size:10px}
-  .f111-preset-recent-card b{font-size:11px;line-height:1.4}
+  .f111-preset-tools{gap:14px;padding:18px}
+  .f111-preset-search{gap:7px}
+  .f111-preset-search>span,.f111-preset-tool-label b,.f111-preset-filter-group>span{font-size:13px;line-height:1.45}
+  .f111-preset-tool-label small{font-size:13px;line-height:1.5}
+  .f111-preset-search input{min-height:44px;padding:10px 12px;font-size:14px;line-height:1.45}
+  .f111-preset-clear{min-height:44px;padding:9px 14px;font-size:13px}
+  .f111-preset-recent{grid-template-columns:150px minmax(0,1fr);gap:10px}
+  .f111-preset-recent-card{padding:10px 12px}
+  .f111-preset-recent-card span{font-size:12px}
+  .f111-preset-recent-card b{font-size:13px;line-height:1.45}
+  .f111-preset-filter-stack{gap:10px}
+  .f111-preset-filter-group{grid-template-columns:64px minmax(0,1fr);gap:10px}
+  .f111-preset-filter-group>div{gap:8px}
+  .f111-preset-filter-chip{min-height:38px;padding:8px 13px;font-size:13px;line-height:1.3}
+  .f111-preset-result-context{padding-top:12px}
+  .f111-preset-result-context b{font-size:14px}
+  .f111-preset-result-context span{font-size:13px}
+
+  .f111-preset-matrix-row{grid-template-columns:minmax(320px,1fr) repeat(4,minmax(80px,96px));min-height:60px}
+  .f111-preset-matrix-head{background:#f7f4fb}
+  .f111-preset-recipe-head,.f111-preset-recipe{padding:15px 17px}
+  .f111-preset-recipe-head b{font-size:14px}
+  .f111-preset-recipe-head small{font-size:13px}
+  .f111-preset-recipe{grid-template-columns:84px minmax(0,1fr);gap:12px}
+  .f111-preset-recipe span{font-size:12px;font-weight:950}
+  .f111-preset-recipe strong{font-size:15px;line-height:1.5;font-weight:900}
+  .f111-preset-level-head{padding:12px 8px;gap:4px}
+  .f111-preset-level-head b{font-size:14px;color:var(--purple-dark);font-weight:950}
+  .f111-preset-level-head small{font-size:13px;line-height:1.25;white-space:normal}
+  .f111-preset-cell{min-height:60px;font-size:13px;line-height:1.4;font-weight:950}
 }

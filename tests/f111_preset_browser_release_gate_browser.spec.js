@@ -187,7 +187,10 @@ test('Issue #149 Desktop UI Polish improves F111 readability without changing th
         chipHeight: chip.height,
         matrixRowHeight: row.height,
         styles: {
-          body: computed('body').fontSize,
+          body: computed('.f111-preset-browser-section').fontSize,
+          heroLead: computed('.coach-home-lead').fontSize,
+          heroSummary: computed('.coach-home-intro .intro-summary').fontSize,
+          heroPoint: computed('.intro-points article p').fontSize,
           search: computed('.f111-preset-search input').fontSize,
           chip: computed('.f111-preset-filter-chip').fontSize,
           recipeId: computed('.f111-preset-recipe span').fontSize,
@@ -200,18 +203,29 @@ test('Issue #149 Desktop UI Polish improves F111 readability without changing th
     });
 
     expect(metrics.mainWidth).toBeGreaterThanOrEqual(metrics.appColumnWidth - 32);
-    expect(metrics.chipHeight).toBeGreaterThanOrEqual(32);
-    expect(metrics.chipHeight).toBeLessThanOrEqual(36);
-    expect(metrics.matrixRowHeight).toBeGreaterThanOrEqual(48);
-    expect(metrics.matrixRowHeight).toBeLessThanOrEqual(54);
-    expect(parseFloat(metrics.styles.body)).toBeGreaterThanOrEqual(13);
-    expect(parseFloat(metrics.styles.search)).toBeGreaterThanOrEqual(12);
-    expect(parseFloat(metrics.styles.chip)).toBeGreaterThanOrEqual(11);
-    expect(parseFloat(metrics.styles.recipeId)).toBeGreaterThanOrEqual(10.5);
-    expect(parseFloat(metrics.styles.recipe)).toBeGreaterThanOrEqual(12);
-    expect(parseFloat(metrics.styles.level)).toBeGreaterThanOrEqual(12);
-    expect(parseFloat(metrics.styles.levelHint)).toBeGreaterThanOrEqual(9.5);
-    expect(parseFloat(metrics.styles.cell)).toBeGreaterThanOrEqual(12);
+    expect(metrics.chipHeight).toBeGreaterThanOrEqual(36);
+    expect(metrics.chipHeight).toBeLessThanOrEqual(40);
+    expect(metrics.matrixRowHeight).toBeGreaterThanOrEqual(58);
+    expect(metrics.matrixRowHeight).toBeLessThanOrEqual(64);
+    expect(parseFloat(metrics.styles.body)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.body)).toBeLessThanOrEqual(16);
+    expect(parseFloat(metrics.styles.heroLead)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.heroSummary)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.heroPoint)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.search)).toBeGreaterThanOrEqual(14);
+    expect(parseFloat(metrics.styles.search)).toBeLessThanOrEqual(15);
+    expect(parseFloat(metrics.styles.chip)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.chip)).toBeLessThanOrEqual(14);
+    expect(parseFloat(metrics.styles.recipeId)).toBeGreaterThanOrEqual(12);
+    expect(parseFloat(metrics.styles.recipeId)).toBeLessThanOrEqual(13);
+    expect(parseFloat(metrics.styles.recipe)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.recipe)).toBeLessThanOrEqual(16);
+    expect(parseFloat(metrics.styles.level)).toBeGreaterThanOrEqual(14);
+    expect(parseFloat(metrics.styles.level)).toBeLessThanOrEqual(15);
+    expect(parseFloat(metrics.styles.levelHint)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.levelHint)).toBeLessThanOrEqual(14);
+    expect(parseFloat(metrics.styles.cell)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.cell)).toBeLessThanOrEqual(14);
 
     const chip = page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]');
     await chip.click();
