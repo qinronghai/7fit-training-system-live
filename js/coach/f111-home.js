@@ -85,7 +85,7 @@
     return modeSwitch()+homeHero()+
       `<section class="section-card f111-preset-browser-section" data-f111-preset-browser>
         <div class="section-head f111-preset-browser-head">
-          <div><h2>7Fit 推荐预设</h2><p>8 个 Recipe Family × 4 个等级，共 ${esc(total)} 套标准课程。桌面端用矩阵快速定位；手机端暂保留紧凑列表，后续升级为 Level-first 浏览。</p></div>
+          <div><h2>7Fit 推荐预设</h2><p>8 个 Recipe Family × 4 个等级，共 ${esc(total)} 套标准课程。桌面端用矩阵快速定位；手机端使用紧凑列表浏览。</p></div>
           <div class="f111-preset-head-actions"><span class="f111-preset-count">${esc(total)} 套预设</span><a class="section-action-link" href="#/coach/f111/compose">进入自由组合编课 →</a></div>
         </div>
         ${matrix()}
