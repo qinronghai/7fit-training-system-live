@@ -44,6 +44,7 @@
   function matrix(){
     const Browser=M.F111PresetBrowser;
     if(!Browser?.recipeRows)return '';
+    const selectedKey=M.F111PresetDetail?.selected?.()?.key||'';
     const rows=Browser.recipeRows();
     const levelHeaders=Browser.LEVELS.map(level=>`
       <div class="f111-preset-level-head" role="columnheader">
@@ -51,12 +52,13 @@
       </div>`).join('');
     const body=rows.map(row=>{
       const states=row.states.map(state=>`
-        <a class="f111-preset-cell"
+        <a class="f111-preset-cell${selectedKey===state.key?' is-selected':''}"
            href="${esc(state.href)}"
            data-f111-preset-cell
            data-recipe-id="${esc(state.recipeId)}"
            data-level="${esc(state.level)}"
            role="gridcell"
+           aria-selected="${selectedKey===state.key?'true':'false'}"
            aria-label="${esc(`${state.recipeId} ${state.level} ${state.label}`)}">
           <span>${esc(state.level)}</span>
         </a>`).join('');
@@ -93,5 +95,15 @@
       </section>`;
   }
 
-  M.F111Home={render};
+  function bind(root,rerender){
+    root?.querySelectorAll?.('[data-f111-preset-cell]').forEach(cell=>cell.addEventListener('click',event=>{
+      const detail=M.F111PresetDetail;
+      if(!detail?.open)return;
+      event.preventDefault();
+      detail.open({recipeId:cell.dataset.recipeId,level:cell.dataset.level,trigger:cell});
+      if(typeof rerender==='function')rerender();
+    }));
+  }
+
+  M.F111Home={render,bind};
 })();
