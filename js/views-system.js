@@ -30,7 +30,7 @@
     if(!session||!slotKey||!/^L[1-4]$/.test(level))return null;
     const otherIds=(session.slots||[]).filter(slot=>slot.slotKey!==slotKey).map(slot=>window.V14State?.getSelection?.(sessionId,slot.slotKey)||slot.baselineId).filter(Boolean);
     const result=window.V15LowerAssistance.candidates({consumer:'F111_D1',level,lowerMode,currentActionIds:otherIds});
-    const match=sessionId.match(/^(F111-\\d+)-(L[1-4])$/);
+    const match=sessionId.match(/^(F111-\d+)-(L[1-4])$/);
     return {
       sessionId,slotKey,level,lowerMode,result,
       candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
