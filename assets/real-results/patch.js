@@ -18,7 +18,11 @@
     .cloud-state{position:fixed;right:14px;bottom:14px;z-index:150;padding:8px 11px;border-radius:999px;background:rgba(33,30,38,.92);color:#fff;font-size:11px;font-weight:800;box-shadow:0 8px 24px rgba(33,30,38,.18)}
     .cloud-state.ok{background:rgba(38,143,92,.94)}.cloud-state.err{background:rgba(183,65,65,.94)}
     .admin-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#EFE8FF;color:#7447D8;font-size:10px;font-weight:900;margin-left:8px}
-    @media(max-width:600px){.grid{grid-template-columns:1fr!important;gap:18px!important}.case-title-row{align-items:center}.edit-case-btn{padding:9px 12px;font-size:11px}.cloud-state{right:10px;bottom:10px}}
+    .existing-preview{margin-top:8px;padding:7px;border:1px solid rgba(149,102,242,.18);border-radius:12px;background:#fff}
+    .existing-preview img{display:block;width:100%;max-height:260px;object-fit:contain;border-radius:9px;background:#FAF8F4}
+    .existing-preview-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;font-size:9px;line-height:1.4;color:var(--muted)}
+    .existing-preview-meta b{color:var(--pd);font-size:9px}
+    @media(max-width:600px){.grid{grid-template-columns:1fr!important;gap:18px!important}.case-title-row{align-items:center}.edit-case-btn{padding:9px 12px;font-size:11px}.cloud-state{right:10px;bottom:10px}.existing-preview img{max-height:320px}}
   `;
   document.head.appendChild(style);
 
@@ -236,12 +240,50 @@
     if(titleEl) titleEl.textContent=title;
     if(helperEl) helperEl.textContent=helper;
   }
+  function setSubmitLabel(label){
+    const btn=document.querySelector("#form .primary");
+    if(btn) btn.textContent=label;
+  }
+  function clearExistingComparisonPreviews(){
+    document.querySelectorAll('#form [data-existing]').forEach(el=>el.replaceChildren());
+  }
+  function renderExistingComparisonPreviews(c){
+    const views=[
+      ["front","正面"],
+      ["side","侧面"],
+      ["back","背面"]
+    ];
+    for(const [view,label] of views){
+      const host=document.querySelector('#form [data-existing="'+view+'"]');
+      if(!host) continue;
+      host.replaceChildren();
+      const src=c?.comparisons?.[view]?.image||"";
+      if(!src) continue;
+      const box=document.createElement("div");
+      box.className="existing-preview";
+      const img=document.createElement("img");
+      img.src=src;
+      img.alt=label+"当前对比图";
+      img.loading="eager";
+      const meta=document.createElement("div");
+      meta.className="existing-preview-meta";
+      const status=document.createElement("b");
+      status.textContent="当前已上传";
+      const hint=document.createElement("span");
+      hint.textContent="重新选择图片后将替换";
+      meta.append(status,hint);
+      box.append(img,meta);
+      host.appendChild(box);
+    }
+  }
   async function clearFormForNew(){
     if(!(await verifyAdmin(true))) return false;
     editingCaseId=null;
     const f=document.querySelector("#form");if(f) f.reset();
     const metrics=document.querySelector("#metrics");if(metrics) metrics.innerHTML="";
+    clearExistingComparisonPreviews();
     titleAndHelper("上传新案例",defaultHelper);
+    setSubmitLabel("保存案例");
     return true;
   }
 
@@ -271,10 +313,12 @@
     editingCaseId=id;originalOpenModal();
     const f=document.querySelector("#form"),metrics=document.querySelector("#metrics");if(!f||!metrics)return;
     f.reset();metrics.innerHTML="";
-    titleAndHelper("编辑案例","修改后会直接同步到云端。没有重新选择的图片会继续保留原图，不需要全部重新上传。");
+    titleAndHelper("编辑案例","修改后会直接同步到云端。下方会显示当前已经上传的对比图；不重新选择图片就继续保留原图。");
+    setSubmitLabel("修改案例");
     f.elements.name.value=c.name||"";f.elements.category.value=c.category||"减脂塑形";f.elements.height.value=c.height||"";
     f.elements.startWeight.value=c.startWeight||"";f.elements.age.value=c.age||"";f.elements.processText.value=c.processText||"";
     const radio=f.querySelector('input[name="coverView"][value="'+(c.coverView||"front")+'"]');if(radio)radio.checked=true;
+    renderExistingComparisonPreviews(c);
     (c.metrics||[]).forEach(x=>addMetric(x.name||"",x.before||"",x.after||""));
     if(!(c.metrics||[]).length){addMetric("体重");addMetric("腰围");addMetric("体脂率");addMetric("大腿围度");addMetric("手臂围度")}
   }
