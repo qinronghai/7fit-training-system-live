@@ -1106,6 +1106,8 @@ body{font-size:14px;line-height:1.55}
 
 
 /* ISSUE 128 / F111 PRESET DETAIL DRAWER */
+[data-f111-preset-drawer]{background:rgba(23,21,31,.10);pointer-events:none}
+[data-f111-preset-drawer] .f111-preset-drawer-head,[data-f111-preset-drawer] .f111-preset-drawer-body{pointer-events:auto;box-shadow:-18px 0 36px rgba(23,21,31,.12)}
 @media(min-width:621px){
   [data-f111-preset-drawer] .f111-preset-drawer-head{height:108px;width:min(540px,46vw);padding:17px 20px;align-items:flex-start}
   [data-f111-preset-drawer] .f111-preset-drawer-body{top:108px;width:min(540px,46vw);padding:17px 20px 0}
