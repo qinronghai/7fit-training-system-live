@@ -40,7 +40,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
   await expect(page.locator('#modal')).toBeVisible();
 
   // Regression: Safari native required validation used to swallow this click.
-  await page.click('#form button[type="submit"]');
+  await page.click('#form .primary');
   await expect(page.locator('#toast')).toContainText('请先填写会员显示名称');
 
   await page.fill('#form input[name="name"]', '测试会员');
@@ -56,7 +56,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
     buffer: png,
   });
 
-  await page.click('#form button[type="submit"]');
+  await page.click('#form .primary');
   await expect(page.locator('#toast')).toContainText('案例已上传到云端', { timeout: 10_000 });
   await expect(page.locator('#modal')).toBeHidden();
 });

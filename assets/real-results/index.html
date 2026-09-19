@@ -1,1 +1,22 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>7Fit 真实案例库</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#FAF8F4;color:#211E26;display:grid;place-items:center;min-height:100vh}.loading{text-align:center}.mark{width:54px;height:54px;border-radius:18px;background:#9566F2;margin:0 auto 14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px}.loading p{margin:0;color:#77717E;font-size:14px}</style></head><body><div class="loading"><div class="mark">7Fit</div><p>正在打开真实案例库…</p></div><script>const v=Date.now();Promise.all([1,2,3,4].map(n=>fetch("part"+n+".b64?v="+v).then(r=>{if(!r.ok)throw new Error("load");return r.text()}))).then(parts=>{const b64=parts.join("").replace(/\s+/g,"");const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);let html=new TextDecoder("utf-8").decode(bytes);html=html.replace("</body>","<script src=\"patch.js?v="+v+"\"><\\/script></body>");document.open();document.write(html);document.close()}).catch(()=>{document.body.innerHTML='<div class="loading"><div class="mark">7Fit</div><p>案例库加载失败，请刷新页面重试。</p></div>'})</script></body></html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>7Fit 真实案例库</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#FAF8F4;color:#211E26;display:grid;place-items:center;min-height:100vh}.loading{text-align:center}.mark{width:54px;height:54px;border-radius:18px;background:#9566F2;margin:0 auto 14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px}.loading p{margin:0;color:#77717E;font-size:14px}</style></head><body><div class="loading"><div class="mark">7Fit</div><p>正在打开真实案例库…</p></div><script>
+const v=Date.now();
+const partRequests=[1,2,3,4].map(n=>fetch("part"+n+".b64?v="+v).then(r=>{if(!r.ok)throw new Error("load part "+n);return r.text()}));
+const patchRequest=fetch("patch.js?v="+v).then(r=>{if(!r.ok)throw new Error("load patch");return r.text()});
+Promise.all([...partRequests,patchRequest]).then(all=>{
+  const patch=all.pop();
+  const b64=all.join("").replace(/\s+/g,"");
+  const bin=atob(b64);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  let page=new TextDecoder("utf-8").decode(bytes);
+  const safePatch=patch.replace(/<\/script/gi,"<\\/script");
+  const closeScript="<"+"/script>";
+  page=page.replace("</body>","<script>"+safePatch+closeScript+"</body>");
+  document.open();
+  document.write(page);
+  document.close();
+}).catch(err=>{
+  console.error(err);
+  document.body.innerHTML='<div class="loading"><div class="mark">7Fit</div><p>案例库加载失败，请刷新页面重试。</p></div>';
+});
+</script></body></html>

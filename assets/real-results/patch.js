@@ -362,19 +362,20 @@
   form.addEventListener("invalid",e=>e.preventDefault(),true);
   form.onsubmit=async e=>{
     e.preventDefault();
-    if(!(await verifyAdmin(true)))return;
-    const f=e.currentTarget,submitBtn=f.querySelector('button[type="submit"]');
-    const oldSubmitText=submitBtn?.textContent||"保存案例";
-    if(submitBtn){submitBtn.disabled=true;submitBtn.textContent="正在保存…";}
-    const fd=new FormData(f),wasEditing=!!editingCaseId,existing=editingCaseId?cases.find(x=>x.id===editingCaseId):null;
+    const f=e.currentTarget||form;
+    const fd=new FormData(f);
     const displayName=String(fd.get("name")||"").trim();
     if(!displayName){
-      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
       toast("请先填写会员显示名称");
       f.elements.name?.focus();
       f.elements.name?.scrollIntoView({behavior:"smooth",block:"center"});
       return;
     }
+    if(!(await verifyAdmin(true)))return;
+    const submitBtn=f.querySelector('button[type="submit"], .primary');
+    const oldSubmitText=submitBtn?.textContent||"保存案例";
+    if(submitBtn){submitBtn.disabled=true;submitBtn.textContent="正在保存…";}
+    const wasEditing=!!editingCaseId,existing=editingCaseId?cases.find(x=>x.id===editingCaseId):null;
     const metrics=[...document.querySelectorAll(".mrow")].map(r=>({name:r.children[0].value.trim(),before:r.children[1].value.trim(),after:r.children[2].value.trim()})).filter(x=>x.name&&(x.before||x.after));
     const selectedCover=fd.get("coverView")||existing?.coverView||"";
     if(!selectedCover){
@@ -443,6 +444,16 @@
       if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
     }
   };
+
+  const explicitSaveButton=form.querySelector('button[type="submit"], .primary');
+  if(explicitSaveButton){
+    explicitSaveButton.type="button";
+    explicitSaveButton.addEventListener("click",e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    });
+  }
 
   document.documentElement.dataset.casePatchReady="1";
   cases=[];
