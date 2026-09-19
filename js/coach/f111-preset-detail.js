@@ -146,11 +146,6 @@
     hashHandler=null;
   }
 
-  function focusables(drawer){
-    return Array.from(drawer.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
-      .filter(node=>!node.hidden&&node.getAttribute('aria-hidden')!=='true');
-  }
-
   function close({restoreFocus=true,rerender=true}={}){
     const drawer=document.getElementById('global-drawer');
     const last=current?{...current}:null;
@@ -160,11 +155,9 @@
       drawer.hidden=true;
       drawer.innerHTML='';
       drawer.removeAttribute('role');
-      drawer.removeAttribute('aria-modal');
       drawer.removeAttribute('aria-label');
       drawer.removeAttribute('data-f111-preset-drawer');
     }
-    document.body.classList.remove('drawer-open');
     if(rerender&&typeof rerenderHome==='function')rerenderHome();
     if(restoreFocus&&last){
       requestAnimationFrame(()=>{
@@ -189,15 +182,6 @@
         close();
         return;
       }
-      if(event.key!=='Tab')return;
-      const nodes=focusables(drawer);
-      if(!nodes.length)return;
-      const first=nodes[0],last=nodes[nodes.length-1];
-      if(event.shiftKey&&document.activeElement===first){
-        event.preventDefault();last.focus();
-      }else if(!event.shiftKey&&document.activeElement===last){
-        event.preventDefault();first.focus();
-      }
     };
     document.addEventListener('keydown',keyHandler);
 
@@ -216,10 +200,8 @@
     drawer.innerHTML=render(recipeId,level);
     drawer.hidden=false;
     drawer.setAttribute('role','dialog');
-    drawer.setAttribute('aria-modal','true');
     drawer.setAttribute('aria-label',`${recipeId} ${level} 预设详情`);
     drawer.setAttribute('data-f111-preset-drawer','');
-    document.body.classList.add('drawer-open');
     bindDrawer(drawer);
     if(rerenderHome)rerenderHome();
     requestAnimationFrame(()=>drawer.querySelector('[data-f111-preset-close]')?.focus());
