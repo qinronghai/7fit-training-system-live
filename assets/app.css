@@ -1125,14 +1125,21 @@ body{font-size:14px;line-height:1.55}
 .f111-preset-detail-section-head h3{margin:2px 0 0;font-size:15px}
 .f111-preset-detail-section-head>small{font-size:10px;color:var(--muted);text-align:right}
 .f111-preset-preview-list{display:grid;gap:6px}
-.f111-preset-preview-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 9px;border-radius:9px;background:#faf9fc}
+.f111-preset-preview-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(142px,42%) auto;gap:10px;align-items:center;padding:9px;border-radius:9px;background:#faf9fc}
 .f111-preset-preview-row>div{min-width:0}
-.f111-preset-preview-row span{display:block;color:var(--muted);font-size:9px;font-weight:800}
-.f111-preset-preview-row b{display:block;margin-top:2px;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
-.f111-preset-preview-row>small{max-width:150px;font-size:9px;line-height:1.4;color:var(--muted);text-align:right}
+.f111-preset-preview-row span{display:block;color:var(--muted);font-size:11px;font-weight:800}
+.f111-preset-preview-row b{display:block;margin-top:2px;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.f111-preset-preview-row>small{max-width:150px;font-size:11px;line-height:1.45;color:var(--muted);text-align:right}
+.f111-preset-preview-row>div>small{display:block;margin-top:3px;max-width:none;text-align:left}
 .f111-preset-preview-prep .f111-preset-prep-summary{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .f111-preset-prep-summary span{display:inline;color:var(--ink);font-size:10px}
 .f111-preset-prep-summary i{font-style:normal;color:#b4adbd;font-size:9px}
+.f111-preset-replace-control{display:grid;gap:3px;min-width:0}
+.f111-preset-replace-control span{font-size:10px;line-height:1.1;color:var(--purple-dark);font-weight:900}
+.f111-preset-replace-control select{width:100%;min-width:0;min-height:38px;padding:7px 24px 7px 9px;border:1px solid #d8c9f3;border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:12px;font-weight:750}
+.f111-preset-replace-control select:focus-visible{outline:2px solid var(--purple-dark);outline-offset:1px}
+.f111-preset-replace-control select:disabled{cursor:not-allowed;opacity:.58;background:#f3f1f6}
+.f111-preset-preview-prescription{align-self:end}
 .f111-preset-detail-facts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .f111-preset-detail-facts>div{padding:9px;border-radius:9px;background:#faf9fc;border:1px solid var(--line)}
 .f111-preset-detail-facts>div:last-child{grid-column:1/-1}
@@ -1141,6 +1148,7 @@ body{font-size:14px;line-height:1.55}
 .f111-preset-detail-facts b{margin-top:2px;font-size:11px;line-height:1.45}
 .f111-preset-swap-chips{display:flex;gap:6px;flex-wrap:wrap}
 .f111-preset-swap-chip{display:inline-flex;align-items:center;min-height:30px;padding:5px 8px;border:1px solid #d8c9f3;border-radius:8px;background:var(--purple-pale);color:var(--purple-dark);font-size:9px;font-weight:850;text-decoration:none}
+.f111-preset-swap-note{align-self:center;color:var(--muted);font-size:10px;line-height:1.4}
 .f111-preset-drawer-actions{position:sticky;bottom:0;display:grid;grid-template-columns:auto 1fr 1.15fr;gap:7px;margin:4px -20px 0;padding:12px 20px calc(14px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--line);backdrop-filter:blur(14px)}
 .f111-preset-cta{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px 10px;border-radius:9px;text-decoration:none;font-size:10px;font-weight:900;text-align:center}
 .f111-preset-cta.primary{background:var(--purple);color:#fff;border:1px solid var(--purple)}
@@ -1298,8 +1306,10 @@ body{font-size:14px;line-height:1.55}
   }
   .f111-preset-detail-chips{margin-bottom:8px}
   .f111-preset-detail-section{padding:11px;margin-bottom:10px}
-  .f111-preset-preview-row{grid-template-columns:minmax(0,1fr) auto;padding:8px}
-  .f111-preset-preview-row>small{max-width:116px;font-size:8.5px}
+  .f111-preset-preview-row{grid-template-columns:minmax(0,1fr);gap:7px;padding:8px}
+  .f111-preset-preview-row>small{max-width:none;text-align:left}
+  .f111-preset-replace-control select{min-height:38px;font-size:12px}
+  .f111-preset-preview-row>small{max-width:none;font-size:10.5px}
   .f111-preset-detail-facts{grid-template-columns:1fr 1fr}
   .f111-preset-drawer-actions{
     grid-template-columns:1fr 1fr;

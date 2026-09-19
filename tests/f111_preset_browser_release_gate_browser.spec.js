@@ -320,6 +320,40 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expectClean(diag);
 });
 
+test('F111 preset detail drawer supports direct legal replacement for PREP and session cards', async ({ page }) => {
+  const diag = diagnostics(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+  await page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]').click();
+
+  const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
+  await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
+
+  const sessionSelect = drawer.locator('[data-f111-drawer-session-select][data-slot-key="C"]');
+  const sessionValues = await sessionSelect.locator('option').evaluateAll(options => options.map(option => option.value).filter(Boolean));
+  expect(sessionValues.length).toBeGreaterThan(1);
+  const sessionReplacement = sessionValues[1];
+  await sessionSelect.selectOption(sessionReplacement);
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-drawer-session-select][data-slot-key="C"]')).toHaveValue(sessionReplacement);
+  expect(await page.evaluate(() => window.V14State.getSelection('F111-03-L2', 'F111-03-L2__SUPPORT'))).toBe(sessionReplacement);
+
+  const prepSelect = drawer.locator('[data-f111-drawer-prep-select]').first();
+  const prepValues = await prepSelect.locator('option').evaluateAll(options => options.map(option => option.value).filter(Boolean));
+  expect(prepValues.length).toBeGreaterThan(1);
+  const prepReplacement = prepValues[1];
+  const prepSlot = await prepSelect.getAttribute('data-slot-key');
+  await prepSelect.selectOption(prepReplacement);
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator(`[data-f111-drawer-prep-select][data-slot-key="${prepSlot}"]`)).toHaveValue(prepReplacement);
+  expect(await page.evaluate(({ slot }) => window.V15State.getPrepSelections('f111', 'F111-03-L2')[slot]?.actionId, { slot: prepSlot })).toBe(prepReplacement);
+
+  await expectNoOverflow(page, 1280);
+  await expectClean(diag);
+});
+
 test('Issue #149 Desktop Drawer leaves the full Matrix visible beside the panel', async ({ page }) => {
   const diag = diagnostics(page);
 
