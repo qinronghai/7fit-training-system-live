@@ -272,7 +272,9 @@
       const host=ensureExistingPreviewHost(view);
       if(!host) continue;
       host.replaceChildren();
-      const src=c?.comparisons?.[view]?.image||"";
+      const kind={front:"comparison_front",side:"comparison_side",back:"comparison_back"}[view];
+      const sourceAsset=(c?.case_assets||[]).find(a=>a.kind===kind&&a.url);
+      const src=c?.comparisons?.[view]?.image||sourceAsset?.url||((c?.coverView===view&&c?.coverImage)?c.coverImage:"");
       if(!src) continue;
       const box=document.createElement("div");
       box.className="existing-preview";
