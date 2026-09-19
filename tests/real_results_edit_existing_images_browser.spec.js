@@ -65,6 +65,7 @@ test('editing a cloud case shows existing comparison images and uses 修改案�
   }
 
   await page.click('#cancel');
+  await page.click('#back');
   await page.click('#openUpload');
   await expect(page.locator('#form .primary')).toHaveText('保存案例');
   await expect(page.locator('#form [data-existing] img')).toHaveCount(0);
