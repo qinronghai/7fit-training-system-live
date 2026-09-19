@@ -24,18 +24,40 @@
     return `<section class="section-card auxiliary-index"><div class="section-head"><div><h2>辅助动作模块</h2><p>上肢模块继续消费 D2 规则；下肢模块由统一 Lower Body Assistance & Capacity Domain 派生，供 F111 D1 与 Body 共用。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','按水平 / 垂直拉推动作池查看 D2 上肢辅助动作。')}${card(lower,'lower','按膝伸、膝屈、髋伸、髋外展、髋内收、单腿等功能家族浏览；固定器械只是筛选条件。')}</div></section>`;
   }
   function lowerReplacementContext(route){
-    if(route.query?.template!=='f111'||!window.V15LowerAssistance?.candidates)return null;
-    const data=D(),sessionId=String(route.query?.sessionId||''),slotKey=String(route.query?.slotKey||'');
-    const session=data.sessions?.[sessionId],level=String(route.query?.level||'').toUpperCase(),lowerMode=String(route.query?.lower||'');
-    if(!session||!slotKey||!/^L[1-4]$/.test(level))return null;
-    const otherIds=(session.slots||[]).filter(slot=>slot.slotKey!==slotKey).map(slot=>window.V14State?.getSelection?.(sessionId,slot.slotKey)||slot.baselineId).filter(Boolean);
-    const result=window.V15LowerAssistance.candidates({consumer:'F111_D1',level,lowerMode,currentActionIds:otherIds});
-    const match=sessionId.match(/^(F111-\d+)-(L[1-4])$/);
-    return {
-      sessionId,slotKey,level,lowerMode,result,
-      candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
-      returnHash:match?`#/coach/f111/${match[1].toLowerCase()}/${match[2].toLowerCase()}`:'#/coach/f111',
-    };
+    if(!window.V15LowerAssistance?.candidates)return null;
+    const templateId=String(route.query?.template||'');
+    const slotKey=String(route.query?.slotKey||''),level=String(route.query?.level||'').toUpperCase();
+    if(!slotKey||!/^L[1-4]$/.test(level))return null;
+
+    if(templateId==='f111'){
+      const data=D(),sessionId=String(route.query?.sessionId||''),session=data.sessions?.[sessionId],lowerMode=String(route.query?.lower||'');
+      if(!session)return null;
+      const otherIds=(session.slots||[]).filter(slot=>slot.slotKey!==slotKey).map(slot=>window.V14State?.getSelection?.(sessionId,slot.slotKey)||slot.baselineId).filter(Boolean);
+      const result=window.V15LowerAssistance.candidates({consumer:'F111_D1',level,lowerMode,currentActionIds:otherIds});
+      const match=sessionId.match(/^(F111-\d+)-(L[1-4])$/);
+      return {
+        templateId:'f111',sessionId,slotKey,level,lowerMode,result,
+        candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
+        returnHash:match?`#/coach/f111/${match[1].toLowerCase()}/${match[2].toLowerCase()}`:'#/coach/f111',
+      };
+    }
+
+    if(templateId==='body'){
+      const familyId=String(route.query?.family||'').toUpperCase();
+      const bodySession=window.V14CoachModules?.BodySession;
+      if(!D().bodyFamilies?.[familyId]||!bodySession?.context)return null;
+      const ctx=bodySession.context({templateId:'body',page:'template-session',familyId,level,query:{}});
+      const currentSelections=Object.fromEntries((ctx.session?.main?.content||[]).map(item=>[item.key,item.actionId]));
+      const result=window.V15LowerAssistance.candidates({
+        consumer:'BODY',familyId,level,slotKey,currentSelections,includeVenueBlocked:false
+      });
+      return {
+        templateId:'body',familyId,sessionId:ctx.sessionKey,slotKey,level,result,
+        candidateMap:new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate])),
+        returnHash:`#/coach/body/${familyId.toLowerCase()}/${level.toLowerCase()}`,
+      };
+    }
+    return null;
   }
   function auxiliaryCard(entry,cfg,systemMode,api,replaceContext=null){
     const action=entry.action||{};
@@ -76,13 +98,13 @@
     const groupKeys=side==='lower'?Object.keys(familyDefs).filter(key=>baseEntries.some(entry=>entry.functionalFamily===key)):classKeys;
     const cards=side==='lower'?groupKeys.map(key=>`<section class="auxiliary-subgroup" data-auxiliary-subgroup="${esc(key)}"><div class="auxiliary-subgroup-head"><div><h3>${esc(familyDefs[key]?.label||key)}</h3><p>Functional Family｜同一功能家族内再按器械、Level 与 Training Role 筛选。</p></div><b>${baseEntries.filter(entry=>entry.functionalFamily===key).length} 个</b></div><div class="auxiliary-action-grid">${baseEntries.filter(entry=>entry.functionalFamily===key).map(entry=>auxiliaryCard(entry,cfg,systemMode,api,replaceContext)).join('')}</div></section>`).join(''):baseEntries.map(entry=>auxiliaryCard(entry,cfg,systemMode,api,null)).join('');
     const missingRefs=catalog.missingRefs?.length?`<p class="auxiliary-data-warning">规则引用了 ${catalog.missingRefs.length} 个动作库缺失 ID：${esc(catalog.missingRefs.map(item=>item.id).join('、'))}</p>`:'';
-    const contextBanner=replaceContext?`<div class="auxiliary-replacement-context"><b>F111 D1｜替换模式</b><span>${esc(replaceContext.sessionId)} · ${esc(replaceContext.level)} · 当前显示 ${baseEntries.length} 个通过 Gate 的候选</span><a href="${replaceContext.returnHash}">返回当前课程</a></div>`:'';
+    const contextBanner=replaceContext?`<div class="auxiliary-replacement-context"><b>${esc(replaceContext.templateId==='body'?'Body '+replaceContext.slotKey:'F111 D1')}｜替换模式</b><span>${esc(replaceContext.sessionId)} · ${esc(replaceContext.level)} · 当前显示 ${baseEntries.length} 个通过 Gate 的候选</span><a href="${replaceContext.returnHash}">返回当前课程</a></div>`:'';
     const controls=side==='lower'
       ?`<div class="auxiliary-module-controls lower-assistance-controls"><label>Functional Family<select data-aux-filter="family" aria-label="Functional Family"><option value="">全部功能家族</option>${familyOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><label>等级<select data-aux-filter="level" aria-label="等级"><option value="">全部等级</option>${['L1','L2','L3','L4'].map(x=>`<option value="${x}" ${level===x?'selected':''}>${x}</option>`).join('')}</select></label><label>Training Role<select data-aux-filter="role" aria-label="Training Role"><option value="">全部训练角色</option>${roleOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：显示训练语义，隐藏底层 ID'}</span></div>`
       :`<div class="auxiliary-module-controls"><label>来源动作池<select data-aux-filter="pool" aria-label="来源动作池"><option value="">全部动作池</option>${poolOptions}</select></label><label>器械分类<select data-aux-filter="equipmentClass" aria-label="器械分类"><option value="">全部分类</option>${classOptions}</select></label><span class="auxiliary-source-note">${systemMode?`数据源：${esc(cfg.sourceLabel)}`:'教练模式：隐藏标准 ID 与审计字段'}</span></div>`;
     const thirdSummary=side==='lower'?`${Object.values(catalog.familyCounts||{}).filter(Boolean).length} 个 Family`:`${cfg.poolKeys.length} 个`;
     return tabs('patterns')+`<a class="back-link" href="#/system/patterns">← 返回十大模式</a>`+hero(cfg.title,`${cfg.eyebrow}｜${cfg.intro}`)+
-      `<section class="section-card auxiliary-module" data-auxiliary-module="${esc(cfg.moduleId)}" data-auxiliary-side="${esc(side)}" ${replaceContext?`data-replacement-session="${esc(replaceContext.sessionId)}" data-replacement-slot="${esc(replaceContext.slotKey)}" data-return-hash="${esc(replaceContext.returnHash)}"`:''}>
+      `<section class="section-card auxiliary-module" data-auxiliary-module="${esc(cfg.moduleId)}" data-auxiliary-side="${esc(side)}" ${replaceContext?`data-replacement-template="${esc(replaceContext.templateId)}" data-replacement-session="${esc(replaceContext.sessionId)}" data-replacement-slot="${esc(replaceContext.slotKey)}" data-replacement-family="${esc(replaceContext.familyId||'')}" data-replacement-level="${esc(replaceContext.level)}" data-return-hash="${esc(replaceContext.returnHash)}"`:''}>
         ${contextBanner}<div class="section-head"><div><h2>${esc(cfg.title)}</h2><p>${esc(cfg.intro)}</p></div><a class="text-link" href="#/library?kind=action">在动作库中查看全部 →</a></div>
         <div class="auxiliary-summary-strip"><div><small>当前体系动作</small><b data-aux-visible-count>${baseEntries.length} 个</b></div><div><small>器械分类</small><b>${esc(auxiliaryClassSummary(catalog,api))}</b></div><div><small>${side==='lower'?'功能家族':'来源动作池'}</small><b>${thirdSummary}</b></div></div>
         ${lowerFamilySummary}${upperPoolSummary}${controls}
@@ -271,10 +293,17 @@
       poolButtons.forEach(button=>button.addEventListener('click',()=>{if(poolControl)poolControl.value=button.dataset.auxPoolButton||'';apply();}));
       familyButtons.forEach(button=>button.addEventListener('click',()=>{if(familyControl)familyControl.value=button.dataset.auxFamilyButton||'';apply();}));
       module.querySelectorAll('[data-aux-select-action]').forEach(button=>button.addEventListener('click',()=>{
-        const sessionId=module.dataset.replacementSession,slotKey=module.dataset.replacementSlot,actionId=button.dataset.auxSelectAction;
-        if(!sessionId||!slotKey||!actionId||!window.V14State?.setSelection)return;
-        window.V14State.setSelection(sessionId,slotKey,actionId);
-        location.hash=module.dataset.returnHash||'#/coach/f111';
+        const templateId=module.dataset.replacementTemplate,sessionId=module.dataset.replacementSession,slotKey=module.dataset.replacementSlot,actionId=button.dataset.auxSelectAction;
+        if(!templateId||!sessionId||!slotKey||!actionId)return;
+        if(templateId==='f111'){
+          if(!window.V14State?.setSelection)return;
+          window.V14State.setSelection(sessionId,slotKey,actionId);
+        }else if(templateId==='body'){
+          const familyId=module.dataset.replacementFamily,level=module.dataset.replacementLevel;
+          if(!familyId||!level||!window.V14CoachModules?.BodySession?.setFormalSelection)return;
+          window.V14CoachModules.BodySession.setFormalSelection(familyId,level,slotKey,actionId);
+        }else return;
+        location.hash=module.dataset.returnHash||'#/coach';
       }));
       apply();
       return;
