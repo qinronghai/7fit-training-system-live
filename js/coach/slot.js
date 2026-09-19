@@ -22,15 +22,21 @@
     let opts=lowerContext?.opts||(view.slotOptions?.[slot.slotKey]||[]);
     if(!opts.length)opts=[{id:slot.baselineId,label:(data.actions[slot.baselineId]?.name||slot.baselineId),kind:'当前'}];
     if(!opts.some(o=>o.id===actionId))opts=[{id:actionId,label:(a.name||actionId),kind:'当前选择'},...opts];
-    const options=opts.map(o=>`<option value="${esc(o.id)}" ${o.id===actionId?'selected':''}>${esc(o.label)}</option>`).join('');
+    const options=opts.map(o=>{
+      const candidate=o.candidate||{},reasons=(candidate.reasons||[]).map(item=>item.text).filter(Boolean).join('；');
+      const tradeoffs=(candidate.tradeoffs||[]).map(item=>item.text).filter(Boolean).join('；');
+      const roles=(candidate.trainingRoles||[]).map(role=>window.V15LowerAssistance?.trainingRoles?.[role]||role).filter(Boolean).join(' / ');
+      return `<option value="${esc(o.id)}" ${o.id===actionId?'selected':''} data-score="${esc(candidate.recommendationScore??'')}" data-family="${esc(candidate.functionalFamilyLabel||'')}" data-role="${esc(roles)}" data-reasons="${esc(reasons)}" data-tradeoffs="${esc(tradeoffs)}">${esc(o.label)}</option>`;
+    }).join('');
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(actionId)}`:`#/library?focus=${encodeURIComponent(actionId)}`;
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.f111Preset?.({sessionId,slotKey:slot.slotKey})||'';
     const quick=Recent?.renderButtons?.({templateId:'f111',contextKey,candidates:opts,currentActionId:actionId})||'';
     const recommended=lowerContext?.result?.candidates?.find(candidate=>candidate.actionId===lowerContext.result.recommended);
     const why=recommended?.reasons?.[0]?.text||'';
     const browse=lowerContext?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=f111&sessionId=${encodeURIComponent(sessionId)}&slotKey=${encodeURIComponent(slot.slotKey)}&level=${encodeURIComponent(lowerContext.level)}&lower=${encodeURIComponent(lowerContext.lowerMode)}">查看全部下肢辅助与容量动作 →</a>`:'';
+    const drawer=lowerContext?`<button type="button" class="lower-assistance-drawer-open" data-replacement-drawer data-replacement-select=".session-swap" data-replacement-title="D1｜下肢辅助替换" data-replacement-subtitle="${esc(lowerContext.level)} · 仅显示当前课程通过 Gate 的候选">打开替换抽屉</button>`:'';
     const whyHtml=why?`<small class="lower-assistance-why">推荐依据：${esc(why)}</small>`:'';
-    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${whyHtml}${browse}${quick}</div></article>`;
+    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${drawer}${whyHtml}${browse}${quick}</div></article>`;
   }
   function windowText(slotKey,resolved){
     if(slotKey==='A'||slotKey==='B'){const w=resolved.windows.main;return `推荐 ${w.recommended}｜常规 ${(w.normal||[]).join('–')}${(w.expanded||[]).length?`｜可退阶 ${(w.expanded||[]).join(' / ')}`:''}`;}
