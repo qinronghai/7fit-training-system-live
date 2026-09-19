@@ -7,6 +7,9 @@ const context = { window: {}, console };
 vm.runInNewContext(fs.readFileSync(`${root}/data/system-data.js`, 'utf8'), context, {
   filename: 'data/system-data.js',
 });
+vm.runInNewContext(fs.readFileSync(`${root}/js/lower-assistance.js`, 'utf8'), context, {
+  filename: 'js/lower-assistance.js',
+});
 vm.runInNewContext(fs.readFileSync(`${root}/js/auxiliary-modules.js`, 'utf8'), context, {
   filename: 'js/auxiliary-modules.js',
 });
@@ -74,18 +77,15 @@ assert.deepStrictEqual([...upperFacePull.sourcePools.map(pool => pool.key)], [
 assert.strictEqual(upperFacePull.action.equipmentClass, 'cable_station');
 
 const lower = api.catalog('lower');
-assert.strictEqual(lower.total, 6, 'lower auxiliary pool should deduplicate to 6 actions');
-assert.strictEqual(JSON.stringify(lower.classCounts), JSON.stringify({ fixed_machine: 4, cable_station: 2 }));
-assert.deepStrictEqual(
-  [...lower.entries.filter(entry => entry.equipmentClass === 'fixed_machine').map(entry => entry.id)],
-  ['tui_qushen', 'kuangnei_shou', 'kuangwai_zhan', 'tui_wanju'],
-);
-assert.deepStrictEqual(
-  [...lower.entries.filter(entry => entry.equipmentClass === 'cable_station').map(entry => entry.id)],
-  ['tunbu_houti', 'xiao_longmen_wai_zhan'],
-);
-assert.strictEqual(lower.entries.find(entry => entry.id === 'tunbu_houti').action.equipmentClass, 'cable_station');
-assert.strictEqual(lower.entries.find(entry => entry.id === 'tui_qushen').action.equipmentClass, 'fixed_machine');
+assert.strictEqual(lower.title, '12｜下肢辅助与容量动作');
+assert(lower.total >= 20, 'lower module should expose the shared audited assistance domain, not only six legacy D1 ids');
+assert(lower.entries.some(entry => entry.id === 'shengsuo_kuan_neishou'));
+assert(!lower.entries.some(entry => entry.id === 'hake_shendun'));
+assert.strictEqual(lower.entries.find(entry => entry.id === 'tui_wanju').functionalFamily, 'KNEE_FLEXION');
+assert.strictEqual(lower.entries.find(entry => entry.id === 'tui_qushen').functionalFamily, 'KNEE_EXTENSION');
+assert(lower.entries.find(entry => entry.id === 'tunbu_houti').consumers.f111D1);
+assert(lower.familyCounts.KNEE_FLEXION >= 1);
+assert(lower.familyCounts.HIP_ABDUCTION >= 1);
 
 const fixture = JSON.parse(JSON.stringify(context.window.V14_DATA));
 fixture.actions.fixture_auxiliary = {
@@ -101,24 +101,32 @@ fixture.actions.fixture_auxiliary = {
 };
 fixture.actionDetails.fixture_auxiliary = { fields: { 训练目标: 'fixture' } };
 fixture.composer.auxiliaryRules.lower.squat.push('fixture_auxiliary');
-fixture.composer.auxiliaryRules.lower.hinge.unshift('fixture_auxiliary');
 context.window.V14_DATA = fixture;
 
+// Legacy rule membership alone is no longer the lower-domain source of truth.
+assert(!api.catalog('lower').entries.some(entry => entry.id === 'fixture_auxiliary'));
+
+fixture.bodyActionMeta.fixture_auxiliary = {
+  families:['BODY-01'],
+  levels:['L1','L2','L3','L4'],
+  roles:['ACCESSORY','ISOLATION','OPTIONAL'],
+  directTargets:['quadriceps'],
+  secondaryTargets:[],
+  exerciseClass:'isolation',
+  fatigueCost:'low',
+  stabilityDemand:'low',
+  repProfile:'isolation_large',
+  laterality:'bilateral',
+};
 const dynamic = api.catalog('lower');
-assert.strictEqual(dynamic.total, 7, 'catalog must derive additions from current rules');
 const fixtureEntry = dynamic.entries.find(entry => entry.id === 'fixture_auxiliary');
-assert(fixtureEntry, 'new rule reference should create a catalog entry');
-assert.deepStrictEqual([...fixtureEntry.sourcePools.map(pool => pool.key)], ['squat', 'hinge']);
+assert(fixtureEntry, 'audited Body metadata should add the action to the shared lower domain');
+assert.strictEqual(fixtureEntry.functionalFamily, 'KNEE_EXTENSION');
+assert.deepStrictEqual([...fixtureEntry.sourcePools.map(pool => pool.key)], ['squat']);
 assert.deepStrictEqual(
   [...fixtureEntry.detailState.missing],
   ['教练口令', '执行步骤', '常见错误', '禁忌 / 限制'],
   'incomplete details must be explicit instead of fabricated',
 );
-
-for (const ids of Object.values(fixture.composer.auxiliaryRules.lower)) {
-  const index = ids.indexOf('fixture_auxiliary');
-  if (index >= 0) ids.splice(index, 1);
-}
-assert.strictEqual(api.catalog('lower').total, 6, 'removing every rule reference must remove the action');
 
 console.log('auxiliary_modules_runtime_test: PASS');
