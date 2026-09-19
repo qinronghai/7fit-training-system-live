@@ -12,6 +12,15 @@
   const sessionIdOf=(recipeId,level)=>`${recipeId}-${level}`;
   const stateKey=(recipeId,level)=>`${recipeId}:${level}`;
   const clean=value=>String(value??'').trim();
+  const isMobile=()=>typeof window.matchMedia==='function'&&window.matchMedia('(max-width:620px)').matches;
+
+  function setMobileBackgroundInert(active){
+    if(active&&!isMobile())return;
+    const shell=document.querySelector('.app-shell'),nav=document.getElementById('mobile-nav');
+    if(shell)shell.toggleAttribute('inert',!!active);
+    if(nav)nav.toggleAttribute('inert',!!active);
+    document.body.classList.toggle('drawer-open',!!active);
+  }
 
   function selected(){
     return current?{...current}:null;
@@ -87,7 +96,7 @@
         prepSelections:currentPrepSelections(recipeId,level),
       });
     }catch(error){
-      return `<div class="drawer-head f111-preset-drawer-head"><div><span>PRESET DETAIL</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
+      return `<div class="drawer-head f111-preset-drawer-head"><span class="f111-preset-sheet-handle" aria-hidden="true"></span><div><span>PRESET DETAIL</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
         <div class="drawer-body f111-preset-drawer-body"><section class="f111-preset-detail-error"><b>预设详情暂时无法解析</b><p>${esc(error?.message||'请进入正式课程页查看。')}</p><a href="${esc(Browser.canonicalHref(recipeId,level))}" data-f111-preset-navigate>进入课程</a></section></div>`;
     }
 
@@ -99,6 +108,7 @@
     const goals=preview.goals.join(' / ')||state.label;
 
     return `<div class="drawer-head f111-preset-drawer-head">
+      <span class="f111-preset-sheet-handle" aria-hidden="true"></span>
       <div class="f111-preset-drawer-title">
         <span>PRESET DETAIL</span>
         <h2>${esc(recipeId)} · ${esc(level)}</h2>
@@ -139,6 +149,11 @@
     </div>`;
   }
 
+  function focusables(drawer){
+    return Array.from(drawer.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+      .filter(node=>!node.hidden&&node.getAttribute('aria-hidden')!=='true');
+  }
+
   function cleanupListeners(){
     if(keyHandler)document.removeEventListener('keydown',keyHandler);
     if(hashHandler)window.removeEventListener('hashchange',hashHandler);
@@ -156,12 +171,21 @@
       drawer.innerHTML='';
       drawer.removeAttribute('role');
       drawer.removeAttribute('aria-label');
+      drawer.removeAttribute('aria-modal');
       drawer.removeAttribute('data-f111-preset-drawer');
     }
     if(rerender&&typeof rerenderHome==='function')rerenderHome();
+    setMobileBackgroundInert(false);
     if(restoreFocus&&last){
       requestAnimationFrame(()=>{
-        document.querySelector(`[data-f111-preset-cell][data-recipe-id="${last.recipeId}"][data-level="${last.level}"]`)?.focus();
+        const selector=`[data-recipe-id="${last.recipeId}"][data-level="${last.level}"]`;
+        const desktop=document.querySelector(`[data-f111-preset-cell]${selector}`);
+        const mobile=document.querySelector(`[data-f111-mobile-preset]${selector}`);
+        const recent=document.querySelector(`[data-f111-recent]${selector}`);
+        const target=(desktop&&desktop.offsetParent!==null?desktop:null)
+          ||(mobile&&mobile.offsetParent!==null?mobile:null)
+          ||(recent&&recent.offsetParent!==null?recent:null);
+        target?.focus();
       });
     }
     rerenderHome=null;
@@ -182,6 +206,15 @@
         event.preventDefault();
         close();
         return;
+      }
+      if(event.key!=='Tab'||!isMobile())return;
+      const nodes=focusables(drawer);
+      if(!nodes.length)return;
+      const first=nodes[0],last=nodes[nodes.length-1];
+      if(event.shiftKey&&document.activeElement===first){
+        event.preventDefault();last.focus();
+      }else if(!event.shiftKey&&document.activeElement===last){
+        event.preventDefault();first.focus();
       }
     };
     document.addEventListener('keydown',keyHandler);
@@ -204,8 +237,10 @@
     drawer.setAttribute('role','dialog');
     drawer.setAttribute('aria-label',`${recipeId} ${level} 预设详情`);
     drawer.setAttribute('data-f111-preset-drawer','');
+    if(isMobile())drawer.setAttribute('aria-modal','true');else drawer.removeAttribute('aria-modal');
     bindDrawer(drawer);
     if(rerenderHome)rerenderHome();
+    setMobileBackgroundInert(isMobile());
     requestAnimationFrame(()=>drawer.querySelector('[data-f111-preset-close]')?.focus());
     return true;
   }

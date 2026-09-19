@@ -96,6 +96,9 @@ test('desktop F111 preset cell opens detail drawer without leaving browser conte
   await expect(page.locator('#global-drawer .f111-preset-drawer-actions')).toContainText('开始课程');
   await expect(page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]')).toHaveAttribute('aria-selected','true');
 
+  await page.locator('[data-f111-preset-close]').click();
+  await expect(page.locator('#global-drawer')).toBeHidden();
+
   const second = page.locator('[data-f111-preset-cell][data-recipe-id="F111-07"][data-level="L3"]');
   await second.click();
   await expect(page.locator('#global-drawer')).toContainText('F111-07 · L3');
@@ -229,6 +232,53 @@ test('360px F111 preset browser keeps compact ALL-level rows usable', async ({ p
   }));
   expect(widths.scrollWidth).toBe(widths.clientWidth);
   expect(widths.clientWidth).toBe(360);
+  await expectNoPageErrors(errors);
+});
+
+test('390px F111 preset detail opens as modal bottom sheet with fixed CTA and focus return', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+
+  await page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]').click();
+  const target = page.locator('[data-f111-mobile-preset][data-recipe-id="F111-03"][data-level="L2"]');
+  await expect(target).toBeVisible();
+  await target.click();
+
+  const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+  await expect(drawer).toBeVisible();
+  await expect(drawer).toHaveAttribute('aria-modal','true');
+  await expect(drawer.locator('.f111-preset-sheet-handle')).toBeVisible();
+  await expect(drawer).toContainText('F111-03 · L2');
+  await expect(drawer).toContainText('髋铰链');
+  await expect(drawer.locator('.f111-preset-cta.primary')).toContainText('开始课程');
+  await expect(drawer.locator('.f111-preset-cta.primary')).toBeVisible();
+
+  expect(await page.locator('body').evaluate(node => node.classList.contains('drawer-open'))).toBeTruthy();
+  expect(await page.locator('.app-shell').evaluate(node => node.hasAttribute('inert'))).toBeTruthy();
+
+  const geometry = await drawer.evaluate(node => {
+    const body = node.querySelector('.f111-preset-drawer-body').getBoundingClientRect();
+    const head = node.querySelector('.f111-preset-drawer-head').getBoundingClientRect();
+    const cta = node.querySelector('.f111-preset-drawer-actions').getBoundingClientRect();
+    return {bodyTop:body.top,headTop:head.top,headBottom:head.bottom,ctaBottom:cta.bottom,viewport:window.innerHeight};
+  });
+  expect(geometry.headTop).toBeGreaterThan(0);
+  expect(geometry.bodyTop).toBeGreaterThan(geometry.headTop);
+  expect(geometry.ctaBottom).toBeLessThanOrEqual(geometry.viewport + 1);
+
+  await drawer.locator('[data-f111-preset-close]').click();
+  await expect(drawer).toBeHidden();
+  expect(await page.locator('body').evaluate(node => node.classList.contains('drawer-open'))).toBeFalsy();
+  expect(await page.locator('.app-shell').evaluate(node => node.hasAttribute('inert'))).toBeFalsy();
+  await expect(page.locator('[data-f111-mobile-preset][data-recipe-id="F111-03"][data-level="L2"]')).toBeFocused();
+
+  const widths = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(widths.scrollWidth).toBe(widths.clientWidth);
+  expect(widths.clientWidth).toBe(390);
   await expectNoPageErrors(errors);
 });
 

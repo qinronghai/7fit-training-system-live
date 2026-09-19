@@ -175,6 +175,12 @@
       chatImages:assetsOf(c,"chat").map(a=>a.url),case_assets:c.case_assets||[],status:c.status||"published",cloud:true
     }
   }
+  let cloudSnapshot=null;
+  const legacyRender=render;
+  render=function(){
+    if(cloudReady&&Array.isArray(cloudSnapshot))cases=cloudSnapshot.slice();
+    return legacyRender();
+  };
   async function api(action,{method="GET",body=null,headers={}}={}){
     const h={...headers};
     if(adminKey) h["x-admin-key"]=adminKey;
@@ -210,12 +216,15 @@
     showCloudState();state.textContent="正在读取云端案例…";
     try{
       const data=await api("list");
-      cases=(data.cases||[]).map(mapCase);
+      cloudSnapshot=(data.cases||[]).map(mapCase);
+      cases=cloudSnapshot.slice();
       cloudReady=true;
       render();
       cloudState("云端案例已同步","ok");
     }catch(e){
       console.error(e);
+      cloudReady=false;
+      cloudSnapshot=null;
       cases=[];
       render();
       cloudState("云端读取失败","err");
