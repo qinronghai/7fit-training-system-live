@@ -287,13 +287,67 @@
     const row=metrics.lastElementChild;if(row&&row.children[1])row.children[1].value=before||"";if(row&&row.children[2])row.children[2].value=after||"";
   };
 
+  function friendlyError(err){
+    const msg=String(err?.message||err||"");
+    if(/unauthorized/i.test(msg)) return "管理身份已失效，请重新输入后台管理密钥";
+    if(/Failed to fetch|NetworkError|Load failed/i.test(msg)) return "网络连接失败，请检查手机网络后重试";
+    if(/file_too_large/i.test(msg)) return "图片文件太大，请重新选择或压缩后再上传";
+    if(/image_only/i.test(msg)) return "只支持上传图片文件";
+    if(/display_name_required/i.test(msg)) return "请填写会员显示名称";
+    if(/invalid_category/i.test(msg)) return "案例分类无效，请重新选择";
+    if(/server key is unavailable/i.test(msg)) return "云端后台配置异常，请稍后重试";
+    return "保存失败："+msg.slice(0,80);
+  }
+
+  async function normalizeImage(file){
+    if(!file||!file.size)return file;
+    const safeTypes=["image/jpeg","image/png","image/webp"];
+    if(file.size<=4*1024*1024 && safeTypes.includes(file.type)) return file;
+    let img=null,url="";
+    try{
+      url=URL.createObjectURL(file);
+      img=await new Promise((resolve,reject)=>{
+        const el=new Image();
+        el.onload=()=>resolve(el);
+        el.onerror=reject;
+        el.src=url;
+      });
+      const maxSide=2600;
+      const scale=Math.min(1,maxSide/Math.max(img.naturalWidth||1,img.naturalHeight||1));
+      const w=Math.max(1,Math.round((img.naturalWidth||1)*scale));
+      const h=Math.max(1,Math.round((img.naturalHeight||1)*scale));
+      const canvas=document.createElement("canvas");
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext("2d",{alpha:false});
+      ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+      let quality=.88;
+      let blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",quality));
+      if(blob&&blob.size>5*1024*1024){
+        quality=.76;
+        blob=await new Promise(ok=>canvas.toBlob(ok,"image/jpeg",quality));
+      }
+      if(blob){
+        const stem=(file.name||"image").replace(/\.[^.]+$/,"");
+        return new File([blob],stem+".jpg",{type:"image/jpeg",lastModified:Date.now()});
+      }
+    }catch(e){
+      console.warn("image normalize skipped",e);
+    }finally{
+      if(url) URL.revokeObjectURL(url);
+    }
+    return file;
+  }
+
   async function uploadFile(caseId,kind,file,replace=false){
     if(!file||!file.size)return null;
+    const uploadFile=await normalizeImage(file);
+    if(uploadFile.size>15*1024*1024)throw new Error("file_too_large");
     const res=await fetch(API+"?action=upload&case_id="+encodeURIComponent(caseId)+"&kind="+encodeURIComponent(kind)+"&replace="+(replace?"1":"0"),{
-      method:"POST",headers:{"x-admin-key":adminKey,"content-type":file.type||"image/jpeg","x-file-name":encodeURIComponent(file.name||"image.jpg")},body:file
+      method:"POST",headers:{"x-admin-key":adminKey,"content-type":uploadFile.type||"image/jpeg","x-file-name":encodeURIComponent(uploadFile.name||"image.jpg")},body:uploadFile
     });
     const data=await res.json().catch(()=>({}));
-    if(!res.ok)throw new Error(data.error||"upload_failed");
+    if(!res.ok)throw new Error(data.error||("upload_failed_"+res.status));
     return data.asset;
   }
 
@@ -306,7 +360,10 @@
   form.onsubmit=async e=>{
     e.preventDefault();
     if(!(await verifyAdmin(true)))return;
-    const f=e.currentTarget,fd=new FormData(f),wasEditing=!!editingCaseId,existing=editingCaseId?cases.find(x=>x.id===editingCaseId):null;
+    const f=e.currentTarget,submitBtn=f.querySelector('button[type="submit"]');
+    const oldSubmitText=submitBtn?.textContent||"保存案例";
+    if(submitBtn){submitBtn.disabled=true;submitBtn.textContent="正在保存…";}
+    const fd=new FormData(f),wasEditing=!!editingCaseId,existing=editingCaseId?cases.find(x=>x.id===editingCaseId):null;
     const metrics=[...document.querySelectorAll(".mrow")].map(r=>({name:r.children[0].value.trim(),before:r.children[1].value.trim(),after:r.children[2].value.trim()})).filter(x=>x.name&&(x.before||x.after));
     const coverView=fd.get("coverView")||existing?.coverView||"front";
     const chosenInput={front:f.elements.frontImage,side:f.elements.sideImage,back:f.elements.backImage}[coverView];
@@ -335,7 +392,12 @@
       if(wasEditing&&!document.querySelector("#detail").classList.contains("hidden"))openCase(caseId);
       toast(wasEditing?"案例已同步更新":"案例已上传到云端");
     }catch(err){
-      console.error(err);cloudState("云端保存失败","err");toast("保存失败，请检查网络后重试");
+      console.error(err);
+      const message=friendlyError(err);
+      cloudState(message,"err");
+      toast(message);
+    }finally{
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldSubmitText;}
     }
   };
 
