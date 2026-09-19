@@ -1157,3 +1157,53 @@ body{font-size:14px;line-height:1.55}
   .f111-preset-drawer-actions{grid-template-columns:1fr 1fr;margin-left:-20px;margin-right:-20px}
   .f111-preset-cta.primary{grid-column:1/-1;grid-row:1}
 }
+
+
+/* ISSUE 129 / F111 PRESET SEARCH FILTERS RECENT */
+.f111-preset-tools{display:grid;gap:10px;margin:0 0 12px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fbfaff}
+.f111-preset-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.f111-preset-search{display:grid;gap:5px;min-width:0}
+.f111-preset-search>span,.f111-preset-tool-label b,.f111-preset-filter-group>span{font-size:10px;font-weight:900;color:var(--ink)}
+.f111-preset-search input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:9px 10px;font-size:11px}
+.f111-preset-search input:focus-visible{outline:2px solid var(--purple-dark);outline-offset:2px}
+.f111-preset-clear{min-height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--purple-dark);padding:7px 10px;font-size:10px;font-weight:900;cursor:pointer}
+.f111-preset-clear:disabled{opacity:.45;cursor:default}
+.f111-preset-recent{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;align-items:center}
+.f111-preset-tool-label{display:grid;gap:2px}
+.f111-preset-tool-label small{font-size:8px;color:var(--muted);line-height:1.35}
+.f111-preset-recent-list{display:flex;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:thin;padding:1px 0}
+.f111-preset-recent-card{flex:0 1 190px;min-width:150px;max-width:210px;display:grid;gap:2px;text-align:left;border:1px solid #dfd5f2;border-radius:9px;background:#fff;padding:7px 9px;color:var(--ink);cursor:pointer}
+.f111-preset-recent-card:hover{border-color:#c7b4f0;background:var(--purple-pale)}
+.f111-preset-recent-card:focus-visible{outline:2px solid var(--purple-dark);outline-offset:2px}
+.f111-preset-recent-card span{font-size:8px;color:var(--purple-dark);font-weight:950}
+.f111-preset-recent-card b{font-size:9px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f111-preset-recent-empty{font-size:9px;color:var(--muted)}
+.f111-preset-filter-stack{display:grid;gap:6px}
+.f111-preset-filter-group{display:grid;grid-template-columns:48px minmax(0,1fr);gap:6px;align-items:center}
+.f111-preset-filter-group>div{display:flex;gap:5px;flex-wrap:wrap}
+.f111-preset-filter-chip{min-height:28px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);padding:4px 9px;font-size:9px;font-weight:850;cursor:pointer}
+.f111-preset-filter-chip:hover{border-color:#c7b4f0;color:var(--purple-dark)}
+.f111-preset-filter-chip.active{background:var(--purple);border-color:var(--purple);color:#fff}
+.f111-preset-filter-chip:focus-visible{outline:2px solid var(--purple-dark);outline-offset:2px}
+.f111-preset-result-context{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:7px;border-top:1px solid var(--line)}
+.f111-preset-result-context b{font-size:10px;color:var(--purple-dark)}
+.f111-preset-result-context span{font-size:8px;color:var(--muted);text-align:right}
+.f111-preset-cell.is-filtered-out{background:#fbfafc;color:#c4beca;box-shadow:none;cursor:default}
+.f111-preset-cell.is-filtered-out:hover{background:#fbfafc;box-shadow:none}
+.f111-preset-empty{display:grid;justify-items:center;gap:5px;padding:30px 16px;border:1px dashed #d8cdea;border-radius:12px;background:#fcfbff;text-align:center}
+.f111-preset-empty b{font-size:14px}
+.f111-preset-empty p{margin:0;color:var(--muted);font-size:10px}
+.f111-preset-empty button{margin-top:5px;border:0;border-radius:9px;background:var(--purple);color:#fff;padding:8px 11px;font-size:10px;font-weight:900;cursor:pointer}
+@media(max-width:979px){
+  .f111-preset-tools{padding:10px}
+  .f111-preset-recent{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .f111-preset-search-row{grid-template-columns:1fr}
+  .f111-preset-clear{width:100%}
+  .f111-preset-filter-group{grid-template-columns:1fr}
+  .f111-preset-filter-chip{min-height:34px;padding:6px 10px;font-size:10px}
+  .f111-preset-result-context{align-items:flex-start;flex-direction:column}
+  .f111-preset-result-context span{text-align:left}
+  .f111-preset-recent-card{min-width:170px}
+}
