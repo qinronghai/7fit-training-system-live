@@ -1,16 +1,36 @@
 (function(){
   const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
   const {esc,D}=C;
+  function lowerAssistancePresetOptions(sessionId,slot,currentActionId){
+    const data=D(),session=data.sessions?.[sessionId],match=String(sessionId||'').match(/^(F111-\d+)-(L[1-4])$/);
+    if(!session||!match||!String(slot?.slotName||'').startsWith('D1｜')||!window.V15LowerAssistance?.candidates)return null;
+    const recipeId=match[1],level=match[2],lowerMode=data.composer?.officialPresetMap?.[recipeId]?.[0]||'';
+    const otherIds=(session.slots||[]).filter(item=>item.slotKey!==slot.slotKey).map(item=>window.V14State.getSelection(sessionId,item.slotKey)||item.baselineId).filter(Boolean);
+    const result=window.V15LowerAssistance.candidates({consumer:'F111_D1',level,lowerMode,currentActionIds:otherIds});
+    const byId=new Map((result.candidates||[]).map(candidate=>[candidate.actionId,candidate]));
+    const baseline=slot.baselineId,ids=[baseline,...(result.candidates||[]).map(candidate=>candidate.actionId)];
+    if(currentActionId&&!ids.includes(currentActionId))ids.unshift(currentActionId);
+    const opts=[...new Set(ids)].filter(id=>data.actions?.[id]).map(id=>{
+      const candidate=byId.get(id),name=data.actions[id]?.name||id;
+      return {id,label:candidate?name+'｜'+(candidate.functionalFamilyLabel||'下肢辅助'):name,kind:id===baseline?'当前默认':'体系候选',candidate};
+    });
+    return {opts,result,recipeId,level,lowerMode};
+  }
   function sessionCard(sessionId,slot){
     const data=D(),view=data.sessionViews[sessionId]||{},actionId=window.V14State.getSelection(sessionId,slot.slotKey),a=data.actions[actionId]||{};
-    let opts=view.slotOptions?.[slot.slotKey]||[];
+    const lowerContext=lowerAssistancePresetOptions(sessionId,slot,actionId);
+    let opts=lowerContext?.opts||(view.slotOptions?.[slot.slotKey]||[]);
     if(!opts.length)opts=[{id:slot.baselineId,label:(data.actions[slot.baselineId]?.name||slot.baselineId),kind:'当前'}];
     if(!opts.some(o=>o.id===actionId))opts=[{id:actionId,label:(a.name||actionId),kind:'当前选择'},...opts];
     const options=opts.map(o=>`<option value="${esc(o.id)}" ${o.id===actionId?'selected':''}>${esc(o.label)}</option>`).join('');
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(actionId)}`:`#/library?focus=${encodeURIComponent(actionId)}`;
     const Recent=window.V15RecentActions,contextKey=Recent?.context?.f111Preset?.({sessionId,slotKey:slot.slotKey})||'';
     const quick=Recent?.renderButtons?.({templateId:'f111',contextKey,candidates:opts,currentActionId:actionId})||'';
-    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${quick}</div></article>`;
+    const recommended=lowerContext?.result?.candidates?.find(candidate=>candidate.actionId===lowerContext.result.recommended);
+    const why=recommended?.reasons?.[0]?.text||'';
+    const browse=lowerContext?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=f111&sessionId=${encodeURIComponent(sessionId)}&slotKey=${encodeURIComponent(slot.slotKey)}&level=${encodeURIComponent(lowerContext.level)}&lower=${encodeURIComponent(lowerContext.lowerMode)}">查看全部下肢辅助与容量动作 →</a>`:'';
+    const whyHtml=why?`<small class="lower-assistance-why">推荐依据：${esc(why)}</small>`:'';
+    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${whyHtml}${browse}${quick}</div></article>`;
   }
   function windowText(slotKey,resolved){
     if(slotKey==='A'||slotKey==='B'){const w=resolved.windows.main;return `推荐 ${w.recommended}｜常规 ${(w.normal||[]).join('–')}${(w.expanded||[]).length?`｜可退阶 ${(w.expanded||[]).join(' / ')}`:''}`;}
