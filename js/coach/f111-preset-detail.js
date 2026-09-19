@@ -134,7 +134,7 @@
       <div class="f111-preset-drawer-actions">
         <a class="f111-preset-cta secondary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-replace>替换动作</a>
         <a class="f111-preset-cta tertiary" href="${esc(composerHref(state))}" data-f111-preset-navigate>加入自由组合编辑</a>
-        <a class="f111-preset-cta primary" href="${esc(state.href)}" data-f111-preset-navigate>开始课程</a>
+        <a class="f111-preset-cta primary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-start>开始课程</a>
       </div>
     </div>`;
   }
@@ -170,6 +170,7 @@
   function bindDrawer(drawer){
     drawer.querySelector('[data-f111-preset-close]')?.addEventListener('click',()=>close());
     drawer.querySelectorAll('[data-f111-preset-navigate]').forEach(link=>link.addEventListener('click',()=>{
+      if(link.hasAttribute('data-preset-start')&&current)M.F111PresetControls?.recordRecent?.({recipeId:current.recipeId,level:current.level});
       close({restoreFocus:false,rerender:false});
     }));
     drawer.addEventListener('click',event=>{
@@ -194,6 +195,7 @@
     if(!state)return false;
     cleanupListeners();
     current={key:stateKey(recipeId,level),recipeId,level};
+    M.F111PresetControls?.recordRecent?.({recipeId,level});
     rerenderHome=typeof rerender==='function'?rerender:null;
     const drawer=document.getElementById('global-drawer');
     if(!drawer)return false;
