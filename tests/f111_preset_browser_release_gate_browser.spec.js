@@ -374,6 +374,9 @@ test('F111 preset detail mobile keeps grouped cards and a compact action bar', a
   await expect(drawer.locator('.f111-preset-drawer-actions a')).toHaveCount(2);
   await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
   await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
+  await expect(drawer.locator('.f111-preset-preview-row-head')).toHaveCount(11);
+  await expect(drawer.locator('.f111-preset-preview-row-head .f111-preset-preview-prescription')).toHaveCount(11);
+  await expect(drawer.locator('.f111-preset-preview-row').first().locator('.f111-preset-preview-prescription')).toContainText('1–2组');
   const sheetBody = await drawer.locator('.f111-preset-drawer-body').boundingBox();
   const sheetHead = await drawer.locator('.f111-preset-drawer-head').boundingBox();
   expect(sheetBody.height).toBeGreaterThanOrEqual(690);

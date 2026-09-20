@@ -109,9 +109,11 @@
       const name=clean(slot.name)||clean(item.name)||'暂无合法候选';
       const prescriptionText=clean(slot.prescription)||prescription(item,level);
       return `<div class="f111-preset-preview-row f111-preset-preview-prep" data-preview-prep-slot="${esc(slot.slotKey)}">
-        <div><span>${esc(slot.prepGrade||slot.slotName||slot.slotKey)}</span><b>${esc(name)}</b><small>${esc(slot.purpose||'按当前主项实时匹配')}</small></div>
+        <div class="f111-preset-preview-row-content">
+          <div class="f111-preset-preview-row-head"><div><span>${esc(slot.prepGrade||slot.slotName||slot.slotKey)}</span><b>${esc(name)}</b></div><small class="f111-preset-preview-prescription">${esc(prescriptionText)}</small></div>
+          <small class="f111-preset-preview-purpose">${esc(slot.purpose||'按当前主项实时匹配')}</small>
+        </div>
         ${replacementControl({kind:'prep',slotKey:slot.slotKey,label:slot.slotName||slot.slotKey,options,currentValue:slot.actionId,disabled:!options.length})}
-        <small class="f111-preset-preview-prescription">${esc(prescriptionText)}</small>
       </div>`;
     }).join('');
   }
@@ -123,9 +125,10 @@
       const session=dataSessionSlot(recipeId,level,displayKey);
       const options=sessionOptions(recipeId,level,displayKey,item.actionId);
       return `<div class="f111-preset-preview-row" data-preview-slot="${esc(displayKey)}">
-        <div><span>${esc(section.label||section.key)}</span><b>${esc(item.name||item.actionId||'—')}</b></div>
+        <div class="f111-preset-preview-row-content">
+          <div class="f111-preset-preview-row-head"><div><span>${esc(section.label||section.key)}</span><b>${esc(item.name||item.actionId||'—')}</b></div><small class="f111-preset-preview-prescription">${esc(prescription(item,preview.level))}</small></div>
+        </div>
         ${replacementControl({kind:'session',slotKey:displayKey,stateSlotKey:session,label:section.label||section.key,options,currentValue:item.actionId,disabled:!options.length})}
-        <small>${esc(prescription(item,preview.level))}</small>
       </div>`;
     }).join('');
     return rows;
