@@ -63,12 +63,12 @@
     const sourceKey=dataSessionSlot(recipeId,level,slotKey);
     const options=(view.slotOptions?.[sourceKey]||[]).map(option=>({
       value:clean(option.id),
-      label:clean(option.label)||clean(option.name)||clean(data.actions?.[option.id]?.name)||clean(option.id),
+      label:compactOptionLabel(clean(option.label)||clean(option.name)||clean(data.actions?.[option.id]?.name)||clean(option.id)),
     })).filter(option=>option.value);
     if(currentActionId&&!options.some(option=>option.value===currentActionId)){
       options.unshift({
         value:currentActionId,
-        label:clean(data.actions?.[currentActionId]?.name)||currentActionId,
+        label:compactOptionLabel(clean(data.actions?.[currentActionId]?.name)||currentActionId),
       });
     }
     return options;
@@ -87,9 +87,14 @@
     return options.map(option=>`<option value="${esc(option.value)}" ${option.value===currentValue?'selected':''}>${esc(option.label)}</option>`).join('');
   }
 
+  function compactOptionLabel(value){
+    const parts=clean(value).split('｜').map(clean).filter(Boolean);
+    return parts.slice(0,2).join(' · ')||clean(value);
+  }
+
   function replacementControl({kind,slotKey,stateSlotKey,label,options,currentValue,disabled=false}){
     const attribute=kind==='prep'?'data-f111-drawer-prep-select':'data-f111-drawer-session-select';
-    return `<label class="f111-preset-replace-control"><span>替换动作</span><select ${attribute} data-slot-key="${esc(slotKey)}" ${stateSlotKey?`data-state-slot-key="${esc(stateSlotKey)}"`:''} aria-label="${esc(label)}：替换动作" ${disabled?'disabled':''}>${optionMarkup(options,currentValue)}</select></label>`;
+    return `<label class="f111-preset-replace-control"><select ${attribute} data-slot-key="${esc(slotKey)}" ${stateSlotKey?`data-state-slot-key="${esc(stateSlotKey)}"`:''} aria-label="${esc(label)}：更换动作" ${disabled?'disabled':''}>${optionMarkup(options,currentValue)}</select></label>`;
   }
 
   function prepRows(recipeId,level,preview){
@@ -99,7 +104,7 @@
       const item=previewItems.get(slot.slotKey)||{};
       const options=(slot.candidates||[]).map(candidate=>({
         value:clean(candidate.actionId),
-        label:[clean(candidate.prepGrade)||'PREP',clean(candidate.name)||clean(candidate.actionId)].filter(Boolean).join('｜'),
+        label:[clean(candidate.name)||clean(candidate.actionId),clean(candidate.prepGrade)||'PREP'].filter(Boolean).join(' · '),
       })).filter(option=>option.value);
       const name=clean(slot.name)||clean(item.name)||'暂无合法候选';
       const prescriptionText=clean(slot.prescription)||prescription(item,level);
@@ -123,19 +128,7 @@
         <small>${esc(prescription(item,preview.level))}</small>
       </div>`;
     }).join('');
-    return `${prepRows(recipeId,level,preview)}${rows}`;
-  }
-
-  function replacementEntries(recipeId,level){
-    const data=D(),sessionId=sessionIdOf(recipeId,level),session=data.sessions?.[sessionId],view=data.sessionViews?.[sessionId]||{};
-    if(!session)return [];
-    return (session.slots||[]).filter(slot=>{
-      const options=view.slotOptions?.[slot.slotKey]||[];
-      return options.length>1;
-    }).map(slot=>({
-      slotKey:slot.slotKey,
-      label:clean(slot.slotName).split('｜')[0]||'动作',
-    }));
+    return rows;
   }
 
   function render(recipeId,level){
@@ -148,22 +141,21 @@
         prepSelections:currentPrepSelections(recipeId,level),
       });
     }catch(error){
-      return `<div class="drawer-head f111-preset-drawer-head"><span class="f111-preset-sheet-handle" aria-hidden="true"></span><div><span>PRESET DETAIL</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
+      return `<div class="drawer-head f111-preset-drawer-head"><span class="f111-preset-sheet-handle" aria-hidden="true"></span><div><span>预设详情</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
         <div class="drawer-body f111-preset-drawer-body"><section class="f111-preset-detail-error"><b>预设详情暂时无法解析</b><p>${esc(error?.message||'请进入正式课程页查看。')}</p><a href="${esc(Browser.canonicalHref(recipeId,level))}" data-f111-preset-navigate>进入课程</a></section></div>`;
     }
 
-    const replacements=replacementEntries(recipeId,level);
-    const prepReplacementCount=prepSlots(recipeId,level).filter(slot=>(slot.candidates||[]).length>1).length;
-    const replacementHtml=replacements.length||prepReplacementCount
-      ?`<span class="f111-preset-swap-chip">${replacements.length+prepReplacementCount} 个训练卡支持直接替换</span><span class="f111-preset-swap-note">替换后会保留当前预设、等级与合法候选范围。</span>`
-      :`<span class="f111-preset-swap-chip">当前预设暂无其他合法候选</span>`;
     const equipment=preview.equipment.length?preview.equipment.join(' · '):'徒手 / 场馆现有器械';
     const goals=preview.goals.join(' / ')||state.label;
+    const prep=prepRows(recipeId,level,preview);
+    const training=trainingRows(preview,recipeId,level);
+    const prepCount=(preview.sections||[]).find(section=>section.key==='PREP')?.items?.length||0;
+    const trainingCount=(preview.sections||[]).filter(section=>section.kind==='SLOT').length;
 
     return `<div class="drawer-head f111-preset-drawer-head">
       <span class="f111-preset-sheet-handle" aria-hidden="true"></span>
       <div class="f111-preset-drawer-title">
-        <span>PRESET DETAIL</span>
+        <span>预设详情</span>
         <h2>${esc(recipeId)} · ${esc(level)}</h2>
         <p>${esc(state.label)}</p>
       </div>
@@ -177,7 +169,15 @@
 
       <section class="f111-preset-detail-section">
         <div class="f111-preset-detail-section-head"><div><span>SESSION PREVIEW</span><h3>今日训练</h3></div><small>${esc(preview.duration.label)}</small></div>
-        <div class="f111-preset-preview-list">${trainingRows(preview,recipeId,level)}</div>
+        <p class="f111-preset-session-note">每张卡都可以直接更换，当前预设与等级保持不变。</p>
+        <div class="f111-preset-preview-group" data-f111-preset-prep-group>
+          <div class="f111-preset-preview-group-head"><h4>PREP 热身</h4><small>${prepCount} 个槽位</small></div>
+          <div class="f111-preset-preview-list">${prep}</div>
+        </div>
+        <div class="f111-preset-preview-group" data-f111-preset-training-group>
+          <div class="f111-preset-preview-group-head"><h4>正式训练</h4><small>${trainingCount} 个动作</small></div>
+          <div class="f111-preset-preview-list">${training}</div>
+        </div>
       </section>
 
       <section class="f111-preset-detail-section">
@@ -189,14 +189,8 @@
         </div>
       </section>
 
-      <section class="f111-preset-detail-section">
-        <div class="f111-preset-detail-section-head"><div><span>LEGAL SWAP</span><h3>卡片内直接替换</h3></div><small>仅显示当前合法候选</small></div>
-        <div class="f111-preset-swap-chips">${replacementHtml}</div>
-      </section>
-
       <div class="f111-preset-drawer-actions">
-        <a class="f111-preset-cta secondary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-replace>替换动作</a>
-        <a class="f111-preset-cta tertiary" href="${esc(composerHref(state))}" data-f111-preset-navigate>加入自由组合编辑</a>
+        <a class="f111-preset-cta secondary" href="${esc(composerHref(state))}" data-f111-preset-navigate>加入自由组合编辑</a>
         <a class="f111-preset-cta primary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-start>开始课程</a>
       </div>
     </div>`;

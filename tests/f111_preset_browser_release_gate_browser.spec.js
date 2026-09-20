@@ -328,6 +328,11 @@ test('F111 preset detail drawer supports direct legal replacement for PREP and s
 
   const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
   await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-preset-prep-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-training-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-legal-swap]')).toHaveCount(0);
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
+  await expect(drawer.locator('.f111-preset-drawer-actions a')).toHaveCount(2);
   await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
   await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
 
@@ -351,6 +356,25 @@ test('F111 preset detail drawer supports direct legal replacement for PREP and s
   expect(await page.evaluate(({ slot }) => window.V15State.getPrepSelections('f111', 'F111-03-L2')[slot]?.actionId, { slot: prepSlot })).toBe(prepReplacement);
 
   await expectNoOverflow(page, 1280);
+  await expectClean(diag);
+});
+
+test('F111 preset detail mobile keeps grouped cards and a compact action bar', async ({ page }) => {
+  const diag = diagnostics(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+  await page.locator('[data-f111-mobile-preset][data-recipe-id="F111-03"][data-level="L3"]').click();
+
+  const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-preset-prep-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-training-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-legal-swap]')).toHaveCount(0);
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
+  await expect(drawer.locator('.f111-preset-drawer-actions a')).toHaveCount(2);
+  await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
+  await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
+  await expectNoOverflow(page, 390);
   await expectClean(diag);
 });
 
@@ -421,9 +445,9 @@ test('Preset Browser V2 recent-use recovery and canonical handoff remain safe', 
   const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
   await expect(drawer).toBeVisible();
   await expect(drawer.locator('[data-preset-start]')).toHaveAttribute('href', '#/coach/f111/f111-07/l3');
-  await expect(drawer.locator('[data-preset-replace]')).toHaveAttribute('href', '#/coach/f111/f111-07/l3');
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
 
-  const composerHref = await drawer.locator('.f111-preset-cta.tertiary').getAttribute('href');
+  const composerHref = await drawer.locator('.f111-preset-cta.secondary').getAttribute('href');
   expect(composerHref).toContain('#/coach/f111/compose?');
   expect(composerHref).toContain('level=L3');
   expect(composerHref).toContain('lower=hinge');
