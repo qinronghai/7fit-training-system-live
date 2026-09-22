@@ -38,6 +38,12 @@ export function hashSessionToken(token) {
   return sha256Hex(token);
 }
 
+export function extractBearerToken(authorization) {
+  const value = String(authorization || '');
+  if (!/^Bearer\s+/i.test(value)) return '';
+  return value.replace(/^Bearer\s+/i, '').trim();
+}
+
 export async function pinMatches(pin, expectedHash) {
   if (!/^\d{6}$/.test(String(pin || '')) || !expectedHash) return false;
   return constantTimeEqual(await sha256Hex(pin), expectedHash);
@@ -58,4 +64,35 @@ export function isSessionActive(record, now = new Date()) {
   if (!record || record.revoked_at) return false;
   const expiresAt = asDate(record.expires_at);
   return Number.isFinite(expiresAt.getTime()) && asDate(now).getTime() < expiresAt.getTime();
+}
+
+export function createAdminAuthService({ expectedPinHash, store, now = () => new Date(), ttlSeconds = 30 * 24 * 60 * 60 }) {
+  return {
+    async login(pin) {
+      if (!(await pinMatches(pin, expectedPinHash))) {
+        return { status: 401, body: { error: 'invalid_pin' } };
+      }
+      const token = createOpaqueToken();
+      const record = createSessionRecord(await hashSessionToken(token), now(), ttlSeconds);
+      await store.insert(record);
+      return {
+        status: 200,
+        body: { ok: true, session: { token, expiresAt: record.expires_at } },
+      };
+    },
+
+    async verify(authorization) {
+      const token = extractBearerToken(authorization);
+      if (!token) return { ok: false };
+      const record = await store.findByHash(await hashSessionToken(token));
+      if (!isSessionActive(record, now())) return { ok: false };
+      return { ok: true, token, record };
+    },
+
+    async logout(authorization) {
+      const token = extractBearerToken(authorization);
+      if (token) await store.revokeByHash(await hashSessionToken(token), now().toISOString());
+      return { status: 200, body: { ok: true } };
+    },
+  };
 }
