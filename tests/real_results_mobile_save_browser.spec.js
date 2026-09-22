@@ -4,7 +4,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.addInitScript(() => {
-    localStorage.setItem('7fit_case_admin_key', 'test-key');
+    localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'session-token', expiresAt: '2026-10-22T10:00:00.000Z' }));
   });
 
   await page.route('**/functions/v1/case-api**', async route => {
@@ -13,7 +13,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
     if (action === 'list') {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ cases: [] }) });
     }
-    if (action === 'verify-admin') {
+    if (action === 'admin-session') {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
     }
     if (action === 'save-case') {
@@ -36,6 +36,7 @@ test('mobile save button always responds and can complete cloud save', async ({ 
   await page.goto('/assets/real-results/?admin=1');
   await page.waitForSelector('#openUpload');
   await page.waitForFunction(() => document.documentElement.dataset.casePatchReady === '1');
+  await expect(page.locator('#adminLogout')).toBeVisible();
   await page.click('#openUpload');
   await expect(page.locator('#modal')).toBeVisible();
 
