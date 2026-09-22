@@ -4,7 +4,7 @@ test('editing a cloud case shows existing comparison images and uses 修改案�
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.addInitScript(() => {
-    localStorage.setItem('7fit_case_admin_key', 'test-key');
+    localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'session-token', expiresAt: '2026-10-22T10:00:00.000Z' }));
   });
 
   const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6W1sAAAAASUVORK5CYII=';
@@ -12,7 +12,7 @@ test('editing a cloud case shows existing comparison images and uses 修改案�
   await page.route('**/functions/v1/case-api**', async route => {
     const url = new URL(route.request().url());
     const action = url.searchParams.get('action');
-    if (action === 'verify-admin') {
+    if (action === 'admin-session') {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
     }
     if (action === 'list') {
@@ -47,6 +47,7 @@ test('editing a cloud case shows existing comparison images and uses 修改案�
 
   await page.goto('/assets/real-results/?admin=1');
   await page.waitForFunction(() => document.documentElement.dataset.casePatchReady === '1');
+  await expect(page.locator('#adminLogout')).toBeVisible();
   await expect(page.locator('.card')).toHaveCount(1);
 
   await page.click('.card');
