@@ -157,6 +157,83 @@
   `;
   document.head.appendChild(authStyle);
 
+  const lightboxStyle=document.createElement("style");
+  lightboxStyle.textContent=`
+    .case-image-lightbox{position:fixed;inset:0;z-index:190;display:grid;place-items:center;padding:18px;background:rgba(25,20,31,.82);backdrop-filter:blur(10px)}
+    .case-image-lightbox-panel{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(1120px,100%);max-height:100%;padding:12px}
+    .case-image-lightbox img{display:block;max-width:100%;max-height:calc(100vh - 92px);width:auto;height:auto;object-fit:contain;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.34);background:#fff}
+    .case-image-lightbox-caption{margin:0;color:#fff;font-size:12px;line-height:1.5;text-align:center}
+    .case-image-lightbox-close{position:absolute;top:-2px;right:-2px;width:40px;height:40px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(255,255,255,.94);color:#211E26;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    .previewable-image{cursor:zoom-in}
+    @media(max-width:600px){.case-image-lightbox{padding:10px}.case-image-lightbox-panel{padding:8px}.case-image-lightbox img{max-height:calc(100vh - 74px);border-radius:12px}.case-image-lightbox-close{top:-4px;right:-4px;width:36px;height:36px;font-size:21px}}
+  `;
+  document.head.appendChild(lightboxStyle);
+
+  let imageLightbox=null;
+  let imageLightboxImage=null;
+  let imageLightboxCaption=null;
+  let imageLightboxPreviousOverflow="";
+  function ensureImageLightbox(){
+    if(imageLightbox)return;
+    imageLightbox=document.createElement("div");
+    imageLightbox.id="caseImageLightbox";
+    imageLightbox.className="case-image-lightbox hidden";
+    imageLightbox.setAttribute("role","dialog");
+    imageLightbox.setAttribute("aria-modal","true");
+    imageLightbox.setAttribute("aria-label","案例图片预览");
+    imageLightbox.innerHTML='<div class="case-image-lightbox-panel"><button type="button" class="case-image-lightbox-close" aria-label="关闭大图">×</button><img alt=""><p class="case-image-lightbox-caption">点击空白处或按 Esc 关闭</p></div>';
+    document.body.appendChild(imageLightbox);
+    imageLightboxImage=imageLightbox.querySelector("img");
+    imageLightboxCaption=imageLightbox.querySelector(".case-image-lightbox-caption");
+    imageLightbox.addEventListener("click",e=>{
+      if(e.target===imageLightbox||e.target.closest(".case-image-lightbox-close"))closeImagePreview();
+    });
+  }
+  function openImagePreview(img){
+    if(!img?.src)return;
+    ensureImageLightbox();
+    imageLightboxPreviousOverflow=document.body.style.overflow;
+    imageLightboxImage.src=img.currentSrc||img.src;
+    imageLightboxImage.alt=img.alt||"案例图片大图";
+    imageLightboxCaption.textContent="点击空白处或按 Esc 关闭";
+    imageLightbox.classList.remove("hidden");
+    document.body.style.overflow="hidden";
+    imageLightbox.querySelector(".case-image-lightbox-close").focus();
+  }
+  function closeImagePreview(){
+    if(!imageLightbox||imageLightbox.classList.contains("hidden"))return;
+    imageLightbox.classList.add("hidden");
+    imageLightboxImage.removeAttribute("src");
+    document.body.style.overflow=imageLightboxPreviousOverflow;
+  }
+  function enhanceDetailImages(){
+    if(!detailBody)return;
+    detailBody.querySelectorAll("img").forEach(img=>{
+      img.classList.add("previewable-image");
+      img.tabIndex=0;
+      img.setAttribute("role","button");
+      img.setAttribute("aria-label",(img.alt||"案例图片")+"，点击查看大图");
+    });
+  }
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")closeImagePreview();
+  });
+  const detailBody=document.querySelector("#detailBody");
+  if(detailBody){
+    detailBody.addEventListener("click",e=>{
+      const img=e.target.closest("img");
+      if(!img)return;
+      img.classList.add("previewable-image");
+      openImagePreview(img);
+    });
+    detailBody.addEventListener("keydown",e=>{
+      const img=e.target.closest("img");
+      if(!img||!['Enter',' '].includes(e.key))return;
+      e.preventDefault();
+      openImagePreview(img);
+    });
+  }
+
   function applyViewportClass(){
     const w=Math.round(window.visualViewport?.width||window.innerWidth||document.documentElement.clientWidth||0);
     const bucket=w<=350?"xxs":w<=390?"xs":w<=600?"sm":w<=900?"md":"lg";
@@ -389,6 +466,7 @@
 
   openCase=function(id){
     originalOpenCase(id);
+    enhanceDetailImages();
     if(!adminSession?.token) return;
     const c=cases.find(x=>x.id===id);
     const dt=document.querySelector("#detailBody .dt");
