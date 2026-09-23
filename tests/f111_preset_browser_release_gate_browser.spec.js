@@ -167,6 +167,90 @@ test('F111 Preset Browser V2 has no page overflow at required desktop and mobile
   await expectClean(diag);
 });
 
+test('Issue #149 Desktop UI Polish improves F111 readability without changing the mobile layout', async ({ page }) => {
+  const diag = diagnostics(page);
+
+  for (const width of [1080, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#/coach/f111');
+
+    const metrics = await page.evaluate(() => {
+      const computed = selector => getComputedStyle(document.querySelector(selector));
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      const main = rect('#app-main');
+      const appColumn = rect('.app-column');
+      const chip = rect('[data-f111-filter-group="level"][data-f111-filter-value="L2"]');
+      const row = rect('[data-f111-recipe-row]');
+      return {
+        mainWidth: main.width,
+        appColumnWidth: appColumn.width,
+        chipHeight: chip.height,
+        matrixRowHeight: row.height,
+        styles: {
+          body: computed('.f111-preset-browser-section').fontSize,
+          heroLead: computed('.coach-home-lead').fontSize,
+          heroSummary: computed('.coach-home-intro .intro-summary').fontSize,
+          heroPoint: computed('.intro-points article p').fontSize,
+          search: computed('.f111-preset-search input').fontSize,
+          chip: computed('.f111-preset-filter-chip').fontSize,
+          recipeId: computed('.f111-preset-recipe span').fontSize,
+          recipe: computed('.f111-preset-recipe strong').fontSize,
+          level: computed('.f111-preset-level-head b').fontSize,
+          levelHint: computed('.f111-preset-level-head small').fontSize,
+          cell: computed('.f111-preset-cell').fontSize,
+        },
+      };
+    });
+
+    expect(metrics.mainWidth).toBeGreaterThanOrEqual(metrics.appColumnWidth - 32);
+    expect(metrics.chipHeight).toBeGreaterThanOrEqual(36);
+    expect(metrics.chipHeight).toBeLessThanOrEqual(40);
+    expect(metrics.matrixRowHeight).toBeGreaterThanOrEqual(58);
+    expect(metrics.matrixRowHeight).toBeLessThanOrEqual(64);
+    expect(parseFloat(metrics.styles.body)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.body)).toBeLessThanOrEqual(16);
+    expect(parseFloat(metrics.styles.heroLead)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.heroSummary)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.heroPoint)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.search)).toBeGreaterThanOrEqual(14);
+    expect(parseFloat(metrics.styles.search)).toBeLessThanOrEqual(15);
+    expect(parseFloat(metrics.styles.chip)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.chip)).toBeLessThanOrEqual(14);
+    expect(parseFloat(metrics.styles.recipeId)).toBeGreaterThanOrEqual(12);
+    expect(parseFloat(metrics.styles.recipeId)).toBeLessThanOrEqual(13);
+    expect(parseFloat(metrics.styles.recipe)).toBeGreaterThanOrEqual(15);
+    expect(parseFloat(metrics.styles.recipe)).toBeLessThanOrEqual(16);
+    expect(parseFloat(metrics.styles.level)).toBeGreaterThanOrEqual(14);
+    expect(parseFloat(metrics.styles.level)).toBeLessThanOrEqual(15);
+    expect(parseFloat(metrics.styles.levelHint)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.levelHint)).toBeLessThanOrEqual(14);
+    expect(parseFloat(metrics.styles.cell)).toBeGreaterThanOrEqual(13);
+    expect(parseFloat(metrics.styles.cell)).toBeLessThanOrEqual(14);
+
+    const chip = page.locator('[data-f111-filter-group="level"][data-f111-filter-value="L2"]');
+    await chip.click();
+    await expect(chip).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-f111-result-count] b')).toContainText('共 8 套预设');
+    await expect(page.locator('[data-f111-preset-cell]')).toHaveCount(8);
+    await expectNoOverflow(page, width);
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+  const mobileMetrics = await page.evaluate(() => ({
+    matrixDisplay: getComputedStyle(document.querySelector('[data-f111-preset-matrix-shell]')).display,
+    mobileListDisplay: getComputedStyle(document.querySelector('[data-f111-mobile-list]')).display,
+    chipHeight: document.querySelector('[data-f111-filter-group="level"][data-f111-filter-value="L2"]').getBoundingClientRect().height,
+    mobileRowHeight: document.querySelector('[data-f111-mobile-row]').getBoundingClientRect().height,
+  }));
+  expect(mobileMetrics.matrixDisplay).toBe('none');
+  expect(mobileMetrics.mobileListDisplay).toBe('grid');
+  expect(mobileMetrics.chipHeight).toBeGreaterThanOrEqual(34);
+  expect(mobileMetrics.mobileRowHeight).toBeGreaterThanOrEqual(50);
+  await expectNoOverflow(page, 390);
+  await expectClean(diag);
+});
+
 test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset preview', async ({ page }) => {
   const diag = diagnostics(page);
 
@@ -181,6 +265,11 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expect(desktopDrawer).toBeVisible();
   await expect(desktopDrawer).not.toHaveAttribute('aria-modal', 'true');
   await expect(desktopTrigger).toHaveAttribute('aria-selected', 'true');
+  const desktopMatrix = page.locator('[data-f111-preset-matrix-shell]');
+  await expect(desktopMatrix).toBeVisible();
+  await expect(desktopMatrix.locator('[data-f111-recipe-row]')).toHaveCount(8);
+  await expect(desktopMatrix.locator('[data-f111-preset-cell]')).toHaveCount(32);
+  await expectNoOverflow(page, 1280);
 
   const desktopPreview = await desktopDrawer.locator('[data-preview-slot]').evaluateAll(nodes =>
     nodes.map(node => ({
@@ -231,6 +320,110 @@ test('Desktop Drawer and Mobile Bottom Sheet render the same resolved preset pre
   await expectClean(diag);
 });
 
+test('F111 preset detail drawer supports direct legal replacement for PREP and session cards', async ({ page }) => {
+  const diag = diagnostics(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/coach/f111');
+  await page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]').click();
+
+  const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-preset-prep-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-training-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-legal-swap]')).toHaveCount(0);
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
+  await expect(drawer.locator('.f111-preset-drawer-actions a')).toHaveCount(2);
+  await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
+  await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
+
+  const sessionSelect = drawer.locator('[data-f111-drawer-session-select][data-slot-key="C"]');
+  const sessionValues = await sessionSelect.locator('option').evaluateAll(options => options.map(option => option.value).filter(Boolean));
+  expect(sessionValues.length).toBeGreaterThan(1);
+  const sessionReplacement = sessionValues[1];
+  await sessionSelect.selectOption(sessionReplacement);
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-drawer-session-select][data-slot-key="C"]')).toHaveValue(sessionReplacement);
+  expect(await page.evaluate(() => window.V14State.getSelection('F111-03-L2', 'F111-03-L2__SUPPORT'))).toBe(sessionReplacement);
+
+  const prepSelect = drawer.locator('[data-f111-drawer-prep-select]').first();
+  const prepValues = await prepSelect.locator('option').evaluateAll(options => options.map(option => option.value).filter(Boolean));
+  expect(prepValues.length).toBeGreaterThan(1);
+  const prepReplacement = prepValues[1];
+  const prepSlot = await prepSelect.getAttribute('data-slot-key');
+  await prepSelect.selectOption(prepReplacement);
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator(`[data-f111-drawer-prep-select][data-slot-key="${prepSlot}"]`)).toHaveValue(prepReplacement);
+  expect(await page.evaluate(({ slot }) => window.V15State.getPrepSelections('f111', 'F111-03-L2')[slot]?.actionId, { slot: prepSlot })).toBe(prepReplacement);
+
+  await expectNoOverflow(page, 1280);
+  await expectClean(diag);
+});
+
+test('F111 preset detail mobile keeps grouped cards and a compact action bar', async ({ page }) => {
+  const diag = diagnostics(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111');
+  await page.locator('[data-f111-mobile-preset][data-recipe-id="F111-03"][data-level="L3"]').click();
+
+  const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-f111-preset-prep-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-training-group]')).toHaveCount(1);
+  await expect(drawer.locator('[data-f111-preset-legal-swap]')).toHaveCount(0);
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
+  await expect(drawer.locator('.f111-preset-drawer-actions a')).toHaveCount(2);
+  await expect(drawer.locator('[data-f111-drawer-prep-select]')).toHaveCount(5);
+  await expect(drawer.locator('[data-f111-drawer-session-select]')).toHaveCount(6);
+  await expect(drawer.locator('.f111-preset-preview-row-head')).toHaveCount(11);
+  await expect(drawer.locator('.f111-preset-preview-row-head .f111-preset-preview-prescription')).toHaveCount(11);
+  await expect(drawer.locator('.f111-preset-preview-row').first().locator('.f111-preset-preview-prescription')).toContainText('1–2组');
+  const sheetBody = await drawer.locator('.f111-preset-drawer-body').boundingBox();
+  const sheetHead = await drawer.locator('.f111-preset-drawer-head').boundingBox();
+  expect(sheetBody.height).toBeGreaterThanOrEqual(690);
+  expect(sheetHead.y).toBeLessThanOrEqual(70);
+  await expectNoOverflow(page, 390);
+  await expectClean(diag);
+});
+
+test('Issue #149 Desktop Drawer leaves the full Matrix visible beside the panel', async ({ page }) => {
+  const diag = diagnostics(page);
+
+  for (const width of [1080, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#/coach/f111');
+    await page.locator('[data-f111-preset-cell][data-recipe-id="F111-03"][data-level="L2"]').click();
+
+    const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
+    const drawerPanel = drawer.locator('.f111-preset-drawer-body');
+    const matrix = page.locator('[data-f111-preset-matrix-shell]');
+    await expect(drawer).toBeVisible();
+    await expect(matrix).toBeVisible();
+    await expect(matrix.locator('[data-f111-preset-cell]')).toHaveCount(32);
+
+    const matrixBox = await matrix.boundingBox();
+    const drawerBox = await drawerPanel.boundingBox();
+    expect(matrixBox).not.toBeNull();
+    expect(drawerBox).not.toBeNull();
+    expect(matrixBox.x + matrixBox.width).toBeLessThanOrEqual(drawerBox.x - 8);
+    const matrixClientWidth = await matrix.evaluate(node => node.clientWidth);
+    const matrixScrollWidth = await matrix.evaluate(node => node.scrollWidth);
+    expect(matrixScrollWidth).toBeLessThanOrEqual(matrixClientWidth);
+    for (const cell of await matrix.locator('[data-f111-preset-cell]').evaluateAll(nodes => nodes.map(node => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, right: box.right };
+    }))) {
+      expect(cell.left).toBeGreaterThanOrEqual(matrixBox.x - 1);
+      expect(cell.right).toBeLessThanOrEqual(matrixBox.x + matrixBox.width + 1);
+    }
+    await expectNoOverflow(page, width);
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+  }
+
+  await expectClean(diag);
+});
+
 test('Preset Browser V2 recent-use recovery and canonical handoff remain safe', async ({ page }) => {
   const diag = diagnostics(page);
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -259,9 +452,9 @@ test('Preset Browser V2 recent-use recovery and canonical handoff remain safe', 
   const drawer = page.locator('#global-drawer[data-f111-preset-drawer]');
   await expect(drawer).toBeVisible();
   await expect(drawer.locator('[data-preset-start]')).toHaveAttribute('href', '#/coach/f111/f111-07/l3');
-  await expect(drawer.locator('[data-preset-replace]')).toHaveAttribute('href', '#/coach/f111/f111-07/l3');
+  await expect(drawer.locator('[data-preset-replace]')).toHaveCount(0);
 
-  const composerHref = await drawer.locator('.f111-preset-cta.tertiary').getAttribute('href');
+  const composerHref = await drawer.locator('.f111-preset-cta.secondary').getAttribute('href');
   expect(composerHref).toContain('#/coach/f111/compose?');
   expect(composerHref).toContain('level=L3');
   expect(composerHref).toContain('lower=hinge');

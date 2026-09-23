@@ -53,37 +53,85 @@
       ||'按当前等级处方';
   }
 
-  function prepSummary(preview){
-    const section=(preview.sections||[]).find(item=>item.key==='PREP');
-    const items=section?.items||[];
-    if(!items.length)return '<span>系统会在正式课程页按当前训练内容解析 PREP。</span>';
-    return items.slice(0,3).map(item=>`<span>${esc(item.name||item.label||item.actionId)}</span>`).join('<i>+</i>');
+  function dataSessionSlot(recipeId,level,slotKey){
+    const session=D().sessions?.[sessionIdOf(recipeId,level)];
+    return session?.slots?.find(item=>item.slotKey===slotKey||String(item.slotKey||'').endsWith(`__${slotKey}`)||String(item.slotName||'').startsWith(`${slotKey}｜`))?.slotKey||slotKey;
   }
 
-  function trainingRows(preview){
-    const rows=(preview.sections||[]).filter(section=>section.kind==='SLOT').map(section=>{
-      const item=section.items?.[0]||{};
-      return `<div class="f111-preset-preview-row" data-preview-slot="${esc(section.key)}">
-        <div><span>${esc(section.label||section.key)}</span><b>${esc(item.name||item.actionId||'—')}</b></div>
-        <small>${esc(prescription(item,preview.level))}</small>
+  function sessionOptions(recipeId,level,slotKey,currentActionId){
+    const data=D(),sessionId=sessionIdOf(recipeId,level),view=data.sessionViews?.[sessionId]||{};
+    const sourceKey=dataSessionSlot(recipeId,level,slotKey);
+    const options=(view.slotOptions?.[sourceKey]||[]).map(option=>({
+      value:clean(option.id),
+      label:compactOptionLabel(clean(option.label)||clean(option.name)||clean(data.actions?.[option.id]?.name)||clean(option.id)),
+    })).filter(option=>option.value);
+    if(currentActionId&&!options.some(option=>option.value===currentActionId)){
+      options.unshift({
+        value:currentActionId,
+        label:compactOptionLabel(clean(data.actions?.[currentActionId]?.name)||currentActionId),
+      });
+    }
+    return options;
+  }
+
+  function prepSlots(recipeId,level){
+    const sessionId=sessionIdOf(recipeId,level);
+    try{
+      return M.Prep?.resolvePresetPrep?.(sessionId,recipeId,level,currentSelections(recipeId,level))?.slots||[];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function optionMarkup(options,currentValue){
+    return options.map(option=>`<option value="${esc(option.value)}" ${option.value===currentValue?'selected':''}>${esc(option.label)}</option>`).join('');
+  }
+
+  function compactOptionLabel(value){
+    const parts=clean(value).split('｜').map(clean).filter(Boolean);
+    return parts.slice(0,2).join(' · ')||clean(value);
+  }
+
+  function replacementControl({kind,slotKey,stateSlotKey,label,options,currentValue,disabled=false}){
+    const attribute=kind==='prep'?'data-f111-drawer-prep-select':'data-f111-drawer-session-select';
+    return `<label class="f111-preset-replace-control"><select ${attribute} data-slot-key="${esc(slotKey)}" ${stateSlotKey?`data-state-slot-key="${esc(stateSlotKey)}"`:''} aria-label="${esc(label)}：更换动作" ${disabled?'disabled':''}>${optionMarkup(options,currentValue)}</select></label>`;
+  }
+
+  function prepRows(recipeId,level,preview){
+    const resolved=prepSlots(recipeId,level);
+    const previewItems=new Map(((preview.sections||[]).find(section=>section.key==='PREP')?.items||[]).map(item=>[item.key,item]));
+    return resolved.map(slot=>{
+      const item=previewItems.get(slot.slotKey)||{};
+      const options=(slot.candidates||[]).map(candidate=>({
+        value:clean(candidate.actionId),
+        label:[clean(candidate.name)||clean(candidate.actionId),clean(candidate.prepGrade)||'PREP'].filter(Boolean).join(' · '),
+      })).filter(option=>option.value);
+      const name=clean(slot.name)||clean(item.name)||'暂无合法候选';
+      const prescriptionText=clean(slot.prescription)||prescription(item,level);
+      return `<div class="f111-preset-preview-row f111-preset-preview-prep" data-preview-prep-slot="${esc(slot.slotKey)}">
+        <div class="f111-preset-preview-row-content">
+          <div class="f111-preset-preview-row-head"><div><span>${esc(slot.prepGrade||slot.slotName||slot.slotKey)}</span><b>${esc(name)}</b></div><small class="f111-preset-preview-prescription">${esc(prescriptionText)}</small></div>
+          <small class="f111-preset-preview-purpose">${esc(slot.purpose||'按当前主项实时匹配')}</small>
+        </div>
+        ${replacementControl({kind:'prep',slotKey:slot.slotKey,label:slot.slotName||slot.slotKey,options,currentValue:slot.actionId,disabled:!options.length})}
       </div>`;
     }).join('');
-    return `<div class="f111-preset-preview-row f111-preset-preview-prep">
-      <div><span>PREP 热身</span><b class="f111-preset-prep-summary">${prepSummary(preview)}</b></div>
-      <small>按当前主项实时匹配</small>
-    </div>${rows}`;
   }
 
-  function replacementEntries(recipeId,level){
-    const data=D(),sessionId=sessionIdOf(recipeId,level),session=data.sessions?.[sessionId],view=data.sessionViews?.[sessionId]||{};
-    if(!session)return [];
-    return (session.slots||[]).filter(slot=>{
-      const options=view.slotOptions?.[slot.slotKey]||[];
-      return options.length>1;
-    }).slice(0,3).map(slot=>({
-      slotKey:slot.slotKey,
-      label:clean(slot.slotName).split('｜')[0]||'动作',
-    }));
+  function trainingRows(preview,recipeId,level){
+    const rows=(preview.sections||[]).filter(section=>section.kind==='SLOT').map(section=>{
+      const item=section.items?.[0]||{};
+      const displayKey=clean(section.label).split('｜')[0]||section.key;
+      const session=dataSessionSlot(recipeId,level,displayKey);
+      const options=sessionOptions(recipeId,level,displayKey,item.actionId);
+      return `<div class="f111-preset-preview-row" data-preview-slot="${esc(displayKey)}">
+        <div class="f111-preset-preview-row-content">
+          <div class="f111-preset-preview-row-head"><div><span>${esc(section.label||section.key)}</span><b>${esc(item.name||item.actionId||'—')}</b></div><small class="f111-preset-preview-prescription">${esc(prescription(item,preview.level))}</small></div>
+        </div>
+        ${replacementControl({kind:'session',slotKey:displayKey,stateSlotKey:session,label:section.label||section.key,options,currentValue:item.actionId,disabled:!options.length})}
+      </div>`;
+    }).join('');
+    return rows;
   }
 
   function render(recipeId,level){
@@ -96,21 +144,21 @@
         prepSelections:currentPrepSelections(recipeId,level),
       });
     }catch(error){
-      return `<div class="drawer-head f111-preset-drawer-head"><span class="f111-preset-sheet-handle" aria-hidden="true"></span><div><span>PRESET DETAIL</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
+      return `<div class="drawer-head f111-preset-drawer-head"><span class="f111-preset-sheet-handle" aria-hidden="true"></span><div><span>预设详情</span><h2>${esc(recipeId)} · ${esc(level)}</h2></div><button type="button" data-f111-preset-close aria-label="关闭预设详情">×</button></div>
         <div class="drawer-body f111-preset-drawer-body"><section class="f111-preset-detail-error"><b>预设详情暂时无法解析</b><p>${esc(error?.message||'请进入正式课程页查看。')}</p><a href="${esc(Browser.canonicalHref(recipeId,level))}" data-f111-preset-navigate>进入课程</a></section></div>`;
     }
 
-    const replacements=replacementEntries(recipeId,level);
-    const replacementHtml=replacements.length
-      ?replacements.map(item=>`<a href="${esc(state.href)}" data-f111-preset-navigate class="f111-preset-swap-chip">${esc(item.label)} 可替换</a>`).join('')
-      :`<a href="${esc(state.href)}" data-f111-preset-navigate class="f111-preset-swap-chip">进入课程查看替换</a>`;
     const equipment=preview.equipment.length?preview.equipment.join(' · '):'徒手 / 场馆现有器械';
     const goals=preview.goals.join(' / ')||state.label;
+    const prep=prepRows(recipeId,level,preview);
+    const training=trainingRows(preview,recipeId,level);
+    const prepCount=(preview.sections||[]).find(section=>section.key==='PREP')?.items?.length||0;
+    const trainingCount=(preview.sections||[]).filter(section=>section.kind==='SLOT').length;
 
     return `<div class="drawer-head f111-preset-drawer-head">
       <span class="f111-preset-sheet-handle" aria-hidden="true"></span>
       <div class="f111-preset-drawer-title">
-        <span>PRESET DETAIL</span>
+        <span>预设详情</span>
         <h2>${esc(recipeId)} · ${esc(level)}</h2>
         <p>${esc(state.label)}</p>
       </div>
@@ -124,7 +172,15 @@
 
       <section class="f111-preset-detail-section">
         <div class="f111-preset-detail-section-head"><div><span>SESSION PREVIEW</span><h3>今日训练</h3></div><small>${esc(preview.duration.label)}</small></div>
-        <div class="f111-preset-preview-list">${trainingRows(preview)}</div>
+        <p class="f111-preset-session-note">每张卡都可以直接更换，当前预设与等级保持不变。</p>
+        <div class="f111-preset-preview-group" data-f111-preset-prep-group>
+          <div class="f111-preset-preview-group-head"><h4>PREP 热身</h4><small>${prepCount} 个槽位</small></div>
+          <div class="f111-preset-preview-list">${prep}</div>
+        </div>
+        <div class="f111-preset-preview-group" data-f111-preset-training-group>
+          <div class="f111-preset-preview-group-head"><h4>正式训练</h4><small>${trainingCount} 个动作</small></div>
+          <div class="f111-preset-preview-list">${training}</div>
+        </div>
       </section>
 
       <section class="f111-preset-detail-section">
@@ -136,14 +192,8 @@
         </div>
       </section>
 
-      <section class="f111-preset-detail-section">
-        <div class="f111-preset-detail-section-head"><div><span>LEGAL SWAP</span><h3>可替换动作</h3></div><small>只进入现有合法替换流程</small></div>
-        <div class="f111-preset-swap-chips">${replacementHtml}</div>
-      </section>
-
       <div class="f111-preset-drawer-actions">
-        <a class="f111-preset-cta secondary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-replace>替换动作</a>
-        <a class="f111-preset-cta tertiary" href="${esc(composerHref(state))}" data-f111-preset-navigate>加入自由组合编辑</a>
+        <a class="f111-preset-cta secondary" href="${esc(composerHref(state))}" data-f111-preset-navigate>加入自由组合编辑</a>
         <a class="f111-preset-cta primary" href="${esc(state.href)}" data-f111-preset-navigate data-preset-start>开始课程</a>
       </div>
     </div>`;
@@ -192,7 +242,7 @@
   }
 
   function bindDrawer(drawer){
-    drawer.querySelector('[data-f111-preset-close]')?.addEventListener('click',()=>close());
+    bindDrawerControls(drawer);
     drawer.querySelectorAll('[data-f111-preset-navigate]').forEach(link=>link.addEventListener('click',()=>{
       if(link.hasAttribute('data-preset-start')&&current)M.F111PresetControls?.recordRecent?.({recipeId:current.recipeId,level:current.level});
       close({restoreFocus:false,rerender:false});
@@ -221,6 +271,33 @@
 
     hashHandler=()=>close({restoreFocus:false,rerender:false});
     window.addEventListener('hashchange',hashHandler,{once:true});
+  }
+
+  function focusReplacement(drawer,kind,slotKey){
+    const attribute=kind==='prep'?'data-f111-drawer-prep-select':'data-f111-drawer-session-select';
+    const target=Array.from(drawer.querySelectorAll(`[${attribute}]`)).find(node=>node.dataset.slotKey===slotKey);
+    target?.focus();
+  }
+
+  function refreshDrawer(drawer,kind,slotKey){
+    if(!current)return;
+    drawer.innerHTML=render(current.recipeId,current.level);
+    bindDrawerControls(drawer);
+    focusReplacement(drawer,kind,slotKey);
+  }
+
+  function bindDrawerControls(drawer){
+    drawer.querySelector('[data-f111-preset-close]')?.addEventListener('click',()=>close());
+    drawer.querySelectorAll('[data-f111-drawer-session-select]').forEach(select=>select.addEventListener('change',()=>{
+      if(!current)return;
+      window.V14State?.setSelection?.(sessionIdOf(current.recipeId,current.level),select.dataset.stateSlotKey||select.dataset.slotKey,select.value);
+      refreshDrawer(drawer,'session',select.dataset.slotKey);
+    }));
+    drawer.querySelectorAll('[data-f111-drawer-prep-select]').forEach(select=>select.addEventListener('change',()=>{
+      if(!current)return;
+      M.Prep?.setPrepSelection?.(sessionIdOf(current.recipeId,current.level),select.dataset.slotKey,select.value);
+      refreshDrawer(drawer,'prep',select.dataset.slotKey);
+    }));
   }
 
   function open({recipeId,level,rerender}={}){
