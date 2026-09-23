@@ -73,12 +73,16 @@
     const cardHtml=key=>slots.filter(slot=>slot.slotKey===key).map(slot=>M.Slot.composerCard(ctx,slot,'')).join('');
     const anatomy=M.Summary?.render?.(allIds)||'';
     const anatomyFold=anatomy?`<details class="f111-anatomy-details"><summary>训练肌群概览</summary>${anatomy}</details>`:'';
-    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>主项、支撑、辅助和核心动作组成完整课程。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div>${M.SavedSessionsUI?.compactControls?.(route)||''}<div class="session-toolbar composer-copy-toolbar"><div></div><div class="session-toolbar-actions">${copyToolbar()}</div></div>${M.ConflictView?.render?.(result)||''}${anatomyFold}</section>`;
+    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>主项、支撑、辅助和核心动作组成完整课程。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div>${M.SavedSessionsUI?.compactControls?.(route)||''}${M.ConflictView?.render?.(result)||''}${anatomyFold}</section>`;
+  }
+
+  function courseOutputSection(){
+    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}</div></section>`;
   }
 
   function render(route){
     const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
-    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx,route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}`;
+    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx,route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}${courseOutputSection()}`;
   }
 
   M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,render};
