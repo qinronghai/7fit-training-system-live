@@ -59,10 +59,10 @@ test('Issue 73: PREP replacement drawer applies a legal choice and survives relo
   const slotKey=await select.getAttribute('data-prep-slot');
   const current=await select.inputValue();
   await card.locator('[data-replacement-drawer]').click();
-  const drawer=page.locator('#replacement-drawer');
+  const drawer=page.locator('#f111-action-drawer');
   await expect(drawer).toBeVisible();
-  const choice=drawer.locator('[data-replacement-choose]:not([disabled])').first();
-  const target=await choice.getAttribute('data-replacement-choose');
+  const choice=drawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)').first();
+  const target=await choice.getAttribute('data-f111-action-choice');
   expect(target).toBeTruthy();
   expect(target).not.toBe(current);
   await choice.click();
