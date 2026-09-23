@@ -18,15 +18,28 @@ async function expectNoOverflow(page,width){
   expect(sizes.bodyScroll).toBeLessThanOrEqual(sizes.htmlClient);
 }
 
-async function expectRecovery(page){
+async function expectRecovery(page,{compact=false}={}){
   const section=page.locator('[data-f111-recovery]');
   await expect(section).toHaveCount(1);
-  await expect(section.getByRole('heading',{name:'完成拉伸｜约 5–8 分钟'})).toBeVisible();
+  await expect(section.getByRole('heading',{name:compact?'训练后拉伸｜约 5–8 分钟':'完成拉伸｜约 5–8 分钟'})).toBeVisible();
   await expect(section).toContainText('训练结束后完成 3 个主要部位拉伸。');
-  const cards=section.locator('[data-recovery-card]');
-  await expect(cards).toHaveCount(3);
-  for(let i=0;i<3;i++)await expect(cards.nth(i)).toContainText('45 秒');
-  await expect(section.getByRole('link',{name:'查看动作详情'})).toHaveCount(3);
+  if(compact){
+    const rows=section.locator('.recovery-row[data-recovery-card]');
+    await expect(rows).toHaveCount(3);
+    await expect(section.locator('.recovery-detail-link')).toHaveCount(0);
+    const rowText=await rows.allTextContents();
+    expect(rowText.every(text=>!text.includes('主要部位'))).toBe(true);
+    for(let i=0;i<3;i++){
+      await expect(rows.nth(i).locator('.recovery-row-region')).not.toBeEmpty();
+      await expect(rows.nth(i).locator('.recovery-row-main b')).not.toBeEmpty();
+      await expect(rows.nth(i).locator('.recovery-prescription')).toContainText('45 秒');
+    }
+  }else{
+    const cards=section.locator('[data-recovery-card]');
+    await expect(cards).toHaveCount(3);
+    for(let i=0;i<3;i++)await expect(cards.nth(i)).toContainText('45 秒');
+    await expect(section.getByRole('link',{name:'查看动作详情'})).toHaveCount(3);
+  }
   await expect(section).not.toContainText('2F 体能热身大厅');
   await expect(section).not.toContainText('一次上楼');
   return section;
@@ -41,7 +54,7 @@ test('Issue 80: preset and composer render three data-driven Recovery cards',asy
   await expectNoOverflow(page,1080);
 
   await page.goto('/#/coach/f111/compose?level=L1&lower=squat&upper=horizontal_push&core=anti_extension');
-  await expectRecovery(page);
+  await expectRecovery(page,{compact:true});
   await expectNoOverflow(page,1080);
 
   expect(diag.pageErrors,`pageerror(s): ${diag.pageErrors.join(' | ')}`).toEqual([]);
@@ -62,13 +75,13 @@ test('Issue 80: Recovery is one column on mobile and three columns on desktop',a
   expect(diag.consoleProblems,`console problem(s): ${diag.consoleProblems.join(' | ')}`).toEqual([]);
 });
 
-test('Issue 80: Recovery detail links open the existing Library drawer',async({page})=>{
+test('Issue 80: compact recovery rows open the existing Library drawer',async({page})=>{
   const diag=diagnostics(page);
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/#/coach/f111/f111-06/l3');
-  const section=await expectRecovery(page);
-  const firstLink=section.getByRole('link',{name:'查看动作详情'}).first();
-  const actionName=await section.locator('[data-recovery-card]').first().locator('strong').innerText();
+  await page.goto('/#/coach/f111/compose?level=L3&lower=single_leg_hinge&upper=horizontal_push&core=anti_extension');
+  const section=await expectRecovery(page,{compact:true});
+  const firstLink=section.locator('.recovery-row[data-recovery-card]').first();
+  const actionName=await firstLink.locator('.recovery-row-main b').innerText();
   await expect(firstLink).toHaveAttribute('href',/#\/library\?focus=.+/);
   await firstLink.click();
   await expect(page).toHaveURL(/#\/library\?focus=.+/);

@@ -40,7 +40,7 @@
   }
 
   function open(button){
-    const card=button.closest('.session-slot,.body-slot-card,.composer-slot-card')||button.parentElement;
+    const card=button.closest('.session-slot,.body-slot-card,.composer-slot-card,.prep-slot-card,.f111-foam-card')||button.parentElement;
     const selector=button.dataset.replacementSelect||'select';
     const select=card?.querySelector(selector);
     if(!select)return;

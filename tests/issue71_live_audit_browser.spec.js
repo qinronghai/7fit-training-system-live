@@ -23,27 +23,34 @@ async function expectClean(diag){
   expect(diag.consoleProblems,'console error/warning must stay empty').toEqual([]);
 }
 
-test('Issue 71: F111 PREP CTA stays horizontal and pages have no literal newline residue',async({page})=>{
+test('Issue 71: F111 PREP uses whole-card detail navigation without a separate detail link',async({page})=>{
   const diag=diagnostics(page);
   for(const width of [390,1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/coach/f111/f111-01/l1');
     await expect(page.locator('.prep-slot-card')).toHaveCount(5);
-    const detail=page.locator('.prep-detail-link').first();
-    await expect(detail).toBeVisible();
-    const metrics=await detail.evaluate(node=>({
-      whiteSpace:getComputedStyle(node).whiteSpace,
+    const card=page.locator('.prep-slot-card').first();
+    const detailRoute=await card.getAttribute('data-prep-detail-href');
+    expect(detailRoute).toMatch(/^#\/system\/prep\?focus=/);
+    await expect(card).toHaveAttribute('tabindex','0');
+    await expect(card).toHaveAttribute('aria-label',/详情/);
+    await expect(card.locator('.prep-replace-trigger')).toBeVisible();
+    await expect(page.locator('.prep-detail-link')).toHaveCount(0);
+    const metrics=await card.evaluate(node=>({
       width:node.getBoundingClientRect().width,
-      height:node.getBoundingClientRect().height,
-      text:node.textContent,
+      buttonWidth:node.querySelector('.prep-replace-trigger').getBoundingClientRect().width,
+      buttonHeight:node.querySelector('.prep-replace-trigger').getBoundingClientRect().height,
+      cursor:getComputedStyle(node).cursor,
     }));
-    expect(metrics.whiteSpace).toBe('nowrap');
-    expect(metrics.width).toBeGreaterThan(70);
-    expect(metrics.height).toBeLessThanOrEqual(48);
-    expect(metrics.text).toContain('查看动作详情');
+    expect(metrics.width).toBeGreaterThan(120);
+    expect(metrics.buttonWidth).toBeGreaterThanOrEqual(40);
+    expect(metrics.buttonHeight).toBeGreaterThanOrEqual(28);
+    expect(metrics.cursor).toBe('pointer');
     const bodyText=await page.locator('body').innerText();
     expect(bodyText).not.toContain('\\n');
     await expectNoOverflow(page,width);
+    await card.click();
+    await expect(page).toHaveURL(new RegExp(detailRoute.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
   }
   await expectClean(diag);
 });

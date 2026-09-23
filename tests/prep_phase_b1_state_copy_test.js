@@ -41,10 +41,11 @@ assert(preset.fallbackSlots.includes(slot.slotKey),'invalid preset PREP must rep
 assert.strictEqual(S.getPrepSelections('f111',sessionId)[slot.slotKey],undefined,'invalid manual PREP must be removed from state');
 assert.strictEqual(preset.slots.find(x=>x.slotKey===slot.slotKey).source,'auto');
 
-// Preset UI exposes a replacement selector and source label.
+// Preset UI keeps the replacement control and compact action-card layout.
 const presetHtml=M.Session.render({recipeId,level});
 assert(presetHtml.includes('prep-slot-select'),'Preset PREP must render replacement selects');
-assert(presetHtml.includes('系统推荐'),'Preset PREP must show source label');
+assert(presetHtml.includes('prep-card-meta'),'Preset PREP must retain action-role metadata');
+assert(presetHtml.includes('prep-card-title-row'),'Preset PREP must keep the action and replacement control in its compact card row');
 
 // Copy must consume the same resolved PREP; old matchedWarmups path must not be called.
 preset=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
