@@ -62,7 +62,15 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
     chipSize:parseFloat(getComputedStyle(document.querySelector('.f111-compose-hero .chip')).fontSize),
     supportGap:getComputedStyle(document.querySelector('.f111-strength-grid')).rowGap,
     coreHeader:getComputedStyle(document.querySelector('.f111-support-grid .composer-slot-head>div')).display,
-    coreHeaderRows:Array.from(document.querySelectorAll('.f111-support-grid .composer-slot-head>div>*')).map(node=>node.getBoundingClientRect().top),
+    coreHeaderRows:Array.from(document.querySelectorAll('.f111-support-grid .f111-slot-card')).map(card=>{
+      const [label,grade]=card.querySelectorAll('.composer-slot-head>div>*');
+      const labelRect=label.getBoundingClientRect(),gradeRect=grade.getBoundingClientRect();
+      return {
+        labelRight:labelRect.right,
+        gradeLeft:gradeRect.left,
+        verticalOverlap:Math.min(labelRect.bottom,gradeRect.bottom)-Math.max(labelRect.top,gradeRect.top),
+      };
+    }),
   }));
   expect(result.viewportWidth).toBe(390);
   expect(result.scrollWidth).toBeLessThanOrEqual(result.width);
@@ -70,7 +78,8 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
   expect(result.timeBadgeWhiteSpace).toBe('nowrap');
   expect(result.chipSize).toBeGreaterThanOrEqual(10);
   expect(result.coreHeader).toBe('flex');
-  expect(new Set(result.coreHeaderRows.map(y=>Math.round(y))).size).toBe(1);
+  expect(result.coreHeaderRows).toHaveLength(2);
+  expect(result.coreHeaderRows.every(row=>row.labelRight<=row.gradeLeft+1&&row.verticalOverlap>0)).toBeTruthy();
   expect(errors).toEqual([]);
 
   await page.setViewportSize({width:1200,height:900});
