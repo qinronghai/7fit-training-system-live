@@ -78,3 +78,4 @@
 }
 .replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
+.f111-drawer-action.is-current{border:2px solid var(--purple);background:var(--purple-pale)}
