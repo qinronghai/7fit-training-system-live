@@ -251,7 +251,7 @@ body[data-mode="coach"] [data-area="maintenance"]{opacity:.58}body[data-mode="sy
 .f111-prep-section .prep-card-action{position:relative;display:block;min-width:0;flex:1;padding-right:17px;color:var(--ink);text-decoration:none}
 .f111-prep-section .prep-card-action b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.35}
 .f111-prep-section .prep-card-action i{position:absolute;right:0;top:0;color:var(--muted);font-size:13px;font-style:normal}
-.f111-prep-section .prep-card-title-row>.f111-replace-trigger{flex:0 0 auto;min-height:30px;padding:0 7px;font-size:8px}
+.f111-prep-section .prep-card-title-row>.f111-replace-trigger{flex:0 0 auto;min-width:40px;min-height:30px;padding:0 7px;font-size:8px}
 .f111-prep-section .prep-card-why{display:block;margin-top:5px;font-size:8px;color:var(--muted);line-height:1.4}
 .f111-inline-save-controls{margin-top:12px}
 .f111-inline-save-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
