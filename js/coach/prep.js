@@ -150,7 +150,7 @@
     const cards=orderedSlots(resolved).map(slot=>{
       const detailHref=slot.prepId?`#/system/prep?focus=${encodeURIComponent(slot.prepId)}`:'';
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
-      const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
+      const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const role=slot.role||record?.role||'训练前激活';
       const prescription=slot.prescription||record?.prescription||'';
@@ -184,7 +184,7 @@
     const foamCards=foam.map((f,index)=>{
       const slotKey=`FOAM-${index+1}`;
       const options=foamOptions.map(option=>`<option value="${esc(option.foamId)}" ${option.foamId===f.foamId?'selected':''}>${esc(option.name)}</option>`).join('');
-      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div><span>放松</span><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
+      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div><span>放松</span><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="泡沫轴候选" data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
     }).join('');
     let foamCopy='';
     if(window.V14ModuleCopy){const fk=`composer-foam-${ctx.stateKey}`;window.V14ModuleCopy.register(fk,'foam',{title:`自由组合泡沫轴｜${title}`,items:foam.map(f=>({name:f.name,prescription:f.prescription,safety:f.safety}))});foamCopy=window.V14ModuleCopy.button(fk,'复制本模块');}

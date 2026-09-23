@@ -213,20 +213,20 @@ test('Issue 79: F111 D1 replacement drawer is responsive at 390 / 1080 / 1280 / 
     await expect(opener).toBeVisible();
     await opener.click();
 
-    const drawer=page.locator('#replacement-drawer');
+    const drawer=page.locator('#f111-action-drawer');
     await expect(drawer).toBeVisible();
-    await expect(drawer.locator('#replacement-drawer-title')).toHaveText('D1｜下肢辅助替换');
-    await expect(drawer.locator('[data-replacement-option]')).toHaveCount(await d1.locator('.session-swap option').count());
-    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('绳索站姿髋内收');
-    await expect(drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]')).toContainText('推荐原因');
+    await expect(drawer.locator('#f111-action-drawer-title')).toHaveText('D1｜下肢辅助替换');
+    await expect(drawer.locator('.f111-drawer-action[data-f111-action-choice]')).toHaveCount(await d1.locator('.session-swap option').count());
+    await expect(drawer.locator('.f111-drawer-action[data-f111-action-choice="shengsuo_kuan_neishou"]')).toContainText('绳索站姿髋内收');
+    await expect(drawer.locator('.f111-drawer-action[data-f111-action-choice="shengsuo_kuan_neishou"]')).toContainText('推荐原因');
     await expectNoOverflow(page,width);
 
-    const box=await drawer.locator('.replacement-drawer-panel').boundingBox();
+    const box=await drawer.locator('.f111-action-drawer-panel').boundingBox();
     expect(box).not.toBeNull();
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.x+box.width).toBeLessThanOrEqual(width+1);
 
-    await drawer.locator('[data-replacement-close]').last().click();
+    await drawer.locator('[data-f111-drawer-close]').last().click();
     await expect(drawer).toBeHidden();
     await expectNoOverflow(page,width);
   }
@@ -240,10 +240,10 @@ test('Issue 79: F111 drawer selection reuses the existing select change gate',as
 
   const d1=page.locator('.session-slot[data-slot="F111-01-L3__2"]');
   await d1.locator('[data-replacement-drawer]').click();
-  const drawer=page.locator('#replacement-drawer');
-  const target=drawer.locator('[data-replacement-option="shengsuo_kuan_neishou"]');
+  const drawer=page.locator('#f111-action-drawer');
+  const target=drawer.locator('.f111-drawer-action[data-f111-action-choice="shengsuo_kuan_neishou"]');
   await expect(target).toContainText('髋内收');
-  await target.locator('[data-replacement-choose="shengsuo_kuan_neishou"]').click();
+  await target.click();
 
   await expect(drawer).toBeHidden();
   await expect(page.locator('.session-swap[data-slot-key="F111-01-L3__2"]')).toHaveValue('shengsuo_kuan_neishou');

@@ -65,7 +65,7 @@
 [data-prep-detail-href],[data-action-detail-href]{cursor:pointer}
 .f111-slot-main{padding-right:0}
 .f111-replace-trigger,.f111-action-drawer-trigger{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:3px;min-height:30px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:10px;font-weight:850;cursor:pointer;white-space:nowrap}
-.f111-replace-trigger i,.f111-action-drawer-trigger i{font-size:12px;font-style:normal;line-height:1}
+.f111-replace-trigger i,.f111-action-drawer-trigger i{font-size:12px;font-style:normal;line-height:1}.f111-replace-trigger i{transform:translateY(-1px)}
 .f111-action-drawer-trigger{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;justify-content:stretch;min-width:116px;text-align:left}
 .f111-action-drawer-trigger span{grid-column:1/-1;color:var(--muted);font-size:8px}
 .f111-action-drawer-trigger b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
@@ -244,7 +244,7 @@ body[data-mode="coach"] [data-area="maintenance"]{opacity:.58}body[data-mode="sy
 .f111-prep-section .session-foam-card,.f111-prep-section .session-warmup-card{min-height:78px;padding:11px;border-radius:13px}
 .f111-prep-section .session-foam-card>b,.f111-prep-section .session-warmup-card>b{font-size:12px;line-height:1.35}
 .f111-prep-section .session-foam-card p,.f111-prep-section .session-warmup-card p{font-size:9px;line-height:1.45;margin-top:4px}
-.f111-prep-section .prep-card-meta{display:flex;align-items:center;gap:5px;min-width:0}
+.f111-prep-section .prep-card-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .f111-prep-section .prep-card-meta span{font-size:9px;font-weight:900;color:var(--purple-dark)}
 .f111-prep-section .prep-card-meta small{font-size:8px;color:var(--muted)}
 .f111-prep-section .prep-card-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;min-width:0;margin-top:6px}
@@ -1598,7 +1598,7 @@ body{font-size:14px;line-height:1.55}
 .f111-support-grid .f111-slot-card{border-color:#d8cde8}
 .f111-strength-grid + .f111-support-grid{margin-top:16px}
 @media(max-width:620px){
-  .f111-support-grid{column-gap:20px;row-gap:12px}
+  .f111-support-grid{column-gap:16px;row-gap:10px}
   .f111-support-grid .composer-slot-head>div{
     display:grid;
     grid-template-columns:minmax(0,1fr);
