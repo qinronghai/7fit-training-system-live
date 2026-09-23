@@ -14,7 +14,7 @@
     if(current.includeExpandedSupport)q.es='1';
     if(current.includeExpandedCore)q.ec='1';
     for(const key of ['em','es','ec'])if(overrides[key]===null)delete q[key];
-    return '#/coach/f111/compose?'+new URLSearchParams(q).toString();
+    return '#/coach/f111?'+new URLSearchParams(q).toString();
   }
 
   function composerContext(route){
@@ -86,9 +86,13 @@
     return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}</div></section>`;
   }
 
+  function recoverySection(recovery){
+    return `<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head f111-recovery-head"><div><div class="f111-recovery-title-row"><h2>训练后拉伸｜约 5–8 分钟</h2><span class="time-badge">训练后</span></div><p>训练结束后完成 3 个主要部位拉伸。</p></div></div>${recovery}</section>`;
+  }
+
   function render(route){
     const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
-    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}${courseOutputSection()}`;
+    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+recoverySection(recovery)+(M.PostCardio?M.PostCardio.render(ctx.stateKey):'')+courseOutputSection();
   }
 
   M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,render};

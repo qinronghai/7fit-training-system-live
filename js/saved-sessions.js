@@ -84,7 +84,7 @@
   function descriptorFromRoute(route={}){
     const data=D();
     if(route.templateId==='f111'||route.page==='compose'||route.page==='preset'){
-      if(route.page==='compose'){
+      if(route.page==='compose'||route.page==='template'){
         return f111ComposerInput(route);
       }
       const recipeId=String(route.recipeId||'').toUpperCase(),level=String(route.level||'').toUpperCase();
@@ -328,7 +328,7 @@
     if(flags.includeExpandedCore)q.ec='1';
     return {
       ok:true,code:reasons.length?'RESTORED_WITH_MIGRATION':'RESTORED',
-      hash:'#/coach/f111/compose?'+new URLSearchParams(q).toString(),
+      hash:'#/coach/f111?'+new URLSearchParams(q).toString(),
       templateId:'f111',sessionKey,reasons,
       droppedSelections:dropped,droppedPrepSelections:prep.dropped,
     };

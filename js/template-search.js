@@ -139,7 +139,7 @@
         title:`${combo.lower} + ${combo.upper}`,
         subtitle:`${combo.id} · F111 自由组合`,
         templates:['f111'],
-        href:`#/coach/f111/compose?${query}`,
+        href:`#/coach/f111?${query}`,
         searchText:lower([
           combo.id,combo.lowerMode,combo.upperMode,combo.lower,combo.upper,
           'F111 女性综合 1+1+1 自由组合',

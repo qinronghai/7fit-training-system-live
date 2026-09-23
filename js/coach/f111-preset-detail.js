@@ -44,7 +44,7 @@
       lower:state.modeIds?.lower||'',
       upper:state.modeIds?.upper||'',
     });
-    return `#/coach/f111/compose?${query.toString()}`;
+    return `#/coach/f111?${query.toString()}`;
   }
 
   function prescription(item,level){

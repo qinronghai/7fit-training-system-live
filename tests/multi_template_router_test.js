@@ -32,7 +32,7 @@ assert.strictEqual(R.isValid(R.parseHash('#/coach/unknown')),false);
 assert.strictEqual(R.isValid(R.parseHash('#/coach/posture/compose')),false);
 
 assert.strictEqual(typeof R.canonicalHash,'function');
-assert.strictEqual(R.canonicalHash(R.parseHash('#/coach/compose?level=L3&lower=single_leg_hinge')),'#/coach/f111/compose?level=L3&lower=single_leg_hinge');
+assert.strictEqual(R.canonicalHash(R.parseHash('#/coach/compose?level=L3&lower=single_leg_hinge')),'#/coach/f111?level=L3&lower=single_leg_hinge');
 assert.strictEqual(R.canonicalHash(R.parseHash('#/coach/f111-06/l3')),'#/coach/f111/f111-06/l3');
 assert.strictEqual(R.canonicalHash(R.parseHash('#/coach/f111')),'#/coach/f111');
 

@@ -18,21 +18,15 @@ def test_issue132_release_gate_artifacts_exist_and_are_discovered():
     assert "workers: 1" in config
 
 
-def test_issue132_browser_gate_freezes_required_contracts():
+def test_issue132_browser_gate_freezes_the_new_f111_entrypoint():
     source = text("tests/f111_preset_browser_release_gate_browser.spec.js")
     for token in [
-        "all 32 canonical states",
-        "[1080, 1280, 1440]",
-        "[360, 390, 430]",
-        "filter truth table",
-        "Desktop Drawer and Mobile Bottom Sheet",
-        "aria-selected",
-        "aria-modal",
-        "inert",
-        "toBeFocused",
+        "opens the free-composition page without the preset browser",
+        "legacy composer URLs remain valid aliases",
+        "legacy individual preset detail routes remain available",
+        "[360,390,430,1080]",
         "scrollWidth",
         "clientWidth",
-        "recent-use recovery",
         "#/coach/f111/f111-07/l3",
         "#/coach/f111/compose?",
         "pageerror",
@@ -48,7 +42,7 @@ def test_issue132_keeps_shared_browser_view_model_and_real_resolver_path():
     assert "V15TemplateResolver" in browser
     assert "resolvePreview" in browser
     assert "buildIndex" in browser
-    assert "F111PresetBrowser" in home
+    assert "F111PresetBrowser" not in home
     assert "F111PresetBrowser" in detail
     assert "32" not in browser or "32" not in browser.split("resolvePreview", 1)[-1]
 

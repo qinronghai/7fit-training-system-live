@@ -75,13 +75,10 @@ delete D.templateRegistry.test_template;
 // F111-specific landing and generic template landing are separate modules.
 assert(M.F111Home&&typeof M.F111Home.render==='function','F111 landing must move to F111Home module');
 assert(M.TemplateHome&&typeof M.TemplateHome.render==='function','generic template landing module must exist');
+M.ComposerView={render:()=>'<main class="f111-compose-hero">F111 自由组合编课</main>'};
 const f111=M.F111Home.render();
-assert(f111.includes('女性综合 1+1+1'));
-assert(f111.includes('8 个推荐预设'));
-assert(f111.includes('20 种自由组合'));
-assert(f111.includes('32 套原课程兼容'));
-assert(f111.includes('#/coach/f111/compose'));
-assert(!f111.includes('href="#/coach/compose"'));
+assert(f111.includes('F111 自由组合编课'));
+assert(!f111.includes('7Fit 推荐预设'));
 
 const body=M.TemplateHome.render('body');
 assert(body.includes('健美式塑形'));

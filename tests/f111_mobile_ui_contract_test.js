@@ -22,7 +22,7 @@ M.Prep={
 };
 M.Summary={render:()=>''};
 M.ConflictView={render:()=>''};
-M.PostCardio={render:()=>''};
+M.PostCardio={render:()=>'<button data-f111-option-drawer></button>'};
 M.SavedSessionsUI={controls:()=>''};
 
 const html=M.ComposerView.render({query:{level:'L2',lower:'squat',upper:'horizontal_pull',core:'anti_extension'}});
@@ -40,6 +40,9 @@ assert(fs.readFileSync(`${root}/js/coach/composer-view.js`,'utf8').includes('f11
 assert(fs.readFileSync(`${root}/js/coach/prep.js`,'utf8').includes('prep-card-action'),'PREP action detail must be attached to the action card instead of a separate link');
 assert(html.includes('复制给教练'),'coach copy action must remain user-facing');
 assert(html.includes('复制给会员'),'member copy action must remain user-facing');
+assert(M.ComposerView.composeHref({level:'L2',lowerMode:'squat',upperMode:'horizontal_pull',coreDemand:'anti_extension'}).startsWith('#/coach/f111?'),
+  'F111 stage and mode choices must keep the home composer route canonical');
+assert(html.includes('data-f111-option-drawer'),'post-cardio choices must expose drawer triggers on the composer');
 assert(!html.includes('5 × 4 主模式矩阵'),'developer-facing matrix explanation must not remain in the hero');
 assert(!html.includes('实时 Anatomy / Conflict'),'developer-facing implementation jargon must not remain in the hero');
 

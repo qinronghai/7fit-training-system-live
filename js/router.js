@@ -111,7 +111,7 @@
       const suffix=querySuffix(route.query);
       if(route.page==='home')return '#/coach'+suffix;
       if(route.page==='template')return `#/coach/${route.templateId}${suffix}`;
-      if(route.page==='compose')return `#/coach/f111/compose${suffix}`;
+      if(route.page==='compose')return `#/coach/f111${suffix}`;
       if(route.page==='template-compose')return `#/coach/${route.templateId}/compose${suffix}`;
       if(route.page==='template-family')return `#/coach/body/${String(route.familyId||'').toLowerCase()}${suffix}`;
       if(route.page==='template-session'){

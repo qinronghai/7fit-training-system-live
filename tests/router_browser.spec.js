@@ -58,11 +58,13 @@ test('390px canonical and legacy F111 preset routes render the same session', as
   await expectNoPageErrors(errors);
 });
 
-test('canonical F111 composer works and F111 home emits canonical links', async ({ page }) => {
+test('F111 home is the free composer and the old composer routes remain aliases', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/f111');
-  await expect(page.locator('a[href="#/coach/f111/compose"]')).toHaveCount(2);
-  await expect(page.locator('a[href^="#/coach/f111/f111-01/l"]')).toHaveCount(4);
+  await expect(page.locator('.composer-slot-card')).toHaveCount(6);
+  await expect(page.locator('.f111-preset-browser-section')).toHaveCount(0);
+  await expect(page.locator('.coach-mode-switch')).toHaveCount(0);
+  await expect(page.locator('.f111-level-switch a')).toHaveCount(4);
   await expect(page.locator('a[href^="#/coach/compose"]')).toHaveCount(0);
 
   await page.goto('/#/coach/f111/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
@@ -71,7 +73,8 @@ test('canonical F111 composer works and F111 home emits canonical links', async 
   await expect(page.locator('.f111-mode-drawer-trigger')).toHaveCount(2);
   await expect(page.locator('.f111-mode-label')).toHaveText(['下肢模式','上肢模式']);
   const composerLevelHrefs = await page.locator('.f111-level-switch a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')));
-  expect(composerLevelHrefs.every(href => href && href.startsWith('#/coach/f111/compose?'))).toBeTruthy();
+  expect(composerLevelHrefs.every(href => href && href.startsWith('#/coach/f111?'))).toBeTruthy();
+  await expect(page.locator('#page-subtitle')).toHaveText('女性综合 1+1+1');
   await expect(page.locator('a[href^="#/coach/compose"]')).toHaveCount(0);
 
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
@@ -177,7 +180,7 @@ test('canonical F111 navigation supports back/forward and invalid nested routes 
   await page.goto('/#/coach/f111/f111-01/l1');
   await expect(page.locator('.session-slot')).toHaveCount(6);
   await page.goBack();
-  await expect(page.getByRole('heading', { name: '女性综合 1+1+1' })).toBeVisible();
+  await expect(page.locator('.f111-compose-hero h1')).toHaveText('F111｜女性综合训练');
   await page.goForward();
   await expect(page.locator('.session-slot')).toHaveCount(6);
 

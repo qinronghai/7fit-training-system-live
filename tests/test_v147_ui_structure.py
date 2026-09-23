@@ -16,11 +16,14 @@ def test_composer_script_is_loaded_before_coach_view():
     assert html.index('js/coach/f111-compose-ui.js') < html.index('js/coach/composer-view.js')
 
 
-def test_coach_center_has_preset_and_free_composer_modes():
+def test_f111_home_is_the_direct_free_composer():
     js=coach_source()
-    for label in ['7Fit 推荐预设','自由组合编课','F111｜女性综合训练','选择训练阶段','选择训练模式','1F｜力量训练']:
+    for label in ['F111｜女性综合训练','选择训练阶段','选择训练模式','1F｜力量训练']:
         assert label in js
-    assert '#/coach/f111/compose' in js
+    assert "route?.page==='template'&&route.templateId==='f111'" in js
+    assert "return '#/coach/f111?'" in js
+    assert 'coach-mode-switch' not in text('js/coach/f111-home.js')
+    assert '7Fit 推荐预设' not in text('js/coach/f111-home.js')
 
 
 def test_free_composer_ui_exposes_stage_navigation_and_drawer_slots():

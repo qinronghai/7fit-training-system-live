@@ -1724,3 +1724,55 @@ body{font-size:14px;line-height:1.55}
   .f111-course-output-actions{margin-top:0;justify-content:stretch}
   .f111-course-output-actions .session-copy-actions{width:100%}
   .f111-course-output-actions .session-copy-actions button{font-size:11px}
+}
+
+/* F111 composer mobile refinements from the coach review. */
+.time-badge{white-space:nowrap;flex:0 0 auto}
+.view-hero.f111-compose-hero .chip{font-size:10px;padding:5px 9px}
+.f111-course-check{margin-top:8px;padding:7px 10px}
+.f111-course-check-head{justify-content:flex-start;gap:12px}
+.f111-check-details,.f111-check-details-trigger{margin:0}
+.f111-check-details summary{list-style:none}
+.f111-check-details summary::-webkit-details-marker{display:none}
+.f111-check-details summary,.f111-check-details-trigger{appearance:none;border:0;padding:4px 0;background:transparent;color:var(--purple-dark);font-size:10px;font-weight:900;cursor:pointer}
+.f111-check-details summary::before{content:'›';display:inline-block;margin-right:5px;font-size:14px;line-height:1;vertical-align:-1px}
+.f111-check-details[open] summary::before{content:'⌄'}
+.f111-course-check .issue-list{margin-top:5px}
+.f111-recovery-head{align-items:flex-start}
+.f111-recovery-head>div{width:100%;min-width:0}
+.f111-recovery-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.f111-recovery-title-row h2{min-width:0;font-size:clamp(14px,4.5vw,18px);line-height:1.3}
+.f111-recovery-title-row .time-badge{font-size:9px}
+.post-cardio-option-trigger{appearance:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0;min-height:40px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);text-align:left;font-size:12px;cursor:pointer}
+.post-cardio-option-trigger b{min-width:0;overflow-wrap:anywhere;font-size:12px;font-weight:600}
+.post-cardio-option-trigger i{flex:0 0 auto;color:var(--purple-dark);font-size:14px;font-style:normal}
+.post-cardio-option-trigger:hover{border-color:#cdb9fa;background:#faf7ff}
+.post-cardio-option-trigger:focus-visible{outline:2px solid var(--purple-dark);outline-offset:2px}
+.f111-mode-drawer-trigger{min-height:48px}
+.f111-mode-drawer-trigger span{min-width:0;overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.4}
+.f111-mode-label{font-size:12px;font-weight:850}
+.f111-strength-grid + .f111-support-grid{margin-top:9px}
+@media(max-width:620px){
+  .f111-strength-grid,.f111-support-grid{column-gap:9px;row-gap:9px}
+  .f111-support-grid .composer-slot-head>div{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:0;border:0;white-space:nowrap}
+  .f111-support-grid .composer-slot-head>div>span,.f111-support-grid .composer-slot-head>div>b{flex:0 0 auto;white-space:nowrap;padding:3px 4px}
+  .f111-support-grid .composer-slot-head>div>span{font-size:9px;line-height:1.3}
+  .f111-support-grid .composer-slot-head>div>b{font-size:8px}
+  .f111-mode-drawer-trigger{align-items:flex-start;min-height:48px;padding:8px 9px}
+  .f111-mode-drawer-trigger span{flex:1;font-size:13px;line-height:1.4}
+  .f111-builder-section .f111-mode-label{font-size:12px}
+  .f111-strength-section .time-badge{font-size:10px;padding:6px 8px}
+  .f111-prep-section .f111-replace-trigger,.f111-strength-section .f111-replace-trigger{position:relative;box-sizing:border-box;height:44px;min-height:44px;padding:0;border-color:transparent;background:transparent;z-index:1}
+  .f111-prep-section .f111-replace-trigger::before,.f111-strength-section .f111-replace-trigger::before{content:'';position:absolute;inset:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}
+  .f111-prep-section .f111-replace-trigger>span,.f111-prep-section .f111-replace-trigger>i,.f111-strength-section .f111-replace-trigger>span,.f111-strength-section .f111-replace-trigger>i{position:relative;z-index:1}
+  .f111-prep-section .f111-replace-trigger:hover::before,.f111-strength-section .f111-replace-trigger:hover::before{border-color:#cdb9fa;background:#faf7ff}
+  .f111-prep-section .f111-replace-trigger:active,.f111-strength-section .f111-replace-trigger:active{background:transparent}
+  .f111-prep-section .f111-replace-trigger:active::before,.f111-strength-section .f111-replace-trigger:active::before{background:var(--purple-pale)}
+  .post-cardio-option-trigger{min-height:44px;padding:7px 8px}
+  .post-cardio-field>span{font-size:10px}
+}
+@media(max-width:360px){
+  .f111-support-grid .f111-slot-card{padding-right:4px;padding-left:4px}
+  .f111-support-grid .composer-slot-head>div{gap:1px}
+  .f111-support-grid .composer-slot-head>div>span,.f111-support-grid .composer-slot-head>div>b{padding:2px 1px;font-size:8px}
+}

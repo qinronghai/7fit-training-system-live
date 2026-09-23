@@ -51,7 +51,7 @@ const combos=S.search({q:'单腿拉',templateId:'f111',kind:'session'});
 const combo=combos.find(x=>x.kind==='f111-combination');
 assert(combo,'F111 combination search should find 单腿拉');
 assert(window.V14Router.isValid(window.V14Router.parseHash(combo.href)),combo.href);
-assert(combo.href.startsWith('#/coach/f111/compose?'));
+assert(combo.href.startsWith('#/coach/f111?'));
 
 const bodyFamilyId=window.V14_DATA.bodyFamilyIds[1]||window.V14_DATA.bodyFamilyIds[0];
 const body=S.search({q:bodyFamilyId,templateId:'body',kind:'session'}).find(x=>x.kind==='body-family');

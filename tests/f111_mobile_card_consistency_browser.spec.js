@@ -42,11 +42,13 @@ test('F111 prep and strength cards align replacement controls, typography, and s
             button: {
               width: buttonRect.width,
               height: buttonRect.height,
+              visualHeight: parseFloat(getComputedStyle(button, '::before').height),
               fontSize: getComputedStyle(button).fontSize,
               color: getComputedStyle(button.querySelector('span')).color,
               background: getComputedStyle(button.querySelector('span')).backgroundColor,
               padding: getComputedStyle(button.querySelector('span')).padding,
               centered: Math.abs((labelRect.x + caretRect.x + caretRect.width) / 2 - (buttonRect.x + buttonRect.width / 2)) < 1,
+              touchExpansion: getComputedStyle(button, '::after').inset,
             },
             warmupButtonInHeader: name !== 'warmup' || !!button.closest('.prep-card-meta'),
           };
@@ -62,9 +64,9 @@ test('F111 prep and strength cards align replacement controls, typography, and s
     ]);
     expect(result.cards.map(card => card.titleSize), `action title scale at ${width}px`).toEqual(['14px', '14px', '14px']);
     expect(result.cards.map(card => card.button), `replacement control geometry at ${width}px`).toEqual([
-      { width: 44, height: 44, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true },
-      { width: 44, height: 44, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true },
-      { width: 44, height: 44, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
     ]);
     expect(result.cards.map(card => card.warmupButtonInHeader)).toEqual([true, true, true]);
 

@@ -42,4 +42,4 @@ def test_search_service_uses_formal_template_membership_sources():
     assert "coreIds" in source
     assert "#/coach/body/compose" in source
     assert "#/coach/conditioning/compose" in source
-    assert "#/coach/f111/compose" in source
+    assert "#/coach/f111?" in source

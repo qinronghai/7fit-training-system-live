@@ -72,20 +72,12 @@ def test_mobile_navigation_has_five_primary_destinations():
     assert [a.get_text(' ', strip=True) for a in links] == ['编课','体系','规则','动作库','更多']
 
 
-def test_coach_home_contains_approved_f111_course_introduction():
+def test_f111_home_uses_the_composer_without_the_preset_landing():
     text = coach_source()
-    required = [
-        '为什么是「1+1+1」',
-        '一下肢 + 一上肢 + 一支撑',
-        '每节课只锁定一个下肢主模式、一个上肢主模式和一个支撑任务',
-        '① 全身都能练到，但重点非常清楚',
-        '② 更适合女性长期塑形',
-        '臀腿线条、背肩塑形、基础力量、核心稳定、动作质量和整体体态。',
-        '③ 可以连续进阶',
-        '动作控制 → 基础负重 → 独立负重 → 完整能力。'
-    ]
-    for item in required:
-        assert item in text
+    assert 'ComposerView.render(route)' in text
+    assert "route?.page==='template'&&route.templateId==='f111'" in text
+    assert '7Fit 推荐预设' not in text
+    assert 'coach-mode-switch' not in text
 
 
 def test_v141_readability_overrides_exist():

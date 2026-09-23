@@ -1,6 +1,7 @@
 (function(){
   const M=window.V14CoachModules||{},Home=M.Home,F111Home=M.F111Home,TemplateHome=M.TemplateHome,Session=M.Session,ComposerView=M.ComposerView;
   const Recent=()=>window.V15RecentActions;
+  const isF111Composer=route=>route?.page==='compose'||(route?.page==='template'&&route.templateId==='f111');
   const selectCandidates=select=>Array.from(select?.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}));
   const selectHas=(select,actionId)=>selectCandidates(select).some(candidate=>candidate.actionId===actionId);
   const bindPrepSelect=(select,onChange)=>{
@@ -25,7 +26,7 @@
   function render(route){
     const adapter=templateAdapter(route);
     if(adapter)return adapter.render(route);
-    if(route.page==='compose')return ComposerView.render(route);
+    if(isF111Composer(route))return ComposerView.render(route);
     if(route.recipeId)return Session.render(route);
     if(route.page==='template'||route.page==='template-compose')return route.templateId==='f111'?F111Home.render(route):TemplateHome.render(route.templateId);
     return Home.render(route);
@@ -82,7 +83,7 @@
       bindFavorites();
       return;
     }
-    if(route.page==='compose'){
+    if(isF111Composer(route)){
       const ctx=ComposerView.composerContext(route);
       document.querySelectorAll('.composer-slot-select').forEach(sel=>sel.addEventListener('change',()=>{
         const contextKey=Recent()?.context?.f111Composer?.({

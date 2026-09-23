@@ -150,6 +150,12 @@
     }).join('');
   }
 
+  function choiceField({label,key,sessionKey,className,current,options,valueOf,labelOf}){
+    const selected=options.find(option=>String(valueOf(option))===String(current));
+    const selectedLabel=selected?labelOf(selected):'';
+    return `<label class="post-cardio-field"><span>${esc(label)}</span><button type="button" class="post-cardio-option-trigger" data-f111-option-drawer data-f111-option-title="${esc(label)}" aria-haspopup="dialog" aria-label="${esc(`${label}：${selectedLabel}`)}"><b>${esc(selectedLabel)}</b><i aria-hidden="true">⌄</i></button><select class="f111-visually-hidden ${esc(className)}" aria-label="${esc(label)}" data-${esc(key)}="${esc(sessionKey)}">${optionTag(options,current,valueOf,labelOf)}</select></label>`;
+  }
+
   /** The compact, member-facing post-cardio block. */
   function render(sessionKey){
     const key=String(sessionKey||'');
@@ -157,7 +163,7 @@
     const copy=window.V14ModuleCopy
       ?(window.V14ModuleCopy.register(`post-cardio-${key}`,'knowledge',{title:`课后有氧｜${key}`,lines:copyLines(p)}),window.V14ModuleCopy.button(`post-cardio-${key}`,'复制本模块'))
       :'';
-    return `<section class="section-card post-cardio-section" data-post-cardio="${esc(key)}" data-module-kind="POST CARDIO ONLY"><div class="section-head"><div><h2>课后有氧</h2><p>不计入力量训练时长，按会员处方执行。</p></div><span class="time-badge">约 ${p.minutes} 分钟</span></div><div class="post-cardio-controls"><label class="post-cardio-field"><span>器械</span><select class="post-cardio-equipment" data-post-cardio-equipment="${esc(key)}">${optionTag(equipment,p.actionId,option=>option.actionId,option=>option.label)}</select></label><label class="post-cardio-field"><span>时长</span><select class="post-cardio-minutes" data-post-cardio-minutes="${esc(key)}">${optionTag(MINUTE_CHOICES,p.minutes,value=>value,value=>`约 ${value} 分钟`)}</select></label><label class="post-cardio-field"><span>平均心率</span><select class="post-cardio-heart-rate" data-post-cardio-heart-rate="${esc(key)}">${optionTag(HEART_RATE_CHOICES,`${p.heartRateMin}-${p.heartRateMax}`,pair=>`${pair[0]}-${pair[1]}`,pair=>`${pair[0]}–${pair[1]} bpm`)}</select></label></div><div class="post-cardio-actions">${copy}</div><p class="post-cardio-summary">${esc(summary(p))}</p></section>`;
+    return `<section class="section-card post-cardio-section" data-post-cardio="${esc(key)}" data-module-kind="POST CARDIO ONLY"><div class="section-head"><div><h2>课后有氧</h2><p>不计入力量训练时长，按会员处方执行。</p></div><span class="time-badge">约 ${p.minutes} 分钟</span></div><div class="post-cardio-controls">${choiceField({label:'器械',key:'post-cardio-equipment',sessionKey:key,className:'post-cardio-equipment',current:p.actionId,options:equipment,valueOf:option=>option.actionId,labelOf:option=>option.label})}${choiceField({label:'时长',key:'post-cardio-minutes',sessionKey:key,className:'post-cardio-minutes',current:p.minutes,options:MINUTE_CHOICES,valueOf:value=>value,labelOf:value=>`约 ${value} 分钟`})}${choiceField({label:'平均心率',key:'post-cardio-heart-rate',sessionKey:key,className:'post-cardio-heart-rate',current:`${p.heartRateMin}-${p.heartRateMax}`,options:HEART_RATE_CHOICES,valueOf:pair=>`${pair[0]}-${pair[1]}`,labelOf:pair=>`${pair[0]}–${pair[1]} bpm`})}</div><div class="post-cardio-actions">${copy}</div><p class="post-cardio-summary">${esc(summary(p))}</p></section>`;
   }
 
   M.PostCardio={equipmentOptions,plan,setSelection,reset,copyLines,memberText,summary,render,STORAGE_KEY};
