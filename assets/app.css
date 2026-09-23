@@ -1598,7 +1598,7 @@ body{font-size:14px;line-height:1.55}
 
 /* F111 mobile support/core pair: make the two adjacent modules read as separate cards. */
 @media(max-width:620px){
-  .f111-support-grid{column-gap:14px;row-gap:10px}
+  .f111-support-grid{column-gap:16px;row-gap:10px}
   .f111-support-grid .composer-slot-head>div{
     display:grid;
     grid-template-columns:minmax(0,1fr);
