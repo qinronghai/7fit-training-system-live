@@ -45,17 +45,18 @@
     return '系统按主项互补、动作暴露和场馆路由推荐';
   }
   function composerCard(ctx,slot,controls=''){
-    const data=D(),opts=ctx.resolved.slotOptions[slot.slotKey]||[],a=data.actions[slot.actionId]||{};
-    const optionHtml=opts.map(o=>{const grade=o.tier||o.grade||'';return `<option value="${esc(o.id)}" ${o.id===slot.actionId?'selected':''}>${esc([grade,o.name].filter(Boolean).join('｜'))}</option>`;}).join('');
+    const data=D(),opts=ctx.resolved.slotOptions[slot.slotKey]||[],a=data.actions[slot.actionId]||{},special=slot.slotKey==='C'||slot.slotKey==='CORE';
+    const grouped=special?M.F111ComposeUI?.actionGroups?.(ctx,slot.slotKey):null;
+    const selectOptions=grouped?.length?grouped.flatMap(group=>group.items):opts;
+    const optionHtml=selectOptions.map(o=>{const grade=o.tier||o.grade||'';return `<option value="${esc(o.id)}" ${o.id===slot.actionId?'selected':''} ${o.disabled?'disabled':''} data-grade="${esc(grade)}">${esc([grade,o.name].filter(Boolean).join('｜'))}</option>`;}).join('');
     const grade=slot.tier||slot.grade||'';
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(slot.actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(slot.actionId)}`:`#/library?focus=${encodeURIComponent(slot.actionId)}`;
     const tierNote=slot.tierNote?`<small class="composer-tier-note">${esc(slot.tierNote)}</small>`:'';
-    const rx=slot.prescriptionOverride?`<small class="composer-rx-note">高阶处方：${esc(slot.prescriptionOverride)}</small>`:'';
-    const Recent=window.V15RecentActions,contextKey=Recent?.context?.f111Composer?.({
-      lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,level:ctx.level,coreDemand:ctx.coreDemand,slotKey:slot.slotKey,
-    })||'';
-    const quick=Recent?.renderButtons?.({templateId:'f111',contextKey,candidates:opts,currentActionId:slot.actionId})||'';
-    return `<article class="composer-slot-card" data-composer-slot="${esc(slot.slotKey)}"><div class="composer-slot-head"><span>${esc(slot.slotName)}</span><b>${esc(grade||'辅助')}</b></div>${controls}<h3>${esc(slot.name||'暂无候选')}</h3><p>${esc(windowText(slot.slotKey,ctx.resolved))}</p>${rx}${tierNote}<div class="composer-slot-actions"><a href="${detailRoute}">查看动作</a><select class="composer-slot-select" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select>${quick}</div></article>`;
+    const rx=slot.prescriptionOverride?`<small class="composer-rx-note">${esc(slot.prescriptionOverride)}</small>`:'';
+    const replace=special
+      ?(M.F111ComposeUI?.actionTrigger?.(ctx,slot.slotKey)||'')
+      :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
+    return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}" data-action-detail-href="${esc(detailRoute)}" tabindex="0" aria-label="查看${esc(slot.name||'动作')}详情"><div class="composer-slot-head"><div><span>${esc(slot.slotName||slot.slotKey)}</span><b>${esc(grade||'辅助')}</b></div>${replace}</div>${controls}<div class="f111-slot-main"><h3>${esc(slot.name||'暂无候选')}</h3></div>${rx}${tierNote}<select class="composer-slot-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select></article>`;
   }
   M.Slot={sessionCard,composerCard,windowText};
 })();

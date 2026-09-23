@@ -122,7 +122,15 @@
     return `<div class="flow-grid recovery-grid">${result.items.map(item=>`<article class="flow-item recovery-card" data-recovery-card="${esc(item.region)}" data-recovery-action="${esc(item.id)}"><div class="recovery-card-region"><small>主要部位</small><b>${esc(item.regionLabel)}</b></div><strong>${esc(item.name)}</strong><span class="recovery-prescription">${esc(item.prescription)}</span><p>${esc(item.reason)}</p><a class="recovery-detail-link" href="#/library?focus=${encodeURIComponent(item.id)}">查看动作详情</a></article>`).join('')}</div>`;
   }
 
+  // F111's mobile composer keeps the same matched items and detail route, but
+  // presents them as compact full-row links so the recovery module does not
+  // dominate the end of a long course page.
+  function renderCompact(result){
+    if(!result||result.status!=='complete')return `<div class="recovery-empty" data-recovery-empty><b>暂时无法自动生成完整拉伸方案</b><span>${esc(result?.message||'当前动作库不足以生成 3 个不同部位的拉伸建议。')}</span><strong>请由教练人工安排恢复动作。</strong></div>`;
+    return `<div class="recovery-list" role="list">${result.items.map(item=>`<a class="recovery-row" role="listitem" data-recovery-card="${esc(item.region)}" data-recovery-action="${esc(item.id)}" href="#/library?focus=${encodeURIComponent(item.id)}"><span class="recovery-row-region">${esc(item.regionLabel)}</span><span class="recovery-row-main"><b>${esc(item.name)}</b><small>${esc(item.reason)}</small></span><span class="recovery-prescription">${esc(item.prescription)}</span></a>`).join('')}</div>`;
+  }
+
   function copyItems(result){return result?.status==='complete'?result.items.map(item=>`${item.name} · ${item.prescription}`):[];}
 
-  window.V14RecoveryMatcher={match,render,copyItems};
+  window.V14RecoveryMatcher={match,render,renderCompact,copyItems};
 })();

@@ -46,6 +46,22 @@
     }));
   }
 
+  function bindDetailCards(scope){
+    scope.querySelectorAll('[data-prep-detail-href],[data-action-detail-href]').forEach(card=>{
+      if(card.dataset.detailBound==='1')return;
+      card.dataset.detailBound='1';
+      const navigate=event=>{
+        if(event.target.closest('button,select,a,input,textarea,[data-replacement-drawer],[data-f111-action-drawer]'))return;
+        const href=card.dataset.prepDetailHref||card.dataset.actionDetailHref;
+        if(href)location.hash=href;
+      };
+      card.addEventListener('click',navigate);
+      card.addEventListener('keydown',event=>{
+        if((event.key==='Enter'||event.key===' ')&&event.target===card){event.preventDefault();navigate(event);}
+      });
+    });
+  }
+
   function bind(route){
     const root=document.getElementById('app-main');
     const rerender=()=>{
@@ -54,6 +70,7 @@
       bind(current);
       if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);
     };
+    bindDetailCards(root);
     const bindSaved=()=>M.SavedSessionsUI?.bind?.(route,root,rerender);
     const bindFavorites=()=>M.FavoritesUI?.bind?.(root,rerender);
     const bindReplacementDrawer=()=>M.ReplacementDrawer?.bind?.(root);
@@ -87,6 +104,7 @@
         rerender();
       }));
       document.querySelectorAll('.prep-slot-select').forEach(sel=>bindPrepSelect(sel,()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
+      document.querySelectorAll('.f111-foam-select').forEach(sel=>sel.addEventListener('change',()=>{M.Foam?.setComposerFoamSelection?.(sel.dataset.foamSession,sel.dataset.foamSlot,sel.value,ctx.level);rerender();}));
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
       const status=document.getElementById('copy-session-status');
       const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
@@ -94,6 +112,7 @@
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindPostCardio(rerender);
+      M.F111ActionDrawer?.bind?.(root,ctx,rerender);
       bindReplacementDrawer();
       bindSaved();
       bindFavorites();
@@ -128,6 +147,7 @@
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
+    M.F111ActionDrawer?.bind?.(root,null,rerender);
     bindPostCardio(rerender);
     bindReplacementDrawer();
     bindSaved();

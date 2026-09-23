@@ -1,6 +1,9 @@
 (function(){
   const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
   const {esc,D}=C;
+  const FOAM_SELECTIONS_KEY='f111-foam-selections';
+  function readComposerFoamSelections(){try{return JSON.parse(sessionStorage.getItem(FOAM_SELECTIONS_KEY)||'{}')||{};}catch(_){return {};}}
+  function writeComposerFoamSelections(value){try{sessionStorage.setItem(FOAM_SELECTIONS_KEY,JSON.stringify(value));}catch(_){} }
   function legacyMatchedFoamRolls(recipeId,level){
     const data=D(),recipe=data.recipes[recipeId]||{},tier=`T${level.slice(-1)}`;
     const eligible=id=>{const f=data.foamRollDetails?.[id];return !!f&&f.sessionLevels.includes(level)&&f.mainTiers.includes(tier);};
@@ -74,8 +77,27 @@
   }
 
   function composerFoamItems(ctx){
-    const data=D(),ids=ctx.resolved.slots.filter(x=>['A','B','D1','D2'].includes(x.slotKey)).map(x=>x.actionId).filter(Boolean);
-    return (window.V14Anatomy?.rankFoam(ids,{limit:4})||[]).map(id=>data.foamRollDetails[id]).filter(Boolean);
+    const data=D(),ids=ctx.resolved.slots.filter(x=>['A','B','D1','D2'].includes(x.slotKey)).map(x=>x.actionId).filter(Boolean),ranked=(window.V14Anatomy?.rankFoam(ids,{limit:4})||[]).map(id=>data.foamRollDetails[id]).filter(Boolean),saved={...readComposerFoamSelections()[ctx.stateKey],...(window.V15State?.getPrepSelections?.('f111',ctx.stateKey)||{})};
+    return ranked.map((item,index)=>{
+      const selected=saved[`FOAM-${index+1}`]?.actionId;
+      return selected&&data.foamRollDetails?.[selected]?data.foamRollDetails[selected]:item;
+    });
   }
-  M.Foam={matchedFoamRolls,foamRollCards,rankForSession,itemsForSession,foamRollCardsFor,composerFoamItems};
+
+  function composerFoamOptions(ctx){
+    const data=D(),tier=`T${String(ctx.level||'L1').slice(-1)}`,mainIds=ctx.resolved.slots.filter(x=>['A','B','D1','D2'].includes(x.slotKey)).map(x=>x.actionId).filter(Boolean),ranked=window.V14Anatomy?.rankFoam(mainIds,{limit:20})||[],eligible=Object.keys(data.foamRollDetails||{}).filter(id=>{const f=data.foamRollDetails[id];return f&&f.sessionLevels?.includes(ctx.level)&&f.mainTiers?.includes(tier);}),ids=[...new Set([...ranked,...eligible])];
+    return ids.map(id=>data.foamRollDetails[id]).filter(Boolean);
+  }
+
+  function setComposerFoamSelection(sessionKey,slotKey,actionId,level){
+    const all=readComposerFoamSelections();
+    all[sessionKey]={...(all[sessionKey]||{}),[slotKey]:{actionId,source:'manual'}};
+    writeComposerFoamSelections(all);
+    if(window.V14State?.setComposerContext&&window.V15State?.setPrepSelection){
+      window.V14State.setComposerContext(sessionKey,{level});
+      try{return window.V15State.setPrepSelection('f111',sessionKey,slotKey,actionId,'manual');}catch(_){return {actionId,source:'manual'};}
+    }
+    return {actionId,source:'manual'};
+  }
+  M.Foam={matchedFoamRolls,foamRollCards,rankForSession,itemsForSession,foamRollCardsFor,composerFoamItems,composerFoamOptions,setComposerFoamSelection};
 })();
