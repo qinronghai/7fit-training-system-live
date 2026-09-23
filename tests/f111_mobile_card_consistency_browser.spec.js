@@ -77,27 +77,26 @@ test('F111 prep and strength cards align replacement controls, typography, and s
 
 test('replacement and C/CORE action drawers still open, select, and close', async ({ page }) => {
   await openComposer(page, 390);
+  const actionDrawer = page.locator('#f111-action-drawer');
 
   const foamCard = page.locator('.f111-foam-card').first();
   const foamButton = foamCard.locator('[data-replacement-drawer]');
   await foamButton.click();
-  const replacementDrawer = page.locator('#replacement-drawer');
-  await expect(replacementDrawer).toBeVisible();
-  await expect(replacementDrawer.locator('#replacement-drawer-title')).toHaveText('泡沫轴｜替换动作');
-  const foamChoice = replacementDrawer.locator('[data-replacement-choose]:not([disabled])').first();
+  await expect(actionDrawer).toBeVisible();
+  await expect(actionDrawer.locator('#f111-action-drawer-title')).toHaveText('泡沫轴｜替换动作');
+  const foamChoice = actionDrawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)').first();
   await expect(foamChoice).toBeVisible();
   await foamChoice.click();
-  await expect(replacementDrawer).toBeHidden();
+  await expect(actionDrawer).toBeHidden();
 
   const warmupCard = page.locator('.prep-slot-card').first();
   await warmupCard.locator('[data-replacement-drawer]').click();
-  await expect(replacementDrawer).toBeVisible();
-  const warmupChoice = replacementDrawer.locator('[data-replacement-choose]:not([disabled])').first();
+  await expect(actionDrawer).toBeVisible();
+  const warmupChoice = actionDrawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)').first();
   await expect(warmupChoice).toBeVisible();
   await warmupChoice.click();
-  await expect(replacementDrawer).toBeHidden();
+  await expect(actionDrawer).toBeHidden();
 
-  const actionDrawer = page.locator('#f111-action-drawer');
   const supportTrigger = page.locator('.f111-slot-card[data-composer-slot="C"] [data-f111-action-drawer="C"]');
   await supportTrigger.click();
   await expect(actionDrawer).toBeVisible();

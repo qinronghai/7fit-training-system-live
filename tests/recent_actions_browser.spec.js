@@ -29,10 +29,10 @@ test('F111 drawer records legal replacements; Body and Conditioning retain recen
   const f111Select=f111Card.locator('.composer-slot-select');
   const f111Current=await f111Select.inputValue();
   await f111Card.locator('[data-replacement-drawer]').click();
-  const drawer=page.locator('#replacement-drawer');
+  const drawer=page.locator('#f111-action-drawer');
   await expect(drawer).toBeVisible();
-  const f111Choice=drawer.locator('[data-replacement-choose]:not([disabled])').first();
-  const f111Target=await f111Choice.getAttribute('data-replacement-choose');
+  const f111Choice=drawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)').first();
+  const f111Target=await f111Choice.getAttribute('data-f111-action-choice');
   expect(f111Target).toBeTruthy();
   expect(f111Target).not.toBe(f111Current);
   await f111Choice.click();
