@@ -10,7 +10,7 @@
   }
 
   function renderGroups(groups){
-    return (groups||[]).map(group=>`<section class="f111-drawer-group"><div class="f111-drawer-group-head"><h3>${esc(group.label)}</h3><span>${group.items.length} 个动作</span></div><div class="f111-drawer-group-list">${group.items.map(item=>`<button type="button" class="f111-drawer-action ${item.selected?'is-current':''} ${item.disabled?'is-disabled':''}" data-f111-action-choice="${esc(item.id)}" ${item.disabled?'disabled':''} ${item.selected?'aria-current="true"':''}><span><b>${esc(item.name)}</b><small>${esc(item.pattern||'')}${item.disabled?' · 当前阶段暂不可选':''}</small></span><i aria-hidden="true">${item.selected?'✓':'›'}</i></button>`).join('')}</div></section>`).join('');
+    return (groups||[]).map(group=>`<section class="f111-drawer-group"><div class="f111-drawer-group-head"><h3>${esc(group.label)}</h3><span>${group.items.length} ${esc(group.countLabel||'个动作')}</span></div><div class="f111-drawer-group-list">${group.items.map(item=>`<button type="button" class="f111-drawer-action ${item.selected?'is-current':''} ${item.disabled?'is-disabled':''}" data-f111-action-choice="${esc(item.id)}" ${item.disabled?'disabled':''} ${item.selected?'aria-current="true"':''}><span><b>${esc(item.name)}</b><small>${esc(item.pattern||'')}${item.disabled?' · 当前阶段暂不可选':''}</small>${item.detail?`<small class="f111-drawer-action-detail">${esc(item.detail)}</small>`:''}</span><i aria-hidden="true">${item.selected?'✓':'›'}</i></button>`).join('')}</div></section>`).join('');
   }
 
   function ensureDrawer(){
@@ -79,6 +79,10 @@
     const title=slotKey==='C'?'选择支撑动作':'选择核心动作';
     const count=groups.reduce((total,group)=>total+group.items.length,0);
     show(root,title,`当前课程可选 ${count} 个动作，按训练阶段分组显示。`,renderGroups(groups));
+    bindSelectChoices(root);
+  }
+
+  function bindSelectChoices(root){
     root.querySelectorAll('[data-f111-action-choice]').forEach(choice=>choice.addEventListener('click',()=>{
       const source=root._sourceSelect;
       if(!source||![...source.options].some(option=>option.value===choice.dataset.f111ActionChoice))return;
@@ -86,6 +90,20 @@
       close();
       source.dispatchEvent(new Event('change',{bubbles:true}));
     }));
+  }
+
+  function openReplacement(button,source,items){
+    const root=ensureDrawer();
+    if(!root||!source)return;
+    root._sourceSelect=source;
+    root._modeContext=null;
+    root._axis=null;
+    const title=button.dataset.replacementTitle||'替换动作';
+    const count=items.length;
+    const subtitle=button.dataset.replacementSubtitle||`当前课程可选 ${count} 个动作，点击动作即可替换。`;
+    const groupLabel=button.dataset.f111ReplacementGroup||'候选动作';
+    show(root,title,subtitle,renderGroups([{label:groupLabel,countLabel:'个候选',items}]));
+    bindSelectChoices(root);
   }
 
   function openCheck(button){
@@ -117,5 +135,5 @@
     });
   }
 
-  M.F111ActionDrawer={renderModes,renderGroups,bind,openMode,openAction,openCheck,close};
+  M.F111ActionDrawer={renderModes,renderGroups,bind,openMode,openAction,openReplacement,openCheck,close};
 })();

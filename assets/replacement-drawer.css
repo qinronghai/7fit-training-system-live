@@ -61,6 +61,7 @@
 .f111-drawer-action>span,.f111-drawer-option>span{display:grid;gap:3px;min-width:0}
 .f111-drawer-action b,.f111-drawer-option b{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
 .f111-drawer-action small,.f111-drawer-option small{font-size:10px;color:var(--muted);line-height:1.35}
+.f111-drawer-action .f111-drawer-action-detail{overflow-wrap:anywhere}
 .f111-drawer-action>i,.f111-drawer-option>i{flex:0 0 auto;color:var(--purple-dark);font-size:17px;font-style:normal}
 .f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
 .f111-drawer-action.is-disabled{opacity:.5;cursor:not-allowed}

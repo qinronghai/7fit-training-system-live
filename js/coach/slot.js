@@ -34,7 +34,7 @@
     const recommended=lowerContext?.result?.candidates?.find(candidate=>candidate.actionId===lowerContext.result.recommended);
     const why=recommended?.reasons?.[0]?.text||'';
     const browse=lowerContext?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=f111&sessionId=${encodeURIComponent(sessionId)}&slotKey=${encodeURIComponent(slot.slotKey)}&level=${encodeURIComponent(lowerContext.level)}&lower=${encodeURIComponent(lowerContext.lowerMode)}">查看全部下肢辅助与容量动作 →</a>`:'';
-    const drawer=lowerContext?`<button type="button" class="lower-assistance-drawer-open" data-replacement-drawer data-replacement-select=".session-swap" data-replacement-title="D1｜下肢辅助替换" data-replacement-subtitle="${esc(lowerContext.level)} · 仅显示当前课程通过 Gate 的候选">打开替换抽屉</button>`:'';
+    const drawer=lowerContext?`<button type="button" class="lower-assistance-drawer-open" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="下肢辅助候选" data-replacement-select=".session-swap" data-replacement-title="D1｜下肢辅助替换" data-replacement-subtitle="${esc(lowerContext.level)} · 仅显示当前课程通过 Gate 的候选">打开替换抽屉</button>`:'';
     const whyHtml=why?`<small class="lower-assistance-why">推荐依据：${esc(why)}</small>`:'';
     return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${drawer}${whyHtml}${browse}${quick}</div></article>`;
   }
@@ -55,7 +55,7 @@
     const rx=slot.prescriptionOverride?`<small class="composer-rx-note">${esc(slot.prescriptionOverride)}</small>`:'';
     const replace=special
       ?(M.F111ComposeUI?.actionTrigger?.(ctx,slot.slotKey)||'')
-      :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
+      :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="动作候选" data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
     return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}" data-action-detail-href="${esc(detailRoute)}" tabindex="0" aria-label="查看${esc(slot.name||'动作')}详情"><div class="composer-slot-head"><div><span>${esc(slot.slotName||slot.slotKey)}</span><b>${esc(grade||'辅助')}</b></div>${replace}</div>${controls}<div class="f111-slot-main"><h3>${esc(slot.name||'暂无候选')}</h3></div>${rx}${tierNote}<select class="composer-slot-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select></article>`;
   }
   M.Slot={sessionCard,composerCard,windowText};
