@@ -1593,7 +1593,10 @@ body{font-size:14px;line-height:1.55}
   .f111-prep-section .session-foam-card:hover,.f111-strength-section .f111-slot-card:hover{transform:none}
 }
 
-/* F111 mobile support/core pair: make the two adjacent modules read as separate cards. */
+/* F111 support/core pair: keep both card axes visibly separated. */
+.f111-support-grid{column-gap:20px;row-gap:12px}
+.f111-support-grid .f111-slot-card{border-color:#d8cde8}
+.f111-strength-grid + .f111-support-grid{margin-top:16px}
 @media(max-width:620px){
   .f111-support-grid{column-gap:16px;row-gap:10px}
   .f111-support-grid .composer-slot-head>div{
@@ -1630,7 +1633,7 @@ body{font-size:14px;line-height:1.55}
   }
 }
 @media(max-width:360px){
-  .f111-support-grid{column-gap:10px}
+  .f111-support-grid{column-gap:14px}
   .f111-support-grid .composer-slot-head>div{grid-template-columns:minmax(0,1fr);gap:5px}
   .f111-support-grid .composer-slot-head>div>b{justify-self:start}
 }
