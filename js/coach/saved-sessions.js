@@ -75,7 +75,16 @@
       <div class="saved-session-save-row"><label><span>课程名称</span><input type="text" value="${esc(defaultName)}" data-save-session-name></label><button type="button" data-save-current-session>保存当前 Session</button></div>
       <div data-saved-session-status></div>
       ${listHtml()}
-    </section>`;
+      </section>`;
+  }
+  function compactControls(route){
+    const descriptor=Service()?.descriptorFromRoute?.(route);
+    if(!descriptor)return '';
+    const defaultName=Service().defaultName(descriptor),latest=(Service()?.list?.()||[])[0];
+    const restore=latest
+      ?`<button type="button" data-saved-restore="${esc(latest.savedId)}">恢复已保存课程</button>`
+      :'<button type="button" disabled>恢复已保存课程</button>';
+    return `<div class="f111-inline-save-controls saved-session-controls"><input type="hidden" value="${esc(defaultName)}" data-save-session-name><div class="f111-inline-save-row"><button type="button" data-save-current-session>保存当前课程</button>${restore}</div><div data-saved-session-status></div><details class="f111-inline-saved-list"><summary>已保存课程</summary>${listHtml()}</details></div>`;
   }
   function setStatus(root,text,kind=''){
     const el=root.querySelector('[data-saved-session-status]');
@@ -129,5 +138,5 @@
     }));
   }
 
-  M.SavedSessionsUI={controls,librarySection,bind};
+  M.SavedSessionsUI={controls,compactControls,librarySection,bind};
 })();

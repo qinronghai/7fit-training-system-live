@@ -68,8 +68,9 @@ test('canonical F111 composer works and F111 home emits canonical links', async 
   await page.goto('/#/coach/f111/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
   await expect(page.locator('.composer-slot-card')).toHaveCount(6);
   await expect(page.getByText('L3｜单腿拉 + 水平推', { exact: false })).toBeVisible();
-  await expect(page.locator('.coach-mode-switch a').last()).toHaveAttribute('href', '#/coach/f111/compose');
-  const composerLevelHrefs = await page.locator('.composer-level-switch a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')));
+  await expect(page.locator('.f111-mode-drawer-trigger')).toHaveCount(2);
+  await expect(page.locator('.f111-mode-label')).toHaveText(['下肢模式','上肢模式']);
+  const composerLevelHrefs = await page.locator('.f111-level-switch a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')));
   expect(composerLevelHrefs.every(href => href && href.startsWith('#/coach/f111/compose?'))).toBeTruthy();
   await expect(page.locator('a[href^="#/coach/compose"]')).toHaveCount(0);
 

@@ -148,7 +148,7 @@ test('BODY-02/L3 full workflow survives swap, copy, reload and reset at 390px',a
   });
   expect(resolved.selected).toBe(replaceable.target);
   await expect(page.locator('.body-volume-overview>div').first().locator('b')).toHaveText(String(resolved.totalWorkingSets));
-  await expect(page.locator('.conflict-box')).toContainText(resolved.conflictStatus);
+  await expect(page.locator('.conflict-box')).toHaveClass(new RegExp(`\\b${resolved.conflictStatus.toLowerCase()}\\b`));
   for(const name of resolved.prepNames)await expect(page.locator('.body-prep-section')).toContainText(name);
 
   await page.evaluate(()=>{

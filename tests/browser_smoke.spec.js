@@ -346,7 +346,8 @@ test('Body, Conditioning and HYROX homes are active while Posture remains future
 test('free composer route loads in Chromium with no pageerror', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/compose');
-  await expect(page.getByText('20 种基础组合', { exact: false })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'F111｜女性综合训练' })).toBeVisible();
+  await expect(page.locator('.f111-mode-section')).toBeVisible();
   await expect(page.getByText('自由组合编课', { exact: false }).first()).toBeVisible();
   await expectNoPageErrors(errors);
 });
@@ -440,17 +441,24 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
   await page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`).selectOption(preset.target);
   let presetSelect = page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`);
   await expect(presetSelect).toHaveValue(preset.target);
-  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('手动选择');
+  await expect.poll(() => page.evaluate(({ sessionKey, slotKey }) =>
+    window.V15State.getPrepSelections('f111', sessionKey)[slotKey]?.source || '', preset
+  )).toBe('manual');
 
   await page.reload();
   presetSelect = page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`);
   await expect(presetSelect).toHaveValue(preset.target);
-  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('手动选择');
+  await expect.poll(() => page.evaluate(({ sessionKey, slotKey }) =>
+    window.V15State.getPrepSelections('f111', sessionKey)[slotKey]?.source || '', preset
+  )).toBe('manual');
 
   const presetState = await page.evaluate(({ sessionKey, slotKey }) => window.V15State.getPrepSelections('f111', sessionKey)[slotKey], preset);
   expect(presetState).toEqual({ actionId: preset.target, source: 'manual' });
   await page.locator('#reset-session').click();
-  await expect(page.locator(`[data-prep-slot-card="${preset.slotKey}"]`)).toContainText('系统推荐');
+  await expect(page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`)).toHaveValue(preset.current);
+  await expect.poll(() => page.evaluate(({ sessionKey, slotKey }) =>
+    window.V15State.getPrepSelections('f111', sessionKey)[slotKey] || null, preset
+  )).toBeNull();
 
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
   await expect(page.locator('.prep-slot-card')).toHaveCount(5);
@@ -459,12 +467,16 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
   await page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`).selectOption(composer.target);
   let composerSelect = page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`);
   await expect(composerSelect).toHaveValue(composer.target);
-  await expect(page.locator(`[data-prep-slot-card="${composer.slotKey}"]`)).toContainText('手动选择');
+  await expect.poll(() => page.evaluate(({ sessionKey, slotKey }) =>
+    window.V15State.getPrepSelections('f111', sessionKey)[slotKey]?.source || '', composer
+  )).toBe('manual');
 
   await page.reload();
   composerSelect = page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`);
   await expect(composerSelect).toHaveValue(composer.target);
-  await expect(page.locator(`[data-prep-slot-card="${composer.slotKey}"]`)).toContainText('手动选择');
+  await expect.poll(() => page.evaluate(({ sessionKey, slotKey }) =>
+    window.V15State.getPrepSelections('f111', sessionKey)[slotKey]?.source || '', composer
+  )).toBe('manual');
   const composerState = await page.evaluate(({ sessionKey, slotKey }) => window.V15State.getPrepSelections('f111', sessionKey)[slotKey], composer);
   expect(composerState).toEqual({ actionId: composer.target, source: 'manual' });
 

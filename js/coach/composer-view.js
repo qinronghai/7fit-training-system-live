@@ -1,21 +1,95 @@
 (function(){
-  const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
-  const {esc,D,hero,coachModeSwitch,copyToolbar}=C;
-  function composeHref(current,overrides={}){const q={level:current.level,lower:current.lowerMode,upper:current.upperMode,core:current.coreDemand,...overrides};if(current.includeExpandedMain)q.em='1';if(current.includeExpandedSupport)q.es='1';if(current.includeExpandedCore)q.ec='1';for(const k of ['em','es','ec'])if(overrides[k]===null)delete q[k];return '#/coach/f111/compose?'+new URLSearchParams(q).toString();}
-  function composerContext(route){const cfg=D().composer||{},q=route.query||{};const level=/^L[1-4]$/.test(q.level||'')?q.level:'L1';const lowerMode=cfg.lowerModes?.[q.lower]?q.lower:'squat';const upperMode=cfg.upperModes?.[q.upper]?q.upper:'horizontal_pull';const coreDemand=cfg.coreDemands?.[q.core]?q.core:'anti_extension';const flags={includeExpandedMain:q.em==='1',includeExpandedSupport:q.es==='1',includeExpandedCore:q.ec==='1'};const probeSession=window.V15TemplateResolver.resolve('f111',{mode:'composer',level,lowerMode,upperMode,coreDemand,...flags});const stateKey=`${probeSession.familyId}-${level}`;const selections=window.V14State.getComposerSelections(stateKey);const resolvedSession=window.V15TemplateResolver.resolve('f111',{mode:'composer',level,lowerMode,upperMode,coreDemand,selections,...flags});const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,...flags});return {level,lowerMode,upperMode,coreDemand,stateKey,resolved,resolvedSession,...flags};}
-  function composerLevelSwitch(ctx){return `<div class="composer-level-switch">${['L1','L2','L3','L4'].map(l=>`<a class="${ctx.level===l?'active':''}" href="${composeHref(ctx,{level:l})}">${l}</a>`).join('')}</div>`;}
-  function composerMatrix(ctx){const cfg=D().composer||{},uppers=Object.entries(cfg.upperModes||{}),lowers=Object.entries(cfg.lowerModes||{});const head=`<div class="composer-matrix-corner">下肢 × 上肢</div>${uppers.map(([,u])=>`<div class="composer-matrix-head">${esc(u.name)}</div>`).join('')}`;const rows=lowers.map(([lk,l])=>`<div class="composer-matrix-rowhead"><b>${esc(l.name)}</b><small>${esc(l.subtitle||'')}</small></div>${uppers.map(([uk,u])=>`<a class="composer-matrix-cell ${ctx.lowerMode===lk&&ctx.upperMode===uk?'active':''}" href="${composeHref(ctx,{lower:lk,upper:uk})}"><span>${esc(l.name)}</span><i>×</i><b>${esc(u.name)}</b></a>`).join('')}`).join('');return `<div class="composer-matrix" aria-label="5 × 4 主模式矩阵">${head}${rows}</div>`;}
-  function composerMobileSelectors(ctx){const cfg=D().composer||{};const options=(obj,current)=>Object.entries(obj).map(([k,v])=>`<option value="${esc(k)}" ${k===current?'selected':''}>${esc(v.name)}</option>`).join('');return `<div class="composer-mobile-selectors"><label>② 选下肢模式<select data-compose-query="lower">${options(cfg.lowerModes||{},ctx.lowerMode)}</select></label><label>③ 选上肢模式<select data-compose-query="upper">${options(cfg.upperModes||{},ctx.upperMode)}</select></label></div>`;}
-  function composerRecovery(ctx){return D().sessionViews?.[`F111-01-${ctx.level}`]||{};}
-  function buildComposerCopyPayload(ctx){const resolvedSession=ctx.resolvedSession||window.V15TemplateResolver.resolve('f111',{mode:'composer',level:ctx.level,lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,coreDemand:ctx.coreDemand,selections:window.V14State?.getComposerSelections?.(ctx.stateKey)||{},includeExpandedMain:!!ctx.includeExpandedMain,includeExpandedSupport:!!ctx.includeExpandedSupport,includeExpandedCore:!!ctx.includeExpandedCore});const ids=resolvedSession.main.content.map(x=>x.actionId).filter(Boolean),summary=resolvedSession.anatomyContext||{primary:[],secondary:[],stabilizers:[]},result=resolvedSession.conflictContext||{issues:[]},recoveryResult=window.V14RecoveryMatcher.match(resolvedSession),view=composerRecovery(ctx),prepResolved=M.Prep.resolveComposerPrep(ctx);return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',foam:M.Foam.composerFoamItems(ctx).map(x=>({name:x.name,prescription:x.prescription})),warmups:M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription,sequencePhase:x.sequencePhase})),slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:x.prescription||window.V14ModuleCopy?.prescriptionForAction?.(x.actionId,{level:ctx.level})||''})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},recovery:window.V14RecoveryMatcher.copyItems(recoveryResult),postCardio:view.postCardio||'',postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(ctx.stateKey):null,conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};}
-  function render(route){
-    const ctx=composerContext(route),cfg=D().composer||{},result=ctx.resolvedSession.conflictContext,allIds=ctx.resolvedSession.main.content.map(x=>x.actionId).filter(Boolean);
-    const demands=Object.entries(cfg.coreDemands||{}).map(([k,v])=>`<a class="${ctx.coreDemand===k?'active':''}" aria-current="${ctx.coreDemand===k?'true':'false'}" href="${composeHref(ctx,{core:k})}">${esc(v.name)}</a>`).join('');
-    const mainExpand=ctx.resolved.windows.main.expanded?.length?`<a class="composer-expand-link" href="${composeHref(ctx,{em:ctx.includeExpandedMain?null:'1'})}">${ctx.includeExpandedMain?'收起额外退阶':'展开额外退阶'}</a>`:'';
-    const supportExpand=ctx.resolved.windows.support.expanded?.length?`<a class="composer-expand-link" href="${composeHref(ctx,{es:ctx.includeExpandedSupport?null:'1'})}">${ctx.includeExpandedSupport?'收起支撑扩展':'查看支撑扩展 '+ctx.resolved.windows.support.expanded.join(' / ')}</a>`:'';
-    const coreExpand=ctx.resolved.windows.core.expanded?.length?`<a class="composer-expand-link" href="${composeHref(ctx,{ec:ctx.includeExpandedCore?null:'1'})}">${ctx.includeExpandedCore?'收起核心退阶':'查看更多核心退阶'}</a>`:'';
-    const view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.render(recoveryResult);
-    return coachModeSwitch('compose')+hero('自由组合编课','5 × 4 主模式矩阵：下肢推 / 下肢拉 / 臀伸 / 单腿蹲 / 单腿拉 × 水平拉 / 垂直拉 / 水平推 / 垂直推。Session L 决定推荐窗口，不把 T / S / CORE-L 机械锁死。',[ctx.level,'20 种基础组合','动态 D1 / D2','实时 Anatomy / Conflict'])+`<section class="section-card composer-builder"><div class="section-head"><div><h2>① 选择 Session Level</h2><p>先确定整节课阶段，再由系统给各模块不同的 Tier / Grade 候选窗口。</p></div></div>${composerLevelSwitch(ctx)}<div class="composer-builder-head"><div><h2>②–③ 选择主模式</h2><p>桌面端直接点击 5 × 4 主模式矩阵；手机端按下肢 → 上肢顺序选择。</p></div>${mainExpand}</div>${composerMatrix(ctx)}${composerMobileSelectors(ctx)}<div class="composer-current"><small>当前组合</small><b>${esc(ctx.level)}｜${esc(ctx.resolved.lower.name)} + ${esc(ctx.resolved.upper.name)}</b><span>${esc(ctx.resolved.compositionId)}</span></div></section>`+M.Prep.composerPrepHtml(ctx)+`<section class="section-card strength-card"><div class="section-head"><div><h2>1F｜STRENGTH</h2><p>A / B 选择主模式；C 使用独立 SUPPORT Grade；D1 / D2 自动补足；CORE 先选 Demand 再筛 Grade。</p></div><span class="time-badge">约 40–43 分钟</span></div>${M.Summary.render(allIds)}${M.ConflictView.render(result)}<div class="composer-window-actions">${supportExpand}</div><div class="composer-slot-grid">${ctx.resolved.slots.map(x=>M.Slot.composerCard(ctx,x,x.slotKey==='CORE'?'<div class="composer-core-controls"><b>① 选择核心功能</b><nav class="core-demand-row" aria-label="核心功能">'+demands+'</nav><div class="composer-window-actions">'+coreExpand+'</div><b>② 选择替换动作</b></div>':'')).join('')}</div><div class="session-toolbar composer-copy-toolbar"><div></div><div class="session-toolbar-actions">${copyToolbar()}<button id="reset-composer" type="button">恢复系统推荐</button></div></div></section>`+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>完成拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">RECOVERY</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}`+(M.SavedSessionsUI?.controls?.(route)||'');
+  'use strict';
+
+  const M=window.V14CoachModules=window.V14CoachModules||{};
+  const C=M.Common||{};
+  const UI=M.F111ComposeUI||{};
+  const esc=C.esc||((value)=>String(value??''));
+  const D=C.D||(()=>window.V14_DATA||{});
+  const copyToolbar=()=>'<div class="session-copy-actions"><button id="copy-coach-session" type="button">复制给教练</button><button id="copy-member-session" type="button">复制给会员</button><span id="copy-session-status" role="status" aria-live="polite"></span></div>';
+
+  function composeHref(current,overrides={}){
+    const q={level:current.level,lower:current.lowerMode,upper:current.upperMode,core:current.coreDemand,...overrides};
+    if(current.includeExpandedMain)q.em='1';
+    if(current.includeExpandedSupport)q.es='1';
+    if(current.includeExpandedCore)q.ec='1';
+    for(const key of ['em','es','ec'])if(overrides[key]===null)delete q[key];
+    return '#/coach/f111/compose?'+new URLSearchParams(q).toString();
   }
+
+  function composerContext(route){
+    const cfg=D().composer||{},q=route.query||{};
+    const level=/^L[1-4]$/.test(q.level||'')?q.level:'L1';
+    const lowerMode=cfg.lowerModes?.[q.lower]?q.lower:'squat';
+    const upperMode=cfg.upperModes?.[q.upper]?q.upper:'horizontal_pull';
+    const coreDemand=cfg.coreDemands?.[q.core]?q.core:'anti_extension';
+    const flags={includeExpandedMain:q.em==='1',includeExpandedSupport:q.es==='1',includeExpandedCore:q.ec==='1'};
+    const input={mode:'composer',level,lowerMode,upperMode,coreDemand,...flags};
+    const probeSession=window.V15TemplateResolver.resolve('f111',input);
+    const stateKey=`${probeSession.familyId}-${level}`;
+    const selections=window.V14State.getComposerSelections(stateKey);
+    const resolvedSession=window.V15TemplateResolver.resolve('f111',{...input,selections});
+    const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,...flags});
+    return {level,lowerMode,upperMode,coreDemand,stateKey,resolved,resolvedSession,...flags};
+  }
+
+  function levelSwitch(ctx){
+    return `<div class="f111-level-switch" aria-label="选择训练阶段">${['L1','L2','L3','L4'].map(level=>`<a class="${ctx.level===level?'active':''}" href="${composeHref(ctx,{level})}">${level}</a>`).join('')}</div>`;
+  }
+
+  function modeSection(ctx){
+    return `<section class="f111-mode-section"><div class="f111-section-title"><div><h2>选择训练模式</h2></div></div><div class="f111-mode-grid">${UI.modeTrigger(ctx,'lower')}${UI.modeTrigger(ctx,'upper')}</div><div class="f111-current-combination"><small>当前组合</small><b>${esc(UI.currentLabel(ctx))}</b></div></section>`;
+  }
+
+  function courseHero(){
+    return `<section class="view-hero f111-compose-hero"><span class="eyebrow">F111 课程说明</span><h1>F111｜女性综合训练</h1><p>围绕女性常见的下肢力量、体态改善与核心稳定需求，把下肢、上肢和核心训练灵活组合。每次训练既能强化臀腿、改善体态，也能提升身体稳定与整体力量，适合循序渐进地塑形和建立长期训练习惯。</p><div class="chips"><span class="chip">强化臀腿</span><span class="chip">改善体态</span><span class="chip">提升核心稳定</span></div></section>`;
+  }
+
+  function stageSection(ctx){
+    return `<section class="section-card f111-builder-section"><div class="f111-section-title"><div><h2>① 选择训练阶段</h2><p>先选择课程阶段，系统会匹配相应难度的动作。</p></div></div>${levelSwitch(ctx)}${modeSection(ctx)}</section>`;
+  }
+
+  function demandSwitch(ctx){
+    const cfg=D().composer||{};
+    const items=Object.entries(cfg.coreDemands||{}).slice(0,3).map(([key,value])=>`<a class="${ctx.coreDemand===key?'active':''}" aria-current="${ctx.coreDemand===key?'true':'false'}" href="${composeHref(ctx,{core:key})}">${esc(value.name)}</a>`).join('');
+    return `<div class="f111-demand-switch"><div><b>核心功能</b><small>选择训练方向</small></div><nav aria-label="核心功能">${items}</nav></div>`;
+  }
+
+  function composerRecovery(ctx){return D().sessionViews?.[`F111-01-${ctx.level}`]||{};}
+
+  function buildComposerCopyPayload(ctx){
+    const resolvedSession=ctx.resolvedSession||window.V15TemplateResolver.resolve('f111',{mode:'composer',level:ctx.level,lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,coreDemand:ctx.coreDemand,selections:window.V14State?.getComposerSelections?.(ctx.stateKey)||{},includeExpandedMain:!!ctx.includeExpandedMain,includeExpandedSupport:!!ctx.includeExpandedSupport,includeExpandedCore:!!ctx.includeExpandedCore});
+    const summary=resolvedSession.anatomyContext||{primary:[],secondary:[],stabilizers:[]};
+    const result=resolvedSession.conflictContext||{issues:[]};
+    const recoveryResult=window.V14RecoveryMatcher.match(resolvedSession),view=composerRecovery(ctx),prepResolved=M.Prep.resolveComposerPrep(ctx);
+    return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',foam:M.Foam.composerFoamItems(ctx).map(x=>({name:x.name,prescription:x.prescription})),warmups:M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription,sequencePhase:x.sequencePhase})),slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:x.prescription||window.V14ModuleCopy?.prescriptionForAction?.(x.actionId,{level:ctx.level})||''})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},recovery:window.V14RecoveryMatcher.copyItems(recoveryResult),postCardio:view.postCardio||'',postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(ctx.stateKey):null,conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};
+  }
+
+  function strengthSection(ctx){
+    const slotsByKey=new Map(ctx.resolved.slots.map(slot=>[slot.slotKey,slot]));
+    const slots=['A','B','D2','D1','C','CORE'].map(key=>slotsByKey.get(key)).filter(Boolean);
+    const cardHtml=key=>slots.filter(slot=>slot.slotKey===key).map(slot=>M.Slot.composerCard(ctx,slot,'')).join('');
+    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>主项、支撑、辅助和核心动作组成完整课程。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div></section>`;
+  }
+
+  function anatomySection(ctx){
+    const allIds=ctx.resolvedSession.main.content.map(x=>x.actionId).filter(Boolean);
+    const anatomy=M.Summary?.render?.(allIds)||'';
+    return anatomy?`<details class="f111-anatomy-details" open><summary>训练肌群概览</summary>${anatomy}</details>`:'';
+  }
+
+  function saveAndCopySection(route){
+    return M.SavedSessionsUI?.compactControls?.(route)||'';
+  }
+
+  function courseOutputSection(){
+    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}</div></section>`;
+  }
+
+  function render(route){
+    const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
+    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}${courseOutputSection()}`;
+  }
+
   M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,render};
 })();

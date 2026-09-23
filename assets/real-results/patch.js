@@ -1,11 +1,11 @@
 (function(){
   const API="https://ynsodlyanpmixbbxblqh.supabase.co/functions/v1/case-api";
-  const ADMIN_STORAGE_KEY="7fit_case_admin_key";
+  const ADMIN_SESSION_STORAGE_KEY="7fit_case_admin_session";
   let editingCaseId=null;
   let cloudReady=false;
-  let adminKey=localStorage.getItem(ADMIN_STORAGE_KEY)||"";
+  let adminSession=null;
   const params=new URLSearchParams(location.search);
-  const adminRequested=params.get("admin")==="1" || !!adminKey;
+  const adminRequested=params.get("admin")==="1" || !!localStorage.getItem(ADMIN_SESSION_STORAGE_KEY);
 
   const style=document.createElement("style");
   style.textContent=`
@@ -144,6 +144,96 @@
   `;
   document.head.appendChild(responsiveStyle);
 
+  const authStyle=document.createElement("style");
+  authStyle.textContent=`
+    .admin-logout{border:1px solid rgba(149,102,242,.24);background:#fff;color:var(--pd);padding:10px 13px;border-radius:999px;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap}
+    .admin-auth-modal{position:fixed;inset:0;z-index:170;display:grid;place-items:center;padding:18px;background:rgba(31,26,35,.42);backdrop-filter:blur(7px)}
+    .admin-auth-panel{width:min(360px,100%);padding:24px;background:#fff;border-radius:24px;box-shadow:0 30px 100px rgba(34,24,47,.22)}
+    .admin-auth-panel h2{margin:0;font-size:22px}.admin-auth-panel p{margin:8px 0 18px;color:var(--muted);font-size:12px;line-height:1.7}
+    .admin-auth-panel input{width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:#FCFBFD;letter-spacing:.28em;font-size:20px;text-align:center;outline:none}
+    .admin-auth-error{min-height:20px;margin-top:8px;color:#B74141;font-size:11px;line-height:1.5}.admin-auth-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+    .admin-auth-actions button{border:0;padding:10px 14px;border-radius:999px;font-weight:850;cursor:pointer}.admin-auth-cancel{background:var(--soft)}.admin-auth-submit{background:var(--p);color:#fff}
+    @media(max-width:600px){.admin-logout{padding:8px 10px;font-size:10px}.admin-auth-panel{padding:20px;border-radius:20px}}
+  `;
+  document.head.appendChild(authStyle);
+
+  const lightboxStyle=document.createElement("style");
+  lightboxStyle.textContent=`
+    .case-image-lightbox{position:fixed;inset:0;z-index:190;display:grid;place-items:center;padding:18px;background:rgba(25,20,31,.82);backdrop-filter:blur(10px)}
+    .case-image-lightbox-panel{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(1120px,100%);max-height:100%;padding:12px}
+    .case-image-lightbox img{display:block;max-width:100%;max-height:calc(100vh - 92px);width:auto;height:auto;object-fit:contain;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.34);background:#fff}
+    .case-image-lightbox-caption{margin:0;color:#fff;font-size:12px;line-height:1.5;text-align:center}
+    .case-image-lightbox-close{position:absolute;top:-2px;right:-2px;width:40px;height:40px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(255,255,255,.94);color:#211E26;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    .previewable-image{cursor:zoom-in}
+    @media(max-width:600px){.case-image-lightbox{padding:10px}.case-image-lightbox-panel{padding:8px}.case-image-lightbox img{max-height:calc(100vh - 74px);border-radius:12px}.case-image-lightbox-close{top:-4px;right:-4px;width:36px;height:36px;font-size:21px}}
+  `;
+  document.head.appendChild(lightboxStyle);
+
+  let imageLightbox=null;
+  let imageLightboxImage=null;
+  let imageLightboxCaption=null;
+  let imageLightboxPreviousOverflow="";
+  function ensureImageLightbox(){
+    if(imageLightbox)return;
+    imageLightbox=document.createElement("div");
+    imageLightbox.id="caseImageLightbox";
+    imageLightbox.className="case-image-lightbox hidden";
+    imageLightbox.setAttribute("role","dialog");
+    imageLightbox.setAttribute("aria-modal","true");
+    imageLightbox.setAttribute("aria-label","案例图片预览");
+    imageLightbox.innerHTML='<div class="case-image-lightbox-panel"><button type="button" class="case-image-lightbox-close" aria-label="关闭大图">×</button><img alt=""><p class="case-image-lightbox-caption">点击空白处或按 Esc 关闭</p></div>';
+    document.body.appendChild(imageLightbox);
+    imageLightboxImage=imageLightbox.querySelector("img");
+    imageLightboxCaption=imageLightbox.querySelector(".case-image-lightbox-caption");
+    imageLightbox.addEventListener("click",e=>{
+      if(e.target===imageLightbox||e.target.closest(".case-image-lightbox-close"))closeImagePreview();
+    });
+  }
+  function openImagePreview(img){
+    if(!img?.src)return;
+    ensureImageLightbox();
+    imageLightboxPreviousOverflow=document.body.style.overflow;
+    imageLightboxImage.src=img.currentSrc||img.src;
+    imageLightboxImage.alt=img.alt||"案例图片大图";
+    imageLightboxCaption.textContent="点击空白处或按 Esc 关闭";
+    imageLightbox.classList.remove("hidden");
+    document.body.style.overflow="hidden";
+    imageLightbox.querySelector(".case-image-lightbox-close").focus();
+  }
+  function closeImagePreview(){
+    if(!imageLightbox||imageLightbox.classList.contains("hidden"))return;
+    imageLightbox.classList.add("hidden");
+    imageLightboxImage.removeAttribute("src");
+    document.body.style.overflow=imageLightboxPreviousOverflow;
+  }
+  function enhanceDetailImages(){
+    if(!detailBody)return;
+    detailBody.querySelectorAll("img").forEach(img=>{
+      img.classList.add("previewable-image");
+      img.tabIndex=0;
+      img.setAttribute("role","button");
+      img.setAttribute("aria-label",(img.alt||"案例图片")+"，点击查看大图");
+    });
+  }
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")closeImagePreview();
+  });
+  const detailBody=document.querySelector("#detailBody");
+  if(detailBody){
+    detailBody.addEventListener("click",e=>{
+      const img=e.target.closest("img");
+      if(!img)return;
+      img.classList.add("previewable-image");
+      openImagePreview(img);
+    });
+    detailBody.addEventListener("keydown",e=>{
+      const img=e.target.closest("img");
+      if(!img||!['Enter',' '].includes(e.key))return;
+      e.preventDefault();
+      openImagePreview(img);
+    });
+  }
+
   function applyViewportClass(){
     const w=Math.round(window.visualViewport?.width||window.innerWidth||document.documentElement.clientWidth||0);
     const bucket=w<=350?"xxs":w<=390?"xs":w<=600?"sm":w<=900?"md":"lg";
@@ -181,36 +271,91 @@
     if(cloudReady&&Array.isArray(cloudSnapshot))cases=cloudSnapshot.slice();
     return legacyRender();
   };
-  async function api(action,{method="GET",body=null,headers={}}={}){
+  function readAdminSession(){
+    try{
+      const parsed=JSON.parse(localStorage.getItem(ADMIN_SESSION_STORAGE_KEY)||"null");
+      return parsed?.token&&parsed?.expiresAt?parsed:null;
+    }catch(e){return null}
+  }
+  function persistAdminSession(){
+    if(adminSession) localStorage.setItem(ADMIN_SESSION_STORAGE_KEY,JSON.stringify(adminSession));
+    else localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+  }
+  function clearAdminSession(){adminSession=null;persistAdminSession()}
+  async function api(action,{method="GET",body=null,headers={},skipSessionRecovery=false}={}){
     const h={...headers};
-    if(adminKey) h["x-admin-key"]=adminKey;
+    if(adminSession?.token) h.authorization="Bearer "+adminSession.token;
     if(body && !(body instanceof ArrayBuffer) && !(body instanceof Blob) && !(body instanceof File)){
       h["content-type"]="application/json";
       body=JSON.stringify(body);
     }
     const res=await fetch(API+"?action="+encodeURIComponent(action),{method,headers:h,body});
     const data=await res.json().catch(()=>({}));
+    if(res.status===401&&!skipSessionRecovery&&action!=="admin-login"){
+      clearAdminSession();
+      updateAdminUi(false);
+    }
     if(!res.ok) throw new Error(data.error||("HTTP "+res.status));
     return data;
   }
-  async function verifyAdmin(promptIfNeeded=true){
-    if(adminKey){
-      try{await api("verify-admin",{method:"POST"});return true}catch(e){localStorage.removeItem(ADMIN_STORAGE_KEY);adminKey=""}
+  let authModal=null;
+  let authPinInput=null;
+  let authError=null;
+  let authSubmit=null;
+  function closeLoginModal(){if(authModal)authModal.classList.add("hidden")}
+  function openLoginModal(){
+    if(!authModal)return;
+    authError.textContent="";authPinInput.value="";authSubmit.disabled=false;authSubmit.textContent="进入后台";
+    authModal.classList.remove("hidden");authPinInput.focus();
+  }
+  function updateAdminUi(loggedIn){
+    if(!uploadBtn)return;
+    if(!adminRequested){uploadBtn.style.display="none";return}
+    uploadBtn.style.display="";
+    uploadBtn.textContent=loggedIn?"＋ 上传案例":"馆主登录";
+    const oldChip=uploadBtn.parentNode.querySelector(".admin-chip");
+    if(oldChip)oldChip.remove();
+    const oldLogout=document.querySelector("#adminLogout");
+    if(oldLogout)oldLogout.remove();
+    const chip=document.createElement("span");chip.className="admin-chip";chip.textContent=loggedIn?"已登录":"馆主后台";uploadBtn.parentNode.insertBefore(chip,uploadBtn);
+    if(loggedIn){
+      const logout=document.createElement("button");logout.type="button";logout.id="adminLogout";logout.className="admin-logout";logout.textContent="退出登录";logout.onclick=adminLogout;uploadBtn.parentNode.appendChild(logout);
     }
-    if(!promptIfNeeded) return false;
-    const entered=prompt("请输入 7Fit 案例后台管理密钥");
-    if(!entered) return false;
-    adminKey=entered.trim();
+  }
+  function createAuthModal(){
+    authModal=document.createElement("div");authModal.id="adminLoginModal";authModal.className="admin-auth-modal hidden";
+    authModal.innerHTML='<form class="admin-auth-panel"><h2>馆主登录</h2><p>请输入 6 位 PIN。登录后本设备将在有效期内保持登录状态。</p><input id="adminPin" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6 位 PIN"><div class="admin-auth-error" id="adminLoginError" role="alert"></div><div class="admin-auth-actions"><button type="button" class="admin-auth-cancel">取消</button><button type="submit" class="admin-auth-submit" id="adminLoginSubmit">进入后台</button></div></form>';
+    document.body.appendChild(authModal);
+    authPinInput=authModal.querySelector("#adminPin");authError=authModal.querySelector("#adminLoginError");authSubmit=authModal.querySelector("#adminLoginSubmit");
+    authModal.querySelector(".admin-auth-cancel").onclick=closeLoginModal;
+    authModal.onclick=e=>{if(e.target===authModal)closeLoginModal()};
+    authModal.querySelector("form").onsubmit=async e=>{
+      e.preventDefault();
+      const pin=authPinInput.value.trim();
+      if(!/^\d{6}$/.test(pin)){authError.textContent="请输入 6 位数字 PIN";authPinInput.focus();return}
+      authSubmit.disabled=true;authSubmit.textContent="验证中…";authError.textContent="";
+      try{
+        const data=await api("admin-login",{method:"POST",body:{pin},skipSessionRecovery:true});
+        if(!data.session?.token)throw new Error("invalid_session");
+        adminSession={token:data.session.token,expiresAt:data.session.expiresAt};persistAdminSession();updateAdminUi(true);closeLoginModal();cloudState("已进入馆主管理模式","ok");
+      }catch(err){authError.textContent=/too_many_attempts/i.test(String(err?.message||err))?"尝试次数过多，请 15 分钟后重试":"PIN 不正确，请重新输入"}
+      finally{authSubmit.disabled=false;authSubmit.textContent="进入后台"}
+    };
+  }
+  async function restoreAdminSession(){
+    if(!adminSession?.token)return false;
     try{
-      await api("verify-admin",{method:"POST"});
-      localStorage.setItem(ADMIN_STORAGE_KEY,adminKey);
-      cloudState("已进入馆主管理模式","ok");
-      return true;
-    }catch(e){
-      adminKey="";
-      alert("管理密钥不正确");
-      return false;
-    }
+      const data=await api("admin-session");
+      adminSession.expiresAt=data.expiresAt||adminSession.expiresAt;persistAdminSession();updateAdminUi(true);return true;
+    }catch(e){clearAdminSession();updateAdminUi(false);return false}
+  }
+  async function adminLogout(){
+    try{if(adminSession?.token)await api("admin-logout",{method:"POST",skipSessionRecovery:true})}catch(e){}
+    clearAdminSession();updateAdminUi(false);cloudState("已退出馆主管理模式","ok");
+  }
+  async function ensureAdminAccess(){
+    if(await restoreAdminSession())return true;
+    openLoginModal();return false;
   }
   async function loadCloud(){
     showCloudState();state.textContent="正在读取云端案例…";
@@ -233,11 +378,9 @@
 
   const uploadBtn=document.querySelector("#openUpload");
   if(uploadBtn){
-    if(!adminRequested) uploadBtn.style.display="none";
-    else {
-      uploadBtn.textContent="＋ 上传案例";
-      const chip=document.createElement("span");chip.className="admin-chip";chip.textContent="馆主后台";uploadBtn.parentNode.insertBefore(chip,uploadBtn);
-    }
+    adminSession=readAdminSession();
+    createAuthModal();
+    updateAdminUi(false);
   }
 
   const defaultHelper="正面 / 侧面 / 背面对比图由人工提前拼好，每个方向只上传 1 张完整对比图，再从中选择 1 张作为首页封面。案例保存后会同步到云端，手机和电脑访问同一链接都能看到。";
@@ -303,7 +446,7 @@
     }
   }
   async function clearFormForNew(){
-    if(!(await verifyAdmin(true))) return false;
+    if(!(await ensureAdminAccess())) return false;
     editingCaseId=null;
     const f=document.querySelector("#form");if(f) f.reset();
     const metrics=document.querySelector("#metrics");if(metrics) metrics.innerHTML="";
@@ -316,13 +459,15 @@
   if(uploadBtn){
     uploadBtn.onclick=async e=>{
       e.preventDefault();e.stopPropagation();
+      if(!await ensureAdminAccess()) return;
       if(await clearFormForNew()) originalOpenModal();
     };
   }
 
   openCase=function(id){
     originalOpenCase(id);
-    if(!adminRequested) return;
+    enhanceDetailImages();
+    if(!adminSession?.token) return;
     const c=cases.find(x=>x.id===id);
     const dt=document.querySelector("#detailBody .dt");
     if(!c||!dt||dt.querySelector(".edit-case-btn")) return;
@@ -330,7 +475,7 @@
     const row=document.createElement("div");row.className="case-title-row";
     h2.parentNode.insertBefore(row,h2);row.appendChild(h2);
     const btn=document.createElement("button");btn.type="button";btn.className="edit-case-btn";btn.textContent="编辑案例";
-    btn.onclick=async()=>{if(await verifyAdmin(true)) openCaseEditor(id)};
+    btn.onclick=async()=>{if(await ensureAdminAccess()) openCaseEditor(id)};
     row.appendChild(btn);
   };
 
@@ -359,7 +504,7 @@
 
   function friendlyError(err){
     const msg=String(err?.message||err||"");
-    if(/unauthorized/i.test(msg)) return "管理身份已失效，请重新输入后台管理密钥";
+    if(/unauthorized/i.test(msg)) return "登录状态已失效，请重新输入 6 位 PIN";
     if(/Failed to fetch|NetworkError|Load failed/i.test(msg)) return "网络连接失败，请检查手机网络后重试";
     if(/file_too_large/i.test(msg)) return "图片文件太大，请重新选择或压缩后再上传";
     if(/image_only/i.test(msg)) return "只支持上传图片文件";
@@ -414,9 +559,10 @@
     const uploadFile=await normalizeImage(file);
     if(uploadFile.size>15*1024*1024)throw new Error("file_too_large");
     const res=await fetch(API+"?action=upload&case_id="+encodeURIComponent(caseId)+"&kind="+encodeURIComponent(kind)+"&replace="+(replace?"1":"0"),{
-      method:"POST",headers:{"x-admin-key":adminKey,"content-type":uploadFile.type||"image/jpeg","x-file-name":encodeURIComponent(uploadFile.name||"image.jpg")},body:uploadFile
+      method:"POST",headers:{...(adminSession?.token?{authorization:"Bearer "+adminSession.token}:{}),"content-type":uploadFile.type||"image/jpeg","x-file-name":encodeURIComponent(uploadFile.name||"image.jpg")},body:uploadFile
     });
     const data=await res.json().catch(()=>({}));
+    if(res.status===401){clearAdminSession();updateAdminUi(false)}
     if(!res.ok)throw new Error(data.error||("upload_failed_"+res.status));
     return data.asset;
   }
@@ -441,7 +587,7 @@
       f.elements.name?.scrollIntoView({behavior:"smooth",block:"center"});
       return;
     }
-    if(!(await verifyAdmin(true)))return;
+    if(!(await ensureAdminAccess()))return;
     const submitBtn=f.querySelector('button[type="submit"], .primary');
     const oldSubmitText=submitBtn?.textContent||"保存案例";
     if(submitBtn){submitBtn.disabled=true;submitBtn.textContent="正在保存…";}
@@ -525,4 +671,5 @@
   cases=[];
   render();
   loadCloud();
+  if(adminSession?.token) restoreAdminSession();
 })();

@@ -36,14 +36,40 @@
       reasons:option.dataset.reasons||'',
       tradeoffs:option.dataset.tradeoffs||'',
       role:option.dataset.role||'',
+      grade:option.dataset.grade||'',
     };
   }
 
+  function f111OptionData(option,index){
+    const row=optionData(option);
+    let name=row.label,grade=row.grade;
+    if(!grade){
+      const tierLabel=name.match(/^((?:P|T)\d+|PREP)｜(.+)$/);
+      if(tierLabel){grade=tierLabel[1];name=tierLabel[2];}
+    }
+    if(grade&&name.startsWith(`${grade}｜`))name=name.slice(grade.length+1);
+    if(row.family&&name.endsWith(`｜${row.family}`))name=name.slice(0,-row.family.length-1);
+    const state=row.selected?'当前动作':index===0?'优先候选':'合法候选';
+    const pattern=[state,grade,row.family,row.role].filter(Boolean).join(' · ');
+    const detail=[
+      row.score?`推荐 ${row.score} 分`:'',
+      row.reasons?`推荐原因：${row.reasons}`:'',
+      row.tradeoffs?`注意：${row.tradeoffs}`:'',
+    ].filter(Boolean).join('；');
+    return {id:row.id,name,pattern,detail,selected:row.selected,disabled:row.disabled};
+  }
+
   function open(button){
-    const card=button.closest('.session-slot,.body-slot-card,.composer-slot-card')||button.parentElement;
+    const card=button.closest('.session-slot,.body-slot-card,.composer-slot-card,.prep-slot-card,.f111-foam-card')||button.parentElement;
     const selector=button.dataset.replacementSelect||'select';
     const select=card?.querySelector(selector);
     if(!select)return;
+    const f111Rows=[...select.options].map(f111OptionData);
+    const isF111Replacement=button.hasAttribute('data-f111-replacement-drawer')||select.matches('.composer-slot-select,.prep-slot-select,.f111-foam-select');
+    if(isF111Replacement&&M.F111ActionDrawer?.openReplacement){
+      M.F111ActionDrawer.openReplacement(button,select,f111Rows);
+      return;
+    }
     const root=ensureDrawer(),list=root.querySelector('[data-replacement-list]');
     root.dataset.sourceSelectId=select.id||'';
     root._sourceSelect=select;

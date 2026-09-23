@@ -12,7 +12,8 @@
 .replacement-drawer-head p{margin:0;color:var(--muted);font-size:10px;line-height:1.55}
 .replacement-drawer-close{appearance:none;border:1px solid var(--line);background:#fff;border-radius:10px;width:36px;height:36px;flex:0 0 36px;font-size:22px;line-height:1;color:var(--muted);cursor:pointer}
 .replacement-drawer-list{min-width:0;overflow:auto;padding:14px 16px 28px;display:grid;align-content:start;gap:10px}
-.replacement-drawer-card{min-width:0;border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px;display:grid;gap:8px}
+.replacement-drawer-card{min-width:0;border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.replacement-drawer-card>*:not(.replacement-drawer-card-top):not(button){grid-column:1/-1}
 .replacement-drawer-card.is-current{border-color:#d6c6f6;background:#faf7ff}
 .replacement-drawer-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .replacement-drawer-card-top>div{min-width:0}
@@ -24,18 +25,58 @@
 .replacement-drawer-card p{margin:0;font-size:10px;line-height:1.55;color:var(--ink);overflow-wrap:anywhere}
 .replacement-drawer-card p b{color:var(--purple-dark)}
 .replacement-drawer-card .replacement-drawer-tradeoff{color:var(--warn)}
-.replacement-drawer-card>button{appearance:none;border:1px solid var(--purple);border-radius:9px;background:var(--purple);color:#fff;min-height:38px;padding:8px 10px;font-size:10px;font-weight:900;cursor:pointer}
+.replacement-drawer-card>button{grid-column:2;grid-row:1;align-self:center;justify-self:end;width:auto;min-width:96px;min-height:44px;appearance:none;border:1px solid var(--purple);border-radius:9px;background:var(--purple);color:#fff;padding:8px 10px;font-size:10px;font-weight:900;white-space:nowrap;cursor:pointer}
 .replacement-drawer-card>button:disabled{border-color:var(--line);background:var(--bg);color:var(--muted);cursor:default}
 .replacement-drawer-open body{overflow:hidden}
 @media(max-width:620px){
-  .replacement-drawer-shell{grid-template-columns:1fr}
-  .replacement-drawer-panel{grid-column:1;width:100%;height:100dvh;border-left:0}
+  .replacement-drawer-shell{grid-template-columns:1fr;align-items:end}
+  .replacement-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);border-left:0;border-radius:18px 18px 0 0;overflow:hidden;box-shadow:0 -12px 36px rgba(43,34,62,.18)}
   .replacement-drawer-head{padding:16px 14px 12px}
-  .replacement-drawer-list{padding:12px 12px 24px}
+  .replacement-drawer-list{padding:12px 12px calc(24px + env(safe-area-inset-bottom))}
   .replacement-drawer-card{padding:12px}
-  .replacement-drawer-card>button{min-height:44px}
   .lower-assistance-drawer-open{width:100%;min-height:42px}
 }
 @media(min-width:621px){
   .replacement-drawer-panel{max-width:520px}
 }
+
+/* F111 grouped mode/action drawer */
+.f111-action-drawer-shell[hidden]{display:none}
+.f111-action-drawer-shell{position:fixed;inset:0;z-index:430;display:grid;grid-template-columns:1fr minmax(360px,520px);overflow:hidden}
+.f111-action-drawer-backdrop{position:absolute;inset:0;background:rgba(24,20,31,.38);backdrop-filter:blur(2px)}
+.f111-action-drawer-panel{grid-column:2;position:relative;z-index:1;width:100%;height:100dvh;min-width:0;background:#fbfaff;border-left:1px solid var(--line);box-shadow:-20px 0 48px rgba(43,34,62,.14);display:grid;grid-template-rows:auto minmax(0,1fr)}
+.f111-action-drawer-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:18px 18px 13px;border-bottom:1px solid var(--line);background:#fff}
+.f111-action-drawer-head>div{min-width:0}
+.f111-action-drawer-head span{font-size:9px;letter-spacing:.12em;font-weight:900;color:var(--purple-dark)}
+.f111-action-drawer-head h2{margin:5px 0 4px;font-size:21px;line-height:1.2}
+.f111-action-drawer-head p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.f111-action-drawer-close{appearance:none;border:1px solid var(--line);background:#fff;border-radius:50%;width:38px;height:38px;flex:0 0 38px;font-size:22px;line-height:1;color:var(--ink);cursor:pointer}
+.f111-action-drawer-list{min-width:0;overflow:auto;padding:14px 16px 30px;display:grid;align-content:start;gap:12px}
+.f111-drawer-group{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px}
+.f111-drawer-group-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}
+.f111-drawer-group-head h3{margin:0;font-size:14px}
+.f111-drawer-group-head span{color:var(--muted);font-size:10px}
+.f111-drawer-group-list{display:grid;gap:6px}
+.f111-drawer-action,.f111-drawer-option{appearance:none;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);text-align:left;cursor:pointer}
+.f111-drawer-action>span,.f111-drawer-option>span{display:grid;gap:3px;min-width:0}
+.f111-drawer-action b,.f111-drawer-option b{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.f111-drawer-action small,.f111-drawer-option small{font-size:10px;color:var(--muted);line-height:1.35}
+.f111-drawer-action .f111-drawer-action-detail{overflow-wrap:anywhere}
+.f111-drawer-action>i,.f111-drawer-option>i{flex:0 0 auto;color:var(--purple-dark);font-size:17px;font-style:normal}
+.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
+.f111-drawer-action.is-disabled{opacity:.5;cursor:not-allowed}
+.f111-drawer-option{min-height:54px;padding:12px;background:#fff}
+.f111-drawer-option b{font-size:14px}
+.f111-drawer-open body{overflow:hidden}
+@media(max-width:620px){
+  .f111-action-drawer-shell{grid-template-columns:1fr}
+  .f111-action-drawer-panel{grid-column:1;width:100%;height:100dvh;border-left:0}
+  .f111-action-drawer-head{padding:16px 14px 12px}
+  .f111-action-drawer-list{padding:12px 12px calc(24px + env(safe-area-inset-bottom))}
+  .f111-drawer-group{padding:9px}
+  .f111-drawer-action,.f111-drawer-option{min-height:48px;padding:12px}
+  .f111-drawer-action b,.f111-drawer-option b{font-size:14px}
+}
+.replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}
+.replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
+.f111-drawer-action.is-current{border:2px solid var(--purple);background:var(--purple-pale)}
