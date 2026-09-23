@@ -74,21 +74,17 @@
 
   function anatomySection(ctx){
     const allIds=ctx.resolvedSession.main.content.map(x=>x.actionId).filter(Boolean);
-    const anatomy=M.Summary?.render?.(allIds)||'';
-    return anatomy?`<details class="f111-anatomy-details" open><summary>训练肌群概览</summary>${anatomy}</details>`:'';
+    return M.Summary?.render?.(allIds,{composer:true})||'';
   }
 
   function saveAndCopySection(route){
-    return M.SavedSessionsUI?.compactControls?.(route)||'';
-  }
-
-  function courseOutputSection(){
-    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}</div></section>`;
+    const saved=M.SavedSessionsUI?.compactControls?.(route)||'';
+    return `${saved}<div class="session-toolbar composer-copy-toolbar"><div></div><div class="session-toolbar-actions">${copyToolbar()}</div></div>`;
   }
 
   function render(route){
     const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
-    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}${courseOutputSection()}`;
+    return courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext,{composer:true})||'')+saveAndCopySection(route)+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>训练后拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">训练后</span></div>${recovery}</section>${M.PostCardio?M.PostCardio.render(ctx.stateKey):''}`;
   }
 
   M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,render};
