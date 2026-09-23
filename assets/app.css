@@ -1724,3 +1724,49 @@ body{font-size:14px;line-height:1.55}
   .f111-course-output-actions{margin-top:0;justify-content:stretch}
   .f111-course-output-actions .session-copy-actions{width:100%}
   .f111-course-output-actions .session-copy-actions button{font-size:11px}
+
+/* F111 composer: present anatomy, validation, saving, and copy actions as one review flow. */
+.f111-composer-anatomy{margin:12px 0 0;padding:14px;border:1px solid #ded8f3;background:#f7f6ff;border-radius:15px}
+.f111-composer-anatomy .muscle-summary-head{align-items:center;margin-bottom:10px}
+.f111-composer-anatomy .muscle-summary-head h2{margin:0;color:var(--purple-dark);font-size:14px}
+.f111-composer-anatomy .muscle-summary-head>small{max-width:430px;font-size:9px}
+.f111-composer-anatomy .muscle-summary-grid{gap:8px}
+.f111-composer-anatomy .muscle-summary-grid>div{padding:9px 10px;border-color:#e1dcf3;border-radius:10px;background:rgba(255,255,255,.78)}
+.f111-composer-anatomy .muscle-summary-grid small{font-size:9px}
+.f111-composer-anatomy .muscle-summary-grid b{font-size:10px;line-height:1.55}
+.f111-compose-course-check{padding:12px 14px;border-color:#d6eae2;border-radius:13px;background:#fff}
+.f111-compose-course-check .f111-course-check-title{margin:0 0 9px;color:var(--purple-dark);font-size:14px;line-height:1.3}
+.f111-compose-course-check .f111-course-check-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;min-height:50px;padding:8px 10px;border:1px solid #cfe8de;border-radius:11px;background:#f1faf6}
+.f111-compose-course-check .f111-course-check-status{flex:none;padding:6px 9px}
+.f111-compose-course-check .f111-course-check-message{flex:1;margin:0;color:#287454;font-size:11px;line-height:1.45}
+.f111-compose-course-check .f111-check-details,.f111-compose-course-check .f111-check-details-trigger{flex:none;margin:0}
+.f111-compose-course-check .f111-check-details summary{min-height:32px;display:flex;align-items:center;gap:5px;padding:0 3px;font-size:10px;white-space:nowrap;list-style:none}
+.f111-compose-course-check .f111-check-details summary::-webkit-details-marker{display:none}
+.f111-compose-course-check .f111-check-details summary::after{content:"⌄";color:var(--muted);transition:transform .15s ease}
+.f111-compose-course-check .f111-check-details[open]{grid-column:1/-1}
+.f111-compose-course-check .f111-check-details[open] summary::after{transform:rotate(180deg)}
+.f111-compose-course-check.warn .f111-course-check-row,.f111-compose-course-check.fail .f111-course-check-row{background:#fffaf0;border-color:#f0dfb5}
+.f111-compose-course-check.fail .f111-course-check-row{background:#fff5f5;border-color:#efd6d8}
+.f111-inline-save-controls [data-saved-session-status]:empty{display:none}
+.f111-inline-saved-list{margin-top:9px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0}
+.f111-inline-saved-list summary{display:flex;align-items:center;gap:5px;min-height:40px;padding:0 12px;cursor:pointer;color:var(--ink);font-size:10px;font-weight:850;list-style:none}
+.f111-inline-saved-list summary::-webkit-details-marker{display:none}
+.f111-inline-saved-list summary::before{content:"▸";color:var(--muted);transition:transform .15s ease}
+.f111-inline-saved-list[open] summary::before{transform:rotate(90deg)}
+.f111-inline-saved-list[open] summary{border-bottom:1px solid var(--line)}
+.f111-inline-saved-list summary span{color:var(--muted);font-weight:700}
+.f111-inline-saved-list .saved-session-list{margin-top:8px}
+.f111-inline-saved-list>.saved-session-empty{margin:10px;border:0;background:transparent;padding:12px;font-size:10px}
+.composer-copy-toolbar{margin-top:9px}
+.composer-copy-toolbar .session-copy-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.composer-copy-toolbar .session-copy-actions button{min-height:42px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--purple-dark);font-size:11px;font-weight:900}
+@media(max-width:620px){
+  .f111-composer-anatomy .muscle-summary-head{display:block}
+  .f111-composer-anatomy .muscle-summary-head>small{display:block;text-align:left;margin-top:5px}
+  .f111-composer-anatomy .muscle-summary-grid{grid-template-columns:1fr}
+  .f111-compose-course-check .f111-course-check-row{grid-template-columns:auto minmax(0,1fr);gap:8px}
+  .f111-compose-course-check .f111-course-check-message{min-width:0}
+  .f111-compose-course-check .f111-check-details,.f111-compose-course-check .f111-check-details-trigger{grid-column:2;justify-self:end;margin-left:auto}
+  .f111-compose-course-check .f111-check-details[open]{grid-column:1/-1;justify-self:stretch}
+  .composer-copy-toolbar .session-copy-actions button{min-height:44px;font-size:10px}
+}
