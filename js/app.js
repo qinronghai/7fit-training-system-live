@@ -5,7 +5,8 @@
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
         return ['编课中心',record?.name||'训练模板'];
       }
-      if(route.page==='compose'||route.recipeId)return ['编课中心','F111 女性综合 1+1+1'];
+      if(route.page==='compose')return ['F111｜女性综合训练','自由组合编课'];
+      if(route.recipeId)return ['编课中心','F111 女性综合 1+1+1'];
       // Family / session routes used to fall through to the generic placeholder, so
       // every non-F111 page was titled 'Multi-Template Coach Center'.
       if(route.page==='template-family'||route.page==='template-session'){

@@ -20,13 +20,24 @@ async function seedAndQuickSwap(page,selectSelector,quickScope,resetSelector){
   return target;
 }
 
-test('F111 Body Conditioning expose legal one-tap recent quick swap at 390px',async({page})=>{
+test('F111 drawer records legal replacements; Body and Conditioning retain recent quick swaps at 390px',async({page})=>{
   const pageErrors=errors(page);
   await page.setViewportSize({width:390,height:844});
 
   await page.goto('/#/coach/f111/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
-  const f111Target=await seedAndQuickSwap(page,'.composer-slot-select','.composer-slot-card','#reset-composer');
-  await expect(page.locator('.composer-slot-select').filter({has:page.locator(`option[value="${f111Target}"]`)}).first()).toHaveValue(f111Target);
+  const f111Card=page.locator('.composer-slot-card[data-composer-slot="A"]');
+  const f111Select=f111Card.locator('.composer-slot-select');
+  const f111Current=await f111Select.inputValue();
+  await f111Card.locator('[data-replacement-drawer]').click();
+  const drawer=page.locator('#replacement-drawer');
+  await expect(drawer).toBeVisible();
+  const f111Choice=drawer.locator('[data-replacement-choose]:not([disabled])').first();
+  const f111Target=await f111Choice.getAttribute('data-replacement-choose');
+  expect(f111Target).toBeTruthy();
+  expect(f111Target).not.toBe(f111Current);
+  await f111Choice.click();
+  await expect(drawer).toBeHidden();
+  await expect(page.locator('.composer-slot-card[data-composer-slot="A"] .composer-slot-select')).toHaveValue(f111Target);
   await width390(page);
 
   await page.goto('/#/coach/body/body-02/l3');

@@ -87,12 +87,19 @@ async function composerWarnCandidate(page) {
 async function expectConflict(page, status, warningTitle = '') {
   const box = page.locator('.conflict-box');
   await expect(box).toBeVisible();
-  await expect(box.locator('.conflict-top b')).toHaveText(status);
   await expect(box).toHaveClass(new RegExp(`\\b${status.toLowerCase()}\\b`));
-  if (warningTitle) await expect(box).toContainText(warningTitle);
+  const labels={PASS:'通过',WARN:'需确认',FAIL:'未通过'};
+  await expect(box.locator('.f111-course-check-status')).toContainText(labels[status]);
+  if (warningTitle) {
+    await box.locator('[data-f111-check-details]').click();
+    const drawer=page.locator('#f111-action-drawer');
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toContainText(warningTitle);
+    await drawer.getByRole('button',{name:'关闭抽屉'}).click();
+  }
 }
 
-test('390px F111 preset and composer conflicts survive swap/reload and reset through V15', async ({ page }) => {
+test('390px F111 preset and composer conflicts survive swap/reload and preset reset through V15', async ({ page }) => {
   const errors = capturePageErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
@@ -131,10 +138,6 @@ test('390px F111 preset and composer conflicts survive swap/reload and reset thr
   await page.reload();
   await expect(page.locator(`.composer-slot-select[data-slot-key="${composer.slotKey}"]`)).toHaveValue(composer.target);
   await expectConflict(page, 'WARN', composer.warningTitle);
-
-  await page.locator('#reset-composer').click();
-  await expect(page.locator(`.composer-slot-select[data-slot-key="${composer.slotKey}"]`)).toHaveValue(composer.baseline);
-  await expectConflict(page, composer.baselineStatus);
   await expectNoOverflow(page);
 
   expect(errors, `unexpected pageerror(s): ${errors.join(' | ')}`).toEqual([]);

@@ -105,7 +105,7 @@ test('CON-03 L2 Circuit survives Station swap, Copy, reload and reset at 390px',
   expect(resolved.level).toBe('L2');
   expect(resolved.protocolId).toBeTruthy();
   expect(resolved.selected).toBe(replaceable.target);
-  await expect(page.locator('.conflict-box')).toContainText(resolved.conflictStatus);
+  await expect(page.locator('.conflict-box')).toHaveClass(new RegExp(`\\b${resolved.conflictStatus.toLowerCase()}\\b`));
   await expect(page.locator('.conditioning-protocol-panel')).toContainText(String(resolved.metrics.estimatedMinutes));
   for(const name of resolved.prepNames)await expect(page.locator('.conditioning-prep-section')).toContainText(name);
 
