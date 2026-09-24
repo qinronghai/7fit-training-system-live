@@ -37,10 +37,10 @@ assert(/\.f111-support-grid \.f111-action-drawer-trigger\{[^}]*grid-row:3;[^}]*w
 assert(/\.f111-support-grid \.f111-action-drawer-trigger\{[^}]*min-height:44px(?:;|\})/.test(css),'C/CORE mobile selector must retain a 44px touch target');
 assert(css.includes('.f111-support-grid .composer-slot-head>div{display:flex;'),'C/CORE heading and grade must share one compact horizontal row');
 assert(css.includes('.f111-strength-grid + .f111-support-grid{margin-top:9px}'),'support/core cards must use the same inter-card spacing as the other strength cards');
-assert(css.includes('.view-hero.f111-compose-hero .chip{font-size:10px;'),'F111 hero chips must be readable on mobile');
+assert(css.includes('.view-hero.f111-compose-hero .chip{font-size:11px;'),'F111 hero chips must be slightly enlarged for mobile readability');
 assert(css.includes('.time-badge{white-space:nowrap;flex:0 0 auto}'),'time badges must stay on one line within narrow cards');
 assert(css.includes('.post-cardio-option-trigger'),'post-cardio controls must have drawer trigger styling');
 assert(css.includes('height:44px;min-height:44px;padding:0;border-color:transparent;background:transparent;z-index:1'),'compact replacement controls must reserve a non-overlapping 44px hit target');
-assert(css.includes('::before{content:\'\';position:absolute;inset:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}'),'replacement controls must keep a compact visible button inside the hit target');
+assert(css.includes('::before{content:\'\';position:absolute;inset:5px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}'),'replacement controls must keep a compact visible button inside the hit target');
 assert(!css.includes('.f111-replace-trigger::after{content:\'\';position:absolute;inset:-6px}'),'replacement hit targets must not overlap nearby controls');
 console.log('f111_mobile_css_contract_test: PASS');

@@ -51,6 +51,11 @@
     if(p&&isStrength(actionId)&&!/RIR/i.test(p))p=`${p}｜${defaultRir(level)}`;
     return p||'按当前动作质量与课程目标执行';
   }
+  function prescriptionForF111Slot(slotKey){
+    const key=clean(slotKey).split('__').pop().split('｜')[0].trim();
+    const canonicalKey=({SUPPORT:'C','2':'D1','3':'D2'})[key]||key;
+    return clean(D().composer?.prescriptionBySlot?.[canonicalKey]);
+  }
   function tierForAction(actionId){
     const a=D().actions?.[actionId]||{};
     const t=clean(a.tier||a.v11StandardTier);
@@ -142,5 +147,5 @@
     });
   }
 
-  window.V14ModuleCopy={rirFromRpe,prescriptionForAction,tierForAction,memberPrescription,formatAction,formatPrep,formatFoam,formatPattern,formatTenPatterns,formatKnowledge,register,button,bind,copyRegistered,copyText};
+  window.V14ModuleCopy={rirFromRpe,prescriptionForAction,prescriptionForF111Slot,tierForAction,memberPrescription,formatAction,formatPrep,formatFoam,formatPattern,formatTenPatterns,formatKnowledge,register,button,bind,copyRegistered,copyText};
 })();

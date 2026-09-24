@@ -26,7 +26,8 @@
     const slots=(s?.slots||[]).map((slot,i)=>{
       const actionId=selected[i],a=data.actions[actionId]||{};
       const tier=window.V14ModuleCopy?.tierForAction?.(actionId)||(/^T[1-4]$/.test(a.tier||'')?a.tier:'');
-      const prescription=window.V14ModuleCopy?.prescriptionForAction?.(actionId,{level})||'';
+      const prescription=window.V14ModuleCopy?.prescriptionForF111Slot?.(slot.slotName||slot.slotKey)
+        ||window.V14ModuleCopy?.prescriptionForAction?.(actionId,{level})||'';
       const grade=a.grade||a.supportGrade||a.coreGrade||'';
       return {slot:slot.slotName,name:a.name||actionId,tier,grade,prescription};
     });

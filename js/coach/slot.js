@@ -52,7 +52,9 @@
     const grade=slot.tier||slot.grade||'';
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(slot.actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(slot.actionId)}`:`#/library?focus=${encodeURIComponent(slot.actionId)}`;
     const tierNote=slot.tierNote?`<small class="composer-tier-note">${esc(slot.tierNote)}</small>`:'';
-    const rx=slot.prescriptionOverride?`<small class="composer-rx-note">${esc(slot.prescriptionOverride)}</small>`:'';
+    const rawPrescription=slot.prescriptionOverride||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:ctx.level})||'';
+    const prescription=window.V14ModuleCopy?.memberPrescription?.(rawPrescription)||rawPrescription;
+    const rx=prescription?`<small class="composer-rx-note">${esc(prescription)}</small>`:'';
     const replace=special
       ?(M.F111ComposeUI?.actionTrigger?.(ctx,slot.slotKey)||'')
       :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="动作候选" data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;

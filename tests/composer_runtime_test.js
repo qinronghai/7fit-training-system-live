@@ -79,7 +79,7 @@ assert.strictEqual(hipL3.slots[0].tier,'T3');
 const hipL4=C.resolve({level:'L4',lowerMode:'hip_extension',upperMode:'horizontal_pull'});
 assert.strictEqual(hipL4.slots[0].actionId,'hipthrust_pause_main');
 assert.strictEqual(hipL4.slots[0].tier,'T4');
-assert.strictEqual(hipL4.slots[0].prescriptionOverride,'3–4组 × 6–8次｜RIR 1–2');
+assert.strictEqual(hipL4.slots[0].prescriptionOverride,'3组 × 12次左右');
 assert.strictEqual(hipL4.slotOptions.A.filter(x=>x.id==='hipthrust_pause_main').length,1);
 assert.strictEqual(hipL4.slotOptions.A.find(x=>x.id==='hipthrust_pause_main').tier,'T4');
 

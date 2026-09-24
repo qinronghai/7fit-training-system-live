@@ -52,8 +52,21 @@
       "additionalProperties": false
     }
   },
-  "required": ["lowerModes", "upperModes", "levelMap", "supportMap", "coreMap", "coreDemands", "auxiliaryRules", "officialPresetMap"],
+  "required": ["lowerModes", "upperModes", "levelMap", "supportMap", "coreMap", "coreDemands", "auxiliaryRules", "officialPresetMap", "prescriptionBySlot"],
   "properties": {
+    "prescriptionBySlot": {
+      "type": "object",
+      "required": ["A", "B", "C", "D1", "D2", "CORE"],
+      "properties": {
+        "A": {"type": "string", "minLength": 1},
+        "B": {"type": "string", "minLength": 1},
+        "C": {"type": "string", "minLength": 1},
+        "D1": {"type": "string", "minLength": 1},
+        "D2": {"type": "string", "minLength": 1},
+        "CORE": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
     "lowerModes": {
       "type": "object",
       "required": ["squat", "hinge", "hip_extension", "single_leg_squat", "single_leg_hinge"],
