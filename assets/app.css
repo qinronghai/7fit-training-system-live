@@ -2011,6 +2011,7 @@ body{font-size:14px;line-height:1.55}
 @media(prefers-reduced-motion:reduce){
   .training-route-row,.training-special-card,.training-auxiliary-section .auxiliary-module-card{transition:none}
   .training-route-row:hover,.training-special-card:hover,.training-auxiliary-section .auxiliary-module-card:hover{transform:none}
+}
 
 /* F111 composer bolder pass: amplify the existing violet hierarchy. */
 #app-main:has(.f111-compose-hero) .section-card,
