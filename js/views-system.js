@@ -3,7 +3,7 @@
   const D=()=>window.V14_DATA;
   function tabs(active){return `<nav class="subnav"><a class="${active==='patterns'?'active':''}" href="#/system/patterns">十大动作模式</a><a class="${active==='prep'?'active':''}" href="#/system/prep">PREP 热身</a></nav>`;}
   function hero(title,body){return `<section class="view-hero compact"><span class="eyebrow">TRAINING KNOWLEDGE</span><h1>${esc(title)}</h1><p>${esc(body)}</p></section>`;}
-  function copyControl(id,kind,payload){const api=window.V14ModuleCopy;if(!api)return '';api.register(id,kind,payload);return api.button(id,'复制本模块');}
+  function copyControl(id,kind,payload,label='复制本模块'){const api=window.V14ModuleCopy;if(!api)return '';api.register(id,kind,payload);return api.button(id,label);}
   function patternLevelLabel(item){
     if(item.type==='support')return 'S1–S6';
     if(item.type==='core')return 'L1–L4 + Core Demand';
@@ -16,12 +16,15 @@
   function auxiliaryIndex(data){
     const api=window.V14AuxiliaryModules;if(!api)return '';
     const upper=api.catalog('upper'),lower=api.catalog('lower');
-    const card=(catalog,side,subtitle)=>`<a class="knowledge-card auxiliary-module-card" href="#/system/patterns?focus=${catalog.moduleId}">
-      <span>${esc(catalog.eyebrow)}</span><h3>${esc(catalog.title)}</h3><p>${esc(subtitle)}</p>
-      <div class="auxiliary-index-facts"><b>${catalog.total} 个唯一动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
-      <footer>查看模块 →</footer>
-    </a>`;
-    return `<section class="section-card auxiliary-index"><div class="section-head"><div><h2>辅助动作模块</h2><p>上肢模块继续消费 D2 规则；下肢模块由统一 Lower Body Assistance & Capacity Domain 派生，供 F111 D1 与 Body 共用。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','按水平 / 垂直拉推动作池查看 D2 上肢辅助动作。')}${card(lower,'lower','按膝伸、膝屈、髋伸、髋外展、髋内收、单腿等功能家族浏览；固定器械只是筛选条件。')}</div></section>`;
+    const card=(catalog,side,subtitle)=>{
+      const title=side==='upper'?'上肢辅助动作':'下肢辅助动作';
+      return `<a class="knowledge-card auxiliary-module-card" href="#/system/patterns?focus=${catalog.moduleId}">
+        <span>${side==='upper'?'上肢训练':'下肢训练'}</span><h3>${title}</h3><p>${esc(subtitle)}</p>
+        <div class="auxiliary-index-facts"><b>${catalog.total} 个动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
+        <footer>查看${title}</footer>
+      </a>`;
+    };
+    return `<section class="training-auxiliary-section" aria-labelledby="training-auxiliary-title"><div class="training-section-heading"><div><h2 id="training-auxiliary-title">辅助动作</h2><p>按部位和动作目标浏览辅助训练动作。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','筛选上肢的推、拉辅助动作。')}${card(lower,'lower','按膝、髋和单腿等训练目标筛选动作。')}</div></section>`;
   }
   function lowerReplacementContext(route){
     if(!window.V15LowerAssistance?.candidates)return null;
@@ -127,19 +130,24 @@
       return tabs('patterns')+`<a class="back-link" href="#/system/patterns">← 返回十大模式</a>`+hero(focus,'V1.1 当前冻结主链；同级替换不等于进阶，实际准入同时服从 7Fit 场馆最低负荷与稳定性要求。')+`<section class="section-card"><div class="module-copy-row">${copy}</div><div class="tier-grid">${levels}</div></section>`;
     }
     const catalog=data.tenPatternCatalog||[];
-    const catalogCopy=copyControl('ten-pattern-catalog','ten_patterns',{items:catalog});
-    const cards=catalog.map((item,index)=>{
+    const catalogCopy=copyControl('ten-pattern-catalog','ten_patterns',{items:catalog},'复制模式清单');
+    const path=(levels,kind,label)=>`<ol class="training-path training-path-${kind}" aria-label="${esc(label)}">${levels.map(x=>`<li><span>${esc(x.tier)}</span><b>${esc(x.name)}</b></li>`).join('')}</ol>`;
+    const patternRoutes=catalog.map((item,index)=>{
       const number=String(index+1).padStart(2,'0');
       if(item.type==='support'){
-        return `<a class="knowledge-card ten-pattern-card" href="#/system/support"><span>${esc(patternLevelLabel(item))}</span><h3>${number}｜支撑模式</h3><div class="mini-chain"><b>S1 基础静态</b><i>→</i><b>S3 动态</b><i>→</i><b>S6 单侧整合</b></div></a>`;
+        const levels=[['S1','基础静态支撑'],['S2','减少支点'],['S3','动态支撑'],['S4','位移支撑'],['S5','旋转支撑'],['S6','单侧支撑']].map(([tier,name])=>({tier,name}));
+        return {kind:'support',markup:`<a class="training-special-card training-special-support" href="#/system/support"><h3><span>${number}</span>支撑模式</h3>${path(levels,'support','支撑训练等级 S1 到 S6')}<span class="training-path-link">查看完整路线</span></a>`};
       }
       if(item.type==='core'){
-        return `<a class="knowledge-card ten-pattern-card" href="#/system/core"><span>${esc(patternLevelLabel(item))}</span><h3>${number}｜核心模式</h3><div class="mini-chain"><b>L1 基础控制</b><i>→</i><b>L3 多方向稳定</b><i>→</i><b>L4 高负荷整合</b></div></a>`;
+        const levels=[['L1','基础控制'],['L2','标准抗伸展'],['L3','多方向稳定'],['L4','高负荷整合']].map(([tier,name])=>({tier,name}));
+        return {kind:'core',markup:`<a class="training-special-card training-special-core" href="#/system/core"><h3><span>${number}</span>核心模式</h3>${path(levels,'core','核心训练等级 L1 到 L4')}<span class="training-path-link">查看完整路线</span></a>`};
       }
-      const v=data.eightPatternDetails[item.key];
-      return `<a class="knowledge-card ten-pattern-card" href="#/system/patterns?focus=${encodeURIComponent(item.key)}"><span>${esc(patternLevelLabel(item))}</span><h3>${number}｜${esc(item.name)}</h3><div class="mini-chain">${v.levels.map(x=>`<b>${esc(x.tier)} ${esc(x.name)}</b>`).join('<i>→</i>')}</div></a>`;
-    }).join('');
-    return tabs('patterns')+hero('十大动作模式','8 个主动作模式使用 T1–T4；第 09 支撑模式使用 S1–S6；第 10 核心模式使用 L1–L4 + Core Demand。三套等级各自独立，不互相替代。')+`<section class="section-card"><div class="module-copy-row">${catalogCopy}</div><div class="knowledge-grid ten-pattern-grid">${cards}</div></section>`+auxiliaryIndex(data);
+      const levels=data.eightPatternDetails[item.key]?.levels||[];
+      return {kind:'primary',markup:`<a class="training-route-row" href="#/system/patterns?focus=${encodeURIComponent(item.key)}"><span class="training-route-heading"><span class="training-route-number">${number}</span><strong>${esc(item.name)}</strong></span>${path(levels,'primary',`${patternLevelLabel(item)} 动作路线`)}<span class="training-route-action">查看路线</span></a>`};
+    });
+    const primaryRoutes=patternRoutes.filter(item=>item.kind==='primary').map(item=>item.markup).join('');
+    const specialRoutes=patternRoutes.filter(item=>item.kind!=='primary').map(item=>item.markup).join('');
+    return tabs('patterns')+`<section class="view-hero training-pattern-hero" aria-labelledby="training-pattern-title"><div class="training-pattern-copy"><h1 id="training-pattern-title">训练模式与进阶路线</h1><p>选择一个动作类型，查看训练等级、推荐动作和训练要点。</p></div><div class="training-level-guide"><h2>三套独立分级</h2><dl><div><dt>主练动作 <span>8 种模式</span></dt><dd>T1–T4</dd></div><div><dt>支撑训练 <span>1 种模式</span></dt><dd>S1–S6</dd></div><div><dt>核心训练 <span>1 种模式</span></dt><dd>L1–L4 + 核心任务</dd></div></dl></div></section>`+`<section class="training-pattern-section" aria-labelledby="training-patterns-title"><div class="training-section-heading"><div><h2 id="training-patterns-title">主练动作</h2><p>8 种动作模式，按 T1 至 T4 查看进阶路线。</p></div>${catalogCopy}</div><div class="training-route-list">${primaryRoutes}</div></section>`+`<section class="training-special-section" aria-labelledby="training-special-title"><div class="training-section-heading"><div><h2 id="training-special-title">支撑与核心训练</h2><p>查看支撑稳定性与核心控制的专项等级。</p></div></div><div class="training-special-grid">${specialRoutes}</div></section>`+auxiliaryIndex(data);
   }
   function prep(route){
     const data=D(),focus=route.query?.focus,foam=route.query?.foam;
