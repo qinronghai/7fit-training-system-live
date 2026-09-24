@@ -94,7 +94,7 @@
     const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
     const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
     const COREopts=coreCandidates(level,coreDemand,!!input.includeExpandedCore),CORE=chooseById(COREopts,selections.CORE);
-    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:x?.prescriptionOverride||'',tierNote:x?.tierNote||''});
+    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||''});
     return {
       compositionId:`F111-C-${lower.code}-${upper.code}`,
       level,lowerMode,upperMode,lower,upper,coreDemand,

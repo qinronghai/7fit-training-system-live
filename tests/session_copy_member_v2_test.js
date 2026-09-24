@@ -28,12 +28,12 @@ const payload={
     '单腿青蛙趴内收肌伸展'
   ],
   slots:[
-    {slot:'A｜下肢主项',name:'哈克深蹲',tier:'T3',prescription:'3组 × 10次｜RIR 1–2'},
-    {slot:'B｜上肢主项',name:'哑铃卧推',tier:'T3',prescription:'3组 × 10次｜RIR 1–2'},
-    {slot:'C｜支撑模式',name:'高位平板交替触肩',grade:'SUP-S3',prescription:'2–3组 × 20–30秒'},
-    {slot:'D1｜下肢辅助',name:'髋内收',tier:'T2',prescription:'1组 × 15次'},
-    {slot:'D2｜肩胛 / 手臂',name:'绳索三头下压',tier:'T2',prescription:'3组 × 12次'},
-    {slot:'CORE｜核心模式',name:'Pallof抗旋转推举',grade:'CORE-L3',prescription:'2–3组 × 6–10次/侧'}
+    {slot:'A｜下肢主项',name:'哈克深蹲',tier:'T3',prescription:'3组 × 12次左右'},
+    {slot:'B｜上肢主项',name:'哑铃卧推',tier:'T3',prescription:'3组 × 12次左右'},
+    {slot:'C｜支撑模式',name:'高位平板交替触肩',grade:'SUP-S3',prescription:'3组 × 20次'},
+    {slot:'D1｜下肢辅助',name:'髋内收',tier:'T2',prescription:'2组 × 15次左右'},
+    {slot:'D2｜肩胛 / 手臂',name:'绳索三头下压',tier:'T2',prescription:'2组 × 15次左右'},
+    {slot:'CORE｜核心模式',name:'Pallof抗旋转推举',grade:'CORE-L3',prescription:'2组 × 15–20次'}
   ],
   muscles:{primary:['肱三头肌','腹横肌','腹内外斜肌','内收肌群','股四头肌','臀大肌']},
   recovery:['臀肌拉伸','胸肌拉伸'],
@@ -50,12 +50,12 @@ assert(member.includes('泡沫轴放松：大腿内侧、手臂后侧、大腿�
 assert(member.includes('髋部活动：青蛙趴、90/90'));
 assert(member.includes('动态活动：最伟大伸展'));
 assert(member.includes('核心激活：平板支撑'));
-assert(member.includes('1. 哈克深蹲｜3 × 10\n   大腿与臀部力量'));
-assert(member.includes('2. 哑铃卧推｜3 × 10\n   上肢推力'));
-assert(member.includes('3. 高位平板交替触肩｜2–3 × 20–30 秒\n   核心稳定与身体控制'));
-assert(member.includes('4. 髋内收｜1 × 15\n   大腿内侧强化'));
-assert(member.includes('5. 绳索三头下压｜3 × 12\n   手臂后侧强化'));
-assert(member.includes('6. Pallof抗旋转推举｜2–3 × 6–10 / 侧\n   核心抗旋转'));
+assert(member.includes('1. 哈克深蹲｜3 × 12左右\n   大腿与臀部力量'));
+assert(member.includes('2. 哑铃卧推｜3 × 12左右\n   上肢推力'));
+assert(member.includes('3. 高位平板交替触肩｜3 × 20\n   核心稳定与身体控制'));
+assert(member.includes('4. 髋内收｜2 × 15左右\n   大腿内侧强化'));
+assert(member.includes('5. 绳索三头下压｜2 × 15左右\n   手臂后侧强化'));
+assert(member.includes('6. Pallof抗旋转推举｜2 × 15–20\n   核心抗旋转'));
 assert(member.includes('今日训练重点\n下肢力量 · 上肢推力 · 核心稳定'));
 assert(member.includes('训练后恢复\n臀部拉伸 · 胸部拉伸'));
 assert(member.endsWith('课后有氧｜约 30 分钟\n选择跑步机爬坡、爬楼梯机、快走或其他有氧，时间 30 分钟左右，平均心率 130 到 140 左右（燃烧脂肪心率）。'));

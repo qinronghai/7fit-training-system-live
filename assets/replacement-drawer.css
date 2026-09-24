@@ -80,10 +80,14 @@
 .replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
 .f111-drawer-action.is-current{border-width:1px}
-.f111-drawer-action:hover,.f111-drawer-option:hover,.replacement-drawer-card:hover{border-color:#b89bed;background:#f8f4ff}
+@media(hover:hover) and (pointer:fine){.f111-drawer-action:hover,.f111-drawer-option:hover,.replacement-drawer-card:hover{border-color:#b89bed;background:#f8f4ff}}
 .f111-drawer-action:focus-visible,.f111-drawer-option:focus-visible,.replacement-drawer-card>button:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-width:1px;border-color:#d6c6f6;background:#faf7ff}
 .f111-action-drawer-panel{transform:translateX(0);transition:transform 220ms cubic-bezier(.2,.7,.2,1)}
 .f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateX(100%)}
 @media(max-width:620px){.f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateY(100%)}}
 .f111-action-drawer-shell.ios-no-drawer-motion .f111-action-drawer-panel,.f111-action-drawer-shell.ios-no-drawer-motion:not(.is-open) .f111-action-drawer-panel,.replacement-drawer-shell.ios-no-drawer-motion .replacement-drawer-panel{transform:none!important;transition:none!important}
+@media(prefers-reduced-motion:no-preference){
+  .replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{transition:transform 120ms cubic-bezier(0.2,0,0,1),background-color 120ms ease-out,border-color 120ms ease-out}
+  .replacement-drawer-card:active,.f111-drawer-action:active:not(:disabled),.f111-drawer-option:active:not(:disabled){transform:scale(.98);background:#faf7ff}
+}

@@ -107,7 +107,9 @@
         if(!legal)actionId=baselineId;
       }
       const source=actionId===baselineId?'baseline':'manual';
-      return publicSlot(key,slot.slotName,actionId,source);
+      return publicSlot(key,slot.slotName,actionId,source,{
+        prescription:String(data.composer?.prescriptionBySlot?.[key]||''),
+      });
     });
     const title=`${recipeId}｜${recipe.name||recipeId}`;
     const summary=String(view.summary||'');
@@ -147,7 +149,7 @@
       return publicSlot(key,slot.slotName,slot.actionId,source,{
         tier:slot.tier,
         grade:slot.grade,
-        prescription:slot.prescriptionOverride||'',
+        prescription:String(D().composer?.prescriptionBySlot?.[key]||slot.prescriptionOverride||''),
       });
     });
     const title=`自由组合｜${resolved.lower?.name||''} + ${resolved.upper?.name||''}`;

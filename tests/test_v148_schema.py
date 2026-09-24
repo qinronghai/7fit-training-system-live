@@ -100,6 +100,7 @@ def test_composer_schema_freezes_core_structure():
         "coreDemands",
         "auxiliaryRules",
         "officialPresetMap",
+        "prescriptionBySlot",
     ]
     lower = schema["properties"]["lowerModes"]
     upper = schema["properties"]["upperModes"]
