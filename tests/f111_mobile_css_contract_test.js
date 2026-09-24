@@ -1,12 +1,16 @@
 const fs=require('fs'),assert=require('assert');
 const css=fs.readFileSync('assets/app.css','utf8');
 const drawer=fs.readFileSync('assets/replacement-drawer.css','utf8');
+const drawerMotion=fs.readFileSync('js/coach/mobile-drawer-motion.js','utf8');
+const html=fs.readFileSync('index.html','utf8');
 for(const token of ['.f111-compose-hero','.f111-compose-stepper','.f111-mode-grid','.f111-prep-grid .session-warmup-grid','.f111-strength-grid','.f111-demand-switch nav','.f111-replace-trigger','.f111-visually-hidden'])assert(css.includes(token),`missing frozen CSS token ${token}`);
 for(const token of ['.f111-action-drawer-shell','.f111-drawer-group','.f111-drawer-action.is-disabled','.f111-drawer-open body'])assert(drawer.includes(token),`missing drawer CSS token ${token}`);
 assert(drawer.includes('align-items:end'),'mobile replacement drawer must dock to the bottom');
 assert(drawer.includes('.replacement-drawer-shell{grid-template-columns:1fr;align-items:end;padding:0}'),'mobile replacement drawer must meet the screen edges without gutters');
 assert(/\.replacement-drawer-panel\{[^}]*height:min\(88vh,760px\);max-height:88vh;[^}]*height:min\(88dvh,760px\);max-height:88dvh/.test(drawer),'mobile replacement drawer must retain vh fallback before using dynamic viewport height');
-assert(/@media \(display-mode:standalone\) and \(max-width:620px\)[\s\S]*?\.replacement-drawer-panel,\.f111-action-drawer-panel\{height:min\(88vh,760px\);max-height:88vh\}/.test(drawer),'iOS Home Screen drawers must use legacy viewport height in standalone mode');
+assert(drawer.includes('.f111-action-drawer-shell.ios-no-drawer-motion .f111-action-drawer-panel')&&drawer.includes('transform:none!important;transition:none!important'),'iOS mobile drawers must avoid composited transform transitions');
+assert(drawerMotion.includes('/iPhone|iPad|iPod/i')&&drawerMotion.includes('ios-no-drawer-motion'),'drawer motion workaround must be scoped to iOS mobile');
+assert(html.includes('<script src="js/coach/mobile-drawer-motion.js"></script>'),'mobile drawer motion helper must load before drawer modules');
 assert(drawer.includes('border-radius:28px 28px 0 0'),'mobile replacement drawer must use larger top-only corners');
 assert(drawer.includes('grid-template-columns:minmax(0,1fr) auto'),'replacement candidates must reserve a compact action column');
 assert(drawer.includes('.replacement-drawer-card>button{grid-column:2;grid-row:1;'),'replacement action must sit beside the candidate title');

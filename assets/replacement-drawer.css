@@ -77,10 +77,6 @@
   .f111-drawer-action,.f111-drawer-option{min-height:48px;padding:12px}
   .f111-drawer-action b,.f111-drawer-option b{font-size:14px}
 }
-/* iOS Home Screen web apps with viewport-fit=cover can misreport dynamic viewport units. */
-@media (display-mode:standalone) and (max-width:620px){
-  .replacement-drawer-panel,.f111-action-drawer-panel{height:min(88vh,760px);max-height:88vh}
-}
 .replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
 .f111-drawer-action.is-current{border-width:1px}
@@ -90,3 +86,4 @@
 .f111-action-drawer-panel{transform:translateX(0);transition:transform 220ms cubic-bezier(.2,.7,.2,1)}
 .f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateX(100%)}
 @media(max-width:620px){.f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateY(100%)}}
+.f111-action-drawer-shell.ios-no-drawer-motion .f111-action-drawer-panel,.f111-action-drawer-shell.ios-no-drawer-motion:not(.is-open) .f111-action-drawer-panel,.replacement-drawer-shell.ios-no-drawer-motion .replacement-drawer-panel{transform:none!important;transition:none!important}

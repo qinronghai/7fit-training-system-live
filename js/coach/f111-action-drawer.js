@@ -40,6 +40,7 @@
     root._sourceSelect=null;
     root._modeContext=null;
     root._axis=null;
+    M.DrawerMotion?.deactivate(root);
     document.documentElement.classList.remove('f111-drawer-open');
   }
 
@@ -49,6 +50,7 @@
     root.querySelector('[data-f111-drawer-list]').innerHTML=html;
     root.hidden=false;
     document.documentElement.classList.add('f111-drawer-open');
+    M.DrawerMotion?.activate(root);
     requestAnimationFrame(()=>root.classList.add('is-open'));
     root.querySelector('.f111-action-drawer-close')?.focus();
   }

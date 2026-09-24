@@ -102,6 +102,7 @@
 
     root.hidden=false;
     document.documentElement.classList.add('replacement-drawer-open');
+    M.DrawerMotion?.activate(root);
     requestAnimationFrame(()=>root.classList.add('is-open'));
     root.querySelector('.replacement-drawer-close')?.focus();
   }
@@ -112,6 +113,7 @@
     root.classList.remove('is-open');
     root.hidden=true;
     root._sourceSelect=null;
+    M.DrawerMotion?.deactivate(root);
     document.documentElement.classList.remove('replacement-drawer-open');
   }
 
