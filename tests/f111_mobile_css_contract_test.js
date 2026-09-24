@@ -5,7 +5,8 @@ for(const token of ['.f111-compose-hero','.f111-compose-stepper','.f111-mode-gri
 for(const token of ['.f111-action-drawer-shell','.f111-drawer-group','.f111-drawer-action.is-disabled','.f111-drawer-open body'])assert(drawer.includes(token),`missing drawer CSS token ${token}`);
 assert(drawer.includes('align-items:end'),'mobile replacement drawer must dock to the bottom');
 assert(drawer.includes('.replacement-drawer-shell{grid-template-columns:1fr;align-items:end;padding:0}'),'mobile replacement drawer must meet the screen edges without gutters');
-assert(drawer.includes('.replacement-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);'),'mobile replacement drawer must leave space above and dock to the bottom');
+assert(/\.replacement-drawer-panel\{[^}]*height:min\(88vh,760px\);max-height:88vh;[^}]*height:min\(88dvh,760px\);max-height:88dvh/.test(drawer),'mobile replacement drawer must retain vh fallback before using dynamic viewport height');
+assert(/@media \(display-mode:standalone\) and \(max-width:620px\)[\s\S]*?\.replacement-drawer-panel,\.f111-action-drawer-panel\{height:min\(88vh,760px\);max-height:88vh\}/.test(drawer),'iOS Home Screen drawers must use legacy viewport height in standalone mode');
 assert(drawer.includes('border-radius:28px 28px 0 0'),'mobile replacement drawer must use larger top-only corners');
 assert(drawer.includes('grid-template-columns:minmax(0,1fr) auto'),'replacement candidates must reserve a compact action column');
 assert(drawer.includes('.replacement-drawer-card>button{grid-column:2;grid-row:1;'),'replacement action must sit beside the candidate title');
@@ -17,8 +18,8 @@ assert(desktopDrawerCss.includes('.replacement-drawer-card>*:not(.replacement-dr
 assert(drawer.includes('.replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}'),'replacement and grouped action choices must share a white bordered card surface');
 assert(drawer.includes('.replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}'),'replacement and grouped action choices must share selected styling');
 assert(drawer.includes('.f111-drawer-action:hover,.f111-drawer-option:hover,.replacement-drawer-card:hover'),'replacement and chooser rows must share hover feedback');
-assert(drawer.includes('.f111-action-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);max-height:88dvh;'),'mobile mode/action choices must float above the bottom edge');
-assert(drawer.includes('.f111-action-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);max-height:88dvh;border:0;border-radius:28px 28px 0 0;overflow:hidden;'),'mobile chooser sheets must clip contents to their larger top-only corners');
+assert(/\.f111-action-drawer-panel\{[^}]*height:min\(88vh,760px\);max-height:88vh;[^}]*height:min\(88dvh,760px\);max-height:88dvh;[^}]*transform:translateY\(0\)/.test(drawer),'mobile mode/action choices must retain viewport fallback and float above the bottom edge');
+assert(/\.f111-action-drawer-panel\{[^}]*height:min\(88vh,760px\);max-height:88vh;[^}]*height:min\(88dvh,760px\);max-height:88dvh;border:0;border-radius:28px 28px 0 0;overflow:hidden;/.test(drawer),'mobile chooser sheets must clip contents to their larger top-only corners');
 assert(drawer.includes('.f111-action-drawer-shell{grid-template-columns:1fr;align-items:end;padding:0}'),'mobile chooser drawer must meet the screen edges without gutters');
 assert(drawer.includes('.f111-drawer-action.is-current{border-width:1px}'),'selected action choices must not use a heavier border');
 assert(drawer.includes('.f111-drawer-action b,.f111-drawer-option b{font-size:14px;line-height:1.35;overflow-wrap:anywhere}'),'grouped action labels must match replacement candidate title scale');
