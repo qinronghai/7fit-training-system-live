@@ -41,6 +41,6 @@ assert(css.includes('.view-hero.f111-compose-hero .chip{font-size:11px;'),'F111 
 assert(css.includes('.time-badge{white-space:nowrap;flex:0 0 auto}'),'time badges must stay on one line within narrow cards');
 assert(css.includes('.post-cardio-option-trigger'),'post-cardio controls must have drawer trigger styling');
 assert(css.includes('height:44px;min-height:44px;padding:0;border-color:transparent;background:transparent;z-index:1'),'compact replacement controls must reserve a non-overlapping 44px hit target');
-assert(css.includes('::before{content:\'\';position:absolute;inset:5px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}'),'replacement controls must keep a compact visible button inside the hit target');
+assert(css.includes('::before{content:\'\';position:absolute;inset:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}'),'replacement controls must keep a compact visible button inside the hit target');
 assert(!css.includes('.f111-replace-trigger::after{content:\'\';position:absolute;inset:-6px}'),'replacement hit targets must not overlap nearby controls');
 console.log('f111_mobile_css_contract_test: PASS');

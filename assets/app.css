@@ -1766,7 +1766,7 @@ body{font-size:14px;line-height:1.55}
   .f111-builder-section .f111-mode-label{font-size:12px}
   .f111-strength-section .time-badge{font-size:10px;padding:6px 8px}
   .f111-prep-section .f111-replace-trigger,.f111-strength-section .f111-replace-trigger{position:relative;box-sizing:border-box;height:44px;min-height:44px;padding:0;border-color:transparent;background:transparent;z-index:1}
-  .f111-prep-section .f111-replace-trigger::before,.f111-strength-section .f111-replace-trigger::before{content:'';position:absolute;inset:5px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}
+  .f111-prep-section .f111-replace-trigger::before,.f111-strength-section .f111-replace-trigger::before{content:'';position:absolute;inset:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;pointer-events:none}
   .f111-prep-section .f111-replace-trigger>span,.f111-prep-section .f111-replace-trigger>i,.f111-strength-section .f111-replace-trigger>span,.f111-strength-section .f111-replace-trigger>i{position:relative;z-index:1}
   @media(hover:hover) and (pointer:fine){
     .f111-prep-section .f111-replace-trigger:hover,.f111-strength-section .f111-replace-trigger:hover{border-color:transparent;background:transparent}
