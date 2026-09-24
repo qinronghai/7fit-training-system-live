@@ -1,6 +1,7 @@
 (function(){
   function labels(route){
     if(route.area==='coach'){
+      if(route.page==='home')return ['编课中心','7Fit 教练工作台'];
       if(route.page==='template'||route.page==='template-compose'){
         if(route.templateId==='f111')return ['编课中心','女性综合 1+1+1'];
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
@@ -56,7 +57,7 @@
   window.addEventListener('DOMContentLoaded',()=>{
     const mode=window.V14State?.getMode?.()||'coach'; document.body.dataset.mode=mode;
     const btn=document.getElementById('mode-toggle');
-    function syncModeButton(){const m=window.V14State.getMode();btn.dataset.mode=m;btn.querySelector('b').textContent=m==='system'?'系统模式':'教练模式';btn.querySelector('small').textContent=m==='system'?'显示来源 / 审计字段':'隐藏开发 / 审计字段';}
+    function syncModeButton(){const m=window.V14State.getMode();btn.dataset.mode=m;btn.querySelector('b').textContent=m==='system'?'系统管理':'教练模式';btn.querySelector('small').textContent=m==='system'?'管理训练数据和规则':'编写课程、查找动作和收藏常用训练';}
     syncModeButton();
     btn.addEventListener('click',()=>{const next=window.V14State.getMode()==='coach'?'system':'coach';window.V14State.setMode(next);syncModeButton();renderRoute(window.V14Router.parseHash(location.hash));});
     window.V14Router.start(renderRoute);

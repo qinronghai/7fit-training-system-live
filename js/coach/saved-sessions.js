@@ -64,7 +64,7 @@
       :'<div class="saved-session-empty">还没有保存的课程。</div>';
   }
   function librarySection(){
-    return `<section class="section-card saved-session-library"><div class="section-head"><div><h2>已保存课程</h2><p>恢复时会重新走当前 Resolver / PREP / Conflict，不直接注入旧 JSON。保存记录仅存在当前浏览器 Session Storage，不代表云端或后端已保存。</p></div><span class="time-badge">LOCAL · 浏览器</span></div><div data-saved-session-status></div>${listHtml()}</section>`;
+    return `<section class="section-card saved-session-library"><div class="section-head"><div><h2>已保存课程</h2><p>课程只在本次打开期间保留，关闭页面后会清除。</p></div><span class="time-badge">临时保存</span></div><div data-saved-session-status></div>${listHtml()}</section>`;
   }
   function controls(route){
     const descriptor=Service()?.descriptorFromRoute?.(route);

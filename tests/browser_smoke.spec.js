@@ -33,19 +33,46 @@ test('390px multi-template coach center renders registered templates without ove
   const errors = capturePageErrors(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach');
-  await expect(page.getByRole('heading', { name: '7Fit Coach Center' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '选择模板，开始编课' })).toBeVisible();
+  await expect(page.locator('.coach-home-workflow li')).toHaveCount(3);
   await expect(page.locator('[data-template-id]')).toHaveCount(5);
-  await expect(page.locator('[data-template-id="f111"]')).toContainText('女性综合 1+1+1');
+  await expect(page.locator('[data-template-id="f111"]')).toContainText('女性全身塑形');
+  await expect(page.locator('[data-template-id="f111"]')).toContainText('可使用');
   await expect(page.locator('[data-template-id="body"]')).toContainText('健美式塑形');
   await expect(page.locator('[data-template-id="conditioning"]')).toContainText('体能训练');
-  await expect(page.locator('[data-template-id="hyrox"]')).toContainText('已启用');
+  await expect(page.locator('[data-template-id="hyrox"]')).toContainText('可使用');
   await expect(page.locator('[data-template-id="posture"]')).toContainText('即将开放');
+  await expect(page.getByRole('heading', { name: '常用内容' })).toBeVisible();
+  await expect(page.getByText('临时保存')).toBeVisible();
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
   }));
   expect(widths.scrollWidth).toBe(widths.clientWidth);
   expect(widths.clientWidth).toBe(390);
+  await expectNoPageErrors(errors);
+});
+
+test('desktop Coach Center keeps the approved card layout and template routes', async ({ page }) => {
+  const errors = capturePageErrors(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/#/coach');
+  await expect(page.getByRole('heading', { name: '选择模板，开始编课' })).toBeVisible();
+  const cards = page.locator('.template-grid [data-template-id]');
+  await expect(cards).toHaveCount(5);
+  const positions = await cards.evaluateAll(nodes => nodes.map(node => {
+    const rect = node.getBoundingClientRect();
+    return { top: Math.round(rect.top), left: Math.round(rect.left), width: Math.round(rect.width) };
+  }));
+  expect(positions[0].top).toBe(positions[1].top);
+  expect(positions[1].top).toBe(positions[2].top);
+  expect(positions[3].top).toBe(positions[4].top);
+  expect(positions[3].width).toBeGreaterThan(positions[0].width);
+  const link = page.getByRole('link', { name: '选择女性全身塑形' });
+  await expect(link).toHaveAttribute('href', '#/coach/f111');
+  await link.click();
+  await expect(page).toHaveURL(/#\/coach\/f111$/);
+  await expect(page.locator('.f111-compose-hero')).toBeVisible();
   await expectNoPageErrors(errors);
 });
 

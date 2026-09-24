@@ -1776,3 +1776,87 @@ body{font-size:14px;line-height:1.55}
   .f111-support-grid .composer-slot-head>div{gap:1px}
   .f111-support-grid .composer-slot-head>div>span,.f111-support-grid .composer-slot-head>div>b{padding:2px 1px;font-size:8px}
 }
+
+/* Coach Center home: violet and cool-white template landing */
+.primary-nav a .nav-icon{display:grid;place-items:center;width:22px;height:22px;color:#aaa3b3}
+.primary-nav a .nav-icon svg{display:block;width:16px;height:16px}
+.primary-nav a.active .nav-icon{color:var(--purple)}
+.view-hero.coach-home-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(390px,.95fr);gap:28px;align-items:center;padding:30px;border-radius:24px;background:linear-gradient(135deg,#17151f 0%,#211b2d 65%,#392568 100%)}
+.view-hero.coach-home-hero:after{right:18px;bottom:-58px;font-size:190px}
+.coach-home-hero-main{min-width:0;padding:0}
+.coach-home-hero-main h1{max-width:620px;margin:9px 0 12px;font-size:clamp(32px,3vw,42px);line-height:1.15;letter-spacing:-.035em}
+.coach-home-hero .coach-home-lead{max-width:600px;margin:0;color:#e5e0ed!important;font-size:15px!important;font-weight:500;line-height:1.7;letter-spacing:0}
+.coach-home-action{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;margin-top:18px;color:#ded2ff;font-size:13px;font-weight:850;text-decoration:none}
+.coach-home-action:hover{color:#fff}
+.coach-home-workflow{position:relative;z-index:1;padding:22px;border:1px solid rgba(255,255,255,.13);border-radius:17px;background:rgba(255,255,255,.075)}
+.workflow-label{display:block;margin-bottom:12px;color:#d8caff;font-size:11px;font-weight:900}
+.coach-home-workflow ol{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.coach-home-workflow li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start}
+.coach-home-workflow li>span{display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.2);border-radius:9px;color:#e4dcf3;font-size:11px;font-variant-numeric:tabular-nums}
+.coach-home-workflow li strong,.coach-home-workflow li small{display:block}
+.coach-home-workflow li strong{color:#fff;font-size:13px;line-height:1.45}
+.coach-home-workflow li small{margin-top:2px;color:#c5bfce;font-size:11px;line-height:1.55}
+.coach-template-section{scroll-margin-top:18px}
+.coach-template-section .section-head{align-items:center}
+.template-count{flex:none;padding:5px 9px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:11px;font-weight:750}
+.recipe-grid.template-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.recipe-grid.template-grid .template-card{grid-column:span 2;display:flex;flex-direction:column;min-width:0;min-height:258px;padding:18px;border-radius:17px;background:#fff}
+.recipe-grid.template-grid .template-card:nth-child(n+4){grid-column:span 3;min-height:226px}
+.recipe-grid.template-grid .template-card.featured{border-color:#d8c6ff;background:var(--purple-pale)}
+.template-card-topline{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.template-card-topline .recipe-code{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.template-status{flex:none;padding:5px 8px;border-radius:7px;font-size:10px;font-weight:800}
+.template-status.active{background:#e5f5ed;color:var(--ok)}
+.template-status.future{background:#fff2d9;color:var(--warn)}
+.recipe-grid.template-grid .template-card h3{margin:14px 0 7px;font-size:18px;line-height:1.4}
+.template-description{min-height:48px;margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.65}
+.recipe-grid.template-grid .recipe-tags{gap:6px;margin-top:auto}
+.recipe-grid.template-grid .recipe-tags span{padding:4px 7px;border:1px solid var(--line);background:#faf9fc;color:var(--muted);font-size:10px;line-height:1.35}
+.template-entry{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:42px;margin-top:10px;color:var(--ink);font-size:12px;font-weight:850;text-decoration:none}
+.template-card.featured .template-entry{color:var(--purple-dark)}
+.template-entry:hover{color:var(--purple-dark)}
+.template-entry:focus-visible,.coach-home-action:focus-visible{outline:2px solid #b89af6;outline-offset:3px;border-radius:4px}
+.coach-utilities{margin:20px 0 14px}
+.coach-utilities>.section-head{align-items:flex-end;margin-bottom:12px}
+.coach-utilities>.section-head h2{margin:0}
+.coach-utility-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.coach-utility-grid>.section-card{min-width:0;margin:0;padding:18px;border-radius:17px;background:#fff}
+.coach-utility-grid .section-head{align-items:flex-start}
+.coach-utility-grid .section-head h2{font-size:17px}
+.coach-utility-grid .section-head p{font-size:12px;line-height:1.6}
+.coach-utility-grid .section-action-link{white-space:nowrap}
+.coach-utility-grid .favorite-empty,.coach-utility-grid .saved-session-empty{display:grid;gap:4px;text-align:left;font-size:12px;line-height:1.6}
+.coach-utility-grid .favorite-empty b{color:var(--ink);font-size:13px}
+.coach-utility-grid .favorite-empty span{color:var(--muted)}
+@media(max-width:1180px){
+  .view-hero.coach-home-hero{grid-template-columns:minmax(0,1fr) minmax(330px,.9fr);gap:20px;padding:25px}
+  .recipe-grid.template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .recipe-grid.template-grid .template-card,.recipe-grid.template-grid .template-card:nth-child(n+4){grid-column:span 1;min-height:238px}
+}
+@media(max-width:820px){
+  .view-hero.coach-home-hero{grid-template-columns:minmax(0,1fr);padding:22px}
+  .coach-home-workflow{display:none}
+  .recipe-grid.template-grid{grid-template-columns:minmax(0,1fr)}
+  .recipe-grid.template-grid .template-card,.recipe-grid.template-grid .template-card:nth-child(n+4){grid-column:1/-1;min-height:0}
+  .template-description{min-height:0}
+  .coach-utility-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+  .view-hero.coach-home-hero{margin-bottom:14px;padding:20px 18px;border:1px solid #e6ddf6;background:linear-gradient(145deg,#faf8ff,#f0eaff);color:var(--ink)}
+  .view-hero.coach-home-hero:after{right:0;bottom:-59px;color:rgba(111,66,217,.07)}
+  .view-hero.coach-home-hero .eyebrow{color:var(--purple-dark)}
+  .view-hero.coach-home-hero h1{margin:7px 0 9px;color:var(--ink);font-size:29px;line-height:1.2}
+  .view-hero.coach-home-hero .coach-home-lead{color:var(--muted)!important;font-size:13px!important}
+  .coach-home-action{min-height:44px;margin-top:10px;color:var(--purple-dark)}
+  .coach-template-section{padding:16px}
+  .coach-template-section .section-head{gap:8px}
+  .coach-template-section .section-head h2{font-size:20px}
+  .coach-template-section .section-head p{font-size:12px}
+  .recipe-grid.template-grid{gap:10px}
+  .recipe-grid.template-grid .template-card,.recipe-grid.template-grid .template-card:nth-child(n+4){padding:16px}
+  .recipe-grid.template-grid .template-card h3{margin-top:11px;font-size:17px}
+  .template-description{margin-bottom:12px;font-size:12px}
+  .template-entry{min-height:44px}
+  .coach-utilities>.section-head h2{font-size:20px}
+  .coach-utilities>.section-head p{font-size:12px}
+}
