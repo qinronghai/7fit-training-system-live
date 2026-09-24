@@ -19,12 +19,12 @@
     const card=(catalog,side,subtitle)=>{
       const title=side==='upper'?'上肢辅助动作':'下肢辅助动作';
       return `<a class="knowledge-card auxiliary-module-card" href="#/system/patterns?focus=${catalog.moduleId}">
-        <span>${side==='upper'?'上肢训练':'下肢训练'}</span><h3>${title}</h3><p>${esc(subtitle)}</p>
-        <div class="auxiliary-index-facts"><b>${catalog.total} 个动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
+        <span>${side==='upper'?'上肢训练':'下肢训练'}</span><h3>${esc(catalog.title||title)}</h3><p>${esc(subtitle)}</p>
+        <div class="auxiliary-index-facts"><b>${catalog.total} 个唯一动作</b><small>${esc(auxiliaryClassSummary(catalog,api))}</small></div>
         <footer>查看${title}</footer>
       </a>`;
     };
-    return `<section class="training-auxiliary-section" aria-labelledby="training-auxiliary-title"><div class="training-section-heading"><div><h2 id="training-auxiliary-title">辅助动作</h2><p>按部位和动作目标浏览辅助训练动作。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','筛选上肢的推、拉辅助动作。')}${card(lower,'lower','按膝、髋和单腿等训练目标筛选动作。')}</div></section>`;
+    return `<section class="training-auxiliary-section auxiliary-index" aria-labelledby="training-auxiliary-title"><div class="training-section-heading"><div><h2 id="training-auxiliary-title">辅助动作</h2><p>按部位和动作目标浏览辅助训练动作。</p></div></div><div class="knowledge-grid auxiliary-module-grid">${card(upper,'upper','筛选上肢的推、拉辅助动作。')}${card(lower,'lower','按膝、髋和单腿等训练目标筛选动作。')}</div></section>`;
   }
   function lowerReplacementContext(route){
     if(!window.V15LowerAssistance?.candidates)return null;
