@@ -38,8 +38,8 @@
   }
   function section(){
     const items=F()?.listResolved?.()||[];
-    return `<section class="section-card favorites-library"><div class="section-head"><div><h2>常用收藏</h2><p>收藏只保存入口身份；每次打开都会重新经过当前 Search / Router 解析，不直接恢复旧 URL。</p></div><a class="section-action-link" href="#/library">去搜索收藏 →</a></div>
-      ${items.length?`<div class="favorite-grid">${items.map(card).join('')}</div>`:'<div class="favorite-empty">还没有收藏。可在动作与编课搜索中收藏常用动作、F111 组合、Body Family 或 Conditioning Protocol。</div>'}
+    return `<section class="section-card favorites-library"><div class="section-head"><div><h2>常用收藏</h2><p>收藏的动作和训练组合会显示在这里。</p></div><a class="section-action-link" href="#/library">打开动作库 →</a></div>
+      ${items.length?`<div class="favorite-grid">${items.map(card).join('')}</div>`:'<div class="favorite-empty"><b>还没有收藏内容</b><span>在动作库收藏动作或训练组合后，可在这里快速找到。</span></div>'}
     </section>`;
   }
   function bind(root,rerender){

@@ -25,7 +25,7 @@
         "conditioningMetrics": false
       },
       "routeBase": "#/coach/f111",
-      "description": "女性长期塑形的一下肢 + 一上肢 + 一支撑训练体系。"
+      "description": "每节课安排一个下肢动作、一个上肢动作和一个支撑动作。"
     },
     "body": {
       "templateId": "body",
@@ -45,7 +45,7 @@
         "conditioningMetrics": false
       },
       "routeBase": "#/coach/body",
-      "description": "以目标肌群、复合动作与训练量管理为核心的健美式塑形模板。"
+      "description": "选择目标肌群和复合动作，并安排训练量。"
     },
     "conditioning": {
       "templateId": "conditioning",
@@ -65,7 +65,7 @@
         "conditioningMetrics": true
       },
       "routeBase": "#/coach/conditioning",
-      "description": "围绕体能方式、冲击需求、功率需求与训练站点组织的体能模板。"
+      "description": "围绕体能目标组合训练项目，安排训练顺序和强度。"
     },
     "hyrox": {
       "templateId": "hyrox",
@@ -85,7 +85,7 @@
         "conditioningMetrics": true
       },
       "routeBase": "#/coach/hyrox",
-      "description": "适配 7Fit 二楼器械与 8 米草坪的固定 Station 混合体能训练模板，支持 Skill、Capacity、Mixed 与 Benchmark。"
+      "description": "结合场地和器械，编排 HYROX 技能、体能、综合训练或体能测试。"
     },
     "posture": {
       "templateId": "posture",
@@ -105,7 +105,7 @@
         "conditioningMetrics": false
       },
       "routeBase": "#/coach/posture",
-      "description": "未来用于体态评估、专项调整与阶段训练编排的模板入口。"
+      "description": "用于体态评估和针对性训练，开放后即可使用。"
     }
   }
 }
