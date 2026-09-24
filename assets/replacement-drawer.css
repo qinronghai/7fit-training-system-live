@@ -4,7 +4,7 @@
 .replacement-drawer-shell[hidden]{display:none}
 .replacement-drawer-shell{position:fixed;inset:0;z-index:420;display:grid;grid-template-columns:1fr minmax(360px,520px);overflow:hidden}
 .replacement-drawer-backdrop{grid-column:1/-1;grid-row:1;position:absolute;inset:0;background:rgba(24,20,31,.36);backdrop-filter:blur(2px)}
-.replacement-drawer-panel{grid-column:2;grid-row:1;position:relative;z-index:1;width:100%;height:100dvh;min-width:0;background:#fbfaff;border-left:1px solid var(--line);box-shadow:-20px 0 48px rgba(43,34,62,.14);display:grid;grid-template-rows:auto minmax(0,1fr);transform:translateX(0)}
+.replacement-drawer-panel{grid-column:2;grid-row:1;position:relative;z-index:1;width:100%;height:100vh;height:100dvh;min-width:0;background:#fbfaff;border-left:1px solid var(--line);box-shadow:-20px 0 48px rgba(43,34,62,.14);display:grid;grid-template-rows:auto minmax(0,1fr);transform:translateX(0)}
 .replacement-drawer-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:20px 20px 14px;border-bottom:1px solid var(--line);background:#fff}
 .replacement-drawer-head>div{min-width:0}
 .replacement-drawer-head span{font-size:9px;letter-spacing:.12em;font-weight:900;color:var(--purple-dark)}
@@ -30,7 +30,7 @@
 .replacement-drawer-open body{overflow:hidden}
 @media(max-width:620px){
   .replacement-drawer-shell{grid-template-columns:1fr;align-items:end;padding:0}
-  .replacement-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);border:0;border-radius:28px 28px 0 0;overflow:hidden;box-shadow:0 -12px 36px rgba(43,34,62,.18)}
+  .replacement-drawer-panel{grid-column:1;width:100%;height:min(88vh,760px);max-height:88vh;height:min(88dvh,760px);max-height:88dvh;border:0;border-radius:28px 28px 0 0;overflow:hidden;box-shadow:0 -12px 36px rgba(43,34,62,.18)}
   .replacement-drawer-head{padding:16px 14px 12px}
   .replacement-drawer-list{padding:12px 12px calc(24px + env(safe-area-inset-bottom))}
   .replacement-drawer-card{padding:12px}
@@ -44,7 +44,7 @@
 .f111-action-drawer-shell[hidden]{display:none}
 .f111-action-drawer-shell{position:fixed;inset:0;z-index:430;display:grid;grid-template-columns:1fr minmax(360px,520px);overflow:hidden}
 .f111-action-drawer-backdrop{position:absolute;inset:0;background:rgba(24,20,31,.38);backdrop-filter:blur(2px)}
-.f111-action-drawer-panel{grid-column:2;position:relative;z-index:1;width:100%;height:100dvh;min-width:0;background:#fbfaff;border-left:1px solid var(--line);box-shadow:-20px 0 48px rgba(43,34,62,.14);display:grid;grid-template-rows:auto minmax(0,1fr)}
+.f111-action-drawer-panel{grid-column:2;position:relative;z-index:1;width:100%;height:100vh;height:100dvh;min-width:0;background:#fbfaff;border-left:1px solid var(--line);box-shadow:-20px 0 48px rgba(43,34,62,.14);display:grid;grid-template-rows:auto minmax(0,1fr)}
 .f111-action-drawer-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:18px 18px 13px;border-bottom:1px solid var(--line);background:#fff}
 .f111-action-drawer-head>div{min-width:0}
 .f111-action-drawer-head span{font-size:9px;letter-spacing:.12em;font-weight:900;color:var(--purple-dark)}
@@ -70,12 +70,16 @@
 .f111-drawer-open body{overflow:hidden}
 @media(max-width:620px){
   .f111-action-drawer-shell{grid-template-columns:1fr;align-items:end;padding:0}
-  .f111-action-drawer-panel{grid-column:1;width:100%;height:min(88dvh,760px);max-height:88dvh;border:0;border-radius:28px 28px 0 0;overflow:hidden;box-shadow:0 -12px 36px rgba(43,34,62,.18);transform:translateY(0)}
+  .f111-action-drawer-panel{grid-column:1;width:100%;height:min(88vh,760px);max-height:88vh;height:min(88dvh,760px);max-height:88dvh;border:0;border-radius:28px 28px 0 0;overflow:hidden;box-shadow:0 -12px 36px rgba(43,34,62,.18);transform:translateY(0)}
   .f111-action-drawer-head{padding:16px 14px 12px}
   .f111-action-drawer-list{padding:12px 12px calc(24px + env(safe-area-inset-bottom))}
   .f111-drawer-group{padding:9px}
   .f111-drawer-action,.f111-drawer-option{min-height:48px;padding:12px}
   .f111-drawer-action b,.f111-drawer-option b{font-size:14px}
+}
+/* iOS Home Screen web apps with viewport-fit=cover can misreport dynamic viewport units. */
+@media (display-mode:standalone) and (max-width:620px){
+  .replacement-drawer-panel,.f111-action-drawer-panel{height:min(88vh,760px);max-height:88vh}
 }
 .replacement-drawer-card,.f111-drawer-action,.f111-drawer-option{border-color:var(--line);border-radius:14px;background:#fff}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-color:#d6c6f6;background:#faf7ff}
