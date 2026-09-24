@@ -1900,12 +1900,19 @@ body{font-size:14px;line-height:1.55}
   border:1px solid #d8cde8;
   background:var(--purple-soft);
 }
-#app-main:has(.f111-compose-hero) .f111-level-switch a:not(.active){border-color:#d8cde8}
+#app-main:has(.f111-compose-hero) .f111-current-combination small{color:var(--muted)}
+#app-main:has(.f111-compose-hero) .f111-level-switch a:not(.active){border-color:#d8cde8;color:var(--ink)}
 #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"],
 #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"]{
   border-color:#cdb9fa;
   background:var(--purple-soft);
 }
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card:not([data-composer-slot="A"]):not([data-composer-slot="B"]) .composer-slot-head>div>span{
+  color:var(--muted);
+}
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-action-drawer-trigger>span{color:var(--muted)}
+#app-main:has(.f111-compose-hero) .f111-recovery-section .recovery-row-region,
+#app-main:has(.f111-compose-hero) .post-cardio-summary{color:var(--muted)}
 #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"] .composer-slot-head>div>span,
 #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"] .composer-slot-head>div>span{
   display:inline-flex;

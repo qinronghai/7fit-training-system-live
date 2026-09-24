@@ -59,14 +59,14 @@ test('F111 prep and strength cards align replacement controls, typography, and s
     expect(result.clientWidth, `viewport ${width}px`).toBe(width);
     expect(result.scrollWidth, `horizontal overflow at ${width}px`).toBe(result.clientWidth);
     expect(result.columns, `paired F111 grids at ${width}px`).toEqual([2, 2, 2]);
-    expect(result.cards.map(card => card.background), `F111 card surfaces at ${width}px`).toEqual([
-      'rgb(255, 255, 255)', 'rgb(255, 255, 255)', 'rgb(255, 255, 255)',
+    expect(result.cards.map(card => card.background), `role-based F111 card surfaces at ${width}px`).toEqual([
+      'rgb(255, 255, 255)', 'rgb(255, 255, 255)', 'rgb(239, 232, 255)',
     ]);
-    expect(result.cards.map(card => card.titleSize), `action title scale at ${width}px`).toEqual(['14px', '14px', '14px']);
+    expect(result.cards.map(card => card.titleSize), `action title scale at ${width}px`).toEqual(['14px', '14px', '16px']);
     expect(result.cards.map(card => card.button), `replacement control geometry at ${width}px`).toEqual([
-      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
-      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
-      { width: 44, height: 44, visualHeight: 28, fontSize: '9px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
+      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
     ]);
     expect(result.cards.map(card => card.warmupButtonInHeader)).toEqual([true, true, true]);
 
