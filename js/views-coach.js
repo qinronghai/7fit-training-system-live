@@ -72,6 +72,11 @@
       if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);
     };
     bindDetailCards(root);
+    if(route?.page==='home')root.querySelector('.coach-home-action')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const target=root.querySelector('#templates');
+      target?.scrollIntoView({block:'start',behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    });
     const bindSaved=()=>M.SavedSessionsUI?.bind?.(route,root,rerender);
     const bindFavorites=()=>M.FavoritesUI?.bind?.(root,rerender);
     const bindReplacementDrawer=()=>M.ReplacementDrawer?.bind?.(root);

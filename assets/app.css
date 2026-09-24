@@ -1797,6 +1797,8 @@ body{font-size:14px;line-height:1.55}
 .coach-home-hero-main{min-width:0;padding:0}
 .coach-home-hero-main h1{max-width:620px;margin:9px 0 12px;font-size:clamp(32px,3vw,42px);line-height:1.15;letter-spacing:-.035em}
 .coach-home-hero .coach-home-lead{max-width:600px;margin:0;color:#e5e0ed!important;font-size:15px!important;font-weight:500;line-height:1.7;letter-spacing:0}
+.coach-home-action{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;margin-top:18px;color:#ded2ff;font-size:13px;font-weight:850;text-decoration:none}
+.coach-home-action:hover{color:#fff}
 .coach-home-workflow{position:relative;z-index:1;padding:22px;border:1px solid rgba(255,255,255,.13);border-radius:17px;background:rgba(255,255,255,.075)}
 .workflow-label{display:block;margin-bottom:12px;color:#d8caff;font-size:11px;font-weight:900}
 .coach-home-workflow ol{display:grid;gap:12px;margin:0;padding:0;list-style:none}
@@ -1824,7 +1826,7 @@ body{font-size:14px;line-height:1.55}
 .template-entry{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:42px;margin-top:10px;color:var(--ink);font-size:12px;font-weight:850;text-decoration:none}
 .template-card.featured .template-entry{color:var(--purple-dark)}
 .template-entry:hover{color:var(--purple-dark)}
-.template-entry:focus-visible{outline:2px solid #b89af6;outline-offset:3px;border-radius:4px}
+.template-entry:focus-visible,.coach-home-action:focus-visible{outline:2px solid #b89af6;outline-offset:3px;border-radius:4px}
 .coach-utilities{margin:20px 0 14px}
 .coach-utilities>.section-head{align-items:flex-end;margin-bottom:12px}
 .coach-utilities>.section-head h2{margin:0}
@@ -1856,6 +1858,7 @@ body{font-size:14px;line-height:1.55}
   .view-hero.coach-home-hero .eyebrow{color:var(--purple-dark)}
   .view-hero.coach-home-hero h1{margin:7px 0 9px;color:var(--ink);font-size:29px;line-height:1.2}
   .view-hero.coach-home-hero .coach-home-lead{color:var(--muted)!important;font-size:13px!important}
+  .coach-home-action{min-height:44px;margin-top:10px;color:var(--purple-dark)}
   .coach-template-section{padding:16px}
   .coach-template-section .section-head{gap:8px}
   .coach-template-section .section-head h2{font-size:20px}

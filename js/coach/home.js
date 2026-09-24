@@ -43,6 +43,7 @@
         <span class="eyebrow">7FIT / 教练工作台</span>
         <h1 id="coach-home-title">选择模板，开始编课</h1>
         <p class="coach-home-lead">根据本次训练目标选择模板，安排动作并保存课程。</p>
+        <a class="coach-home-action" href="#templates">查看训练模板 <span aria-hidden="true">↘</span></a>
       </div>
       <div class="coach-home-workflow" aria-label="编课步骤">
         <span class="workflow-label">编课步骤</span>
