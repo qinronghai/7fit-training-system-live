@@ -1871,3 +1871,72 @@ body{font-size:14px;line-height:1.55}
   .coach-utilities>.section-head h2{font-size:20px}
   .coach-utilities>.section-head p{font-size:12px}
 }
+
+/* F111 composer bolder pass: amplify the existing violet hierarchy. */
+#app-main:has(.f111-compose-hero) .section-card,
+#app-main:has(.f111-compose-hero) .f111-prep-section{
+  border-color:#d8cde8;
+  background:var(--purple-pale);
+}
+#app-main:has(.f111-compose-hero) .section-head h2,
+#app-main:has(.f111-compose-hero) .f111-section-title h2{
+  color:var(--ink);
+  font-weight:950;
+}
+#app-main:has(.f111-compose-hero) .section-head p,
+#app-main:has(.f111-compose-hero) .f111-section-title p{
+  color:var(--muted);
+}
+#app-main:has(.f111-compose-hero) .f111-compose-hero h1{
+  font-size:clamp(30px,2.9vw,42px);
+  line-height:1.08;
+}
+#app-main:has(.f111-compose-hero) .f111-compose-hero .eyebrow{font-size:10px}
+#app-main:has(.f111-compose-hero) .f111-builder-section .f111-section-title h2{font-size:23px}
+#app-main:has(.f111-compose-hero) .f111-builder-section .f111-section-index{color:var(--ink)}
+#app-main:has(.f111-compose-hero) .f111-mode-section .f111-section-title h2{font-size:19px}
+#app-main:has(.f111-compose-hero) .f111-mode-drawer-trigger{border-color:#d8cde8}
+#app-main:has(.f111-compose-hero) .f111-current-combination{
+  border:1px solid #d8cde8;
+  background:var(--purple-soft);
+}
+#app-main:has(.f111-compose-hero) .f111-level-switch a:not(.active){border-color:#d8cde8}
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"],
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"]{
+  border-color:#cdb9fa;
+  background:var(--purple-soft);
+}
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"] .composer-slot-head>div>span,
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"] .composer-slot-head>div>span{
+  display:inline-flex;
+  width:fit-content;
+  align-items:center;
+  padding:4px 7px;
+  border-radius:8px;
+  background:var(--purple-dark);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  line-height:1.3;
+}
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"] .f111-slot-main h3,
+#app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"] .f111-slot-main h3{
+  font-size:18px;
+  font-weight:950;
+}
+@media(min-width:621px){
+  #app-main:has(.f111-compose-hero) .f111-compose-hero{padding:28px}
+  #app-main:has(.f111-compose-hero) .f111-compose-hero p{font-size:15px}
+  #app-main:has(.f111-compose-hero) .section-head h2{font-size:22px}
+}
+@media(max-width:620px){
+  #app-main:has(.f111-compose-hero) .f111-compose-hero{padding:20px 18px}
+  #app-main:has(.f111-compose-hero) .f111-compose-hero p{font-size:13px}
+  #app-main:has(.f111-compose-hero) .section-head h2{font-size:20px}
+  #app-main:has(.f111-compose-hero) .f111-builder-section .f111-section-title h2{font-size:21px}
+  #app-main:has(.f111-compose-hero) .f111-mode-section .f111-section-title h2{font-size:18px}
+  #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="A"] .f111-slot-main h3,
+  #app-main:has(.f111-compose-hero) .f111-strength-section .f111-slot-card[data-composer-slot="B"] .f111-slot-main h3{font-size:16px}
+  #app-main:has(.f111-compose-hero) .f111-prep-section .f111-replace-trigger,
+  #app-main:has(.f111-compose-hero) .f111-strength-section .f111-replace-trigger{font-size:10px}
+}
