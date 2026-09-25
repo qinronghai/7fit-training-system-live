@@ -46,6 +46,9 @@
     const w=supportWindow(level),grades=[...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])],allowed=new Set(grades),rec=w.recommended;
     return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return a;}).filter(x=>allowed.has(x.grade)).sort((a,b)=>(a.grade===rec?-1:0)-(b.grade===rec?-1:0));
   }
+  function supportSelectionOptions(){
+    return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return a;});
+  }
   function matchesDemand(a,demandKey){
     const meta=cfg().coreDemands?.[demandKey]; if(!meta)return true;
     const text=clean(a.coreDemand); return (meta.keywords||[]).some(k=>text.includes(k));
@@ -56,6 +59,9 @@
     const matched=base.filter(x=>matchesDemand(x,demandKey));
     const list=matched.length?matched:base;
     return list.sort((a,b)=>(recommended.has(a.grade)?-1:0)-(recommended.has(b.grade)?-1:0));
+  }
+  function coreSelectionOptions(){
+    return (D().coreIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.coreGrade||a.tier;return a;});
   }
   function auxCandidates(kind,modeKey,selectedIds=[],context={}){
     if(kind==='lower'&&window.V15LowerAssistance?.candidates){
@@ -89,11 +95,13 @@
     const lower=cfg().lowerModes[lowerMode],upper=cfg().upperModes[upperMode],selections=input.selections||{};
     const Aopts=mainCandidates('lower',lowerMode,level,!!input.includeExpandedMain), Bopts=mainCandidates('upper',upperMode,level,!!input.includeExpandedMain);
     const A=chooseById(Aopts,selections.A),B=chooseById(Bopts,selections.B);
-    const Copts=supportCandidates(level,!!input.includeExpandedSupport),C=chooseById(Copts,selections.C);
+    const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport),Copts=supportSelectionOptions();
+    const C=Copts.find(option=>option.id===selections.C)||chooseById(CautoOptions);
     const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:C?.id}}),D1=chooseById(D1opts,selections.D1);
     const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
     const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
-    const COREopts=coreCandidates(level,coreDemand,!!input.includeExpandedCore),CORE=chooseById(COREopts,selections.CORE);
+    const COREautoOptions=coreCandidates(level,coreDemand,!!input.includeExpandedCore),COREopts=coreSelectionOptions();
+    const CORE=COREopts.find(option=>option.id===selections.CORE)||chooseById(COREautoOptions);
     const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||''});
     return {
       compositionId:`F111-C-${lower.code}-${upper.code}`,
