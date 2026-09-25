@@ -32,8 +32,15 @@ assert(r.slotOptions.D1.length>=3);
 assert(r.slotOptions.D2.length>=3);
 assert(!r.slotOptions.D1.some(x=>x.id===r.slots[0].actionId));
 assert(!r.slotOptions.D2.some(x=>x.id===r.slots[1].actionId));
-assert(r.slotOptions.C.every(x=>['SUP-S2','SUP-S3','SUP-S4'].includes(x.grade)));
-assert(r.slotOptions.CORE.every(x=>['CORE-L2','CORE-L3'].includes(x.grade)));
+assert.deepStrictEqual(Array.from(r.slotOptions.C,x=>x.id),Array.from(D.supportIds));
+assert.deepStrictEqual(Array.from(r.slotOptions.CORE,x=>x.id),Array.from(D.coreIds));
+const higherSupport=r.slotOptions.C.find(x=>x.grade==='SUP-S6');
+const higherCore=r.slotOptions.CORE.find(x=>x.grade==='CORE-L4');
+assert(higherSupport,'all support grades must be selectable');
+assert(higherCore,'all core grades must be selectable');
+const higherSelections=C.resolve({level:'L1',lowerMode:'squat',upperMode:'horizontal_pull',coreDemand:'anti_extension',selections:{C:higherSupport.id,CORE:higherCore.id}});
+assert.strictEqual(higherSelections.slots.find(x=>x.slotKey==='C').actionId,higherSupport.id);
+assert.strictEqual(higherSelections.slots.find(x=>x.slotKey==='CORE').actionId,higherCore.id);
 assert(r.slots[5].coreDemand.includes('抗伸展'));
 
 // V14.7 release-gate: every 20 x 4 state must resolve all six formal slots.
