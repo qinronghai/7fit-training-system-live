@@ -122,10 +122,16 @@ function fromDbItem(row: any) {
 }
 
 const repository = {
-  async listMembers({ includeArchived, search, limit }: { includeArchived: boolean; search: string; limit: number }) {
-    let query = supabase.from("members").select(MEMBER_COLUMNS).order("display_name", { ascending: true }).limit(limit);
-    if (!includeArchived) query = query.eq("status", "ACTIVE").is("archived_at", null);
+  async listMembers({ status, includeArchived, search, limit, offset }: { status: string; includeArchived: boolean; search: string; limit: number; offset: number }) {
+    let query = supabase.from("members").select(MEMBER_COLUMNS)
+      .order("display_name", { ascending: true })
+      .order("id", { ascending: true });
+    if (status === "ACTIVE") query = query.eq("status", "ACTIVE").is("archived_at", null);
+    else if (status === "ARCHIVED") query = query.not("archived_at", "is", null);
+    else if (status === "INACTIVE") query = query.eq("status", "INACTIVE").is("archived_at", null);
+    else if (!includeArchived) query = query.eq("status", "ACTIVE").is("archived_at", null);
     if (search) query = query.ilike("display_name", `%${search}%`);
+    query = query.range(offset, offset + limit - 1);
     const { data, error } = await query;
     throwOnError(error);
     return (data || []).map(fromDbMember);
@@ -184,6 +190,8 @@ const repository = {
       .eq("member_id", memberId)
       .eq("status", "COMPLETED")
       .order("session_date", { ascending: false })
+      .order("completed_at", { ascending: false })
+      .order("id", { ascending: false })
       .order("sort_order", { referencedTable: "training_session_items", ascending: true })
       .limit(limit);
     throwOnError(error);

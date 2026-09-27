@@ -122,7 +122,10 @@ function normalizeSnapshot(snapshot) {
   const fields = [];
   snapshot.items.forEach((item, index) => {
     const checked = validateTrainingSessionItem(item);
-    if (!checked.ok) fields.push(`items.${index}`);
+    if (!checked.ok) {
+      fields.push(`items.${index}`);
+      return;
+    }
     if (item.sessionId !== snapshot.session.id) fields.push(`items.${index}.sessionId`);
     if (item.completed !== false || item.performedActionId !== null || item.performedActionSnapshot !== null) fields.push(`items.${index}.plannedState`);
   });
@@ -244,10 +247,16 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
 
     try {
       if (request.method === 'GET' && action === 'list-members') {
+        const requestedStatus = url.searchParams.get('status') || '';
+        if (requestedStatus && !['ACTIVE', 'ARCHIVED', 'INACTIVE'].includes(requestedStatus)) {
+          return apiError('invalid_request', 400, ['status']);
+        }
         const options = {
+          status: requestedStatus || (['1', 'true'].includes((url.searchParams.get('includeArchived') || '').toLowerCase()) ? 'ALL' : 'ACTIVE'),
           includeArchived: ['1', 'true'].includes((url.searchParams.get('includeArchived') || '').toLowerCase()),
           search: (url.searchParams.get('search') || '').trim().slice(0, 120),
           limit: boundedLimit(url.searchParams.get('limit')),
+          offset: boundedOffset(url.searchParams.get('offset')),
         };
         return json({ members: await repository.listMembers(options) });
       }

@@ -135,3 +135,15 @@ def test_anon_sql_gate_asserts_no_member_access_and_history_tables_stay_separate
         assert "has_table_privilege('anon'" in sql
     assert "relrowsecurity" in sql
     assert "case_assets" not in sql
+
+
+def test_recent_completed_query_orders_all_session_tiebreakers_before_limit():
+    source = (ROOT / "supabase" / "functions" / "member-api" / "index.ts").read_text(encoding="utf-8")
+    query = source.split("async getCompletedSessionsForContext", 1)[1].split("async savePlannedSession", 1)[0]
+    order_positions = [
+        query.index('.order("session_date", { ascending: false })'),
+        query.index('.order("completed_at", { ascending: false })'),
+        query.index('.order("id", { ascending: false })'),
+        query.index(".limit(limit)"),
+    ]
+    assert order_positions == sorted(order_positions), "the database must choose the same latest three sessions the domain layer would sort"

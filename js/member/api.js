@@ -39,8 +39,8 @@
     return payload;
   }
 
-  function listMembers({search='',includeArchived=false,limit=100}={}){
-    return request('list-members',{query:{search,includeArchived:includeArchived?'true':'',limit}}).then(value=>value.members||[]);
+  function listMembers({search='',status='',includeArchived=false,limit=100,offset=0}={}){
+    return request('list-members',{query:{search,status:status||'',includeArchived:includeArchived?'true':'',limit,offset}}).then(value=>value.members||[]);
   }
 
   const api={

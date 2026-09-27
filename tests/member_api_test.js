@@ -83,11 +83,16 @@ async function main() {
 
   let listOptions;
   const listApi = createMemberApi({ auth: createAuth(), repository: repository({ async listMembers(options) { listOptions = options; return [memberFixture]; } }), now: () => NOW });
-  const listResult = await call(listApi, 'list-members', { query: '&includeArchived=true&search=%E6%9E%97&limit=999' });
+  const listResult = await call(listApi, 'list-members', { query: '&status=ARCHIVED&search=%E6%9E%97&limit=999&offset=25' });
   assert.equal(listResult.response.status, 200);
-  assert.equal(listOptions.includeArchived, true);
+  assert.equal(listOptions.status, 'ARCHIVED');
   assert.equal(listOptions.search, '林');
   assert.equal(listOptions.limit, 100);
+  assert.equal(listOptions.offset, 25);
+
+  const invalidMemberStatus = await call(listApi, 'list-members', { query: '&status=EVERYONE' });
+  assert.equal(invalidMemberStatus.response.status, 400);
+  assert.equal(invalidMemberStatus.body.error, 'invalid_request');
 
   let updates = 0;
   let memberRecord = { ...memberFixture };
@@ -150,6 +155,13 @@ async function main() {
   });
   assert.equal(unknownSnapshot.response.status, 400);
   assert.equal(unknownSnapshot.body.error, 'invalid_snapshot');
+  assert.equal(unknownSnapshotWrites, 0);
+
+  const invalidNullItem = await call(unknownSnapshotApi, 'save-planned-session', {
+    method: 'POST', body: { snapshot: { ...plannedFixture, items: [null] } },
+  });
+  assert.equal(invalidNullItem.response.status, 400);
+  assert.equal(invalidNullItem.body.error, 'invalid_snapshot');
   assert.equal(unknownSnapshotWrites, 0);
 
   let completion;
