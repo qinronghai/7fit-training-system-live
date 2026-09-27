@@ -4,7 +4,7 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const normalCategories=new Set(['主训练','T1','T2','T3','T4']);
   const excludedCategories=new Set(['热身','激活','活动','放松','体能']);
-  let dialog=null,returnFocus=null,requestVersion=0,currentSessionId='',currentSession=null,currentItems=[],mutationInFlight=false,onSessionChanged=null;
+  let dialog=null,returnFocus=null,returnFocusSessionId='',requestVersion=0,currentSessionId='',currentSession=null,currentItems=[],mutationInFlight=false,onSessionChanged=null;
 
   function dateLabel(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)?value.replaceAll('-','.'):esc(value||'日期未记录');}
   function statusLabel(status){return ({PLANNED:'待训练',COMPLETED:'已完成',CANCELLED:'已取消'})[status]||'状态未知';}
@@ -132,7 +132,15 @@
     dialog.addEventListener('cancel',event=>{if(mutationInFlight)event.preventDefault();});
     dialog.addEventListener('close',()=>{
       requestVersion++;
-      if(returnFocus?.isConnected)returnFocus.focus();
+      const stableTrigger=Array.from(document.querySelectorAll('[data-open-session-detail]'))
+        .find(trigger=>trigger.dataset.sessionId===returnFocusSessionId);
+      const focusTarget=returnFocus?.isConnected?returnFocus:stableTrigger;
+      if(focusTarget)focusTarget.focus();
+      else{
+        const fallback=document.querySelector('[data-member-timeline]')||document.querySelector('[data-member-center-page="detail"]');
+        if(fallback){fallback.setAttribute('tabindex','-1');fallback.focus();}
+      }
+      returnFocus=null;returnFocusSessionId='';
       onSessionChanged=null;
     });
     return dialog;
@@ -204,7 +212,7 @@
       if(version!==requestVersion||!dialog.open)return;
       currentSession={...currentSession,...result,status:'COMPLETED'};
       await loadSession(sessionId,version);
-      onSessionChanged?.(currentSession);
+      await onSessionChanged?.(currentSession);
     }catch(error){if(version===requestVersion&&dialog.open)showMutationError(error);}
     finally{mutationInFlight=false;if(version===requestVersion&&dialog.open)setMutationState(false);}
   }
@@ -218,14 +226,14 @@
       if(version!==requestVersion||!dialog.open)return;
       currentSession={...currentSession,...result,status:'CANCELLED'};
       await loadSession(sessionId,version);
-      onSessionChanged?.(currentSession);
+      await onSessionChanged?.(currentSession);
     }catch(error){if(version===requestVersion&&dialog.open)showMutationError(error);}
     finally{mutationInFlight=false;if(version===requestVersion&&dialog.open)setMutationState(false);}
   }
 
   function open(sessionId,trigger,sessionChanged){
     const root=ensureDialog(),version=++requestVersion;
-    currentSessionId=sessionId;currentSession=null;currentItems=[];returnFocus=trigger||document.activeElement;onSessionChanged=sessionChanged||null;
+    currentSessionId=sessionId;currentSession=null;currentItems=[];returnFocus=trigger||document.activeElement;returnFocusSessionId=sessionId;onSessionChanged=sessionChanged||null;
     root.querySelector('[data-session-detail-subtitle]').textContent='正在读取课程记录…';
     root.querySelector('[data-session-detail-content]').innerHTML='<p class="member-state-loading">正在读取课程记录…</p>';
     if(!root.open)root.showModal();

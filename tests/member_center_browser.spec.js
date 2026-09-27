@@ -430,6 +430,39 @@ test('A planned session requires an explicit second action before cancellation',
   expect(state.completions).toHaveLength(0);
 });
 
+test('closing a completed session returns keyboard focus to the rebuilt timeline trigger', async ({ page }) => {
+  const state = await mockMemberApi(page);
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  const sessionId = sessionSummaries[0].id;
+  await page.locator(`[data-open-session-detail][data-session-id="${sessionId}"]`).click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.locator('[data-session-complete]').click();
+  await expect(page.locator(`[data-timeline-session="${sessionId}"] [data-session-status="COMPLETED"]`)).toBeVisible();
+  await detail.locator('[data-session-detail-close]').click();
+  await expect.poll(() => page.evaluate(() => {
+    const active = document.activeElement;
+    return active?.matches('[data-open-session-detail]') ? active.dataset.sessionId : '';
+  })).toBe(sessionId);
+  expect(state.completions).toHaveLength(1);
+});
+
+test('closing a cancelled session returns keyboard focus to the rebuilt timeline trigger', async ({ page }) => {
+  const state = await mockMemberApi(page);
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  const sessionId = sessionSummaries[0].id;
+  await page.locator(`[data-open-session-detail][data-session-id="${sessionId}"]`).click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.locator('[data-session-cancel-request]').click();
+  await detail.locator('[data-session-cancel-confirm]').click();
+  await expect(page.locator(`[data-timeline-session="${sessionId}"] [data-session-status="CANCELLED"]`)).toBeVisible();
+  await detail.locator('[data-session-detail-close]').click();
+  await expect.poll(() => page.evaluate(() => {
+    const active = document.activeElement;
+    return active?.matches('[data-open-session-detail]') ? active.dataset.sessionId : '';
+  })).toBe(sessionId);
+  expect(state.calls.filter(call => call.action === 'cancel-session')).toHaveLength(1);
+});
+
 test('A failed completion can be retried without changing the planned session', async ({ page }) => {
   const state = await mockMemberApi(page, { failComplete: true });
   await page.goto(`/#/coach/members/${MEMBER_ID}`);

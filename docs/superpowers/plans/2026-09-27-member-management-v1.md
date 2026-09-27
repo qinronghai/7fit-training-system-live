@@ -67,6 +67,7 @@
 - [x] Run focused contract tests to GREEN.
 - [x] Implement non-destructive DDL, `ON DELETE RESTRICT` for member history, cascading session items, and RPCs with execute grants limited to `service_role`.
 - [x] Verify the migration on an isolated database before production; query FK/check/grant/RLS metadata and confirm `anon` cannot select any Member table.
+- [x] Run `supabase/tests/member_management_v1_release_gate.sql` on the free staging project; same-key replay returns one persisted session/item, a second writer with revision 1 is rejected after the first advances it, and winning snapshots/data remain unchanged.
 - [x] Confirm production `cases` and `case_assets` still contain seven cases and six assets; record rollback/recovery instructions.
 - [x] Run staging Security and Performance Advisors and compare with the baseline; no high-risk finding was introduced.
 - [x] Commit the initial migration and DB tests; the profile-array validation follow-up is included in the current local branch and must be committed before Task 2 is locally complete.
@@ -82,6 +83,8 @@
 - [x] Extract the existing token hashing/expiry/revocation service without changing PIN limits or Case behavior; retain the current auth module as a compatibility surface.
 - [x] Implement the Member-only Edge Function and service with server-side validation, list payload limits, `401`/`404`/`409` semantics, and no direct browser database key.
 - [x] Run focused auth/API tests and existing Case API auth tests to GREEN.
+- [x] Exercise the real shared Staff auth service through Member API login and revocation; rejected read/write requests do not call protected repository methods.
+- [x] Exercise two concurrent API writes against a shared persisted-revision adapter; one writer wins and the second receives `stale_update` without changing the winner's note or revision.
 - [x] Commit the Issue-scoped API/auth changes.
 
 ### Task 4 — #163 Member Center UI
@@ -135,6 +138,8 @@
 **Interfaces:** CI runs the domain/API/DB contract tests and complete responsive browser matrix. Live proof records commit/build ID, migration version, Edge Function version, Pages URL, viewport screenshots, console/page errors, advisor comparison, and Case regression counts.
 
 - [x] Add browser coverage for Member-first and Template-first flows, retry/copy boundaries, replacement completion, and fresh context; the integrated release scenario currently uses an in-memory API adapter.
+- [x] Add regressions for routed members outside the first 100 results and keyboard focus restoration after completion/cancellation.
+- [x] Mutate current action name, level, and muscle metadata, reopen historical course detail, and verify the persisted planned/performed snapshots remain the displayed record.
 - [x] Create and archive the unique non-sensitive release-test member after the real database flow is verified.
 - [x] Run all local Python tests, schema/build checks, all Node tests, all JS syntax checks, all Playwright tests, and Case/F111/Body/Conditioning/HYROX regressions.
 - [x] Run Security/Performance Advisors, execute anon-denial checks, and verify the persisted Member API flow on the isolated free database project.
@@ -146,6 +151,6 @@
 
 - Spec coverage: #160 domain/snapshot; #161 schema/security; #162 API/auth; #163 Member Center; #164 explicit planned save; #165 execution/replacement; #166 unique context and Member-first F111; #167 responsive, security, regression, deployment, and live evidence.
 - Interface consistency: API uses the Task 1 contract; DB/RPC consumes the same names; UI reads the API and does not derive context; #167 runs only after #163–#166.
-- Review Focus tests cover unknown phase, idempotent retry, stale updates, immutable performed snapshots, and invalid/revoked auth.
+- Review Focus coverage includes unknown phases, API idempotency replay, persisted staging RPC replay, two writers sharing a revision, historical metadata changes, and real Staff-session revocation with zero protected writes.
 - Scope: Case Library stays independent, F111 Resolver is not modified, and no CRM/AI/recovery-score work is introduced.
 - Environment baseline: current repo is `origin/master` at `0f373db`; local Python default is 3.9.6 but CI-compatible Python 3.13 passes all 256 baseline tests. Production Supabase ref is `ynsodlyanpmixbbxblqh`, PostgreSQL 17.6.1.166, with no existing development branch; baseline Security Advisor has three existing INFO findings and Performance Advisor is empty.

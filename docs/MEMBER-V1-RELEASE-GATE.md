@@ -9,7 +9,7 @@ Status: **local implementation, regression gates, and the free isolated Supabase
 - Python 3.13 full suite on 2026-09-28: **276 passed**.
 - Node runtime suite: **97 `tests/*_test.js` files passed**.
 - Node built-in ESM suite: **8 passed**.
-- Playwright Chromium suite on 2026-09-28: **130 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
+- Playwright Chromium suite on 2026-09-28 after fresh-review fixes: **133 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
 - Standalone Member V1 integrated browser gate: **1 passed**.
 - System data build freshness: **PASS** (`python tools/build_system_data.py --check`).
 - Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`, Python 3.13).
@@ -17,6 +17,9 @@ Status: **local implementation, regression gates, and the free isolated Supabase
 - Member and Case Edge Function bundle builds: **PASS**.
 - `git diff --check`: **PASS**.
 - Independent review regressions: delayed archive and restore responses do not replace a different active route; a delayed Member-first fallback lookup cannot override an explicit member choice. Both tests failed against the prior behavior and pass after the fix.
+- Fresh whole-branch review fixes: a routed Member outside the first 100 now preselects and saves; closing a completed or cancelled session restores focus to its rebuilt timeline trigger. Both defects were reproduced before the fix; the new browser tests passed afterward.
+- Review Focus automation: the API test composes the real shared Staff auth service with Member API login/revocation and checks rejected reads/writes never reach the repository; concurrent API updates share revision 1 and assert one winner plus an unchanged winner after the losing `stale_update`.
+- Historical metadata regression: the release browser gate mutates current action names, levels, and primary muscles, reopens the stored course, and verifies planned/performed snapshots remain unchanged.
 - Responsive screenshots were captured for Member detail, course detail, and Member-first F111 at the full viewport matrix below; Member list and Save-to-Member selector were captured at 390×844 and 1280×900. The 390×844 and 1440×960 Member-first F111 captures and the 390×844 execution and archive-pagination captures were visually inspected.
 
 Screenshot directory: `/Users/ronny/.codex/visualizations/2026/09/27/01a0e289-3e47-7c31-8115-2df2010a9a44/member-v1/`.
@@ -39,6 +42,7 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - The live-staging browser had **0 console errors, 0 warnings, and 0 recorded page errors**. Width checks at 360, 390×844, 430, 1080, 1280, and 1440 showed document/body width equal to viewport width.
 - PostgreSQL catalog fixture `tests/fixtures/member-v1/anon_access.sql`: **PASS**. Anonymous direct table/RPC access is denied; RLS is enabled and no direct-access policies exist for the Member tables.
 - Additional persisted boundary checks passed: invalid training level/profile values are rejected; member deletion with history is restricted; invalid second-item insertion rolls the parent session and first item back atomically; deleting a test session cascades its items.
+- `supabase/tests/member_management_v1_release_gate.sql` ran against this Free staging database: identical planned-session replay returned the original session and left one item; a completion at revision 1 advanced to revision 2; a stale second writer at revision 1 was rejected with the winning completed session, performed snapshot, and actuals intact. A follow-up query confirmed the temporary database-gate member was removed (0 leftovers).
 - Security Advisor returned four INFO findings, all intentional “RLS enabled, no policy” notices on `case_admin_sessions`, `members`, `training_sessions`, and `training_session_items`; no higher-severity finding. Performance Advisor returned two INFO unused-index notices (`members_archived_at_idx` on the small staging table and the existing `case_admin_sessions_active_lookup_idx`); no higher-severity finding.
 - Read-only production check still returned **7 cases** and **6 case assets**. The Member migration has not been applied to production.
 - The disposable staging Staff token was revoked after the browser flow, and its browser local-storage entry was cleared.
@@ -62,6 +66,9 @@ Therefore #167 remains **pending production release**, and Epic #159 is not comp
 | Staging Security Advisor | PASS: 4 intentional INFO notices | RLS default-deny tables |
 | Staging Performance Advisor | PASS: 2 INFO unused-index notices | Small staging dataset |
 | Member API persisted-flow E2E | PASS | 2 members, 5 sessions, 30 items |
+| Staging planned-save idempotency and persisted revision gate | PASS | `supabase/tests/member_management_v1_release_gate.sql`; 0 fixture rows left |
+| Staff auth/API revoke and concurrent revision regressions | PASS | `tests/member_api_test.js` |
+| Historical action metadata snapshot regression | PASS | `tests/member-v1-release-gate_browser.spec.js` |
 | Staging responsive browser and errors | PASS: six widths; zero errors | Member-first F111 route |
 | Production migration/function | Pending | Production project unchanged |
 | GitHub verify/browser-smoke/deploy | Pending | PR/merge not yet run |

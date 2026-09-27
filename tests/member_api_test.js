@@ -47,6 +47,7 @@ async function call(api, action, options) {
 
 async function main() {
   const { createMemberApi } = await import('../supabase/functions/member-api/service.mjs');
+  const { createStaffAuthService, sha256Hex } = await import('../supabase/functions/_shared/staff-auth.mjs');
 
   let memberReads = 0;
   const unauthenticated = createMemberApi({ auth: createAuth(), repository: repository({ async listMembers() { memberReads += 1; return []; } }), now: () => NOW });
@@ -54,6 +55,41 @@ async function main() {
   assert.equal(denied.response.status, 401);
   assert.deepEqual(denied.body, { error: 'unauthorized' });
   assert.equal(memberReads, 0);
+
+  const staffRecords = new Map();
+  const staffStore = {
+    async insert(record) { staffRecords.set(record.token_hash, record); },
+    async findByHash(tokenHash) { return staffRecords.get(tokenHash) || null; },
+    async revokeByHash(tokenHash, revokedAt) {
+      const record = staffRecords.get(tokenHash);
+      if (record && !record.revoked_at) record.revoked_at = revokedAt;
+    },
+  };
+  const staffAuth = createStaffAuthService({ expectedPinHash: await sha256Hex('123456'), store: staffStore, now: () => NOW });
+  const staffLogin = await staffAuth.login('123456');
+  assert.equal(staffLogin.status, 200);
+  let staffReads = 0;
+  let staffWrites = 0;
+  const staffApi = createMemberApi({
+    auth: staffAuth, now: () => NOW,
+    repository: repository({
+      async listMembers() { staffReads += 1; return []; },
+      async saveMember(value) { staffWrites += 1; return value; },
+    }),
+  });
+  const staffToken = staffLogin.body.session.token;
+  const validStaffRead = await call(staffApi, 'list-members', { token: staffToken });
+  assert.equal(validStaffRead.response.status, 200);
+  assert.equal(staffReads, 1);
+  await staffAuth.logout(`Bearer ${staffToken}`);
+  const revokedStaffRead = await call(staffApi, 'list-members', { token: staffToken });
+  const revokedStaffWrite = await call(staffApi, 'save-member', {
+    method: 'POST', token: staffToken, body: { displayName: '不应写入', trainingLevel: 'L2' },
+  });
+  assert.equal(revokedStaffRead.response.status, 401);
+  assert.equal(revokedStaffWrite.response.status, 401);
+  assert.equal(staffReads, 1);
+  assert.equal(staffWrites, 0);
 
   let createdMember;
   const memberApi = createMemberApi({
@@ -119,6 +155,30 @@ async function main() {
   const savedSession = await call(saveSessionApi, 'save-planned-session', { method: 'POST', body: { snapshot: plannedFixture } });
   assert.equal(savedSession.response.status, 200);
   assert.deepEqual(savedSnapshot, plannedFixture);
+
+  const persistedByIntent = new Map();
+  const replayApi = createMemberApi({
+    auth: createAuth(), now: () => NOW,
+    repository: repository({
+      async getMember() { return memberFixture; },
+      async savePlannedSession(snapshot) {
+        const key = `${snapshot.session.memberId}:${snapshot.session.idempotencyKey}`;
+        const existing = persistedByIntent.get(key);
+        if (existing) return { ...existing, idempotentReplay: true };
+        const created = { sessionId: snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false };
+        persistedByIntent.set(key, created);
+        return created;
+      },
+    }),
+  });
+  const firstPlannedWrite = await call(replayApi, 'save-planned-session', { method: 'POST', body: { snapshot: plannedFixture } });
+  const replayedPlannedWrite = await call(replayApi, 'save-planned-session', { method: 'POST', body: { snapshot: plannedFixture } });
+  assert.equal(firstPlannedWrite.response.status, 200);
+  assert.equal(firstPlannedWrite.body.idempotentReplay, false);
+  assert.equal(replayedPlannedWrite.response.status, 200);
+  assert.equal(replayedPlannedWrite.body.idempotentReplay, true);
+  assert.equal(replayedPlannedWrite.body.sessionId, firstPlannedWrite.body.sessionId);
+  assert.equal(persistedByIntent.size, 1);
 
   let missingIdempotencyWrites = 0;
   const missingIdempotencyApi = createMemberApi({
@@ -268,6 +328,36 @@ async function main() {
   });
   assert.equal(stale.response.status, 409);
   assert.equal(stale.body.error, 'stale_update');
+
+  const sharedSession = { ...structuredClone(plannedFixture.session), revision: 1 };
+  let updateWriters = 0;
+  let releaseSharedRevision;
+  const bothWritersLoadedRevision = new Promise(resolve => { releaseSharedRevision = resolve; });
+  const concurrentUpdateApi = createMemberApi({
+    auth: createAuth(), now: () => NOW,
+    repository: repository({
+      async getSession() { return { session: { ...sharedSession }, items: plannedFixture.items }; },
+      async updateSession(id, expectedRevision, patch, updatedAt) {
+        updateWriters += 1;
+        if (updateWriters === 2) releaseSharedRevision();
+        await bothWritersLoadedRevision;
+        if (id !== sharedSession.id || sharedSession.revision !== expectedRevision || sharedSession.status !== 'PLANNED') return null;
+        Object.assign(sharedSession, patch, { revision: expectedRevision + 1, updatedAt });
+        return { ...sharedSession };
+      },
+    }),
+  });
+  const concurrentWrites = await Promise.all(['第一位教练更新', '第二位教练更新'].map(coachNote => call(concurrentUpdateApi, 'update-session', {
+    method: 'POST', body: { sessionId: sharedSession.id, expectedRevision: 1, patch: { coachNote } },
+  })));
+  const concurrentWinner = concurrentWrites.find(result => result.response.status === 200);
+  const concurrentLoser = concurrentWrites.find(result => result.response.status === 409);
+  assert.ok(concurrentWinner);
+  assert.equal(concurrentLoser.body.error, 'stale_update');
+  assert.equal(sharedSession.revision, 2);
+  assert.equal(sharedSession.coachNote, concurrentWinner.body.session.coachNote);
+  assert.equal(concurrentWrites.filter(result => result.response.status === 200).length, 1);
+  assert.equal(concurrentWrites.filter(result => result.response.status === 409).length, 1);
 
   let invalidDateWrites = 0;
   const invalidDateApi = createMemberApi({

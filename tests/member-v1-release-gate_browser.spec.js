@@ -192,6 +192,35 @@ test('Member-first and Template-first F111 complete the local release flow', asy
 
   await sessionDetail.locator('[data-session-detail-close]').click();
   await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
+
+  const plannedActionBeforeMetadataChange = structuredClone(plannedBefore.plannedActionSnapshot);
+  const performedActionBeforeMetadataChange = structuredClone(completedItem.performedActionSnapshot);
+  const plannedActionId = plannedBefore.plannedActionId;
+  const mutatedCatalogMetadata = await page.evaluate(({ plannedActionId: planId, performedActionId: actualId }) => {
+    Object.assign(window.V14_DATA.actions[planId], {
+      name: '目录更新后的计划动作', level: 'T1', primaryMuscles: ['新的主要肌群'],
+    });
+    Object.assign(window.V14_DATA.actions[actualId], {
+      name: '目录更新后的实际动作', level: 'T1', primaryMuscles: ['新的实际肌群'],
+    });
+    return {
+      planned: { name: window.V14_DATA.actions[planId].name, level: window.V14_DATA.actions[planId].level, primaryMuscles: window.V14_DATA.actions[planId].primaryMuscles },
+      performed: { name: window.V14_DATA.actions[actualId].name, level: window.V14_DATA.actions[actualId].level, primaryMuscles: window.V14_DATA.actions[actualId].primaryMuscles },
+    };
+  }, { plannedActionId, performedActionId: replacementActionId });
+  expect(mutatedCatalogMetadata).toEqual({
+    planned: { name: '目录更新后的计划动作', level: 'T1', primaryMuscles: ['新的主要肌群'] },
+    performed: { name: '目录更新后的实际动作', level: 'T1', primaryMuscles: ['新的实际肌群'] },
+  });
+  await page.locator(`[data-open-session-detail][data-session-id="${firstSessionId}"]`).click();
+  await expect(sessionDetail).toContainText(`计划：${plannedActionBeforeMetadataChange.name}`);
+  await expect(sessionDetail).toContainText(`实际：${performedActionBeforeMetadataChange.name}`);
+  await expect(sessionDetail).not.toContainText('目录更新后的计划动作');
+  await expect(sessionDetail).not.toContainText('目录更新后的实际动作');
+  expect(completedItem.plannedActionSnapshot).toEqual(plannedActionBeforeMetadataChange);
+  expect(completedItem.performedActionSnapshot).toEqual(performedActionBeforeMetadataChange);
+  await sessionDetail.locator('[data-session-detail-close]').click();
+
   await page.locator('[data-member-next-session]').click();
   const refreshedContext = page.locator('[data-member-first-context]');
   await expect(refreshedContext).toContainText(firstSnapshot.session.sessionTitle);

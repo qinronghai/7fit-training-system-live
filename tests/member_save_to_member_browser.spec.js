@@ -426,3 +426,35 @@ test('member selector searches the server directory beyond the first 100 members
   await dialog.locator('select').selectOption(directory[139].id);
   await expect(dialog.locator('[data-member-save-status]')).toContainText('确认会员后保存');
 });
+
+test('Member-first selector preselects a routed member outside the first 100 rows', async ({ page }) => {
+  await installStaffSession(page);
+  const directory = Array.from({ length: 140 }, (_, index) => ({
+    id: `e1000000-0000-4000-8000-${String(index + 300).padStart(12, '0')}`,
+    displayName: `会员 ${index + 1}`,
+    status: 'ACTIVE',
+  }));
+  const routedMember = directory[139];
+  const snapshots = [];
+  const calls = await mockMemberApi(page, async ({ route, action, body }) => {
+    if (action !== 'save-planned-session') throw new Error(`unexpected member API action ${action}`);
+    snapshots.push(body.snapshot);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      sessionId: body.snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false,
+    }) });
+  }, directory);
+
+  await page.goto(`/#/coach/f111?memberId=${routedMember.id}&level=L3&lower=squat&upper=horizontal_pull&core=anti_extension`);
+  await page.locator('[data-save-member-session]').click();
+  const dialog = page.locator('[data-member-save-dialog]');
+  const select = dialog.locator('[data-member-save-select]');
+  await expect(select.locator(`option[value="${routedMember.id}"]`)).toHaveCount(1);
+  await expect(select).toHaveValue(routedMember.id);
+  await expect(dialog.locator('[data-member-save-submit]')).toBeEnabled();
+  expect(calls.some(call => call.action === 'get-member' && call.memberId === routedMember.id)).toBeTruthy();
+
+  await dialog.locator('[data-member-save-submit]').click();
+  await expect(dialog.locator('[data-member-save-status]')).toContainText(`已保存到 ${routedMember.displayName} · PLANNED`);
+  expect(snapshots).toHaveLength(1);
+  expect(snapshots[0].session.memberId).toBe(routedMember.id);
+});

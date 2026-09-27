@@ -279,7 +279,7 @@
     if(target.matches('[data-member-load-more-members]')){loadMoreMembers();return;}
     if(target.matches('[data-member-detail-retry]')){void loadDetail(root);return;}
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
-    if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>{if(route?.page==='member-detail')void loadDetail(root);});return;}
+    if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
   }
 
   function bind(routeValue,root,rerender){

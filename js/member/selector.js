@@ -68,7 +68,7 @@
     node.textContent=message||'';
   }
 
-  function renderOptions(){
+  function renderOptions({refresh=true}={}){
     if(!dialog)return;
     const select=dialog.querySelector('[data-member-save-select]');
     const selected=select.value;
@@ -76,7 +76,7 @@
     select.innerHTML='<option value="">选择会员</option>'+active.map(member=>`<option value="${esc(member.id)}">${esc(member.displayName)}</option>`).join('');
     if(active.some(member=>member.id===selected))select.value=selected;
     if(!active.length&&!busy)setStatus(excludedMemberId?'没有其他可选的有效会员。':'没有找到有效会员。','info');
-    void refreshSelectionState();
+    if(refresh)void refreshSelectionState();
   }
 
   async function restoreIntentSelection(version){
@@ -93,7 +93,7 @@
         if(member&&searchAtStart&&!String(member.displayName||'').toLocaleLowerCase().includes(searchAtStart.toLocaleLowerCase()))return;
         if(member&&member.status==='ACTIVE'&&!member.archivedAt){
           members=[...members,member].sort((left,right)=>String(left.displayName||'').localeCompare(String(right.displayName||''),'zh-Hans-CN'));
-          renderOptions();
+          renderOptions({refresh:false});
         }
       }
       if(version!==memberSearchVersion||selectionAtStart!==selectionVersion||!current||current.memberId!==routedMemberId||select.value&&select.value!==routedMemberId)return;
@@ -124,7 +124,7 @@
       if(version!==memberSearchVersion||!current||current.intent?.memberId!==intent.memberId)return;
       if(!member||member.status!=='ACTIVE'||member.archivedAt|| (query&&!String(member.displayName||'').toLocaleLowerCase().includes(query)))return;
       members=[...members,member].sort((left,right)=>String(left.displayName||'').localeCompare(String(right.displayName||''),'zh-Hans-CN'));
-      renderOptions();
+      renderOptions({refresh:false});
       select.value=member.id;
       await refreshSelectionState();
     }catch(_){/* the member can still be found by directory search */}
