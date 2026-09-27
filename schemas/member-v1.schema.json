@@ -62,7 +62,7 @@
         "createdAt": { "$ref": "#/$defs/timestamp" },
         "updatedAt": { "$ref": "#/$defs/timestamp" },
         "completedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }], "description": "Required for COMPLETED and null for PLANNED or CANCELLED." },
-        "idempotencyKey": { "type": ["string", "null"], "minLength": 8, "maxLength": 200 }
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 200, "pattern": "\\S" }
       },
       "allOf": [
         {

@@ -1,8 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import {
-  createAdminAuthService,
-} from "./auth.mjs";
+import { createStaffAuthService } from "../_shared/staff-auth.mjs";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const legacyServiceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -91,7 +89,7 @@ async function sessionStore() {
   };
 }
 
-const adminAuth = createAdminAuthService({
+const adminAuth = createStaffAuthService({
   expectedPinHash: PIN_HASH,
   store: await sessionStore(),
   ttlSeconds: SESSION_TTL_SECONDS,

@@ -17,6 +17,7 @@
 - Freeze action, level, muscle, equipment/station, and prescription metadata when the session is saved or replaced.
 - Canonical load phases are `PRIMARY`, `SECONDARY`, `ACCESSORY`, `CORE`, and `CONDITIONING`; `FOAM`, `PREP`, `MOBILITY`, and unknown phases do not count as primary repetition signals.
 - Member tables stay separate from `cases` / `case_assets`; archive members instead of deleting training history.
+- Every persisted planned-session snapshot carries a stable idempotency key so retries after a lost response or page refresh return the original session.
 - All Member tables enable RLS; `anon` and `authenticated` receive no Member-data grants or policies; server keys stay in Edge Function secrets.
 - Staff authentication rejects missing, expired, or revoked sessions and preserves the current Case Admin login protections.
 - Member context is advisory only; do not change F111 Resolver behavior, presets, or ordinary no-member F111 flow.
@@ -60,7 +61,7 @@
 
 **Files:** Create a CLI-generated migration under `supabase/migrations/`, `tests/test_member_migration_contract.py`, `tests/fixtures/member-v1/anon_access.sql`, and `docs/MEMBER-V1-DATABASE.md`.
 
-**Interfaces:** Tables are `public.members`, `public.training_sessions`, and `public.training_session_items`; atomic save/complete/cancel RPCs consume Task 1 field names and `schemaVersion=1`. Use `revision` for optimistic concurrency and `(member_id, idempotency_key)` for retry identity.
+**Interfaces:** Tables are `public.members`, `public.training_sessions`, and `public.training_session_items`; atomic save/complete/cancel RPCs consume Task 1 field names and `schemaVersion=1`. Use `revision` for optimistic concurrency and a required `(member_id, idempotency_key)` pair for retry identity.
 
 - [ ] Write failing migration-contract tests for the three tables, fields, FKs, indexes, status/phase checks, completed-at consistency, archive preservation, explicit role grants, and RLS.
 - [ ] Run focused tests and verify RED.
@@ -76,12 +77,12 @@
 
 **Interfaces:** Actions cover member list/get/save/archive/restore, session list/get/save-planned/update/complete/cancel, and `get-member-training-context`. Errors use stable codes and HTTP statuses. Session writes call Task 2 atomic RPCs; updates require expected revision.
 
-- [ ] Add failing tests for auth, validation, CRUD, atomic RPC invocation, idempotency, stale revisions, allowed/forbidden transitions, and error redaction.
-- [ ] Verify RED before implementation.
-- [ ] Extract the existing token hashing/expiry/revocation service without changing PIN limits or Case behavior; retain the current auth module as a compatibility surface.
-- [ ] Implement the Member-only Edge Function and service with server-side validation, list payload limits, `401`/`404`/`409` semantics, and no direct browser database key.
-- [ ] Run focused auth/API tests and existing Case API auth tests to GREEN.
-- [ ] Commit the Issue-scoped API/auth changes.
+- [x] Add failing tests for auth, validation, CRUD, atomic RPC invocation, idempotency, stale revisions, allowed/forbidden transitions, and error redaction.
+- [x] Verify RED before implementation.
+- [x] Extract the existing token hashing/expiry/revocation service without changing PIN limits or Case behavior; retain the current auth module as a compatibility surface.
+- [x] Implement the Member-only Edge Function and service with server-side validation, list payload limits, `401`/`404`/`409` semantics, and no direct browser database key.
+- [x] Run focused auth/API tests and existing Case API auth tests to GREEN.
+- [x] Commit the Issue-scoped API/auth changes.
 
 ### Task 4 — #163 Member Center UI
 

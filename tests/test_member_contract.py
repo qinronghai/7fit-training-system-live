@@ -87,6 +87,24 @@ def test_schema_rejects_completed_session_without_completion_timestamp():
     assert errors(session)
 
 
+def test_schema_rejects_empty_goal_key_and_impossible_calendar_date():
+    member = load_fixture("member-active.json")
+    member["primaryGoal"] = ""
+    assert errors(member)
+
+    session = load_fixture("f111-training-session.json")["session"]
+    session["idempotencyKey"] = ""
+    assert errors(session)
+
+    session = load_fixture("f111-training-session.json")["session"]
+    session["idempotencyKey"] = None
+    assert errors(session)
+
+    session = load_fixture("f111-training-session.json")["session"]
+    session["sessionDate"] = "2026-02-31"
+    assert errors(session)
+
+
 def test_schema_keeps_unknown_phase_explicit_and_non_load_bearing():
     planned = load_fixture("f111-training-session.json")
     item = dict(planned["items"][0])

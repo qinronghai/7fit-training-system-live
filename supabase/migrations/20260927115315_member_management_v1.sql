@@ -41,7 +41,7 @@ create table public.training_sessions (
   member_copy_text text,
   coach_note text,
   schema_version integer not null default 1,
-  idempotency_key text,
+  idempotency_key text not null,
   request_fingerprint text,
   completion_fingerprint text,
   revision integer not null default 1,
@@ -70,8 +70,8 @@ create table public.training_sessions (
     or (status <> 'COMPLETED' and completed_at is null)
   ),
   constraint training_sessions_idempotency_fingerprint_check check (
-    (idempotency_key is null and request_fingerprint is null)
-    or (idempotency_key is not null and request_fingerprint is not null)
+    length(idempotency_key) between 8 and 200
+    and request_fingerprint is not null
   ),
   constraint training_sessions_completion_fingerprint_check check (
     (status = 'COMPLETED' and completion_fingerprint is not null)
@@ -205,7 +205,10 @@ begin
 
   v_session_id := (v_session->>'id')::uuid;
   v_member_id := (v_session->>'memberId')::uuid;
-  v_idempotency_key := nullif(v_session->>'idempotencyKey', '');
+  v_idempotency_key := v_session->>'idempotencyKey';
+  if v_idempotency_key is null or length(v_idempotency_key) < 8 or length(v_idempotency_key) > 200 then
+    raise exception using errcode = '22023', message = 'MEMBER_INVALID_SNAPSHOT';
+  end if;
   v_fingerprint := pg_catalog.md5(p_snapshot::text);
 
   select status, archived_at

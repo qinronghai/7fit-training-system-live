@@ -11,6 +11,6 @@ Migration `20260927115315_member_management_v1.sql` adds the Member tables and s
 
 ## Access Boundary
 
-The tables have RLS enabled and no browser policies. `PUBLIC`, `anon`, and `authenticated` have no Member table or RPC grants. The Edge Function's `service_role` performs server-side reads and writes after Staff session validation; no server key belongs in the static browser bundle.
+The tables have RLS enabled and no browser policies. `PUBLIC`, `anon`, and `authenticated` have no Member table or RPC grants. Every planned session requires an 8–200 character idempotency key, unique per member; a retry with the same key and snapshot returns the original session. The Edge Function's `service_role` performs server-side reads and writes after Staff session validation; no server key belongs in the static browser bundle.
 
 Run `tests/fixtures/member-v1/anon_access.sql` after applying the migration to verify the grants, policies, and RLS flags against the target database.

@@ -40,12 +40,13 @@ def test_member_fields_archive_and_level_constraints_match_contract():
 def test_session_status_revision_and_retry_constraints():
     sql = compact(migration_text())
     sessions = sql.split("create table public.training_sessions", 1)[1].split(");", 1)[0]
-    for column in ["member_id uuid not null", "session_date date not null", "status text not null", "template_key text not null", "template_version text", "level_snapshot text", "session_title text not null", "focus_snapshot jsonb not null", "resolved_session_snapshot jsonb not null", "schema_version integer not null", "idempotency_key text", "revision integer not null", "completed_at timestamptz", "completion_fingerprint text"]:
+    for column in ["member_id uuid not null", "session_date date not null", "status text not null", "template_key text not null", "template_version text", "level_snapshot text", "session_title text not null", "focus_snapshot jsonb not null", "resolved_session_snapshot jsonb not null", "schema_version integer not null", "idempotency_key text not null", "revision integer not null", "completed_at timestamptz", "completion_fingerprint text"]:
         assert column in sessions
     assert "status in ('planned', 'completed', 'cancelled')" in sessions
     assert "(status = 'completed' and completed_at is not null) or (status <> 'completed' and completed_at is null)" in sessions
     assert "create unique index" in sql and "(member_id, idempotency_key)" in sql
     assert "revision > 0" in sessions
+    assert "length(idempotency_key) between 8 and 200" in sessions
     assert "completion_fingerprint is not null" in sessions
 
 

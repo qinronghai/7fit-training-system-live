@@ -55,7 +55,9 @@ function validTimestamp(value) {
 }
 
 function validDate(value) {
-  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00Z`));
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
 
 function validUuid(value) {
@@ -96,6 +98,7 @@ export function validateMember(value) {
   if (!['ACTIVE', 'INACTIVE'].includes(value.status)) errors.push('status: expected ACTIVE or INACTIVE');
   if (value.trainingLevel !== null && value.trainingLevel !== undefined && !TRAINING_LEVELS.has(value.trainingLevel)) errors.push('trainingLevel: expected L1-L4 or null');
   optionalString(value.primaryGoal, 'primaryGoal', errors, 240);
+  if (typeof value.primaryGoal === 'string' && !value.primaryGoal.length) errors.push('primaryGoal: expected non-empty string or null');
   validateTrainingProfile(value.trainingProfile, errors);
   optionalString(value.coachNotes, 'coachNotes', errors);
   if (!validTimestamp(value.createdAt)) errors.push('createdAt: expected ISO timestamp');
@@ -141,8 +144,8 @@ export function validateTrainingSession(value) {
   } else if (value.completedAt !== undefined && value.completedAt !== null) {
     errors.push('completedAt: must be null unless status is COMPLETED');
   }
-  optionalString(value.idempotencyKey, 'idempotencyKey', errors, 200);
-  if (value.idempotencyKey && value.idempotencyKey.length < 8) errors.push('idempotencyKey: minimum length is 8');
+  requiredString(value.idempotencyKey, 'idempotencyKey', errors, 200);
+  if (typeof value.idempotencyKey === 'string' && value.idempotencyKey.length < 8) errors.push('idempotencyKey: minimum length is 8');
   return result(errors);
 }
 
@@ -272,6 +275,9 @@ export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
   for (const key of ['sessionId', 'memberId', 'sessionDate', 'createdAt', 'updatedAt']) {
     if (typeof options[key] !== 'string' || !options[key]) throw Object.assign(new TypeError(`${key} is required to build a stable session snapshot.`), { code: 'INVALID_SNAPSHOT_INPUT' });
   }
+  if (typeof options.idempotencyKey !== 'string' || options.idempotencyKey.trim().length < 8 || options.idempotencyKey.length > 200) {
+    throw Object.assign(new TypeError('idempotencyKey must be a stable string between 8 and 200 characters.'), { code: 'INVALID_SNAPSHOT_INPUT' });
+  }
   if (!validUuid(options.sessionId) || !validUuid(options.memberId)) throw Object.assign(new TypeError('sessionId and memberId must be UUIDs.'), { code: 'INVALID_SNAPSHOT_INPUT' });
   if (!Array.isArray(options.itemIds) || options.itemIds.length !== resolvedSession.main.content.length || options.itemIds.some(id => !validUuid(id))) {
     throw Object.assign(new TypeError('itemIds must contain one UUID for each ResolvedSession slot.'), { code: 'INVALID_SNAPSHOT_INPUT' });
@@ -298,7 +304,7 @@ export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
     createdAt: options.createdAt,
     updatedAt: options.updatedAt,
     completedAt: null,
-    idempotencyKey: options.idempotencyKey || null,
+    idempotencyKey: options.idempotencyKey,
   };
   const items = resolvedSession.main.content.map((slot, sortOrder) => {
     if (!slot || typeof slot.actionId !== 'string' || !slot.actionId) throw Object.assign(new TypeError(`ResolvedSession slot ${sortOrder} has no actionId.`), { code: 'INVALID_RESOLVED_SESSION' });

@@ -35,8 +35,12 @@ async function main() {
   replaced.items.forEach(item => assert.equal(domain.validateTrainingSessionItem(item).ok, true));
 
   assert.equal(domain.validateMember({ ...member, status: 'ARCHIVED' }).ok, false);
+  assert.equal(domain.validateMember({ ...member, primaryGoal: '' }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, status: 'CANCELLED', completedAt: '2026-09-27T10:00:00.000Z' }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, status: 'COMPLETED', completedAt: null }).ok, false);
+  assert.equal(domain.validateTrainingSession({ ...planned.session, sessionDate: '2026-02-31' }).ok, false);
+  assert.equal(domain.validateTrainingSession({ ...planned.session, idempotencyKey: '' }).ok, false);
+  assert.equal(domain.validateTrainingSession({ ...planned.session, idempotencyKey: null }).ok, false);
 
   const phaseCases = [
     ['A', 'PRIMARY'], ['B', 'SECONDARY'], ['SUPPORT', 'ACCESSORY'],
@@ -69,6 +73,16 @@ async function main() {
     sessionDate: planned.session.sessionDate,
     createdAt: planned.session.createdAt,
     updatedAt: planned.session.updatedAt,
+    actionsById: window.V14_DATA.actions,
+    anatomyById: window.V14_ANATOMY.records,
+  }), error => error.code === 'INVALID_SNAPSHOT_INPUT');
+  assert.throws(() => domain.buildTrainingSessionSnapshot(actualResolved, {
+    sessionId: planned.session.id,
+    memberId: planned.session.memberId,
+    sessionDate: planned.session.sessionDate,
+    createdAt: planned.session.createdAt,
+    updatedAt: planned.session.updatedAt,
+    itemIds: planned.items.map(item => item.id),
     actionsById: window.V14_DATA.actions,
     anatomyById: window.V14_ANATOMY.records,
   }), error => error.code === 'INVALID_SNAPSHOT_INPUT');
