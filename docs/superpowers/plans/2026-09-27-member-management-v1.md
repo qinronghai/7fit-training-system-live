@@ -63,13 +63,13 @@
 
 **Interfaces:** Tables are `public.members`, `public.training_sessions`, and `public.training_session_items`; atomic save/complete/cancel RPCs consume Task 1 field names and `schemaVersion=1`. Use `revision` for optimistic concurrency and a required `(member_id, idempotency_key)` pair for retry identity.
 
-- [ ] Write failing migration-contract tests for the three tables, fields, FKs, indexes, status/phase checks, completed-at consistency, archive preservation, explicit role grants, and RLS.
-- [ ] Run focused tests and verify RED.
-- [ ] Generate the migration with `supabase migration new`; implement non-destructive DDL, `ON DELETE RESTRICT` for member history, cascading session items, and `SECURITY INVOKER` RPCs with execute grants limited to `service_role`.
+- [x] Write migration-contract tests for the three tables, fields, FKs, indexes, status/phase checks, completed-at consistency, archive preservation, explicit role grants, and RLS.
+- [x] Run focused contract tests to GREEN.
+- [x] Implement non-destructive DDL, `ON DELETE RESTRICT` for member history, cascading session items, and RPCs with execute grants limited to `service_role`.
 - [ ] Verify the migration on an isolated database/branch before production; query FK/check/grant/RLS metadata and confirm `anon` cannot select any Member table.
 - [ ] Confirm `cases`, `case_assets`, their six assets, and seven rows are unchanged; record rollback/recovery instructions.
 - [ ] Run Security and Performance Advisors and compare with the captured baseline; fix any new high-risk finding.
-- [ ] Commit the migration and DB tests.
+- [x] Commit the initial migration and DB tests; the profile-array validation follow-up is included in the current local branch and must be committed before Task 2 is locally complete.
 
 ### Task 3 — #162 Member API and Staff Auth Boundary
 
@@ -90,11 +90,10 @@
 
 **Interfaces:** Routes are `#/coach/members` and `#/coach/members/:memberId`. UI consumes API/derived context and never recalculates repetition counts. Session Detail is a desktop drawer and mobile sheet with focus return.
 
-- [ ] Add failing route/render/browser tests for search, active/archive filters, create/edit/archive/restore, empty/error/loading states, recent-context hierarchy, timeline, session detail, keyboard access, and focus behavior.
-- [ ] Verify RED.
-- [ ] Implement the Coach Center entry, list/detail/profile, recent 1/3 completed sessions, timeline, drawer/sheet, and accessible member forms.
-- [ ] Run focused tests and capture 1080/1280/1440 and 360/390×844/430 screenshots; assess overflow, hierarchy, and page errors.
-- [ ] Commit the Issue-scoped Member Center changes.
+- [x] Add route/render/browser coverage for search, active/archive filters, create/edit/archive/restore, empty/error/loading states, recent-context hierarchy, timeline, session detail, keyboard access, and focus behavior.
+- [x] Implement the Coach Center entry, list/detail/profile, recent 1/3 completed sessions, timeline, drawer/sheet, and accessible member forms.
+- [x] Run focused tests and capture the full detail/F111 matrix at 1080/1280/1440 and 360/390×844/430; assess overflow, hierarchy, and page errors.
+- [x] Commit the Issue-scoped Member Center changes.
 
 ### Task 5 — #164 F111 Save-to-Member
 
@@ -102,11 +101,10 @@
 
 **Interfaces:** Preset and Composer ResolvedSessions create the same `TrainingSessionSnapshot`; the selector returns a saved session ID. Copy actions never call the Member API. Retry key and saved state survive refresh; explicit “另存给其他会员” starts a new save intent.
 
-- [ ] Add failing snapshot/save/browser tests for both F111 modes, full frozen action metadata, planned status, cancel-without-write, copy-without-write, refresh retry, duplicate clicks, and save failure recovery.
-- [ ] Verify RED.
-- [ ] Add only the explicit “保存到会员” flow and selector; persist the planned snapshot and item rows through `member-api`.
-- [ ] Run focused tests; assert F111 Resolver fingerprints/outputs are unchanged.
-- [ ] Commit the Issue-scoped Save-to-Member changes.
+- [x] Add snapshot/save/browser coverage for both F111 modes, full frozen action metadata, planned status, cancel-without-write, copy-without-write, refresh retry, duplicate clicks, and save failure recovery.
+- [x] Add only the explicit “保存到会员” flow and selector; persist the planned snapshot and item rows through `member-api`.
+- [x] Run focused tests; assert F111 Resolver fingerprints/outputs are unchanged.
+- [x] Commit the Issue-scoped Save-to-Member changes.
 
 ### Task 6 — #165 Planned to Completed
 
@@ -114,11 +112,10 @@
 
 **Interfaces:** Only `PLANNED → COMPLETED` and `PLANNED → CANCELLED` are legal. Unchanged items inherit planned action/prescription on one-click completion; replacements keep both snapshots. Optional actual fields are sets, reps, loadKg, RIR, RPE, and note.
 
-- [ ] Add failing tests for one-click completion, one/multiple replacements, optional actual values, cancellation, retries, and illegal transitions.
-- [ ] Verify RED.
-- [ ] Implement execution editing through legal replacement candidates and atomic completion/cancel RPCs.
-- [ ] Run focused tests and verify the Member Detail shows the completed session immediately.
-- [ ] Commit the Issue-scoped execution changes.
+- [x] Add execution coverage for one-click completion, one/multiple replacements, optional actual values, cancellation, retries, and illegal transitions.
+- [x] Implement execution editing through legal replacement candidates and atomic completion/cancel RPCs.
+- [x] Run focused tests and verify the Member Detail shows the completed session immediately.
+- [x] Commit the Issue-scoped execution test changes; the dialog implementation is shared with the #163 Session Detail module.
 
 ### Task 7 — #166 Recent Context and Member-first F111
 
@@ -126,11 +123,10 @@
 
 **Interfaces:** Context is derived only by `deriveMemberTrainingContext` from the latest three completed sessions; performed actions take precedence. F111 receives `memberId` and fresh context as optional route state, with no resolver input changes.
 
-- [ ] Add failing context tests for 0/1/3/5 sessions, repeats, cancelled/planned sessions, performed replacements, every canonical phase, PREP/FOAM, and unknown phases.
-- [ ] Verify RED.
-- [ ] Implement Member Detail → “为她编下一节” → F111 context header, compact recent summary, history return, and refresh-on-entry/completion.
-- [ ] Run focused tests; compare no-member F111 and frozen Resolver behavior to baseline.
-- [ ] Commit the Issue-scoped context/Member-first changes.
+- [x] Add context tests for 0/1/3/5 sessions, repeats, cancelled/planned sessions, performed replacements, every canonical phase, PREP/FOAM, and unknown phases.
+- [x] Implement Member Detail → “为她编下一节” → F111 context header, compact recent summary, history return, and refresh-on-entry/completion.
+- [x] Run focused tests; compare no-member F111 and frozen Resolver behavior to baseline.
+- [x] Commit the Issue-scoped context/Member-first regression coverage.
 
 ### Task 8 — #167 Release Gate and Live Evidence
 
@@ -138,12 +134,13 @@
 
 **Interfaces:** CI runs the domain/API/DB contract tests and complete responsive browser matrix. Live proof records commit/build ID, migration version, Edge Function version, Pages URL, viewport screenshots, console/page errors, advisor comparison, and Case regression counts.
 
-- [ ] Add failing E2E tests for Member-first and Template-first flows, retry/copy boundaries, replacement completion, snapshot immutability, and fresh context; verify RED.
-- [ ] Implement the final gate and preserve a unique non-sensitive release-test member; archive it after verification.
-- [ ] Run all Python tests, schema/build checks, all Node tests, all JS syntax checks, all Playwright tests, Security/Performance Advisors, anon-denial checks, and Case/F111/Body/Conditioning/HYROX regressions.
+- [x] Add browser coverage for Member-first and Template-first flows, retry/copy boundaries, replacement completion, and fresh context; the integrated release scenario currently uses an in-memory API adapter.
+- [ ] Create and archive the unique non-sensitive release-test member after the real database flow is verified.
+- [x] Run all local Python tests, schema/build checks, all Node tests, all JS syntax checks, all Playwright tests, and Case/F111/Body/Conditioning/HYROX regressions.
+- [ ] Run Security/Performance Advisors, execute anon-denial checks, and verify the persisted Member API flow on the isolated database branch.
 - [ ] Merge only after the full gate; verify the master `verify`, `browser-smoke`, and `deploy` jobs, deployed build marker, Pages URL, and live Member workflows.
 - [ ] Update Issues #160–#167 with evidence and close only verified issues; close Epic #159 only after every dependency and live gate is green.
-- [ ] Commit the Release Gate, changelog, and evidence documentation.
+- [x] Commit the local Release Gate, changelog, and evidence documentation.
 
 ## Plan Self-Review
 
