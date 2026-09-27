@@ -66,9 +66,9 @@
 - [x] Write migration-contract tests for the three tables, fields, FKs, indexes, status/phase checks, completed-at consistency, archive preservation, explicit role grants, and RLS.
 - [x] Run focused contract tests to GREEN.
 - [x] Implement non-destructive DDL, `ON DELETE RESTRICT` for member history, cascading session items, and RPCs with execute grants limited to `service_role`.
-- [ ] Verify the migration on an isolated database/branch before production; query FK/check/grant/RLS metadata and confirm `anon` cannot select any Member table.
-- [ ] Confirm `cases`, `case_assets`, their six assets, and seven rows are unchanged; record rollback/recovery instructions.
-- [ ] Run Security and Performance Advisors and compare with the captured baseline; fix any new high-risk finding.
+- [x] Verify the migration on an isolated database before production; query FK/check/grant/RLS metadata and confirm `anon` cannot select any Member table.
+- [x] Confirm production `cases` and `case_assets` still contain seven cases and six assets; record rollback/recovery instructions.
+- [x] Run staging Security and Performance Advisors and compare with the baseline; no high-risk finding was introduced.
 - [x] Commit the initial migration and DB tests; the profile-array validation follow-up is included in the current local branch and must be committed before Task 2 is locally complete.
 
 ### Task 3 — #162 Member API and Staff Auth Boundary
@@ -135,9 +135,9 @@
 **Interfaces:** CI runs the domain/API/DB contract tests and complete responsive browser matrix. Live proof records commit/build ID, migration version, Edge Function version, Pages URL, viewport screenshots, console/page errors, advisor comparison, and Case regression counts.
 
 - [x] Add browser coverage for Member-first and Template-first flows, retry/copy boundaries, replacement completion, and fresh context; the integrated release scenario currently uses an in-memory API adapter.
-- [ ] Create and archive the unique non-sensitive release-test member after the real database flow is verified.
+- [x] Create and archive the unique non-sensitive release-test member after the real database flow is verified.
 - [x] Run all local Python tests, schema/build checks, all Node tests, all JS syntax checks, all Playwright tests, and Case/F111/Body/Conditioning/HYROX regressions.
-- [ ] Run Security/Performance Advisors, execute anon-denial checks, and verify the persisted Member API flow on the isolated database branch.
+- [x] Run Security/Performance Advisors, execute anon-denial checks, and verify the persisted Member API flow on the isolated free database project.
 - [ ] Merge only after the full gate; verify the master `verify`, `browser-smoke`, and `deploy` jobs, deployed build marker, Pages URL, and live Member workflows.
 - [ ] Update Issues #160–#167 with evidence and close only verified issues; close Epic #159 only after every dependency and live gate is green.
 - [x] Commit the local Release Gate, changelog, and evidence documentation.

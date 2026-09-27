@@ -1,15 +1,16 @@
 # Member Management V1 Release Gate
 
-Status: **local implementation and regression gates pass; the release gate is not yet complete.** This record separates checks that ran in the isolated worktree from checks that require an isolated Supabase branch and a live deployment.
+Status: **local implementation, regression gates, and the free isolated Supabase staging gate pass; production release is still pending.**
 
 ## Local Evidence
 
 - Workspace: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS`
 - Branch base: `0f373dbdd9babae5eef5a6dd1caad47f889daf96` (`origin/master` at start)
-- Python 3.13 full suite after review fixes on 2026-09-28: **276 passed**.
+- Python 3.13 full suite on 2026-09-28: **276 passed**.
 - Node runtime suite: **97 `tests/*_test.js` files passed**.
 - Node built-in ESM suite: **8 passed**.
-- Playwright Chromium suite after review fixes: **130 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
+- Playwright Chromium suite on 2026-09-28: **130 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
+- Standalone Member V1 integrated browser gate: **1 passed**.
 - System data build freshness: **PASS** (`python tools/build_system_data.py --check`).
 - Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`, Python 3.13).
 - JavaScript syntax gate: **PASS** (`rg --files -g '*.js' data js | xargs -r -n1 node --check`).
@@ -20,34 +21,49 @@ Status: **local implementation and regression gates pass; the release gate is no
 
 Screenshot directory: `/Users/ronny/.codex/visualizations/2026/09/27/01a0e289-3e47-7c31-8115-2df2010a9a44/member-v1/`.
 
+Additional live-staging Member-first F111 capture: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS/output/playwright/member-v1-f111-member-context-mobile.png` (390×844).
+
 Full-matrix viewport coverage: 360, 390×844, 430, 1080, 1280, and 1440 pixels wide. Screenshots are local review evidence and are not live deployment evidence.
 
-The integrated Playwright release scenario uses an in-memory mock Member API. It verifies Member-first and Template-first flows, planned save, cancellation of the selector without a write, action replacement, completion, and refreshed context at the browser layer. It does **not** prove database persistence, server authentication, PostgreSQL authorization, or a live release.
+The CI Playwright tests use an in-memory Member API. The separate browser run below proves persistence and staff authentication against the real staging Edge Function and PostgreSQL database.
 
-## Supabase and Live Gates Still Required
+## Isolated Free Supabase Staging Evidence
 
-- The Member migration `20260927115315_member_management_v1.sql` has **not** been applied to any database.
-- No development branch has been created. The branch list contains only the default `main`. The project and organization are resolved, and the `$0.01344/hour` default Micro quote was refreshed and cost confirmation recorded on 2026-09-28. Branch creation was rejected with `PaymentRequiredException: Branching is supported only on the Pro plan or above`; Supabase documents preview branching as a Pro feature. The `$9.81` estimate for 730 hours covers base compute only: preview branches can also incur disk, egress, and storage usage, and branching usage is not covered by the Spend Cap. See [Supabase plan and branching requirements](https://supabase.com/docs/guides/deployment), [branching costs](https://supabase.com/docs/guides/platform/manage-your-usage/branching), and [compute usage](https://supabase.com/docs/guides/platform/manage-your-usage/compute).
-- A local Supabase/PostgreSQL substitute is unavailable on this host: the Supabase CLI, Docker, and PostgreSQL executables are not installed. No migration has been executed against a database.
-- The `tests/fixtures/member-v1/anon_access.sql` catalog assertions have **not** been executed against PostgreSQL.
-- Security and Performance Advisors have **not** been run against a database containing the Member schema.
-- `member-api` has **not** been deployed to a development branch, exercised against persisted Member records, or deployed to production.
-- The live test-member lifecycle, migration version, Edge Function version, Pages build marker, live URL, and live console/page-error checks remain unverified.
-- GitHub Actions has **not** run for this unpushed branch. The CI workflows include the Member contract gate and integrated browser gate for the eventual PR/release run.
-- Production Supabase and GitHub Pages have not been changed by this worktree.
+- Organization plan: **Free**. Isolated staging project: `7fit-member-v1-staging`, ref `wxvyjfvhyoudoxjuwlcp`, region `ap-southeast-1`, PostgreSQL `17.6.1.166`, status `ACTIVE_HEALTHY`.
+- Staging is a separate free project because Supabase preview branches require Pro; no paid branch was created. Production project `7fit-real-results` (`ynsodlyanpmixbbxblqh`) was not migrated or otherwise written to.
+- Applied staging migrations: remote version `20260927165952` (`member_management_v1`) and `20260927170340` (`case_admin_sessions`). The Member schema is the additive migration in `supabase/migrations/20260927115315_member_management_v1.sql`.
+- Deployed staging Edge Function: `member-api` version **1**, `verify_jwt=false` with the existing custom Staff session authentication enforced by the function.
+- Real API/browser flow: list/create member, save a planned F111 session, replace a planned action with the performed action, complete the session, refresh the Member detail and F111 context, and cancel a separate template-first session. Browser requests carried the Staff bearer token only; no Supabase API key was sent by the browser.
+- Persisted staging data after the run: 2 non-sensitive test members, 5 sessions (3 `COMPLETED`, 2 `CANCELLED`, 0 `PLANNED`), and 30 session items. The UI-created release-gate member was archived after verification; its completed history and replacement action remain visible.
+- The real completed-session detail showed planned `哑铃高脚杯深蹲` and performed `壶铃高脚杯深蹲`, 3×10 at 20 kg, RIR 2, RPE 8, with its note. The next F111 route showed that completed session and performed action as recent context.
+- The live-staging browser had **0 console errors, 0 warnings, and 0 recorded page errors**. Width checks at 360, 390×844, 430, 1080, 1280, and 1440 showed document/body width equal to viewport width.
+- PostgreSQL catalog fixture `tests/fixtures/member-v1/anon_access.sql`: **PASS**. Anonymous direct table/RPC access is denied; RLS is enabled and no direct-access policies exist for the Member tables.
+- Additional persisted boundary checks passed: invalid training level/profile values are rejected; member deletion with history is restricted; invalid second-item insertion rolls the parent session and first item back atomically; deleting a test session cascades its items.
+- Security Advisor returned four INFO findings, all intentional “RLS enabled, no policy” notices on `case_admin_sessions`, `members`, `training_sessions`, and `training_session_items`; no higher-severity finding. Performance Advisor returned two INFO unused-index notices (`members_archived_at_idx` on the small staging table and the existing `case_admin_sessions_active_lookup_idx`); no higher-severity finding.
+- Read-only production check still returned **7 cases** and **6 case assets**. The Member migration has not been applied to production.
+- The disposable staging Staff token was revoked after the browser flow, and its browser local-storage entry was cleared.
 
-Therefore #167 is **pending**, and Epic #159 is not complete. Once the branch cost is confirmed, finish the isolated database/API tests and advisor checks, then run the live release gate only after all scoped checks pass. Preserve the existing Case Library tables and records, archive the non-sensitive release-test member after verification, and record actual build and deployment identifiers here before closing any Issue.
+## Production Release Gates Still Required
+
+- Push the reviewed branch and open the PR; complete GitHub `verify` and `browser-smoke` checks.
+- After merge, apply the additive Member migration to production, deploy `member-api`, and verify the production function version and protected API behavior.
+- Confirm the master `verify`, `browser-smoke`, and `deploy` jobs pass; record the Pages URL and build marker, then verify live routes, browser errors, and Member flows.
+- Recheck production Case Library counts/data and run the production Security/Performance Advisors after the migration. Record the final migration/function/build identifiers before updating and closing Issues #160–#167 and Epic #159.
+
+Therefore #167 remains **pending production release**, and Epic #159 is not complete yet.
 
 ## Completion Record
 
 | Evidence | Result | Reference |
 | --- | --- | --- |
-| Migration version applied | Pending | — |
-| Development branch and project ref | Blocked: branch API requires Pro or above | — |
-| Anonymous table/RPC access denial | Pending database execution | `tests/fixtures/member-v1/anon_access.sql` |
-| Security Advisor | Pending | — |
-| Performance Advisor | Pending | — |
-| Member API persisted-flow E2E | Pending | — |
-| GitHub verify/browser-smoke/deploy | Pending | — |
+| Staging migration version | PASS: `20260927165952`, `20260927170340` | Free project `wxvyjfvhyoudoxjuwlcp` |
+| Isolated staging database | PASS: standalone free project | `7fit-member-v1-staging` |
+| Anonymous table/RPC access denial | PASS | `tests/fixtures/member-v1/anon_access.sql` |
+| Staging Security Advisor | PASS: 4 intentional INFO notices | RLS default-deny tables |
+| Staging Performance Advisor | PASS: 2 INFO unused-index notices | Small staging dataset |
+| Member API persisted-flow E2E | PASS | 2 members, 5 sessions, 30 items |
+| Staging responsive browser and errors | PASS: six widths; zero errors | Member-first F111 route |
+| Production migration/function | Pending | Production project unchanged |
+| GitHub verify/browser-smoke/deploy | Pending | PR/merge not yet run |
 | Pages live build marker and URL | Pending | — |
-| Live responsive screenshots and browser errors | Pending | — |
+| Production live screenshots and browser errors | Pending | — |
