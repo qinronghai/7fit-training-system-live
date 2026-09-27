@@ -212,4 +212,17 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   expect(state.snapshots[1].session.memberId).toBe(MEMBER_ID);
   expect(state.snapshots[1].session.status).toBe('PLANNED');
   expect(state.snapshots[1].session.id).not.toBe(firstSessionId);
+
+  const plannedPrescriptions = new Map(firstSnapshot.items.map(item => [item.slotKey, item.plannedPrescriptionSnapshot]));
+  expect(plannedPrescriptions.get('C').rawText).toBeTruthy();
+  expect(plannedPrescriptions.get('D1').rawText).toBeTruthy();
+  expect(plannedPrescriptions.get('D2').rawText).toBeTruthy();
+  await page.evaluate(() => {
+    Object.assign(window.V14_DATA.composer.prescriptionBySlot, {
+      C: '后续变更的支撑处方', D1: '后续变更的辅助处方', D2: '后续变更的手臂处方',
+    });
+  });
+  for (const item of state.itemsBySession[firstSessionId]) {
+    expect(item.plannedPrescriptionSnapshot).toEqual(plannedPrescriptions.get(item.slotKey));
+  }
 });

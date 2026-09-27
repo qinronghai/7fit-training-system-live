@@ -6,15 +6,17 @@ Status: **local implementation and regression gates pass; the release gate is no
 
 - Workspace: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS`
 - Branch base: `0f373dbdd9babae5eef5a6dd1caad47f889daf96` (`origin/master` at start)
-- Python 3.13 full suite: **275 passed**.
+- Python 3.13 full suite after review fixes on 2026-09-28: **276 passed**.
 - Node runtime suite: **97 `tests/*_test.js` files passed**.
 - Node built-in ESM suite: **8 passed**.
-- Playwright Chromium suite: **122 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
+- Playwright Chromium suite after review fixes: **130 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
 - System data build freshness: **PASS** (`python tools/build_system_data.py --check`).
-- Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`).
-- JavaScript syntax gate: **PASS** (`find data js -type f -name '*.js' -print0 | xargs -0 -n1 node --check`).
+- Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`, Python 3.13).
+- JavaScript syntax gate: **PASS** (`rg --files -g '*.js' data js | xargs -r -n1 node --check`).
+- Member and Case Edge Function bundle builds: **PASS**.
 - `git diff --check`: **PASS**.
-- Responsive screenshots were captured for Member detail, course detail, and Member-first F111 at the full viewport matrix below; Member list and Save-to-Member selector were captured at 390×844 and 1280×900. The 390×844 and 1440×960 Member-first F111 captures were visually inspected.
+- Independent review regressions: delayed archive and restore responses do not replace a different active route; a delayed Member-first fallback lookup cannot override an explicit member choice. Both tests failed against the prior behavior and pass after the fix.
+- Responsive screenshots were captured for Member detail, course detail, and Member-first F111 at the full viewport matrix below; Member list and Save-to-Member selector were captured at 390×844 and 1280×900. The 390×844 and 1440×960 Member-first F111 captures and the 390×844 execution and archive-pagination captures were visually inspected.
 
 Screenshot directory: `/Users/ronny/.codex/visualizations/2026/09/27/01a0e289-3e47-7c31-8115-2df2010a9a44/member-v1/`.
 
@@ -25,7 +27,7 @@ The integrated Playwright release scenario uses an in-memory mock Member API. It
 ## Supabase and Live Gates Still Required
 
 - The Member migration `20260927115315_member_management_v1.sql` has **not** been applied to any database.
-- No development branch has been created. The project and organization must be resolved and the branch cost quoted and confirmed before branch creation.
+- No development branch has been created. The read-only branch check returned no branches; the project and organization are resolved. For `ap-southeast-1`, the quoted default Micro compute cost is `$0.01344/hour` (about `$9.81` for 730 compute hours, before other metered usage). User cost confirmation is pending before branch creation. See [Supabase branching costs](https://supabase.com/docs/guides/platform/manage-your-usage/branching) and [compute usage](https://supabase.com/docs/guides/platform/manage-your-usage/compute).
 - The `tests/fixtures/member-v1/anon_access.sql` catalog assertions have **not** been executed against PostgreSQL.
 - Security and Performance Advisors have **not** been run against a database containing the Member schema.
 - `member-api` has **not** been deployed to a development branch, exercised against persisted Member records, or deployed to production.
