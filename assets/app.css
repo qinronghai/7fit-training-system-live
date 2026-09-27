@@ -2161,6 +2161,8 @@ body{font-size:14px;line-height:1.55}
 .member-state-empty h3,.member-state-error p{margin:0;font-size:14px;font-weight:850}
 .member-state-empty p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
 .member-state-error p{color:#8b2834}
+.member-auth-recovery{display:block;color:#8b2834;font-size:12px;line-height:1.55}
+.member-auth-recovery a{color:var(--purple-dark);font-weight:800;text-underline-offset:2px}
 .member-inline-error{margin-inline-start:8px;color:#8b2834;font-size:11px}
 .member-back-link{width:fit-content;color:var(--purple-dark);font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
 .member-detail-heading{align-items:center;padding-bottom:5px}
@@ -2242,6 +2244,7 @@ body{font-size:14px;line-height:1.55}
 .member-session-execution-heading>div{display:grid;gap:4px;min-width:0}
 .member-session-execution-heading span{color:var(--muted);font-size:10px}
 .member-session-execution-heading strong{font-size:13px;overflow-wrap:anywhere}
+.member-session-planned-prescription{margin:0;color:#433c4c;font-size:12px;font-weight:750;line-height:1.5}
 .member-session-replacement,.member-session-actual-grid>label{display:grid;gap:5px;min-width:0;font-size:10px;font-weight:800}
 .member-session-replacement select,.member-session-actual-grid input,.member-session-actual-grid textarea{width:100%;min-width:0;min-height:38px;padding:8px 9px;border:1px solid #d9d5e1;border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:12px}
 .member-session-actual-grid textarea{min-height:58px;resize:vertical;line-height:1.5}

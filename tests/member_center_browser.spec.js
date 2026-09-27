@@ -72,14 +72,22 @@ async function mockMemberApi(page, state = {}) {
 
     if (action === 'list-members') {
       if (state.listWait) await state.listWait;
+      if (state.unauthorizedList) return respond({ error: 'unauthorized' }, 401);
       if (state.failList) return respond({ error: 'network_unavailable' }, 503);
       const search = (url.searchParams.get('search') || '').toLocaleLowerCase();
-      const includeArchived = url.searchParams.get('includeArchived') === 'true';
-      const results = state.members.filter(value => (includeArchived || (value.status === 'ACTIVE' && !value.archivedAt))
-        && value.displayName.toLocaleLowerCase().includes(search));
-      return respond({ members: results.slice(0, Number(url.searchParams.get('limit')) || 100) });
+      const status = url.searchParams.get('status') || (url.searchParams.get('includeArchived') === 'true' ? 'ALL' : 'ACTIVE');
+      const offset = Number(url.searchParams.get('offset')) || 0;
+      const results = state.members.filter(value => (status === 'ALL'
+        || (status === 'ACTIVE' && value.status === 'ACTIVE' && !value.archivedAt)
+        || (status === 'ARCHIVED' && !!value.archivedAt)
+        || (status === 'INACTIVE' && value.status === 'INACTIVE' && !value.archivedAt))
+        && value.displayName.toLocaleLowerCase().includes(search))
+        .sort((left, right) => left.displayName.localeCompare(right.displayName));
+      return respond({ members: results.slice(offset, offset + (Number(url.searchParams.get('limit')) || 100)) });
     }
     if (action === 'get-member') {
+      if (state.memberWait) await state.memberWait;
+      if (state.failMember) return respond({ error: 'unauthorized' }, 401);
       const value = state.members.find(row => row.id === url.searchParams.get('memberId'));
       return value ? respond({ member: value }) : respond({ error: 'member_not_found' }, 404);
     }
@@ -90,6 +98,7 @@ async function mockMemberApi(page, state = {}) {
       return respond({ member: value });
     }
     if (action === 'archive-member' || action === 'restore-member') {
+      if (state.mutationWaits?.[action]) await state.mutationWaits[action];
       const value = state.members.find(row => row.id === body.id);
       if (!value) return respond({ error: 'member_not_found' }, 404);
       Object.assign(value, action === 'archive-member'
@@ -99,7 +108,7 @@ async function mockMemberApi(page, state = {}) {
     }
     if (action === 'get-member-training-context') {
       if (state.contextWait) await state.contextWait;
-      if (state.failContext) return respond({ error: 'network_unavailable' }, 503);
+      if (state.failContext) return respond({ error: state.unauthorizedContext ? 'unauthorized' : 'network_unavailable' }, state.unauthorizedContext ? 401 : 503);
       const value = Object.hasOwn(state, 'context') ? state.context : context;
       return respond({ context: { ...value, memberId: url.searchParams.get('memberId') } });
     }
@@ -167,7 +176,74 @@ test('Member Center searches active members on the server and switches to the ar
   await page.locator('[data-member-search]').fill('');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
   await expect(page.getByText('王同学')).toBeVisible();
-  expect(state.calls.some(call => call.action === 'list-members' && call.query.includeArchived === 'true')).toBeTruthy();
+  expect(state.calls.some(call => call.action === 'list-members' && call.query.status === 'ARCHIVED')).toBeTruthy();
+});
+
+test('member status filtering happens before paging and archived members beyond the first page are reachable', async ({ page }, testInfo) => {
+  const active = Array.from({ length: 105 }, (_, index) => member(
+    `e5000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    `Active ${String(index + 1).padStart(3, '0')}`,
+  ));
+  const archived = Array.from({ length: 105 }, (_, index) => member(
+    `e6000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    `Archived ${String(index + 1).padStart(3, '0')}`,
+    'INACTIVE', '2026-09-20T00:00:00.000Z',
+  ));
+  const state = await mockMemberApi(page, { members: [...active, ...archived] });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/members');
+  await expect(page.locator('[data-member-row]')).toHaveCount(100);
+  await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await expect(page.locator('[data-member-row]')).toHaveCount(100);
+  await expect(page.getByText('Archived 001')).toBeVisible();
+  const loadMore = page.locator('[data-member-load-more-members]');
+  await expect(loadMore).toBeVisible();
+  await loadMore.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('member-archive-pagination-390x844.png') });
+  await loadMore.click();
+  await expect(page.locator('[data-member-row]')).toHaveCount(105);
+  await expect(page.getByText('Archived 105')).toBeVisible();
+  expect(state.calls.some(call => call.action === 'list-members'
+    && call.query.status === 'ARCHIVED' && call.query.offset === '100')).toBeTruthy();
+});
+
+test('expired staff sessions offer PIN verification recovery from both the member list and detail', async ({ page }) => {
+  const state = await mockMemberApi(page, { unauthorizedList: true, failMember: true });
+  await page.goto('/#/coach/members');
+  let recovery = page.locator('[data-member-auth-recovery]');
+  await expect(recovery).toContainText('馆主管理 PIN 验证');
+  await expect(recovery.locator('[data-member-auth-link]')).toHaveAttribute('target', '_blank');
+  await expect(page.locator('[data-member-retry]')).toBeVisible();
+  page.memberConsoleErrors=[];
+
+  state.unauthorizedList = false;
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await page.locator('[data-member-retry]').click();
+  await expect(page.locator(`[data-member-row="${MEMBER_ID}"]`)).toBeVisible();
+
+  await page.evaluate(memberId => { location.hash = `#/coach/members/${memberId}`; }, MEMBER_ID);
+  recovery = page.locator('[data-member-auth-recovery]');
+  await expect(recovery).toContainText('馆主管理 PIN 验证');
+  await expect(page.locator('[data-member-detail-retry]')).toBeVisible();
+  page.memberConsoleErrors=[];
+  state.failMember = false;
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await page.locator('[data-member-detail-retry]').click();
+  await expect(page.getByRole('heading', { name: '林同学' })).toBeVisible();
+});
+
+test('a late member detail response cannot replace the page after navigating away', async ({ page }) => {
+  let releaseMember;
+  const memberWait = new Promise(resolve => { releaseMember = resolve; });
+  const state = await mockMemberApi(page, { memberWait });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await expect.poll(() => state.calls.some(call => call.action === 'get-member')).toBeTruthy();
+
+  await page.evaluate(() => { location.hash = '#/coach/f111?level=L3&lower=squat&upper=horizontal_pull&core=anti_extension'; });
+  await expect(page.locator('[data-save-member-session]')).toBeVisible();
+  releaseMember();
+  await expect(page.locator('[data-member-center-page]')).toHaveCount(0);
+  await expect(page.locator('[data-save-member-session]')).toBeVisible();
 });
 
 test('Coach Center exposes the Member Training entry in its existing workflow', async ({ page }) => {
@@ -207,6 +283,42 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await page.locator('[data-member-restore]').click();
   await expect(page.locator('[data-member-archive]')).toBeVisible();
   expect(state.calls.some(call => call.action === 'restore-member')).toBeTruthy();
+});
+
+test('a delayed archive response cannot rerender Coach Home over another area', async ({ page }) => {
+  let releaseArchive;
+  const archiveWait = new Promise(resolve => { releaseArchive = resolve; });
+  const state = await mockMemberApi(page, { mutationWaits: { 'archive-member': archiveWait } });
+  await page.goto('/#/coach/members');
+  await page.locator(`[data-member-archive="${MEMBER_ID}"]`).click();
+  const dialog = page.locator('[data-member-archive-dialog]');
+  await dialog.locator('[data-member-archive-confirm]').click();
+  await expect.poll(() => state.calls.filter(call => call.action === 'archive-member')).toHaveLength(1);
+  await dialog.locator('[data-member-archive-cancel]').click();
+  await page.goto('/#/library');
+  await expect(page.locator('#page-title')).toHaveText('搜索');
+
+  releaseArchive();
+  await expect.poll(() => state.members.find(value => value.id === MEMBER_ID)?.archivedAt).toBeTruthy();
+  await expect(page.locator('#page-title')).toHaveText('搜索');
+  await expect(page.locator('#app-main .coach-member-entry')).toHaveCount(0);
+});
+
+test('a delayed restore response cannot rerender Coach Home over another area', async ({ page }) => {
+  let releaseRestore;
+  const restoreWait = new Promise(resolve => { releaseRestore = resolve; });
+  const state = await mockMemberApi(page, { mutationWaits: { 'restore-member': restoreWait } });
+  await page.goto('/#/coach/members');
+  await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await page.locator(`[data-member-restore="${ARCHIVED_ID}"]`).click();
+  await expect.poll(() => state.calls.filter(call => call.action === 'restore-member')).toHaveLength(1);
+  await page.goto('/#/library');
+  await expect(page.locator('#page-title')).toHaveText('搜索');
+
+  releaseRestore();
+  await expect.poll(() => state.members.find(value => value.id === ARCHIVED_ID)?.archivedAt).toBeNull();
+  await expect(page.locator('#page-title')).toHaveText('搜索');
+  await expect(page.locator('#app-main .coach-member-entry')).toHaveCount(0);
 });
 
 test('Member detail leads with recent training context and opens session detail with keyboard focus return', async ({ page }) => {
@@ -249,13 +361,17 @@ test('Member with no completed history can still enter F111 at her training leve
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
 
-test('A planned session can be completed in one action with planned items preserved', async ({ page }) => {
+test('A planned session can be completed in one action with planned items preserved', async ({ page }, testInfo) => {
   const state = await mockMemberApi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/#/coach/members/${MEMBER_ID}`);
   await page.locator(`[data-open-session-detail][data-session-id="${sessionSummaries[0].id}"]`).click();
   const detail = page.locator('[data-member-session-detail]');
   await expect(detail).toBeVisible();
-  await expect(detail.locator('[data-session-execution]')).toBeVisible();
+  const execution = detail.locator('[data-session-execution]');
+  await expect(execution).toBeVisible();
+  await expect(execution.locator('[data-session-planned-prescription]')).toContainText('计划处方：4 组 × 8 次');
+  await page.screenshot({ path: testInfo.outputPath('member-session-execution-390x844.png') });
   await detail.locator('[data-session-complete]').click();
 
   await expect(detail).toContainText('已完成');
@@ -416,6 +532,21 @@ test('Member-first F111 remains usable and can retry when context loading fails'
   await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
   await expect(panel).toContainText('全身塑形');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
+});
+
+test('Member-first F111 offers PIN verification recovery when the staff session expires', async ({ page }) => {
+  const state = await mockMemberApi(page, { failContext: true, unauthorizedContext: true });
+  await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
+  const panel = page.locator('[data-member-first-context]');
+  await expect(panel.getByRole('alert')).toContainText('教练登录已失效');
+  await expect(panel.locator('[data-member-auth-link]')).toHaveAttribute('target', '_blank');
+  page.memberConsoleErrors=[];
+  state.failContext = false;
+  state.unauthorizedContext = false;
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await panel.locator('[data-member-context-retry]').click();
+  await expect(panel).toContainText('全身塑形');
+  page.memberConsoleErrors=[];
 });
 
 test('Member-first F111 reloads context after leaving Coach for another area', async ({ page }) => {

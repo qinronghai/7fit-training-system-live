@@ -37,6 +37,7 @@
     return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
   }
   function renderRoute(route){
+    window.V14CoachModules?.MemberCenter?.routeChanged?.(route);
     if(!isF111ComposerRoute(route))window.V14CoachModules?.ComposerView?.resetMemberContextBinding?.();
     const main=document.getElementById('app-main');
     if(!window.V14Router.isValid(route)){

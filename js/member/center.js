@@ -4,7 +4,7 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const LIMIT=100;
   const SESSION_PAGE_SIZE=30;
-  let route=null,query='',filter='ACTIVE',listVersion=0,detailVersion=0,listTimer=null,formReturnFocus=null,archiveTarget=null,membersById=new Map(),currentMember=null,currentContext=null,currentSessions=[],timelineHasMore=false,timelineLoading=false,timelineLoadError=false;
+  let route=null,routeVersion=0,query='',filter='ACTIVE',listVersion=0,detailVersion=0,listTimer=null,formReturnFocus=null,archiveTarget=null,membersById=new Map(),listRows=[],listHasMore=false,listLoadingMore=false,listMoreError=false,listMoreAuthError=false,currentMember=null,currentContext=null,currentSessions=[],timelineHasMore=false,timelineLoading=false,timelineLoadError=false;
 
   function dateLabel(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)?value.replaceAll('-','.'):esc(value||'日期未记录');}
   function statusLabel(status){return ({ACTIVE:'有效会员',INACTIVE:'已停用',PLANNED:'待训练',COMPLETED:'已完成',CANCELLED:'已取消'})[status]||'状态未知';}
@@ -21,19 +21,58 @@
     return `<article class="member-directory-row" data-member-row="${esc(member.id)}"><div class="member-row-main"><a data-member-open="${esc(member.id)}" href="#/coach/members/${encodeURIComponent(member.id)}">${esc(member.displayName)}</a><p>${meta.map(esc).join(' · ')}</p></div><span class="member-row-status ${member.archivedAt?'archived':''}">${member.archivedAt?'已归档':statusLabel(member.status)}</span><div class="member-row-actions">${member.archivedAt?`<button type="button" data-member-restore="${esc(member.id)}">恢复会员</button>`:`<button type="button" data-member-edit="${esc(member.id)}">编辑资料</button><button type="button" data-member-archive="${esc(member.id)}">归档</button>`}</div></article>`;
   }
 
-  function renderListResults(rows){
+  function renderListResults(rows,hasMore=listHasMore){
     const visible=rows.filter(member=>filter==='ACTIVE'?member.status==='ACTIVE'&&!member.archivedAt:filter==='ARCHIVED'?!!member.archivedAt:member.status==='INACTIVE'&&!member.archivedAt);
     visible.forEach(member=>membersById.set(member.id,member));
     if(!visible.length){
       const title=query?'没有找到匹配的会员':filter==='ARCHIVED'?'还没有归档会员':filter==='INACTIVE'?'没有停用会员':'还没有会员记录';
       return `<div class="member-state-empty" data-member-empty><h3>${title}</h3><p>${query?'试试输入完整姓名或减少搜索条件。':'创建会员后，可以从这里进入她的训练记录。'}</p>${filter==='ACTIVE'?'<button type="button" data-member-create>新增会员</button>':''}</div>`;
     }
-    return `<div class="member-directory-list">${visible.map(memberRow).join('')}</div><p class="member-list-count">显示 ${visible.length} 位会员</p>`;
+    const moreError=listMoreError?`<p class="member-load-more-error" role="alert">${listMoreAuthError?staffRecoveryMarkup():'更多会员暂时无法读取，请重试。'}</p>`:'';
+    const moreButton=hasMore?`<button class="member-load-more" type="button" data-member-load-more-members${listLoadingMore?' disabled':''}>${listLoadingMore?'正在加载…':listMoreError?'重试加载':'加载更多会员'}</button>`:'';
+    return `<div class="member-directory-list">${visible.map(memberRow).join('')}</div><p class="member-list-count">显示 ${visible.length} 位会员</p>${moreError}${moreButton}`;
   }
 
-  function showListError(){
+  function staffRecoveryMarkup(){
+    return '<span class="member-auth-recovery" data-member-auth-recovery>教练登录已失效。请在新标签页完成馆主管理 PIN 验证，然后返回此页重试。 <a data-member-auth-link href="assets/real-results/index.html?admin=1" target="_blank" rel="noopener">打开教练验证</a></span>';
+  }
+
+  function showListError(error){
     const target=document.querySelector('[data-member-results]');
-    if(target)target.innerHTML='<div class="member-state-error" data-member-error><p>会员列表暂时无法读取。</p><button type="button" data-member-retry>重试</button></div>';
+    if(target)target.innerHTML=`<div class="member-state-error" data-member-error role="alert">${error?.status===401?staffRecoveryMarkup():'<p>会员列表暂时无法读取。</p>'}<button type="button" data-member-retry>重试</button></div>`;
+  }
+
+  async function loadMemberListPage(version,{append=false}={}){
+    try{
+      const offset=append?listRows.length:0;
+      const rows=await window.V14MemberAPI.listMembers({search:query,status:filter,limit:LIMIT,offset});
+      if(version!==listVersion||route?.page!=='member-list')return;
+      const pageRows=Array.isArray(rows)?rows:[];
+      if(append){
+        const known=new Set(listRows.map(member=>member.id));
+        listRows.push(...pageRows.filter(member=>!known.has(member.id)));
+      }else listRows=pageRows;
+      listHasMore=pageRows.length===LIMIT;
+      listLoadingMore=false;listMoreError=false;listMoreAuthError=false;
+      const result=document.querySelector('[data-member-results]');
+      if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+    }catch(error){
+      if(version!==listVersion||route?.page!=='member-list')return;
+      listLoadingMore=false;
+      if(append){
+        listMoreError=true;listMoreAuthError=error?.status===401;
+        const result=document.querySelector('[data-member-results]');
+        if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+      }else showListError(error);
+    }
+  }
+
+  function loadMoreMembers(){
+    if(listLoadingMore||!listHasMore||route?.page!=='member-list')return;
+    listLoadingMore=true;listMoreError=false;listMoreAuthError=false;
+    const result=document.querySelector('[data-member-results]');
+    if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+    void loadMemberListPage(listVersion,{append:true});
   }
 
   function scheduleListLoad(delay=160){
@@ -42,16 +81,10 @@
     query=search.value.trim();
     const version=++listVersion;
     clearTimeout(listTimer);
+    listRows=[];listHasMore=false;listLoadingMore=false;listMoreError=false;listMoreAuthError=false;
     const target=document.querySelector('[data-member-results]');
     if(target)target.innerHTML='<p class="member-state-loading" data-member-loading>正在加载会员…</p>';
-    listTimer=setTimeout(async()=>{
-      try{
-        const rows=await window.V14MemberAPI.listMembers({search:query,includeArchived:filter!=='ACTIVE',limit:LIMIT});
-        if(version!==listVersion||route?.page!=='member-list')return;
-        const result=document.querySelector('[data-member-results]');
-        if(result)result.innerHTML=renderListResults(Array.isArray(rows)?rows:[]);
-      }catch(_){if(version===listVersion&&route?.page==='member-list')showListError();}
-    },delay);
+    listTimer=setTimeout(()=>{void loadMemberListPage(version);},delay);
   }
 
   function contextMarkup(context){
@@ -102,7 +135,7 @@
     }catch(error){
       if(version!==detailVersion)return;
       const loading=root.querySelector('[data-member-loading]');
-      if(loading)loading.outerHTML=`<div class="member-state-error" data-member-detail-error><p>${error?.status===404?'没有找到这位会员。':'会员训练记录暂时无法读取。'}</p><button type="button" data-member-detail-retry>重试</button></div>`;
+      if(loading)loading.outerHTML=`<div class="member-state-error" data-member-detail-error role="alert">${error?.status===401?staffRecoveryMarkup():`<p>${error?.status===404?'没有找到这位会员。':'会员训练记录暂时无法读取。'}</p>`}<button type="button" data-member-detail-retry>重试</button></div>`;
     }
   }
 
@@ -185,7 +218,8 @@
       dialog.close();
       if(route?.page==='member-detail')rerender();else scheduleListLoad(0);
     }catch(error){
-      errorNode.textContent=error?.status===401?'教练登录已失效，请重新验证后再保存。':error?.code==='invalid_member'?'会员资料未通过校验，请检查姓名和每项信息的长度。':'保存失败，请检查网络后重试。';
+      if(error?.status===401)errorNode.innerHTML=`${staffRecoveryMarkup()}<span>验证完成后返回此页，再次保存资料。</span>`;
+      else errorNode.textContent=error?.code==='invalid_member'?'会员资料未通过校验，请检查姓名和每项信息的长度。':'保存失败，请检查网络后重试。';
       errorNode.hidden=false;
     }finally{button.disabled=false;button.textContent=form.dataset.memberId?'保存修改':'保存资料';}
   }
@@ -200,18 +234,31 @@
 
   async function archiveMember(root,rerender){
     if(!archiveTarget)return;
+    const startedRouteVersion=routeVersion,startedInMemberView=route?.area==='coach'&&['member-list','member-detail'].includes(route.page);
     const dialog=root.querySelector('[data-member-archive-dialog]'),button=dialog.querySelector('[data-member-archive-confirm]');
     button.disabled=true;button.textContent='正在归档…';
     try{
       await window.V14MemberAPI.archiveMember(archiveTarget.id);
-      dialog.close();archiveTarget=null;rerender();
-    }catch(_){dialog.querySelector('[data-member-archive-copy]').textContent='归档失败，历史记录未变更。请检查网络后重试。';}
+      dialog.close();archiveTarget=null;
+      if(startedInMemberView&&startedRouteVersion===routeVersion&&route?.area==='coach'&&['member-list','member-detail'].includes(route.page))rerender();
+    }catch(error){
+      const copy=dialog.querySelector('[data-member-archive-copy]');
+      if(error?.status===401)copy.innerHTML=`${staffRecoveryMarkup()}<span>验证后返回此页，再次归档。</span>`;
+      else copy.textContent='归档失败，历史记录未变更。请检查网络后重试。';
+    }
     finally{button.disabled=false;button.textContent='确认归档';}
   }
 
   async function restoreMember(id,rerender){
-    try{await window.V14MemberAPI.restoreMember(id);rerender();}
-    catch(_){const target=document.querySelector(`[data-member-restore="${CSS.escape(id)}"]`);if(target)target.insertAdjacentHTML('afterend','<span class="member-inline-error" role="alert">恢复失败，请重试。</span>');}
+    const startedRouteVersion=routeVersion,startedInMemberView=route?.area==='coach'&&['member-list','member-detail'].includes(route.page);
+    try{
+      await window.V14MemberAPI.restoreMember(id);
+      if(startedInMemberView&&startedRouteVersion===routeVersion&&route?.area==='coach'&&['member-list','member-detail'].includes(route.page))rerender();
+    }
+    catch(error){
+      const target=document.querySelector(`[data-member-restore="${CSS.escape(id)}"]`);
+      if(target)target.insertAdjacentHTML('afterend',error?.status===401?`<span class="member-inline-error" role="alert">${staffRecoveryMarkup()}</span>`:'<span class="member-inline-error" role="alert">恢复失败，请重试。</span>');
+    }
   }
 
   function handleClick(event,root,rerender){
@@ -229,6 +276,7 @@
     if(target.matches('[data-member-archive-confirm]')){void archiveMember(root,rerender);return;}
     if(target.matches('[data-member-restore]')){void restoreMember(target.dataset.memberRestore,rerender);return;}
     if(target.matches('[data-member-retry]')){scheduleListLoad(0);return;}
+    if(target.matches('[data-member-load-more-members]')){loadMoreMembers();return;}
     if(target.matches('[data-member-detail-retry]')){void loadDetail(root);return;}
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
     if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>{if(route?.page==='member-detail')void loadDetail(root);});return;}
@@ -258,7 +306,20 @@
     return renderDetailShell();
   }
 
-  const module={render,bind};
+  function routeChanged(nextRoute){
+    const next=nextRoute||null;
+    const currentRouteKey=route?[route.area,route.page,route.memberId||''].join('|'):'';
+    const nextRouteKey=next?[next.area,next.page,next.memberId||''].join('|'):'';
+    if(currentRouteKey!==nextRouteKey)routeVersion++;
+    const leavingList=route?.page==='member-list'&&nextRoute?.page!=='member-list';
+    const leavingDetail=route?.page==='member-detail'
+      &&(nextRoute?.page!=='member-detail'||nextRoute.memberId!==route.memberId);
+    if(leavingList){listVersion++;clearTimeout(listTimer);listTimer=null;}
+    if(leavingDetail)detailVersion++;
+    route=next;
+  }
+
+  const module={render,bind,routeChanged};
   window.V14CoachModules=window.V14CoachModules||{};
   window.V14CoachModules.MemberCenter=module;
 })();
