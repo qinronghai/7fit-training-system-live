@@ -112,3 +112,24 @@ def test_schema_keeps_unknown_phase_explicit_and_non_load_bearing():
     assert errors(item) == []
     item["phase"] = "MAGIC"
     assert errors(item)
+
+
+def test_profile_and_prescription_limits_are_frozen_in_schema():
+    member = load_fixture("member-active.json")
+    member["trainingProfile"]["movementConstraints"] = ["knee"] * 41
+    assert errors(member)
+
+    member = load_fixture("member-active.json")
+    member["trainingProfile"]["movementConstraints"] = ["x" * 241]
+    assert errors(member)
+
+    member = load_fixture("member-active.json")
+    member["trainingProfile"]["preferredEquipment"] = ["dumbbell"] * 81
+    assert errors(member)
+
+    planned = load_fixture("f111-training-session.json")
+    planned["items"][0]["sets"] = 101
+    assert errors(planned["items"][0])
+    planned = load_fixture("f111-training-session.json")
+    planned["items"][0]["plannedPrescriptionSnapshot"]["sets"] = 101
+    assert errors(planned["items"][0])

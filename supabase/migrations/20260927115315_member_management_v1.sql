@@ -1,3 +1,26 @@
+create or replace function public.member_jsonb_string_array_is_valid(p_value jsonb, p_max_items integer, p_max_length integer)
+returns boolean
+language sql
+immutable
+parallel safe
+set search_path = ''
+as $member_jsonb_string_array_is_valid$
+  select case
+    when pg_catalog.jsonb_typeof(p_value) is distinct from 'array' then false
+    when pg_catalog.jsonb_array_length(p_value) > p_max_items then false
+    else not exists (
+      select 1
+      from pg_catalog.jsonb_array_elements(p_value) as item(value)
+      where pg_catalog.jsonb_typeof(item.value) <> 'string'
+        or pg_catalog.length(pg_catalog.btrim(item.value #>> '{}')) = 0
+        or pg_catalog.length(item.value #>> '{}') > p_max_length
+    )
+  end;
+$member_jsonb_string_array_is_valid$;
+
+revoke all on function public.member_jsonb_string_array_is_valid(jsonb, integer, integer) from public, anon, authenticated;
+grant execute on function public.member_jsonb_string_array_is_valid(jsonb, integer, integer) to service_role;
+
 create table public.members (
   id uuid primary key default gen_random_uuid(),
   schema_version integer not null default 1,
@@ -21,7 +44,19 @@ create table public.members (
     and training_profile ?& array['schemaVersion', 'experienceLevel', 'movementConstraints', 'preferredEquipment', 'notes']
     and (training_profile - array['schemaVersion', 'experienceLevel', 'movementConstraints', 'preferredEquipment', 'notes']::text[]) = '{}'::jsonb
     and pg_catalog.jsonb_typeof(training_profile->'movementConstraints') = 'array'
+    and case
+      when pg_catalog.jsonb_typeof(training_profile->'movementConstraints') = 'array'
+      then pg_catalog.jsonb_array_length(training_profile->'movementConstraints') <= 40
+      else false
+    end
+    and public.member_jsonb_string_array_is_valid(training_profile->'movementConstraints', 40, 240)
     and pg_catalog.jsonb_typeof(training_profile->'preferredEquipment') = 'array'
+    and case
+      when pg_catalog.jsonb_typeof(training_profile->'preferredEquipment') = 'array'
+      then pg_catalog.jsonb_array_length(training_profile->'preferredEquipment') <= 80
+      else false
+    end
+    and public.member_jsonb_string_array_is_valid(training_profile->'preferredEquipment', 80, 120)
     and (training_profile->'experienceLevel' = 'null'::jsonb or training_profile->>'experienceLevel' in ('BEGINNER', 'INTERMEDIATE', 'ADVANCED'))
     and (pg_catalog.jsonb_typeof(training_profile->'notes') in ('null', 'string'))
   )
@@ -58,7 +93,17 @@ create table public.training_sessions (
     pg_catalog.jsonb_typeof(focus_snapshot) = 'object'
     and focus_snapshot->>'schemaVersion' = '1'
     and pg_catalog.jsonb_typeof(focus_snapshot->'patterns') = 'array'
+    and case
+      when pg_catalog.jsonb_typeof(focus_snapshot->'patterns') = 'array'
+      then pg_catalog.jsonb_array_length(focus_snapshot->'patterns') <= 120
+      else false
+    end
     and pg_catalog.jsonb_typeof(focus_snapshot->'primaryMuscles') = 'array'
+    and case
+      when pg_catalog.jsonb_typeof(focus_snapshot->'primaryMuscles') = 'array'
+      then pg_catalog.jsonb_array_length(focus_snapshot->'primaryMuscles') <= 120
+      else false
+    end
   ),
   constraint training_sessions_resolved_snapshot_check check (
     pg_catalog.jsonb_typeof(resolved_session_snapshot) = 'object'
@@ -114,6 +159,23 @@ create table public.training_session_items (
     performed_prescription is null
     or (pg_catalog.jsonb_typeof(performed_prescription) = 'object' and performed_prescription->>'schemaVersion' = '1')
   ),
+  constraint training_session_items_prescription_sets_check check (
+    case
+      when pg_catalog.jsonb_typeof(planned_prescription_snapshot->'sets') = 'null' then true
+      when pg_catalog.jsonb_typeof(planned_prescription_snapshot->'sets') = 'number' then
+        (planned_prescription_snapshot->>'sets')::numeric between 0 and 100
+        and (planned_prescription_snapshot->>'sets')::numeric = pg_catalog.trunc((planned_prescription_snapshot->>'sets')::numeric)
+      else false
+    end
+    and case
+      when performed_prescription is null then true
+      when pg_catalog.jsonb_typeof(performed_prescription->'sets') = 'null' then true
+      when pg_catalog.jsonb_typeof(performed_prescription->'sets') = 'number' then
+        (performed_prescription->>'sets')::numeric between 0 and 100
+        and (performed_prescription->>'sets')::numeric = pg_catalog.trunc((performed_prescription->>'sets')::numeric)
+      else false
+    end
+  ),
   constraint training_session_items_planned_action_pair_check check (
     (planned_action_id is null and planned_action_snapshot is null)
     or (planned_action_id is not null and pg_catalog.jsonb_typeof(planned_action_snapshot) = 'object' and planned_action_snapshot->>'schemaVersion' = '1' and planned_action_snapshot->>'actionId' = planned_action_id)
@@ -123,7 +185,7 @@ create table public.training_session_items (
     or (performed_action_id is not null and pg_catalog.jsonb_typeof(performed_action_snapshot) = 'object' and performed_action_snapshot->>'schemaVersion' = '1' and performed_action_snapshot->>'actionId' = performed_action_id)
   ),
   constraint training_session_items_actual_values_check check (
-    (sets is null or sets >= 0)
+    (sets is null or sets between 0 and 100)
     and (load_kg is null or load_kg >= 0)
     and (rir is null or rir between 0 and 10)
     and (rpe is null or rpe between 0 and 10)

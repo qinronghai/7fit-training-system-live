@@ -36,11 +36,16 @@ async function main() {
 
   assert.equal(domain.validateMember({ ...member, status: 'ARCHIVED' }).ok, false);
   assert.equal(domain.validateMember({ ...member, primaryGoal: '' }).ok, false);
+  assert.equal(domain.validateMember({ ...member, trainingProfile: { ...member.trainingProfile, movementConstraints: Array.from({ length: 41 }, () => 'knee') } }).ok, false);
+  assert.equal(domain.validateMember({ ...member, trainingProfile: { ...member.trainingProfile, movementConstraints: ['x'.repeat(241)] } }).ok, false);
+  assert.equal(domain.validateMember({ ...member, trainingProfile: { ...member.trainingProfile, preferredEquipment: Array.from({ length: 81 }, () => 'dumbbell') } }).ok, false);
+  assert.equal(domain.validateMember({ ...member, trainingProfile: { ...member.trainingProfile, preferredEquipment: ['x'.repeat(121)] } }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, status: 'CANCELLED', completedAt: '2026-09-27T10:00:00.000Z' }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, status: 'COMPLETED', completedAt: null }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, sessionDate: '2026-02-31' }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, idempotencyKey: '' }).ok, false);
   assert.equal(domain.validateTrainingSession({ ...planned.session, idempotencyKey: null }).ok, false);
+  assert.equal(domain.validateTrainingSession({ ...planned.session, focusSnapshot: { ...planned.session.focusSnapshot, patterns: Array.from({ length: 121 }, () => 'squat') } }).ok, false);
 
   const phaseCases = [
     ['A', 'PRIMARY'], ['B', 'SECONDARY'], ['SUPPORT', 'ACCESSORY'],
@@ -94,6 +99,13 @@ async function main() {
   assert(replacedItem, 'fixture must preserve both sides of a replaced action');
   assert.notDeepEqual(replacedItem.plannedActionSnapshot, replacedItem.performedActionSnapshot);
   assert.equal(domain.validateTrainingSessionItem({ ...replacedItem, performedActionId: 'different-action' }).ok, false);
+  assert.equal(domain.validateTrainingSessionItem({ ...planned.items[0], sets: 101 }).ok, false);
+  assert.equal(domain.validateTrainingSessionItem({ ...planned.items[0], plannedPrescriptionSnapshot: { ...planned.items[0].plannedPrescriptionSnapshot, sets: 101 } }).ok, false);
+  assert.equal(domain.validateTrainingSessionItem({ ...planned.items[0], plannedPrescriptionSnapshot: { ...planned.items[0].plannedPrescriptionSnapshot, tempo: 'x'.repeat(81) } }).ok, false);
+  assert.equal(domain.validateTrainingSessionItem({
+    ...planned.items[0],
+    plannedActionSnapshot: { ...planned.items[0].plannedActionSnapshot, primaryMuscles: Array.from({ length: 121 }, () => 'quadriceps') },
+  }).ok, false);
 
   const unknownPhaseItem = {
     ...replaced.items[0], id: 'member-v1-session-unknown-item', phase: 'UNKNOWN', plannedActionId: 'unknown-action',

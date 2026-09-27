@@ -72,6 +72,15 @@ function result(errors) {
   return { ok: errors.length === 0, errors };
 }
 
+function validateStringList(value, path, errors, { maxItems = 120, maxLength = 120 } = {}) {
+  if (!Array.isArray(value)) {
+    errors.push(`${path}: expected string array`);
+    return;
+  }
+  if (value.length > maxItems) errors.push(`${path}: too many items`);
+  value.forEach((item, index) => requiredString(item, `${path}[${index}]`, errors, maxLength));
+}
+
 function validateTrainingProfile(value, errors) {
   if (!isRecord(value)) {
     errors.push('trainingProfile: expected object');
@@ -81,10 +90,8 @@ function validateTrainingProfile(value, errors) {
   requireKeys(value, PROFILE_KEYS, 'trainingProfile', errors);
   if (value.schemaVersion !== 1) errors.push('trainingProfile.schemaVersion: expected 1');
   if (value.experienceLevel !== null && value.experienceLevel !== undefined && !['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].includes(value.experienceLevel)) errors.push('trainingProfile.experienceLevel: invalid value');
-  for (const key of ['movementConstraints', 'preferredEquipment']) {
-    if (!Array.isArray(value[key])) errors.push(`trainingProfile.${key}: expected array`);
-    else if (value[key].some(item => typeof item !== 'string' || !item.trim())) errors.push(`trainingProfile.${key}: expected non-empty strings`);
-  }
+  validateStringList(value.movementConstraints, 'trainingProfile.movementConstraints', errors, { maxItems: 40, maxLength: 240 });
+  validateStringList(value.preferredEquipment, 'trainingProfile.preferredEquipment', errors, { maxItems: 80, maxLength: 120 });
   optionalString(value.notes, 'trainingProfile.notes', errors, 2000);
 }
 
@@ -114,9 +121,7 @@ function validateFocusSnapshot(value, errors) {
   }
   const allowed = new Set(['schemaVersion', 'patterns', 'primaryMuscles']);
   keysAreKnown(value, allowed, 'focusSnapshot', errors);
-  for (const key of ['patterns', 'primaryMuscles']) {
-    if (!Array.isArray(value[key]) || value[key].some(item => typeof item !== 'string' || !item.trim())) errors.push(`focusSnapshot.${key}: expected string array`);
-  }
+  for (const key of ['patterns', 'primaryMuscles']) validateStringList(value[key], `focusSnapshot.${key}`, errors);
 }
 
 export function validateTrainingSession(value) {
@@ -161,9 +166,7 @@ function validateActionSnapshot(value, path, errors) {
   requiredString(value.name, `${path}.name`, errors, 240);
   requiredString(value.pattern, `${path}.pattern`, errors, 120);
   optionalString(value.level, `${path}.level`, errors, 80);
-  for (const key of ['primaryMuscles', 'secondaryMuscles']) {
-    if (!Array.isArray(value[key]) || value[key].some(item => typeof item !== 'string' || !item.trim())) errors.push(`${path}.${key}: expected string array`);
-  }
+  for (const key of ['primaryMuscles', 'secondaryMuscles']) validateStringList(value[key], `${path}.${key}`, errors);
   optionalString(value.equipment, `${path}.equipment`, errors, 240);
   optionalString(value.stationId, `${path}.stationId`, errors, 160);
 }
@@ -176,11 +179,12 @@ function validatePrescription(value, path, errors) {
   keysAreKnown(value, PRESCRIPTION_KEYS, path, errors);
   requireKeys(value, PRESCRIPTION_KEYS, path, errors);
   if (value.schemaVersion !== 1) errors.push(`${path}.schemaVersion: expected 1`);
-  if (value.sets !== null && (!Number.isInteger(value.sets) || value.sets < 0)) errors.push(`${path}.sets: expected non-negative integer or null`);
+  if (value.sets !== null && (!Number.isInteger(value.sets) || value.sets < 0 || value.sets > 100)) errors.push(`${path}.sets: expected integer from 0 to 100 or null`);
   if (value.reps !== null && !(Number.isInteger(value.reps) && value.reps >= 0) && !(typeof value.reps === 'string' && value.reps.length <= 80)) errors.push(`${path}.reps: expected non-negative integer, string, or null`);
   for (const key of ['rir']) if (value[key] !== null && (typeof value[key] !== 'number' || value[key] < 0 || value[key] > 10)) errors.push(`${path}.${key}: expected 0-10 or null`);
   if (value.restSeconds !== null && (!Number.isInteger(value.restSeconds) || value.restSeconds < 0 || value.restSeconds > 7200)) errors.push(`${path}.restSeconds: expected non-negative seconds or null`);
-  for (const key of ['tempo', 'loadPrescription', 'rawText']) optionalString(value[key], `${path}.${key}`, errors, key === 'rawText' ? 240 : 240);
+  optionalString(value.tempo, `${path}.tempo`, errors, 80);
+  for (const key of ['loadPrescription', 'rawText']) optionalString(value[key], `${path}.${key}`, errors, 240);
 }
 
 export function validateTrainingSessionItem(value) {
@@ -204,7 +208,7 @@ export function validateTrainingSessionItem(value) {
   if (value.performedActionId && value.performedActionSnapshot?.actionId !== value.performedActionId) errors.push('performedActionSnapshot.actionId must match performedActionId');
   validatePrescription(value.plannedPrescriptionSnapshot, 'plannedPrescriptionSnapshot', errors);
   if (value.performedPrescription !== null) validatePrescription(value.performedPrescription, 'performedPrescription', errors);
-  if (value.sets !== null && (!Number.isInteger(value.sets) || value.sets < 0)) errors.push('sets: expected non-negative integer or null');
+  if (value.sets !== null && (!Number.isInteger(value.sets) || value.sets < 0 || value.sets > 100)) errors.push('sets: expected integer from 0 to 100 or null');
   if (value.reps !== null && !(Number.isInteger(value.reps) && value.reps >= 0) && !(typeof value.reps === 'string' && value.reps.length <= 80)) errors.push('reps: expected non-negative integer, string, or null');
   if (value.loadKg !== null && (typeof value.loadKg !== 'number' || value.loadKg < 0 || value.loadKg > 2000)) errors.push('loadKg: expected 0-2000 or null');
   for (const key of ['rir', 'rpe']) if (value[key] !== null && (typeof value[key] !== 'number' || value[key] < 0 || value[key] > 10)) errors.push(`${key}: expected 0-10 or null`);

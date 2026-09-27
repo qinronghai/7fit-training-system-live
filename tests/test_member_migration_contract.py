@@ -34,7 +34,26 @@ def test_member_fields_archive_and_level_constraints_match_contract():
         assert column in members
     assert "training_level is null or training_level in ('l1', 'l2', 'l3', 'l4')" in members
     assert "status in ('active', 'inactive')" in members
+    assert "then pg_catalog.jsonb_array_length(training_profile->'movementconstraints') <= 40" in members
+    assert "then pg_catalog.jsonb_array_length(training_profile->'preferredequipment') <= 80" in members
+    assert "public.member_jsonb_string_array_is_valid(training_profile->'movementconstraints', 40, 240)" in members
+    assert "public.member_jsonb_string_array_is_valid(training_profile->'preferredequipment', 80, 120)" in members
     assert "on delete restrict" in compact(sql.split("create table public.training_sessions", 1)[1].split(");", 1)[0])
+
+
+def test_profile_array_constraint_rejects_non_string_blank_and_oversized_items():
+    sql = compact(migration_text())
+    signature = "create or replace function public.member_jsonb_string_array_is_valid"
+    assert signature in sql
+    helper = sql.split(signature, 1)[1].split("$member_jsonb_string_array_is_valid$;", 1)[0]
+    assert "language sql immutable parallel safe" in helper
+    assert "set search_path = ''" in helper
+    assert "pg_catalog.jsonb_array_elements(p_value)" in helper
+    assert "pg_catalog.jsonb_typeof(item.value) <> 'string'" in helper
+    assert "pg_catalog.btrim(item.value #>> '{}')" in helper
+    assert "pg_catalog.length(item.value #>> '{}') > p_max_length" in helper
+    assert "revoke all on function public.member_jsonb_string_array_is_valid(jsonb, integer, integer) from public, anon, authenticated" in sql
+    assert "grant execute on function public.member_jsonb_string_array_is_valid(jsonb, integer, integer) to service_role" in sql
 
 
 def test_session_status_revision_and_retry_constraints():
@@ -58,6 +77,15 @@ def test_item_fields_canonical_phase_and_delete_policy():
     assert "phase in ('primary', 'secondary', 'accessory', 'core', 'conditioning', 'foam', 'prep', 'mobility', 'unknown')" in items
     assert "on delete cascade" in items
     assert "check (sort_order >= 0)" in items
+    assert "sets between 0 and 100" in items
+    sessions = compact(sql.split("create table public.training_sessions", 1)[1].split(");", 1)[0])
+    assert "then pg_catalog.jsonb_array_length(focus_snapshot->'patterns') <= 120" in sessions
+    assert "then pg_catalog.jsonb_array_length(focus_snapshot->'primarymuscles') <= 120" in sessions
+    assert "training_session_items_prescription_sets_check" in items
+    assert "(planned_prescription_snapshot->>'sets')::numeric between 0 and 100" in items
+    assert "(planned_prescription_snapshot->>'sets')::numeric = pg_catalog.trunc" in items
+    assert "(performed_prescription->>'sets')::numeric between 0 and 100" in items
+    assert "(performed_prescription->>'sets')::numeric = pg_catalog.trunc" in items
 
 
 def test_indexes_cover_member_history_archive_filters_and_item_order():
