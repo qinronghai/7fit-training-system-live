@@ -1,6 +1,6 @@
 (function(){
   const REQUIRED_ROUTES = [
-    '#/coach','#/coach/compose','#/coach/f111','#/coach/f111/compose',
+    '#/coach','#/coach/compose','#/coach/f111','#/coach/f111/compose','#/coach/members',
     '#/coach/body','#/coach/body/compose','#/coach/conditioning','#/coach/conditioning/compose','#/coach/hyrox','#/coach/hyrox/skill/l1','#/coach/hyrox/capacity/l1','#/coach/hyrox/mixed/l1','#/coach/hyrox/benchmark/b1','#/coach/posture',
     '#/system/patterns','#/system/prep','#/system/support','#/system/core',
     '#/rules/venue','#/rules/replacement','#/rules/conflicts','#/library',
@@ -19,6 +19,11 @@
     const second=parts[1]||'';
     if(!second)return {area:'coach',page:'home',query,raw:'#/'+raw};
     if(second==='compose')return {area:'coach',page:'compose',templateId:'f111',query,raw:'#/'+raw};
+    if(second==='members'){
+      if(parts.length===2)return {area:'coach',page:'member-list',query,raw:'#/'+raw};
+      if(parts.length===3)return {area:'coach',page:'member-detail',memberId:parts[2],query,raw:'#/'+raw};
+      return {area:'coach',page:'invalid-member-route',query,raw:'#/'+raw};
+    }
 
     const record=templateRegistry()[second];
     if(record){
@@ -78,6 +83,8 @@
     isValid(route){
       if(route.area==='coach'){
         if(route.page==='home')return true;
+        if(route.page==='member-list')return true;
+        if(route.page==='member-detail')return /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(route.memberId||'');
         if(route.page==='compose')return route.templateId==='f111';
         if(route.page==='template')return !!templateRegistry()[route.templateId];
         if(route.page==='template-compose')return templateRegistry()[route.templateId]?.status==='ACTIVE';
@@ -110,6 +117,8 @@
       if(route.area!=='coach')return route.raw||'#/coach';
       const suffix=querySuffix(route.query);
       if(route.page==='home')return '#/coach'+suffix;
+      if(route.page==='member-list')return '#/coach/members'+suffix;
+      if(route.page==='member-detail')return `#/coach/members/${route.memberId}${suffix}`;
       if(route.page==='template')return `#/coach/${route.templateId}${suffix}`;
       if(route.page==='compose')return `#/coach/f111${suffix}`;
       if(route.page==='template-compose')return `#/coach/${route.templateId}/compose${suffix}`;

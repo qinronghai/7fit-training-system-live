@@ -2,6 +2,7 @@
   function labels(route){
     if(route.area==='coach'){
       if(route.page==='home')return ['编课中心','7Fit 教练工作台'];
+      if(route.page==='member-list'||route.page==='member-detail')return ['会员训练','近期完成情况与课程记录'];
       if(route.page==='template'||route.page==='template-compose'){
         if(route.templateId==='f111')return ['编课中心','女性综合 1+1+1'];
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
@@ -32,7 +33,11 @@
   function setActive(area){
     document.querySelectorAll('[data-area]').forEach(a=>a.classList.toggle('active',a.dataset.area===area));
   }
+  function isF111ComposerRoute(route){
+    return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
+  }
   function renderRoute(route){
+    if(!isF111ComposerRoute(route))window.V14CoachModules?.ComposerView?.resetMemberContextBinding?.();
     const main=document.getElementById('app-main');
     if(!window.V14Router.isValid(route)){
       document.getElementById('page-title').textContent='页面不存在';
