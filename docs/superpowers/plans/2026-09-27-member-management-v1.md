@@ -58,7 +58,7 @@
 
 ### Task 2 — #161 Database and RLS
 
-**Files:** Create a CLI-generated migration under `supabase/migrations/`, `tests/test_member_migration_contract.py`, and `tests/fixtures/member-v1/anon_access.sql` (or an equivalent executable SQL gate).
+**Files:** Create a CLI-generated migration under `supabase/migrations/`, `tests/test_member_migration_contract.py`, `tests/fixtures/member-v1/anon_access.sql`, and `docs/MEMBER-V1-DATABASE.md`.
 
 **Interfaces:** Tables are `public.members`, `public.training_sessions`, and `public.training_session_items`; atomic save/complete/cancel RPCs consume Task 1 field names and `schemaVersion=1`. Use `revision` for optimistic concurrency and `(member_id, idempotency_key)` for retry identity.
 
