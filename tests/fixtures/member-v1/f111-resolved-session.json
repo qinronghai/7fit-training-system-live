@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "resolverVersion": "f111-adapter-v1",
+  "templateId": "f111",
+  "familyId": "F111-06",
+  "level": "L3",
+  "title": "F111-06｜下肢推 + 水平推 + 支撑",
+  "summary": "L3｜增加自由重量、单侧控制与局部张力。 2F → 1F → 2F",
+  "main": {
+    "kind": "SLOT",
+    "content": [
+      {
+        "key": "A",
+        "label": "A｜下肢主项",
+        "actionId": "hake_shendun",
+        "name": "哈克深蹲",
+        "tier": "T3",
+        "grade": "",
+        "prescription": "3组 × 12次左右",
+        "source": "baseline"
+      },
+      {
+        "key": "B",
+        "label": "B｜上肢主项",
+        "actionId": "wotu_xiong_tui",
+        "name": "哑铃卧推",
+        "tier": "T3",
+        "grade": "",
+        "prescription": "3组 × 12次左右",
+        "source": "baseline"
+      },
+      {
+        "key": "SUPPORT",
+        "label": "C｜支撑模式",
+        "actionId": "SUP-S3-02",
+        "name": "高位平板交替触肩",
+        "tier": "",
+        "grade": "SUP-S3",
+        "prescription": "",
+        "source": "baseline"
+      },
+      {
+        "key": "2",
+        "label": "D1｜下肢辅助",
+        "actionId": "kuangnei_shou",
+        "name": "髋内收",
+        "tier": "",
+        "grade": "",
+        "prescription": "",
+        "source": "baseline"
+      },
+      {
+        "key": "3",
+        "label": "D2｜上肢辅助",
+        "actionId": "shengsuo_santou_xiaya",
+        "name": "绳索三头下压",
+        "tier": "",
+        "grade": "",
+        "prescription": "",
+        "source": "baseline"
+      },
+      {
+        "key": "CORE",
+        "label": "CORE｜核心模式",
+        "actionId": "CORE-L3-01",
+        "name": "Pallof抗旋转推举",
+        "tier": "CORE-L3",
+        "grade": "CORE-L3",
+        "prescription": "2组 × 15–20次",
+        "source": "baseline"
+      }
+    ]
+  },
+  "prepContext": {
+    "template": "f111",
+    "level": "L3",
+    "recipeId": "F111-06",
+    "mainPatterns": [
+      "蹲",
+      "水平推"
+    ],
+    "mainActionIds": [
+      "hake_shendun",
+      "wotu_xiong_tui"
+    ],
+    "formalActionIds": [
+      "hake_shendun",
+      "wotu_xiong_tui",
+      "SUP-S3-02",
+      "kuangnei_shou",
+      "shengsuo_santou_xiaya",
+      "CORE-L3-01"
+    ],
+    "targetMuscles": [],
+    "modalities": [],
+    "impactDemand": "",
+    "powerDemand": ""
+  },
+  "anatomyContext": {
+    "actionIds": [
+      "hake_shendun",
+      "wotu_xiong_tui",
+      "SUP-S3-02",
+      "kuangnei_shou",
+      "shengsuo_santou_xiaya",
+      "CORE-L3-01"
+    ],
+    "primary": [
+      "肱三头肌",
+      "腹横肌",
+      "腹内外斜肌",
+      "内收肌群",
+      "股四头肌",
+      "臀大肌",
+      "胸大肌"
+    ],
+    "secondary": [
+      "肱三头肌",
+      "内收肌群",
+      "三角肌前束",
+      "前锯肌",
+      "腹直肌"
+    ],
+    "stabilizers": [
+      "腹壁",
+      "臀中肌",
+      "肩胛稳定肌群",
+      "肩袖肌群",
+      "竖脊肌",
+      "骨盆稳定肌群"
+    ]
+  },
+  "conflictContext": {
+    "status": "PASS",
+    "hardCount": 0,
+    "warnCount": 0,
+    "issues": []
+  },
+  "copyContext": {
+    "title": "F111-06｜下肢推 + 水平推 + 支撑",
+    "summary": "L3｜增加自由重量、单侧控制与局部张力。 2F → 1F → 2F",
+    "actionIds": [
+      "hake_shendun",
+      "wotu_xiong_tui",
+      "SUP-S3-02",
+      "kuangnei_shou",
+      "shengsuo_santou_xiaya",
+      "CORE-L3-01"
+    ]
+  },
+  "warnings": [],
+  "resolvedSelections": [
+    {
+      "key": "A",
+      "actionId": "hake_shendun",
+      "source": "baseline"
+    },
+    {
+      "key": "B",
+      "actionId": "wotu_xiong_tui",
+      "source": "baseline"
+    },
+    {
+      "key": "SUPPORT",
+      "actionId": "SUP-S3-02",
+      "source": "baseline"
+    },
+    {
+      "key": "2",
+      "actionId": "kuangnei_shou",
+      "source": "baseline"
+    },
+    {
+      "key": "3",
+      "actionId": "shengsuo_santou_xiaya",
+      "source": "baseline"
+    },
+    {
+      "key": "CORE",
+      "actionId": "CORE-L3-01",
+      "source": "baseline"
+    }
+  ],
+  "source": {
+    "type": "PRESET",
+    "id": "F111-06-L3"
+  }
+}

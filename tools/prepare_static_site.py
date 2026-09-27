@@ -48,6 +48,10 @@ def prepare_site(root: Path, dest: Path, build_id: str) -> None:
     for directory in ("assets", "data", "js"):
         shutil.copytree(root / directory, dest / directory)
 
+    member_directory = dest / "js" / "member"
+    member_directory.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(root / "supabase" / "functions" / "_shared" / "member-domain.mjs", member_directory / "member-domain.mjs")
+
     index_path = dest / "index.html"
     index_path.write_text(
         version_index(index_path.read_text(encoding="utf-8"), build_id),

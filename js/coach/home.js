@@ -63,6 +63,10 @@
         ${M.FavoritesUI?.section?.()||''}
         ${M.SavedSessionsUI?.librarySection?.()||''}
       </div>
+    </section>
+    <section class="coach-member-entry" aria-labelledby="coach-member-entry-title">
+      <div><h2 id="coach-member-entry-title">会员训练记录</h2><p>查看近期完成训练、会员训练重点和课程历史。</p></div>
+      <a href="#/coach/members">打开会员训练 <span aria-hidden="true">→</span></a>
     </section>`;
   }
 

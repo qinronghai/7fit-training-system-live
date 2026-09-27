@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "e1000000-0000-4000-8000-000000000001",
+  "displayName": "林女士",
+  "status": "ACTIVE",
+  "trainingLevel": "L3",
+  "primaryGoal": "建立基础力量",
+  "trainingProfile": {
+    "schemaVersion": 1,
+    "experienceLevel": "INTERMEDIATE",
+    "movementConstraints": [
+      "右膝深屈时不适"
+    ],
+    "preferredEquipment": [
+      "哈克深蹲机"
+    ],
+    "notes": null
+  },
+  "coachNotes": null,
+  "createdAt": "2026-09-20T09:00:00.000Z",
+  "updatedAt": "2026-09-27T09:00:00.000Z",
+  "archivedAt": null
+}

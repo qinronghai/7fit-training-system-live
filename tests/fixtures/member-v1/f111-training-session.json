@@ -1,0 +1,491 @@
+{
+  "schemaVersion": 1,
+  "session": {
+    "schemaVersion": 1,
+    "id": "e1000000-0000-4000-8000-000000000002",
+    "memberId": "e1000000-0000-4000-8000-000000000001",
+    "sessionDate": "2026-09-27",
+    "status": "PLANNED",
+    "templateKey": "f111",
+    "templateVersion": "f111-adapter-v1",
+    "levelSnapshot": "L3",
+    "sessionTitle": "F111-06｜下肢推 + 水平推 + 支撑",
+    "focusSnapshot": {
+      "schemaVersion": 1,
+      "patterns": [
+        "蹲",
+        "水平推"
+      ],
+      "primaryMuscles": [
+        "肱三头肌",
+        "腹横肌",
+        "腹内外斜肌",
+        "内收肌群",
+        "股四头肌",
+        "臀大肌",
+        "胸大肌"
+      ]
+    },
+    "resolvedSessionSnapshot": {
+      "schemaVersion": 1,
+      "resolverVersion": "f111-adapter-v1",
+      "templateId": "f111",
+      "familyId": "F111-06",
+      "level": "L3",
+      "title": "F111-06｜下肢推 + 水平推 + 支撑",
+      "summary": "L3｜增加自由重量、单侧控制与局部张力。 2F → 1F → 2F",
+      "main": {
+        "kind": "SLOT",
+        "content": [
+          {
+            "key": "A",
+            "label": "A｜下肢主项",
+            "actionId": "hake_shendun",
+            "name": "哈克深蹲",
+            "tier": "T3",
+            "grade": "",
+            "prescription": "3组 × 12次左右",
+            "source": "baseline"
+          },
+          {
+            "key": "B",
+            "label": "B｜上肢主项",
+            "actionId": "wotu_xiong_tui",
+            "name": "哑铃卧推",
+            "tier": "T3",
+            "grade": "",
+            "prescription": "3组 × 12次左右",
+            "source": "baseline"
+          },
+          {
+            "key": "SUPPORT",
+            "label": "C｜支撑模式",
+            "actionId": "SUP-S3-02",
+            "name": "高位平板交替触肩",
+            "tier": "",
+            "grade": "SUP-S3",
+            "prescription": "",
+            "source": "baseline"
+          },
+          {
+            "key": "2",
+            "label": "D1｜下肢辅助",
+            "actionId": "kuangnei_shou",
+            "name": "髋内收",
+            "tier": "",
+            "grade": "",
+            "prescription": "",
+            "source": "baseline"
+          },
+          {
+            "key": "3",
+            "label": "D2｜上肢辅助",
+            "actionId": "shengsuo_santou_xiaya",
+            "name": "绳索三头下压",
+            "tier": "",
+            "grade": "",
+            "prescription": "",
+            "source": "baseline"
+          },
+          {
+            "key": "CORE",
+            "label": "CORE｜核心模式",
+            "actionId": "CORE-L3-01",
+            "name": "Pallof抗旋转推举",
+            "tier": "CORE-L3",
+            "grade": "CORE-L3",
+            "prescription": "2组 × 15–20次",
+            "source": "baseline"
+          }
+        ]
+      },
+      "prepContext": {
+        "template": "f111",
+        "level": "L3",
+        "recipeId": "F111-06",
+        "mainPatterns": [
+          "蹲",
+          "水平推"
+        ],
+        "mainActionIds": [
+          "hake_shendun",
+          "wotu_xiong_tui"
+        ],
+        "formalActionIds": [
+          "hake_shendun",
+          "wotu_xiong_tui",
+          "SUP-S3-02",
+          "kuangnei_shou",
+          "shengsuo_santou_xiaya",
+          "CORE-L3-01"
+        ],
+        "targetMuscles": [],
+        "modalities": [],
+        "impactDemand": "",
+        "powerDemand": ""
+      },
+      "anatomyContext": {
+        "actionIds": [
+          "hake_shendun",
+          "wotu_xiong_tui",
+          "SUP-S3-02",
+          "kuangnei_shou",
+          "shengsuo_santou_xiaya",
+          "CORE-L3-01"
+        ],
+        "primary": [
+          "肱三头肌",
+          "腹横肌",
+          "腹内外斜肌",
+          "内收肌群",
+          "股四头肌",
+          "臀大肌",
+          "胸大肌"
+        ],
+        "secondary": [
+          "肱三头肌",
+          "内收肌群",
+          "三角肌前束",
+          "前锯肌",
+          "腹直肌"
+        ],
+        "stabilizers": [
+          "腹壁",
+          "臀中肌",
+          "肩胛稳定肌群",
+          "肩袖肌群",
+          "竖脊肌",
+          "骨盆稳定肌群"
+        ]
+      },
+      "conflictContext": {
+        "status": "PASS",
+        "hardCount": 0,
+        "warnCount": 0,
+        "issues": []
+      },
+      "copyContext": {
+        "title": "F111-06｜下肢推 + 水平推 + 支撑",
+        "summary": "L3｜增加自由重量、单侧控制与局部张力。 2F → 1F → 2F",
+        "actionIds": [
+          "hake_shendun",
+          "wotu_xiong_tui",
+          "SUP-S3-02",
+          "kuangnei_shou",
+          "shengsuo_santou_xiaya",
+          "CORE-L3-01"
+        ]
+      },
+      "warnings": [],
+      "resolvedSelections": [
+        {
+          "key": "A",
+          "actionId": "hake_shendun",
+          "source": "baseline"
+        },
+        {
+          "key": "B",
+          "actionId": "wotu_xiong_tui",
+          "source": "baseline"
+        },
+        {
+          "key": "SUPPORT",
+          "actionId": "SUP-S3-02",
+          "source": "baseline"
+        },
+        {
+          "key": "2",
+          "actionId": "kuangnei_shou",
+          "source": "baseline"
+        },
+        {
+          "key": "3",
+          "actionId": "shengsuo_santou_xiaya",
+          "source": "baseline"
+        },
+        {
+          "key": "CORE",
+          "actionId": "CORE-L3-01",
+          "source": "baseline"
+        }
+      ],
+      "source": {
+        "type": "PRESET",
+        "id": "F111-06-L3"
+      }
+    },
+    "memberCopyText": null,
+    "coachNote": null,
+    "createdAt": "2026-09-27T09:00:00.000Z",
+    "updatedAt": "2026-09-27T09:00:00.000Z",
+    "completedAt": null,
+    "idempotencyKey": "member-v1-idempotency-001"
+  },
+  "items": [
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000016",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "PRIMARY",
+      "slotKey": "A",
+      "sortOrder": 0,
+      "plannedActionId": "hake_shendun",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "hake_shendun",
+        "name": "哈克深蹲",
+        "pattern": "蹲",
+        "level": "T3",
+        "primaryMuscles": [
+          "股四头肌",
+          "臀大肌"
+        ],
+        "secondaryMuscles": [
+          "内收肌群"
+        ],
+        "equipment": "哈克深蹲机",
+        "stationId": null
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": "3组 × 12次左右"
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000017",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "SECONDARY",
+      "slotKey": "B",
+      "sortOrder": 1,
+      "plannedActionId": "wotu_xiong_tui",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "wotu_xiong_tui",
+        "name": "哑铃卧推",
+        "pattern": "水平推",
+        "level": "T3",
+        "primaryMuscles": [
+          "胸大肌"
+        ],
+        "secondaryMuscles": [
+          "肱三头肌",
+          "三角肌前束"
+        ],
+        "equipment": "哑铃 + 哑铃架 + 平凳",
+        "stationId": null
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": "3组 × 12次左右"
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000018",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "ACCESSORY",
+      "slotKey": "SUPPORT",
+      "sortOrder": 2,
+      "plannedActionId": "SUP-S3-02",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "SUP-S3-02",
+        "name": "高位平板交替触肩",
+        "pattern": "支撑模式",
+        "level": "SUP-S3",
+        "primaryMuscles": [
+          "腹横肌",
+          "腹内外斜肌"
+        ],
+        "secondaryMuscles": [
+          "前锯肌",
+          "肱三头肌"
+        ],
+        "equipment": "自重 / 垫子",
+        "stationId": null
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": null
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000019",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "ACCESSORY",
+      "slotKey": "2",
+      "sortOrder": 3,
+      "plannedActionId": "kuangnei_shou",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "kuangnei_shou",
+        "name": "髋内收",
+        "pattern": "髋外展",
+        "level": null,
+        "primaryMuscles": [
+          "内收肌群"
+        ],
+        "secondaryMuscles": [],
+        "equipment": "髋内收外展器械",
+        "stationId": "adductor-abductor-combo-01"
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": null
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000020",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "ACCESSORY",
+      "slotKey": "3",
+      "sortOrder": 4,
+      "plannedActionId": "shengsuo_santou_xiaya",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "shengsuo_santou_xiaya",
+        "name": "绳索三头下压",
+        "pattern": "水平推",
+        "level": null,
+        "primaryMuscles": [
+          "肱三头肌"
+        ],
+        "secondaryMuscles": [],
+        "equipment": "小飞鸟 / 小龙门架",
+        "stationId": null
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": null
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e1000000-0000-4000-8000-000000000021",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
+      "phase": "CORE",
+      "slotKey": "CORE",
+      "sortOrder": 5,
+      "plannedActionId": "CORE-L3-01",
+      "plannedActionSnapshot": {
+        "schemaVersion": 1,
+        "actionId": "CORE-L3-01",
+        "name": "Pallof抗旋转推举",
+        "pattern": "核心模式",
+        "level": "CORE-L3",
+        "primaryMuscles": [
+          "腹内外斜肌",
+          "腹横肌"
+        ],
+        "secondaryMuscles": [
+          "腹直肌"
+        ],
+        "equipment": "小飞鸟 / 小龙门架",
+        "stationId": null
+      },
+      "performedActionId": null,
+      "performedActionSnapshot": null,
+      "plannedPrescriptionSnapshot": {
+        "schemaVersion": 1,
+        "sets": null,
+        "reps": null,
+        "rir": null,
+        "restSeconds": null,
+        "tempo": null,
+        "loadPrescription": null,
+        "rawText": "2组 × 15–20次"
+      },
+      "performedPrescription": null,
+      "sets": null,
+      "reps": null,
+      "loadKg": null,
+      "rir": null,
+      "rpe": null,
+      "completed": false,
+      "note": null
+    }
+  ]
+}
