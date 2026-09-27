@@ -67,6 +67,20 @@ def test_schema_rejects_unknown_status_and_arbitrary_profile_keys():
     assert errors(member)
 
 
+def test_database_entity_identifiers_are_uuids():
+    member = load_fixture("member-active.json")
+    member["id"] = "member-123"
+    assert errors(member)
+
+    session = load_fixture("f111-training-session.json")["session"]
+    session["id"] = "session-123"
+    assert errors(session)
+
+    session = load_fixture("f111-training-session.json")["session"]
+    session["memberId"] = "member-123"
+    assert errors(session)
+
+
 def test_schema_rejects_completed_session_without_completion_timestamp():
     session = load_fixture("replaced-action-completed.json")["session"]
     session["completedAt"] = None

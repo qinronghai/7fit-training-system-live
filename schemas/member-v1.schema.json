@@ -17,7 +17,7 @@
       "required": ["schemaVersion", "id", "displayName", "status", "trainingProfile", "createdAt", "updatedAt"],
       "properties": {
         "schemaVersion": { "const": 1 },
-        "id": { "$ref": "#/$defs/id" },
+        "id": { "$ref": "#/$defs/uuid" },
         "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
         "status": { "enum": ["ACTIVE", "INACTIVE"], "description": "INACTIVE covers both archived and intentionally inactive members; archivedAt distinguishes archived records. History is retained." },
         "trainingLevel": { "anyOf": [{ "$ref": "#/$defs/trainingLevel" }, { "type": "null" }] },
@@ -47,8 +47,8 @@
       "required": ["schemaVersion", "id", "memberId", "sessionDate", "status", "templateKey", "templateVersion", "levelSnapshot", "sessionTitle", "focusSnapshot", "resolvedSessionSnapshot", "memberCopyText", "coachNote", "createdAt", "updatedAt", "completedAt", "idempotencyKey"],
       "properties": {
         "schemaVersion": { "const": 1 },
-        "id": { "$ref": "#/$defs/id" },
-        "memberId": { "$ref": "#/$defs/id" },
+        "id": { "$ref": "#/$defs/uuid" },
+        "memberId": { "$ref": "#/$defs/uuid" },
         "sessionDate": { "$ref": "#/$defs/date" },
         "status": { "enum": ["PLANNED", "COMPLETED", "CANCELLED"], "description": "Only COMPLETED is evidence of performed training. PLANNED and CANCELLED never enter MemberTrainingContext." },
         "templateKey": { "type": "string", "minLength": 1, "maxLength": 120 },
@@ -88,8 +88,8 @@
       "required": ["schemaVersion", "id", "sessionId", "phase", "slotKey", "sortOrder", "plannedActionId", "plannedActionSnapshot", "performedActionId", "performedActionSnapshot", "plannedPrescriptionSnapshot", "performedPrescription", "sets", "reps", "loadKg", "rir", "rpe", "completed", "note"],
       "properties": {
         "schemaVersion": { "const": 1 },
-        "id": { "$ref": "#/$defs/id" },
-        "sessionId": { "$ref": "#/$defs/id" },
+        "id": { "$ref": "#/$defs/uuid" },
+        "sessionId": { "$ref": "#/$defs/uuid" },
         "phase": { "enum": ["PRIMARY", "SECONDARY", "ACCESSORY", "CORE", "CONDITIONING", "FOAM", "PREP", "MOBILITY", "UNKNOWN"], "description": "Only the first five canonical phases enter training load context; FOAM, PREP, MOBILITY, and UNKNOWN are excluded." },
         "slotKey": { "type": ["string", "null"], "maxLength": 80 },
         "sortOrder": { "type": "integer", "minimum": 0 },
@@ -155,7 +155,7 @@
       "required": ["schemaVersion", "memberId", "displayName", "trainingLevel", "lastCompletedSession", "recentSessions", "recentPatterns", "recentActions", "recentPrimaryMuscles", "generatedAt"],
       "properties": {
         "schemaVersion": { "const": 1 },
-        "memberId": { "$ref": "#/$defs/id" },
+        "memberId": { "$ref": "#/$defs/uuid" },
         "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
         "trainingLevel": { "anyOf": [{ "$ref": "#/$defs/trainingLevel" }, { "type": "null" }] },
         "lastCompletedSession": { "anyOf": [{ "$ref": "#/$defs/recentSession" }, { "type": "null" }] },
@@ -171,7 +171,7 @@
       "additionalProperties": false,
       "required": ["id", "sessionDate", "templateKey", "sessionTitle", "completedAt", "sessionsAgo"],
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
+        "id": { "$ref": "#/$defs/uuid" },
         "sessionDate": { "$ref": "#/$defs/date" },
         "templateKey": { "type": "string", "minLength": 1, "maxLength": 120 },
         "sessionTitle": { "type": "string", "minLength": 1, "maxLength": 240 },
@@ -215,6 +215,7 @@
       "items": { "type": "string", "minLength": 1, "maxLength": 120 },
       "maxItems": 120
     },
+    "uuid": { "type": "string", "format": "uuid" },
     "id": { "type": "string", "minLength": 1, "maxLength": 160 },
     "trainingLevel": { "enum": ["L1", "L2", "L3", "L4"] },
     "date": { "type": "string", "format": "date" },

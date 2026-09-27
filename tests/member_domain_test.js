@@ -56,10 +56,22 @@ async function main() {
     createdAt: planned.session.createdAt,
     updatedAt: planned.session.updatedAt,
     idempotencyKey: planned.session.idempotencyKey,
+    itemIds: planned.items.map(item => item.id),
     actionsById: window.V14_DATA.actions,
     anatomyById: window.V14_ANATOMY.records,
   });
   assert.deepEqual(snapshot, planned);
+  assert(snapshot.items.every(item => /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(item.id)),
+    'database item identifiers must be UUIDs');
+  assert.throws(() => domain.buildTrainingSessionSnapshot(actualResolved, {
+    sessionId: planned.session.id,
+    memberId: planned.session.memberId,
+    sessionDate: planned.session.sessionDate,
+    createdAt: planned.session.createdAt,
+    updatedAt: planned.session.updatedAt,
+    actionsById: window.V14_DATA.actions,
+    anatomyById: window.V14_ANATOMY.records,
+  }), error => error.code === 'INVALID_SNAPSHOT_INPUT');
   const frozenSnapshot = JSON.stringify(snapshot);
   actualResolved.main.content[0].name = 'Changed after save';
   assert.equal(JSON.stringify(snapshot), frozenSnapshot, 'saved snapshots must not retain live resolver references');
@@ -81,7 +93,7 @@ async function main() {
   const context = domain.deriveMemberTrainingContext(member, [
     { ...replaced.session, items: [...replaced.items, unknownPhaseItem, ...excludedPhaseItems] },
     { ...planned.session, status: 'CANCELLED', completedAt: null, items: planned.items },
-    { ...planned.session, id: 'session-old', sessionDate: '2026-09-20', status: 'COMPLETED', completedAt: '2026-09-20T11:00:00.000Z', items: planned.items },
+    { ...planned.session, id: '0f000000-0000-4000-8000-000000000020', sessionDate: '2026-09-20', status: 'COMPLETED', completedAt: '2026-09-20T11:00:00.000Z', items: planned.items.map(item => ({ ...item, completed: true })) },
   ], { generatedAt: '2026-09-27T12:00:00.000Z' });
   assert.equal(context.schemaVersion, 1);
   assert.equal(context.memberId, member.id);

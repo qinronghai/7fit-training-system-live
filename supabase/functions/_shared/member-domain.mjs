@@ -58,6 +58,14 @@ function validDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00Z`));
 }
 
+function validUuid(value) {
+  return typeof value === 'string' && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value);
+}
+
+function requiredUuid(value, path, errors) {
+  if (!validUuid(value)) errors.push(`${path}: expected UUID`);
+}
+
 function result(errors) {
   return { ok: errors.length === 0, errors };
 }
@@ -83,7 +91,7 @@ export function validateMember(value) {
   if (!isRecord(value)) return result(['member: expected object']);
   keysAreKnown(value, MEMBER_KEYS, 'member', errors);
   if (value.schemaVersion !== CONTRACT_VERSION) errors.push('schemaVersion: expected 1');
-  requiredString(value.id, 'id', errors, 160);
+  requiredUuid(value.id, 'id', errors);
   requiredString(value.displayName, 'displayName', errors, 120);
   if (!['ACTIVE', 'INACTIVE'].includes(value.status)) errors.push('status: expected ACTIVE or INACTIVE');
   if (value.trainingLevel !== null && value.trainingLevel !== undefined && !TRAINING_LEVELS.has(value.trainingLevel)) errors.push('trainingLevel: expected L1-L4 or null');
@@ -114,8 +122,8 @@ export function validateTrainingSession(value) {
   keysAreKnown(value, SESSION_KEYS, 'trainingSession', errors);
   requireKeys(value, SESSION_KEYS, 'trainingSession', errors);
   if (value.schemaVersion !== CONTRACT_VERSION) errors.push('schemaVersion: expected 1');
-  requiredString(value.id, 'id', errors, 160);
-  requiredString(value.memberId, 'memberId', errors, 160);
+  requiredUuid(value.id, 'id', errors);
+  requiredUuid(value.memberId, 'memberId', errors);
   if (!validDate(value.sessionDate)) errors.push('sessionDate: expected YYYY-MM-DD date');
   if (!SESSION_STATUSES.has(value.status)) errors.push('status: expected PLANNED, COMPLETED, or CANCELLED');
   requiredString(value.templateKey, 'templateKey', errors, 120);
@@ -178,8 +186,8 @@ export function validateTrainingSessionItem(value) {
   keysAreKnown(value, ITEM_KEYS, 'trainingSessionItem', errors);
   requireKeys(value, ITEM_KEYS, 'trainingSessionItem', errors);
   if (value.schemaVersion !== CONTRACT_VERSION) errors.push('schemaVersion: expected 1');
-  requiredString(value.id, 'id', errors, 160);
-  requiredString(value.sessionId, 'sessionId', errors, 160);
+  requiredUuid(value.id, 'id', errors);
+  requiredUuid(value.sessionId, 'sessionId', errors);
   if (!PHASES.has(value.phase)) errors.push('phase: expected a canonical phase or UNKNOWN');
   optionalString(value.slotKey, 'slotKey', errors, 80);
   if (!Number.isInteger(value.sortOrder) || value.sortOrder < 0) errors.push('sortOrder: expected non-negative integer');
@@ -257,16 +265,16 @@ function prescriptionSnapshot(rawText) {
   };
 }
 
-function makeItemId(sessionId, sortOrder) {
-  return `${sessionId}:${String(sortOrder + 1).padStart(2, '0')}`;
-}
-
 export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
   if (!isRecord(resolvedSession) || !isRecord(resolvedSession.main) || resolvedSession.main.kind !== 'SLOT' || !Array.isArray(resolvedSession.main.content)) {
     throw Object.assign(new TypeError('Only slot-based ResolvedSessions can be snapshotted in Member V1.'), { code: 'UNSUPPORTED_RESOLVED_SESSION' });
   }
   for (const key of ['sessionId', 'memberId', 'sessionDate', 'createdAt', 'updatedAt']) {
     if (typeof options[key] !== 'string' || !options[key]) throw Object.assign(new TypeError(`${key} is required to build a stable session snapshot.`), { code: 'INVALID_SNAPSHOT_INPUT' });
+  }
+  if (!validUuid(options.sessionId) || !validUuid(options.memberId)) throw Object.assign(new TypeError('sessionId and memberId must be UUIDs.'), { code: 'INVALID_SNAPSHOT_INPUT' });
+  if (!Array.isArray(options.itemIds) || options.itemIds.length !== resolvedSession.main.content.length || options.itemIds.some(id => !validUuid(id))) {
+    throw Object.assign(new TypeError('itemIds must contain one UUID for each ResolvedSession slot.'), { code: 'INVALID_SNAPSHOT_INPUT' });
   }
   const title = typeof resolvedSession.title === 'string' && resolvedSession.title.trim() ? resolvedSession.title : resolvedSession.templateId;
   const session = {
@@ -296,7 +304,7 @@ export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
     if (!slot || typeof slot.actionId !== 'string' || !slot.actionId) throw Object.assign(new TypeError(`ResolvedSession slot ${sortOrder} has no actionId.`), { code: 'INVALID_RESOLVED_SESSION' });
     return {
       schemaVersion: CONTRACT_VERSION,
-      id: makeItemId(options.sessionId, sortOrder),
+      id: options.itemIds[sortOrder],
       sessionId: options.sessionId,
       phase: canonicalPhase(slot.key),
       slotKey: typeof slot.key === 'string' ? slot.key : null,

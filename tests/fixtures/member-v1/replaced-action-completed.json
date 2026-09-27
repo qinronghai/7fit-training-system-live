@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "session": {
     "schemaVersion": 1,
-    "id": "member-v1-session-f111-001",
-    "memberId": "member-v1-member-001",
+    "id": "e1000000-0000-4000-8000-000000000002",
+    "memberId": "e1000000-0000-4000-8000-000000000001",
     "sessionDate": "2026-09-27",
     "status": "COMPLETED",
     "templateKey": "f111",
@@ -224,8 +224,8 @@
   "items": [
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:01",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000016",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "PRIMARY",
       "slotKey": "A",
       "sortOrder": 0,
@@ -294,8 +294,8 @@
     },
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:02",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000017",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "SECONDARY",
       "slotKey": "B",
       "sortOrder": 1,
@@ -339,8 +339,8 @@
     },
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:03",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000018",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "ACCESSORY",
       "slotKey": "SUPPORT",
       "sortOrder": 2,
@@ -385,8 +385,8 @@
     },
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:04",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000019",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "ACCESSORY",
       "slotKey": "2",
       "sortOrder": 3,
@@ -427,8 +427,8 @@
     },
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:05",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000020",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "ACCESSORY",
       "slotKey": "3",
       "sortOrder": 4,
@@ -469,8 +469,8 @@
     },
     {
       "schemaVersion": 1,
-      "id": "member-v1-session-f111-001:06",
-      "sessionId": "member-v1-session-f111-001",
+      "id": "e1000000-0000-4000-8000-000000000021",
+      "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "CORE",
       "slotKey": "CORE",
       "sortOrder": 5,
