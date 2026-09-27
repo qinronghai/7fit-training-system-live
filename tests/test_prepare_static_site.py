@@ -38,6 +38,9 @@ def test_prepare_site_copies_runtime_and_rewrites_only_deployed_index(tmp_path: 
         path = root / directory
         path.mkdir()
         (path / filename).write_text("/* fixture */", encoding="utf-8")
+    member_domain = root / "supabase" / "functions" / "_shared" / "member-domain.mjs"
+    member_domain.parent.mkdir(parents=True)
+    member_domain.write_text("export const fixture = true;", encoding="utf-8")
 
     prepare_site(root, dest, "abcdef0123456789")
 
@@ -50,3 +53,4 @@ def test_prepare_site_copies_runtime_and_rewrites_only_deployed_index(tmp_path: 
     assert "__BUILD_ID__" in source
     assert (dest / ".nojekyll").exists()
     assert (dest / "data" / "system-data.js").exists()
+    assert (dest / "js" / "member" / "member-domain.mjs").read_text(encoding="utf-8") == "export const fixture = true;"
