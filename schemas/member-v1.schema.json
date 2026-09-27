@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://7fit.example/schemas/member-v1.schema.json",
+  "title": "7Fit Member Management V1 Contract",
+  "description": "V1 is a strict write contract with explicit allowed fields. Optional scalar fields are omitted when unknown or set to null when the field is part of a persisted snapshot; collections use empty arrays. Compatible optional additions may be introduced without reinterpreting old records; incompatible changes require a schemaVersion increment. Unknown profile keys are rejected so UI-only blobs cannot silently become domain data. Unknown phases are represented as UNKNOWN and excluded from load context.",
+  "oneOf": [
+    { "$ref": "#/$defs/member" },
+    { "$ref": "#/$defs/trainingSession" },
+    { "$ref": "#/$defs/trainingSessionItem" },
+    { "$ref": "#/$defs/trainingSessionSnapshot" },
+    { "$ref": "#/$defs/memberTrainingContext" }
+  ],
+  "$defs": {
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "id", "displayName", "status", "trainingProfile", "createdAt", "updatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "$ref": "#/$defs/id" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "status": { "enum": ["ACTIVE", "INACTIVE"], "description": "INACTIVE covers both archived and intentionally inactive members; archivedAt distinguishes archived records. History is retained." },
+        "trainingLevel": { "anyOf": [{ "$ref": "#/$defs/trainingLevel" }, { "type": "null" }] },
+        "primaryGoal": { "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 240 }, { "type": "null" }] },
+        "trainingProfile": { "$ref": "#/$defs/trainingProfile" },
+        "coachNotes": { "anyOf": [{ "type": "string", "maxLength": 4000 }, { "type": "null" }] },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "updatedAt": { "$ref": "#/$defs/timestamp" },
+        "archivedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] }
+      }
+    },
+    "trainingProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "experienceLevel", "movementConstraints", "preferredEquipment", "notes"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "experienceLevel": { "anyOf": [{ "enum": ["BEGINNER", "INTERMEDIATE", "ADVANCED"] }, { "type": "null" }] },
+        "movementConstraints": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 240 }, "maxItems": 40 },
+        "preferredEquipment": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 120 }, "maxItems": 80 },
+        "notes": { "anyOf": [{ "type": "string", "maxLength": 2000 }, { "type": "null" }] }
+      }
+    },
+    "trainingSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "id", "memberId", "sessionDate", "status", "templateKey", "templateVersion", "levelSnapshot", "sessionTitle", "focusSnapshot", "resolvedSessionSnapshot", "memberCopyText", "coachNote", "createdAt", "updatedAt", "completedAt", "idempotencyKey"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "$ref": "#/$defs/id" },
+        "memberId": { "$ref": "#/$defs/id" },
+        "sessionDate": { "$ref": "#/$defs/date" },
+        "status": { "enum": ["PLANNED", "COMPLETED", "CANCELLED"], "description": "Only COMPLETED is evidence of performed training. PLANNED and CANCELLED never enter MemberTrainingContext." },
+        "templateKey": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "templateVersion": { "type": ["string", "null"], "maxLength": 120 },
+        "levelSnapshot": { "anyOf": [{ "$ref": "#/$defs/trainingLevel" }, { "type": "null" }] },
+        "sessionTitle": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "focusSnapshot": { "$ref": "#/$defs/focusSnapshot" },
+        "resolvedSessionSnapshot": { "type": "object", "description": "Frozen public ResolvedSession as saved; opening history never invokes the current Resolver." },
+        "memberCopyText": { "type": ["string", "null"], "maxLength": 12000 },
+        "coachNote": { "type": ["string", "null"], "maxLength": 4000 },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "updatedAt": { "$ref": "#/$defs/timestamp" },
+        "completedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }], "description": "Required for COMPLETED and null for PLANNED or CANCELLED." },
+        "idempotencyKey": { "type": ["string", "null"], "minLength": 8, "maxLength": 200 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "COMPLETED" } }, "required": ["status"] },
+          "then": { "properties": { "completedAt": { "$ref": "#/$defs/timestamp" } } },
+          "else": { "properties": { "completedAt": { "type": "null" } } }
+        }
+      ]
+    },
+    "trainingSessionSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "session", "items"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "session": { "$ref": "#/$defs/trainingSession" },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/trainingSessionItem" }, "maxItems": 80 }
+      }
+    },
+    "trainingSessionItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "id", "sessionId", "phase", "slotKey", "sortOrder", "plannedActionId", "plannedActionSnapshot", "performedActionId", "performedActionSnapshot", "plannedPrescriptionSnapshot", "performedPrescription", "sets", "reps", "loadKg", "rir", "rpe", "completed", "note"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "id": { "$ref": "#/$defs/id" },
+        "sessionId": { "$ref": "#/$defs/id" },
+        "phase": { "enum": ["PRIMARY", "SECONDARY", "ACCESSORY", "CORE", "CONDITIONING", "FOAM", "PREP", "MOBILITY", "UNKNOWN"], "description": "Only the first five canonical phases enter training load context; FOAM, PREP, MOBILITY, and UNKNOWN are excluded." },
+        "slotKey": { "type": ["string", "null"], "maxLength": 80 },
+        "sortOrder": { "type": "integer", "minimum": 0 },
+        "plannedActionId": { "type": ["string", "null"], "maxLength": 160 },
+        "plannedActionSnapshot": { "anyOf": [{ "$ref": "#/$defs/actionSnapshot" }, { "type": "null" }] },
+        "performedActionId": { "type": ["string", "null"], "maxLength": 160 },
+        "performedActionSnapshot": { "anyOf": [{ "$ref": "#/$defs/actionSnapshot" }, { "type": "null" }] },
+        "plannedPrescriptionSnapshot": { "$ref": "#/$defs/prescriptionSnapshot" },
+        "performedPrescription": { "anyOf": [{ "$ref": "#/$defs/prescriptionSnapshot" }, { "type": "null" }] },
+        "sets": { "anyOf": [{ "type": "integer", "minimum": 0, "maximum": 100 }, { "type": "null" }] },
+        "reps": { "anyOf": [{ "type": ["integer", "string"], "minimum": 0, "maxLength": 80 }, { "type": "null" }] },
+        "loadKg": { "anyOf": [{ "type": "number", "minimum": 0, "maximum": 2000 }, { "type": "null" }] },
+        "rir": { "anyOf": [{ "type": "number", "minimum": 0, "maximum": 10 }, { "type": "null" }] },
+        "rpe": { "anyOf": [{ "type": "number", "minimum": 0, "maximum": 10 }, { "type": "null" }] },
+        "completed": { "type": "boolean" },
+        "note": { "type": ["string", "null"], "maxLength": 2000 }
+      }
+    },
+    "actionSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "actionId", "name", "pattern", "level", "primaryMuscles", "secondaryMuscles", "equipment", "stationId"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "actionId": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "pattern": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "level": { "type": ["string", "null"], "maxLength": 80 },
+        "primaryMuscles": { "$ref": "#/$defs/stringList" },
+        "secondaryMuscles": { "$ref": "#/$defs/stringList" },
+        "equipment": { "type": ["string", "null"], "maxLength": 240 },
+        "stationId": { "type": ["string", "null"], "maxLength": 160 }
+      }
+    },
+    "prescriptionSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "sets", "reps", "rir", "restSeconds", "tempo", "loadPrescription", "rawText"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "sets": { "anyOf": [{ "type": "integer", "minimum": 0, "maximum": 100 }, { "type": "null" }] },
+        "reps": { "anyOf": [{ "type": ["integer", "string"], "minimum": 0, "maxLength": 80 }, { "type": "null" }] },
+        "rir": { "anyOf": [{ "type": "number", "minimum": 0, "maximum": 10 }, { "type": "null" }] },
+        "restSeconds": { "anyOf": [{ "type": "integer", "minimum": 0, "maximum": 7200 }, { "type": "null" }] },
+        "tempo": { "type": ["string", "null"], "maxLength": 80 },
+        "loadPrescription": { "type": ["string", "null"], "maxLength": 240 },
+        "rawText": { "type": ["string", "null"], "maxLength": 240 }
+      }
+    },
+    "focusSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "patterns", "primaryMuscles"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "patterns": { "$ref": "#/$defs/stringList" },
+        "primaryMuscles": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "memberTrainingContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "memberId", "displayName", "trainingLevel", "lastCompletedSession", "recentSessions", "recentPatterns", "recentActions", "recentPrimaryMuscles", "generatedAt"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "memberId": { "$ref": "#/$defs/id" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "trainingLevel": { "anyOf": [{ "$ref": "#/$defs/trainingLevel" }, { "type": "null" }] },
+        "lastCompletedSession": { "anyOf": [{ "$ref": "#/$defs/recentSession" }, { "type": "null" }] },
+        "recentSessions": { "type": "array", "items": { "$ref": "#/$defs/recentSession" }, "maxItems": 3 },
+        "recentPatterns": { "type": "array", "items": { "$ref": "#/$defs/recentPattern" } },
+        "recentActions": { "type": "array", "items": { "$ref": "#/$defs/recentAction" } },
+        "recentPrimaryMuscles": { "type": "array", "items": { "$ref": "#/$defs/recentMuscle" } },
+        "generatedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "recentSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sessionDate", "templateKey", "sessionTitle", "completedAt", "sessionsAgo"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "sessionDate": { "$ref": "#/$defs/date" },
+        "templateKey": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "sessionTitle": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "completedAt": { "$ref": "#/$defs/timestamp" },
+        "sessionsAgo": { "type": "integer", "minimum": 0, "maximum": 2 }
+      }
+    },
+    "recentPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pattern", "sessionsAgo", "countLast3"],
+      "properties": {
+        "pattern": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "sessionsAgo": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "countLast3": { "type": "integer", "minimum": 1, "maximum": 3 }
+      }
+    },
+    "recentAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actionId", "actionNameSnapshot", "sessionsAgo", "countLast3"],
+      "properties": {
+        "actionId": { "$ref": "#/$defs/id" },
+        "actionNameSnapshot": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "sessionsAgo": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "countLast3": { "type": "integer", "minimum": 1, "maximum": 3 }
+      }
+    },
+    "recentMuscle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["muscle", "sessionsAgo", "countLast3"],
+      "properties": {
+        "muscle": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "sessionsAgo": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "countLast3": { "type": "integer", "minimum": 1, "maximum": 3 }
+      }
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+      "maxItems": 120
+    },
+    "id": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "trainingLevel": { "enum": ["L1", "L2", "L3", "L4"] },
+    "date": { "type": "string", "format": "date" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}
