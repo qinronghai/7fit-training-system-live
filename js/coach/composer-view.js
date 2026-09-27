@@ -65,7 +65,7 @@
         const patterns=Array.isArray(context.recentPatterns)?context.recentPatterns:[];
         const actions=Array.isArray(context.recentActions)?context.recentActions:[];
         const lastPatterns=patterns.filter(item=>item.sessionsAgo===0).slice(0,4);
-        const lastActions=actions.filter(item=>item.sessionsAgo===0).slice(0,4);
+        const lastActions=actions.filter(item=>item.sessionsAgo===0);
         const allPatterns=patterns.slice(0,6);
         content=`<div class="member-first-context-last"><div><span>最近完成 · ${esc(String(last.sessionDate||'日期未记录').replaceAll('-','.'))}</span><strong>${esc(last.sessionTitle||last.templateKey||'训练课程')}</strong></div><a href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a></div><div class="member-first-context-columns"><section><h3>上次训练动作</h3>${lastActions.length?`<ul>${lastActions.map(item=>`<li>${esc(item.actionNameSnapshot||item.actionId)}</li>`).join('')}</ul>`:'<p>暂无主要动作记录</p>'}</section><section><h3>近 3 节训练模式</h3>${allPatterns.length?`<ul>${allPatterns.map(item=>`<li><span>${esc(patternLabel(item.pattern))}</span><b>${esc(sessionAgoLabel(item.sessionsAgo))}</b></li>`).join('')}</ul>`:'<p>暂无主要训练模式记录</p>'}</section>${lastPatterns.length?`<p class="member-first-context-latest-patterns">上次训练：${lastPatterns.map(item=>esc(patternLabel(item.pattern))).join(' · ')}</p>`:''}</div>`;
       }

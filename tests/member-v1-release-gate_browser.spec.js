@@ -255,3 +255,48 @@ test('Member-first and Template-first F111 complete the local release flow', asy
     expect(item.plannedPrescriptionSnapshot).toEqual(plannedPrescriptions.get(item.slotKey));
   }
 });
+
+test('Member-first context shows all recent actions including a late-sorting performed replacement', async ({ page }) => {
+  const state = await installReleaseApi(page);
+  state.members.push({ id: MEMBER_ID, displayName: '上下文验收会员', trainingLevel: 'L2', status: 'ACTIVE' });
+  const sessionId = 'e9000000-0000-4000-8000-000000000002';
+  state.sessions.push({
+    id: sessionId,
+    memberId: MEMBER_ID,
+    sessionDate: '2026-09-28',
+    createdAt: '2026-09-28T09:00:00.000Z',
+    completedAt: '2026-09-28T10:00:00.000Z',
+    status: 'COMPLETED',
+    templateKey: 'f111',
+    sessionTitle: 'F111 验收课',
+  });
+  const actualNames = ['Action B', 'Action C', 'Action D', 'Action E', 'Action F', 'Z Actual Replacement'];
+  state.itemsBySession[sessionId] = actualNames.map((name, sortOrder) => {
+    const actionId = `actual-${sortOrder}`;
+    const actualSnapshot = {
+      actionId,
+      name,
+      pattern: ['SQUAT', 'HORIZONTAL_PULL', 'HIP_HINGE', 'VERTICAL_PULL', 'ANTI_ROTATION', 'SQUAT'][sortOrder],
+      primaryMuscles: ['Test muscle'],
+    };
+    const isReplacement = sortOrder === actualNames.length - 1;
+    return {
+      id: `item-${sortOrder}`,
+      phase: sortOrder === 0 ? 'PRIMARY' : sortOrder === 1 ? 'SECONDARY' : sortOrder === 5 ? 'CORE' : 'ACCESSORY',
+      sortOrder,
+      completed: true,
+      plannedActionId: isReplacement ? 'planned-squat' : actionId,
+      plannedActionSnapshot: isReplacement ? { ...actualSnapshot, actionId: 'planned-squat', name: 'Original Planned Squat' } : actualSnapshot,
+      performedActionId: actionId,
+      performedActionSnapshot: actualSnapshot,
+    };
+  });
+
+  await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
+  const context = page.locator('[data-member-first-context]');
+  const recentActionList = context.locator('.member-first-context-columns section').first().locator('li');
+  await expect(context).toContainText('F111 验收课');
+  await expect(recentActionList).toHaveCount(actualNames.length);
+  await expect(context).toContainText('Z Actual Replacement');
+  await expect(context).not.toContainText('Original Planned Squat');
+});
