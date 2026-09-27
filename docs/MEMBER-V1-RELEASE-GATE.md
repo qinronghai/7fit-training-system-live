@@ -1,18 +1,18 @@
 # Member Management V1 Release Gate
 
-Status: **local implementation, regression gates, and the free isolated Supabase staging gate pass; production release is still pending.**
+Status: **Member Management V1 is live on the existing Free Supabase organization. Production database, API, UI, security, browser, and release gates have passed.**
 
 ## Local Evidence
 
 - Workspace: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS`
 - Branch base: `0f373dbdd9babae5eef5a6dd1caad47f889daf96` (`origin/master` at start)
-- Python 3.13 full suite on 2026-09-28: **276 passed**.
+- Python 3.12 full suite on 2026-09-28: **276 passed**.
 - Node runtime suite: **97 `tests/*_test.js` files passed**.
 - Node built-in ESM suite: **8 passed**.
-- Playwright Chromium suite on 2026-09-28 after fresh-review fixes: **133 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
-- Standalone Member V1 integrated browser gate: **1 passed**.
+- Playwright Chromium suite on 2026-09-28 after the production-context visibility fix: **134 passed**. The Member Center, Save-to-Member, and integrated Member V1 release-gate specs are included.
+- Standalone Member V1 integrated browser gate: **2 passed**, including the six-action performed-replacement case.
 - System data build freshness: **PASS** (`python tools/build_system_data.py --check`).
-- Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`, Python 3.13).
+- Existing V14.8 schema: **PASS** (`python tools/validate_v148_schema.py`, Python 3.12).
 - JavaScript syntax gate: **PASS** (`rg --files -g '*.js' data js | xargs -r -n1 node --check`).
 - Member and Case Edge Function bundle builds: **PASS**.
 - `git diff --check`: **PASS**.
@@ -24,6 +24,8 @@ Status: **local implementation, regression gates, and the free isolated Supabase
 
 Screenshot directory: `/Users/ronny/.codex/visualizations/2026/09/27/01a0e289-3e47-7c31-8115-2df2010a9a44/member-v1/`.
 
+Live production F111 Member-first screenshot (1280×720), captured after build `317a3bbd`: `/Users/ronny/.codex/visualizations/2026/09/27/01a0e289-3e47-7c31-8115-2df2010a9a44/member-v1/live-production-member-context-desktop.jpg`.
+
 Additional live-staging Member-first F111 capture: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS/output/playwright/member-v1-f111-member-context-mobile.png` (390×844).
 
 Full-matrix viewport coverage: 360, 390×844, 430, 1080, 1280, and 1440 pixels wide. Screenshots are local review evidence and are not live deployment evidence.
@@ -33,7 +35,7 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 ## Isolated Free Supabase Staging Evidence
 
 - Organization plan: **Free**. Isolated staging project: `7fit-member-v1-staging`, ref `wxvyjfvhyoudoxjuwlcp`, region `ap-southeast-1`, PostgreSQL `17.6.1.166`, status `ACTIVE_HEALTHY`.
-- Staging is a separate free project because Supabase preview branches require Pro; no paid branch was created. Production project `7fit-real-results` (`ynsodlyanpmixbbxblqh`) was not migrated or otherwise written to.
+- Staging is a separate free project because Supabase preview branches require Pro; no paid branch was created. Production project `7fit-real-results` (`ynsodlyanpmixbbxblqh`) remained read-only during staging verification; its later release is recorded below.
 - Applied staging migrations: remote version `20260927165952` (`member_management_v1`) and `20260927170340` (`case_admin_sessions`). The Member schema is the additive migration in `supabase/migrations/20260927115315_member_management_v1.sql`.
 - Deployed staging Edge Function: `member-api` version **1**, `verify_jwt=false` with the existing custom Staff session authentication enforced by the function.
 - Real API/browser flow: list/create member, save a planned F111 session, replace a planned action with the performed action, complete the session, refresh the Member detail and F111 context, and cancel a separate template-first session. Browser requests carried the Staff bearer token only; no Supabase API key was sent by the browser.
@@ -44,17 +46,21 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - Additional persisted boundary checks passed: invalid training level/profile values are rejected; member deletion with history is restricted; invalid second-item insertion rolls the parent session and first item back atomically; deleting a test session cascades its items.
 - `supabase/tests/member_management_v1_release_gate.sql` ran against this Free staging database: identical planned-session replay returned the original session and left one item; a completion at revision 1 advanced to revision 2; a stale second writer at revision 1 was rejected with the winning completed session, performed snapshot, and actuals intact. A follow-up query confirmed the temporary database-gate member was removed (0 leftovers).
 - Security Advisor returned four INFO findings, all intentional “RLS enabled, no policy” notices on `case_admin_sessions`, `members`, `training_sessions`, and `training_session_items`; no higher-severity finding. Performance Advisor returned two INFO unused-index notices (`members_archived_at_idx` on the small staging table and the existing `case_admin_sessions_active_lookup_idx`); no higher-severity finding.
-- Read-only production check still returned **7 cases** and **6 case assets**. The Member migration has not been applied to production.
+- Before production rollout, a read-only check returned **7 cases** and **6 case assets**; those counts remained unchanged after the additive Member migration.
 - The disposable staging Staff token was revoked after the browser flow, and its browser local-storage entry was cleared.
 
-## Production Release Gates Still Required
+## Production Release Evidence
 
-- Push the reviewed branch and open the PR; complete GitHub `verify` and `browser-smoke` checks.
-- After merge, apply the additive Member migration to production, deploy `member-api`, and verify the production function version and protected API behavior.
-- Confirm the master `verify`, `browser-smoke`, and `deploy` jobs pass; record the Pages URL and build marker, then verify live routes, browser errors, and Member flows.
-- Recheck production Case Library counts/data and run the production Security/Performance Advisors after the migration. Record the final migration/function/build identifiers before updating and closing Issues #160–#167 and Epic #159.
-
-Therefore #167 remains **pending production release**, and Epic #159 is not complete yet.
+- Supabase organization plan: **Free**. Production project: `7fit-real-results`, ref `ynsodlyanpmixbbxblqh`, region `ap-southeast-1`, PostgreSQL 17, status `ACTIVE_HEALTHY`.
+- Applied production migration: `20260927182659` (`member_management_v1`). The migration adds the three Member tables and does not alter Case tables.
+- Production `member-api`: version **1**, `ACTIVE`, `verify_jwt=false`; the function validates the existing Staff bearer session. A request without Staff authentication returned **401 `unauthorized`**.
+- Production Security Advisor: **6 INFO only**, all intentional RLS-enabled/no-policy findings for the three Member tables and three existing Case tables. Performance Advisor: **1 INFO only**, the new `members_archived_at_idx` is unused at current traffic. No higher-severity findings.
+- Production rows after release: **7 cases**, **6 case assets**, and one archived non-sensitive release-test member with one completed session. The test member was archived through the recoverable UI flow; its completed history remains available.
+- Live Member-first E2E: create the test member, enter F111, save a `PLANNED` session, verify it does not enter completed context, replace the planned `徒手深蹲` with `壶铃高脚杯深蹲`, record 3×12 at 12 kg, RIR 2, RPE 8 and a note, complete the session, and reopen F111. The next-context list now shows all six completed actions, including the performed replacement.
+- UI visibility correction: PR [#169](https://github.com/qinronghai/7fit-training-system-live/pull/169) removes the four-action display cap that hid alphabetically late actions. Its browser regression uses six completed actions and asserts that the performed snapshot is shown instead of the original planned name.
+- Feature PR [#168](https://github.com/qinronghai/7fit-training-system-live/pull/168) merged as `470f592e6779c502eaa0cac9fc5dd1ad4686de13`; master workflow run `36340633579` passed `verify`, `browser-smoke`, and `deploy`.
+- Follow-up PR [#169](https://github.com/qinronghai/7fit-training-system-live/pull/169) merged as `317a3bbd7335117f27fe3d3b7a07f03ff87de1b9`; master workflow run `36342696929` passed `verify`, `browser-smoke`, and `deploy`.
+- Live Pages URL: [7fit-training-system-live](https://qinronghai.github.io/7fit-training-system-live/). The deployed `7fit-build` marker is **`317a3bbd`**. The live F111 Member-first route displayed the completed session and all six recent actions.
 
 ## Completion Record
 
@@ -70,7 +76,13 @@ Therefore #167 remains **pending production release**, and Epic #159 is not comp
 | Staff auth/API revoke and concurrent revision regressions | PASS | `tests/member_api_test.js` |
 | Historical action metadata snapshot regression | PASS | `tests/member-v1-release-gate_browser.spec.js` |
 | Staging responsive browser and errors | PASS: six widths; zero errors | Member-first F111 route |
-| Production migration/function | Pending | Production project unchanged |
-| GitHub verify/browser-smoke/deploy | Pending | PR/merge not yet run |
-| Pages live build marker and URL | Pending | — |
-| Production live screenshots and browser errors | Pending | — |
+| Production migration | PASS: `20260927182659` | `7fit-real-results`, additive Member schema |
+| Production `member-api` | PASS: version 1; unauthenticated request returned 401 | Staff bearer validation enforced in function |
+| Production Security Advisor | PASS: 6 intentional INFO notices only | RLS-enabled/no-policy tables |
+| Production Performance Advisor | PASS: 1 INFO unused index only | `members_archived_at_idx` |
+| Production Case Library preservation | PASS: 7 cases, 6 case assets | Counts unchanged after migration |
+| Production Member-first closure | PASS: planned → replacement → completed → next F111 context | Test member archived; 1 completed session retained |
+| Performed-action context visibility | PASS: all 6 latest actions shown, including `壶铃高脚杯深蹲` | PR #169; integrated browser gate 2 passed |
+| GitHub verify/browser-smoke/deploy | PASS | PR #168 run `36340633579`; PR #169 run `36342696929` |
+| Pages live build marker and URL | PASS: `317a3bbd` | `https://qinronghai.github.io/7fit-training-system-live/` |
+| Production live screenshot | PASS: captured and visually inspected at 1280×720 | `live-production-member-context-desktop.jpg` |
