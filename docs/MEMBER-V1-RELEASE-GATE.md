@@ -27,7 +27,8 @@ The integrated Playwright release scenario uses an in-memory mock Member API. It
 ## Supabase and Live Gates Still Required
 
 - The Member migration `20260927115315_member_management_v1.sql` has **not** been applied to any database.
-- No development branch has been created. The read-only branch check returned no branches; the project and organization are resolved. For `ap-southeast-1`, the quoted default Micro compute cost is `$0.01344/hour` (about `$9.81` for 730 compute hours, before other metered usage). User cost confirmation is pending before branch creation. See [Supabase branching costs](https://supabase.com/docs/guides/platform/manage-your-usage/branching) and [compute usage](https://supabase.com/docs/guides/platform/manage-your-usage/compute).
+- No development branch has been created. The branch list contains only the default `main`. The project and organization are resolved, and the `$0.01344/hour` default Micro quote was refreshed and cost confirmation recorded on 2026-09-28. Branch creation was rejected with `PaymentRequiredException: Branching is supported only on the Pro plan or above`; Supabase documents preview branching as a Pro feature. The `$9.81` estimate for 730 hours covers base compute only: preview branches can also incur disk, egress, and storage usage, and branching usage is not covered by the Spend Cap. See [Supabase plan and branching requirements](https://supabase.com/docs/guides/deployment), [branching costs](https://supabase.com/docs/guides/platform/manage-your-usage/branching), and [compute usage](https://supabase.com/docs/guides/platform/manage-your-usage/compute).
+- A local Supabase/PostgreSQL substitute is unavailable on this host: the Supabase CLI, Docker, and PostgreSQL executables are not installed. No migration has been executed against a database.
 - The `tests/fixtures/member-v1/anon_access.sql` catalog assertions have **not** been executed against PostgreSQL.
 - Security and Performance Advisors have **not** been run against a database containing the Member schema.
 - `member-api` has **not** been deployed to a development branch, exercised against persisted Member records, or deployed to production.
@@ -42,7 +43,7 @@ Therefore #167 is **pending**, and Epic #159 is not complete. Once the branch co
 | Evidence | Result | Reference |
 | --- | --- | --- |
 | Migration version applied | Pending | — |
-| Development branch and project ref | Pending cost confirmation | — |
+| Development branch and project ref | Blocked: branch API requires Pro or above | — |
 | Anonymous table/RPC access denial | Pending database execution | `tests/fixtures/member-v1/anon_access.sql` |
 | Security Advisor | Pending | — |
 | Performance Advisor | Pending | — |
