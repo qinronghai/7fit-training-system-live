@@ -95,6 +95,23 @@ async function main() {
   actualResolved.main.content[0].name = 'Changed after save';
   assert.equal(JSON.stringify(snapshot), frozenSnapshot, 'saved snapshots must not retain live resolver references');
 
+  const prescriptionSnapshot = domain.buildTrainingSessionSnapshot(resolved, {
+    sessionId: planned.session.id,
+    memberId: planned.session.memberId,
+    sessionDate: planned.session.sessionDate,
+    createdAt: planned.session.createdAt,
+    updatedAt: planned.session.updatedAt,
+    idempotencyKey: planned.session.idempotencyKey,
+    itemIds: planned.items.map(item => item.id),
+    actionsById: window.V14_DATA.actions,
+    anatomyById: window.V14_ANATOMY.records,
+    prescriptionForSlot: slot => ({ SUPPORT: '3组 × 20次', '2': '2组 × 15次左右', '3': '2组 × 15次左右' })[slot.key] || slot.prescription,
+  });
+  for (const [slotKey, expected] of [['SUPPORT', '3组 × 20次'], ['2', '2组 × 15次左右'], ['3', '2组 × 15次左右']]) {
+    assert.equal(prescriptionSnapshot.items.find(item => item.slotKey === slotKey).plannedPrescriptionSnapshot.rawText, expected,
+      `${slotKey} must freeze the same resolved prescription that F111 displays/copies`);
+  }
+
   const replacedItem = replaced.items.find(item => item.plannedActionId !== item.performedActionId);
   assert(replacedItem, 'fixture must preserve both sides of a replaced action');
   assert.notDeepEqual(replacedItem.plannedActionSnapshot, replacedItem.performedActionSnapshot);

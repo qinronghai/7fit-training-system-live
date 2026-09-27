@@ -81,7 +81,31 @@
 
   async function restoreIntentSelection(version){
     const intent=current?.intent,select=dialog?.querySelector('[data-member-save-select]');
-    if(!intent||!select||version!==memberSearchVersion||directoryLoading)return;
+    if(!select||version!==memberSearchVersion||directoryLoading)return;
+    if(current.memberId){
+      const selectionAtStart=selectionVersion,searchInput=dialog.querySelector('[data-member-save-search]'),searchAtStart=searchInput?.value.trim()||'';
+      const routedMemberId=current.memberId;
+      let member=members.find(value=>value.id===current.memberId);
+      if(!member){
+        try{member=await window.V14MemberAPI.getMember(current.memberId);}
+        catch(error){if(version===memberSearchVersion&&error?.status===401)showError(error);return;}
+        if(version!==memberSearchVersion||selectionAtStart!==selectionVersion||!current||current.memberId!==routedMemberId||dialog?.querySelector('[data-member-save-select]')!==select)return;
+        if(member&&searchAtStart&&!String(member.displayName||'').toLocaleLowerCase().includes(searchAtStart.toLocaleLowerCase()))return;
+        if(member&&member.status==='ACTIVE'&&!member.archivedAt){
+          members=[...members,member].sort((left,right)=>String(left.displayName||'').localeCompare(String(right.displayName||''),'zh-Hans-CN'));
+          renderOptions();
+        }
+      }
+      if(version!==memberSearchVersion||selectionAtStart!==selectionVersion||!current||current.memberId!==routedMemberId||select.value&&select.value!==routedMemberId)return;
+      if(!member||member.status!=='ACTIVE'||member.archivedAt){
+        setStatus('当前会员已停用或归档，请从有效会员入口开始新课程。','error');
+        return;
+      }
+      select.value=member.id;
+      await refreshSelectionState();
+      return;
+    }
+    if(!intent)return;
     if(members.some(member=>member.id===intent.memberId)){
       select.value=intent.memberId;
       await refreshSelectionState();
@@ -240,10 +264,10 @@
 
   function close(){if(busy)return;selectionVersion++;memberSearchVersion++;clearTimeout(memberSearchTimer);directoryLoading=false;if(dialog?.open)dialog.close();current=null;excludedMemberId='';}
 
-  async function open(trigger,resolvedSession){
+  async function open(trigger,resolvedSession,memberId=null){
     selectionVersion++;previousFocus=trigger||document.activeElement;excludedMemberId='';busy=false;
     directoryLoading=false;
-    current={resolvedSession,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null};
+    current={resolvedSession,memberId:typeof memberId==='string'&&memberId?memberId:null,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null};
     const opening=current;
     const root=ensureDialog();root.querySelector('[data-member-save-search]').value='';root.querySelector('[data-member-save-select]').innerHTML='<option value="">加载会员中…</option>';
     root.querySelector('[data-member-save-submit]').hidden=false;root.querySelector('[data-member-save-new-intent]').hidden=true;
@@ -251,17 +275,17 @@
     if(!root.open)root.showModal();
     loadDirectoryImmediately();
     try{
-      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{sessionDate:current.sessionDate});
+      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{memberId:current.memberId||undefined,sessionDate:current.sessionDate});
       if(current!==opening)return;
       current.intent=intent;
       await restoreIntentSelection(memberSearchVersion);
     }catch(error){showError(error);}
   }
 
-  function bind(root,getResolvedSession){
+  function bind(root,getResolvedSession,getMemberId){
     if(!root)return;
     root.querySelectorAll('[data-save-member-session]').forEach(button=>button.addEventListener('click',()=>{
-      try{void open(button,getResolvedSession());}
+      try{void open(button,getResolvedSession(),getMemberId?.()||null);}
       catch(_){button.focus();}
     }));
   }

@@ -21,24 +21,34 @@ async function installStaffSession(page) {
   })));
 }
 
-async function mockMemberApi(page, handler, availableMembers = members) {
+async function mockMemberApi(page, handler, availableMembers = members, state = {}) {
   const calls = [];
   await page.route(`${API}**`, async route => {
     const request = route.request();
     const url = new URL(request.url());
     const action = url.searchParams.get('action');
     const body = request.method() === 'POST' ? request.postDataJSON() : null;
-    calls.push({ action, body, search: url.searchParams.get('search') || '', authorization: request.headers().authorization });
+    calls.push({ action, body, search: url.searchParams.get('search') || '', memberId: url.searchParams.get('memberId') || '', authorization: request.headers().authorization });
     if (action === 'list-members') {
       const search = (url.searchParams.get('search') || '').toLocaleLowerCase();
+      if (search) state.memberSearchStarted = true;
       const limit = Number(url.searchParams.get('limit')) || 100;
       const filtered = availableMembers.filter(member => String(member.displayName || '').toLocaleLowerCase().includes(search));
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ members: filtered.slice(0, limit) }) });
       return;
     }
     if (action === 'get-member') {
+      if (state.memberSearchStarted && url.searchParams.get('memberId') === state.delayGetMemberId && state.getMemberWait) await state.getMemberWait;
       const member = availableMembers.find(value => value.id === url.searchParams.get('memberId')) || null;
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ member }) });
+      return;
+    }
+    if (action === 'get-member-training-context') {
+      const member = availableMembers.find(value => value.id === url.searchParams.get('memberId')) || availableMembers[0];
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ context: {
+        schemaVersion: 1, memberId: member.id, displayName: member.displayName, trainingLevel: 'L3',
+        lastCompletedSession: null, recentSessions: [], recentPatterns: [], recentActions: [], recentPrimaryMuscles: [],
+      } }) });
       return;
     }
     await handler({ route, action, body, calls });
@@ -95,7 +105,28 @@ async function checkSavedSnapshot(page, route, memberId) {
 }
 
 test('preset F111 requires an explicit member save and stores a full PLANNED snapshot', async ({ page }) => {
-  await checkSavedSnapshot(page, '/#/coach/f111/f111-06/l3', members[0].id);
+  await installStaffSession(page);
+  const captured = [];
+  await mockMemberApi(page, async ({ route, action, body }) => {
+    if (action !== 'save-planned-session') throw new Error(`unexpected member API action ${action}`);
+    captured.push(body.snapshot);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      sessionId: body.snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false,
+    }) });
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/f111/f111-06/l3');
+  const displayedPrescriptions = await page.evaluate(() => Object.fromEntries(
+    ['SUPPORT', '2', '3'].map(slotKey => [slotKey, window.V14ModuleCopy.prescriptionForF111Slot(slotKey)]),
+  ));
+  await openAndSave(page, members[0].id);
+  expect(captured).toHaveLength(1);
+  const snapshot = captured[0];
+  for (const slotKey of ['SUPPORT', '2', '3']) {
+    const displayed = displayedPrescriptions[slotKey];
+    expect(displayed, `${slotKey} must have a displayed/copy prescription`).toBeTruthy();
+    expect(snapshot.items.find(item => item.slotKey === slotKey).plannedPrescriptionSnapshot.rawText).toBe(displayed);
+  }
 });
 
 test('Composer F111 copy and cancel do not save; explicit save works', async ({ page }) => {
@@ -234,6 +265,82 @@ test('a saved preset can explicitly start a new save intent for another member',
   expect(snapshots[1].session.memberId).toBe(members[1].id);
   expect(snapshots[1].session.id).not.toBe(snapshots[0].session.id);
   expect(snapshots[1].session.idempotencyKey).not.toBe(snapshots[0].session.idempotencyKey);
+});
+
+test('Member-first save ignores another member’s saved intent and selects the routed member', async ({ page }) => {
+  await installStaffSession(page);
+  const snapshots = [];
+  await mockMemberApi(page, async ({ route, action, body }) => {
+    if (action !== 'save-planned-session') throw new Error(`unexpected member API action ${action}`);
+    snapshots.push(body.snapshot);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      sessionId: body.snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false,
+    }) });
+  });
+  const routedMember = members[1];
+  await page.goto(`/#/coach/f111?memberId=${routedMember.id}&level=L3&lower=squat&upper=horizontal_pull&core=anti_extension`);
+  await page.evaluate(async otherMemberId => {
+    const route = window.V14Router.parseHash(location.hash);
+    const resolved = window.V14CoachModules.ComposerView.composerContext(route).resolvedSession;
+    const intent = await window.V14MemberSnapshots.prepareIntent(resolved, { memberId: otherMemberId });
+    const store = JSON.parse(localStorage.getItem(window.V14MemberSnapshots.STORAGE_KEY));
+    store[intent.key] = { ...intent, status: 'SAVED', savedSessionId: intent.snapshot.session.id };
+    localStorage.setItem(window.V14MemberSnapshots.STORAGE_KEY, JSON.stringify(store));
+  }, members[0].id);
+
+  await page.locator('[data-save-member-session]').click();
+  const dialog = page.locator('[data-member-save-dialog]');
+  const select = dialog.locator('[data-member-save-select]');
+  await expect(select).toHaveValue(routedMember.id);
+  await expect(dialog.locator('[data-member-save-status]')).not.toContainText('已保存到 林同学');
+  await dialog.locator('[data-member-save-submit]').click();
+  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 王同学 · PLANNED');
+  expect(snapshots).toHaveLength(1);
+  expect(snapshots[0].session.memberId).toBe(routedMember.id);
+});
+
+test('a delayed routed-member lookup cannot override a member explicitly selected after search', async ({ page }) => {
+  await installStaffSession(page);
+  let releaseLookup;
+  const getMemberWait = new Promise(resolve => { releaseLookup = resolve; });
+  const snapshots = [];
+  const lookupState = { delayGetMemberId: members[0].id, getMemberWait };
+  const calls = await mockMemberApi(page, async ({ route, action, body }) => {
+    if (action !== 'save-planned-session') throw new Error(`unexpected member API action ${action}`);
+    snapshots.push(body.snapshot);
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      sessionId: body.snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false,
+    }) });
+  }, members, lookupState);
+  await page.goto(`/#/coach/f111?memberId=${members[0].id}&level=L3&lower=squat&upper=horizontal_pull&core=anti_extension`);
+  await expect(page.locator('[data-member-first-context]')).toContainText('暂无已完成训练');
+  await page.locator('[data-save-member-session]').click();
+  const dialog = page.locator('[data-member-save-dialog]');
+  const search = dialog.locator('[data-member-save-search]');
+  const priorLookups = calls.filter(call => call.action === 'get-member' && call.memberId === members[0].id).length;
+  await search.fill('王同学');
+  await expect.poll(() => calls.filter(call => call.action === 'get-member' && call.memberId === members[0].id).length).toBeGreaterThan(priorLookups);
+  const delayedLookupCount = calls.filter(call => call.action === 'get-member' && call.memberId === members[0].id).length - priorLookups;
+  const select = dialog.locator('[data-member-save-select]');
+  await expect(select.locator('option')).toHaveCount(2);
+  await select.selectOption(members[1].id);
+
+  let finishedDelayedLookups = 0;
+  let releaseStarted = false;
+  page.on('requestfinished', request => {
+    if (!releaseStarted) return;
+    const url = new URL(request.url());
+    if (url.searchParams.get('action') === 'get-member' && url.searchParams.get('memberId') === members[0].id) finishedDelayedLookups++;
+  });
+  releaseStarted = true;
+  releaseLookup();
+  await expect.poll(() => finishedDelayedLookups).toBe(delayedLookupCount);
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await expect(select).toHaveValue(members[1].id);
+  await dialog.locator('[data-member-save-submit]').click();
+  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 王同学');
+  expect(snapshots).toHaveLength(1);
+  expect(snapshots[0].session.memberId).toBe(members[1].id);
 });
 
 test('save submit is disabled while the first member write is in flight', async ({ page }) => {

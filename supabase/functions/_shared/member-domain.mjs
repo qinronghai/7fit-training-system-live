@@ -312,6 +312,9 @@ export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
   };
   const items = resolvedSession.main.content.map((slot, sortOrder) => {
     if (!slot || typeof slot.actionId !== 'string' || !slot.actionId) throw Object.assign(new TypeError(`ResolvedSession slot ${sortOrder} has no actionId.`), { code: 'INVALID_RESOLVED_SESSION' });
+    const plannedPrescription = typeof options.prescriptionForSlot === 'function'
+      ? options.prescriptionForSlot(slot)
+      : slot.prescription;
     return {
       schemaVersion: CONTRACT_VERSION,
       id: options.itemIds[sortOrder],
@@ -323,7 +326,7 @@ export function buildTrainingSessionSnapshot(resolvedSession, options = {}) {
       plannedActionSnapshot: actionSnapshot(slot, options),
       performedActionId: null,
       performedActionSnapshot: null,
-      plannedPrescriptionSnapshot: prescriptionSnapshot(slot.prescription),
+      plannedPrescriptionSnapshot: prescriptionSnapshot(plannedPrescription),
       performedPrescription: null,
       sets: null,
       reps: null,
