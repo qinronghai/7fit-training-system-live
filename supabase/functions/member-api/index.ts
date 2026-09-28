@@ -254,6 +254,15 @@ const repository = {
     throwOnError(error);
     return data;
   },
+
+  async deletePlannedSession({ sessionId, expectedRevision }: { sessionId: string; expectedRevision: number }) {
+    const { data, error } = await supabase.rpc("member_delete_planned_training_session", {
+      p_session_id: sessionId,
+      p_expected_revision: expectedRevision,
+    });
+    throwOnError(error);
+    return data;
+  },
 };
 
 async function createSessionStore() {

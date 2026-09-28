@@ -61,6 +61,7 @@
       return request('complete-session',{method:'POST',body});
     },
     cancelSession(sessionId,expectedRevision){return request('cancel-session',{method:'POST',body:{sessionId,expectedRevision}});},
+    deletePlannedSession(sessionId,expectedRevision){return request('delete-planned-session',{method:'POST',body:{sessionId,expectedRevision}});},
     getMemberTrainingContext(memberId){return request('get-member-training-context',{query:{memberId}}).then(value=>value.context);},
   };
 

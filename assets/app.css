@@ -2204,6 +2204,11 @@ body{font-size:14px;line-height:1.55}
 .member-timeline-actions{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
 .member-timeline-actions>button{min-height:38px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--purple-dark);font:inherit;font-size:11px;font-weight:800;cursor:pointer}
 .member-timeline-actions>button:disabled{opacity:.62;cursor:wait}
+.member-timeline-actions>.member-session-delete-action{color:#9a3440}
+.member-timeline-feedback{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.member-timeline-feedback:empty{display:none}
+.member-timeline-feedback.success{color:#26714b}
+.member-timeline-feedback.error{color:#9a3440}
 .member-copy-inline-status{display:block;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.45}
 .member-copy-inline-status:empty{display:none}
 .member-copy-inline-status.error{color:#8b2834}

@@ -47,8 +47,15 @@ begin
 
   if pg_catalog.has_function_privilege('anon', 'public.member_save_planned_session(jsonb)', 'EXECUTE')
     or pg_catalog.has_function_privilege('anon', 'public.member_complete_training_session(uuid,integer,timestamptz,jsonb)', 'EXECUTE')
-    or pg_catalog.has_function_privilege('anon', 'public.member_cancel_training_session(uuid,integer)', 'EXECUTE') then
+    or pg_catalog.has_function_privilege('anon', 'public.member_cancel_training_session(uuid,integer)', 'EXECUTE')
+    or pg_catalog.has_function_privilege('anon', 'public.member_delete_planned_training_session(uuid,integer)', 'EXECUTE') then
     raise exception 'anon can execute a Member V1 RPC';
+  end if;
+  if not pg_catalog.has_function_privilege('service_role', 'public.member_delete_planned_training_session(uuid,integer)', 'EXECUTE') then
+    raise exception 'service_role is missing the planned-session deletion RPC grant';
+  end if;
+  if not pg_catalog.has_table_privilege('service_role', 'public.training_sessions', 'DELETE') then
+    raise exception 'service_role is missing the planned-session parent delete grant';
   end if;
 end;
 $assert_member_access$;

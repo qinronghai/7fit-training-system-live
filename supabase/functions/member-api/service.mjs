@@ -371,6 +371,12 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
         return json(await repository.cancelSession({ sessionId: id, expectedRevision: body.expectedRevision }));
       }
 
+      if (request.method === 'POST' && action === 'delete-planned-session') {
+        const id = body.sessionId || '';
+        if (!isUuid(id) || !safeExpectedRevision(body.expectedRevision)) return apiError('invalid_session', 400);
+        return json(await repository.deletePlannedSession({ sessionId: id, expectedRevision: body.expectedRevision }));
+      }
+
       if (request.method === 'GET' && action === 'get-member-training-context') {
         const memberId = url.searchParams.get('memberId') || '';
         if (!isUuid(memberId)) return apiError('invalid_member', 400, ['memberId']);
