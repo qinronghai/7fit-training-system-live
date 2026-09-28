@@ -16,7 +16,7 @@
     dialog.setAttribute('aria-labelledby','member-save-title');
     dialog.innerHTML=`
       <form class="member-save-panel" method="dialog">
-        <header class="member-save-head"><div><h2 id="member-save-title">保存训练课到会员</h2><p>将当前 F111 课程保存为一节待执行训练课。</p></div><button type="button" class="member-save-close" data-member-save-close aria-label="关闭">×</button></header>
+        <header class="member-save-head"><div><h2 id="member-save-title">保存训练课到会员</h2><p>选择会员后，会将课程计划保存为一节待训练课程。</p></div><button type="button" class="member-save-close" data-member-save-close aria-label="关闭">×</button></header>
         <div class="member-save-body">
           <label class="member-save-search"><span>搜索会员</span><input type="search" data-member-save-search placeholder="输入会员姓名" autocomplete="off"></label>
           <label class="member-save-member"><span>选择会员</span><select data-member-save-select><option value="">选择会员</option></select></label>
@@ -197,7 +197,7 @@
       return;
     }
     try{
-      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(current.resolvedSession,{memberId:selectedMember.id,sessionDate:current.sessionDate});
+      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(current.resolvedSession,{memberId:selectedMember.id,sessionDate:current.sessionDate,plannedItems:current.plannedItems});
       if(version!==selectionVersion||!current||select.value!==selectedMember.id)return;
       current.selectedIntent=intent;
       if(intent?.status==='SAVED'){
@@ -241,7 +241,7 @@
     dialog.querySelectorAll('[data-member-save-close],[data-member-save-cancel],[data-member-save-select],[data-member-save-search],[data-member-save-new-intent]').forEach(control=>{control.disabled=true;});
     setStatus('正在保存到会员训练记录…','info');
     try{
-      const intent=current.selectedIntent||await window.V14MemberSnapshots.prepareIntent(current.resolvedSession,{memberId,sessionDate:current.sessionDate,allowNewAfterPendingIntentKey:current.allowNewAfterPendingIntentKey});
+      const intent=current.selectedIntent||await window.V14MemberSnapshots.prepareIntent(current.resolvedSession,{memberId,sessionDate:current.sessionDate,allowNewAfterPendingIntentKey:current.allowNewAfterPendingIntentKey,plannedItems:current.plannedItems});
       current.intent=intent;
       current.selectedIntent=intent;
       current.allowNewAfterPendingIntentKey=null;
@@ -264,18 +264,19 @@
 
   function close(){if(busy)return;selectionVersion++;memberSearchVersion++;clearTimeout(memberSearchTimer);directoryLoading=false;if(dialog?.open)dialog.close();current=null;excludedMemberId='';}
 
-  async function open(trigger,resolvedSession,memberId=null){
-    selectionVersion++;previousFocus=trigger||document.activeElement;excludedMemberId='';busy=false;
+  async function open(trigger,resolvedSession,memberId=null,options={}){
+    selectionVersion++;previousFocus=trigger||document.activeElement;excludedMemberId=typeof options?.excludeMemberId==='string'?options.excludeMemberId:'';busy=false;
     directoryLoading=false;
-    current={resolvedSession,memberId:typeof memberId==='string'&&memberId?memberId:null,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null};
+    current={resolvedSession,memberId:typeof memberId==='string'&&memberId?memberId:null,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null,plannedItems:Array.isArray(options?.plannedItems)?options.plannedItems:null};
     const opening=current;
     const root=ensureDialog();root.querySelector('[data-member-save-search]').value='';root.querySelector('[data-member-save-select]').innerHTML='<option value="">加载会员中…</option>';
     root.querySelector('[data-member-save-submit]').hidden=false;root.querySelector('[data-member-save-new-intent]').hidden=true;
     setStatus('正在加载有效会员…','info');
     if(!root.open)root.showModal();
     loadDirectoryImmediately();
+    if(options?.deferIntentLookup===true)return;
     try{
-      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{memberId:current.memberId||undefined,sessionDate:current.sessionDate});
+      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{memberId:current.memberId||undefined,sessionDate:current.sessionDate,plannedItems:current.plannedItems});
       if(current!==opening)return;
       current.intent=intent;
       await restoreIntentSelection(memberSearchVersion);
