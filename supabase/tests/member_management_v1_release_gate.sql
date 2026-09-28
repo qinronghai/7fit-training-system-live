@@ -3,14 +3,24 @@ declare
   v_member_id uuid := gen_random_uuid();
   v_session_id uuid := gen_random_uuid();
   v_item_id uuid := gen_random_uuid();
+  v_delete_session_id uuid := gen_random_uuid();
+  v_delete_item_id uuid := gen_random_uuid();
+  v_cancel_session_id uuid := gen_random_uuid();
+  v_cancel_item_id uuid := gen_random_uuid();
   v_snapshot jsonb;
+  v_delete_snapshot jsonb;
   v_first jsonb;
   v_replay jsonb;
   v_completion jsonb;
+  v_deleted jsonb;
+  v_cancelled jsonb;
   v_performed_item jsonb;
   v_session public.training_sessions%rowtype;
   v_item public.training_session_items%rowtype;
   v_stale_rejected boolean := false;
+  v_stale_delete_rejected boolean := false;
+  v_completed_delete_rejected boolean := false;
+  v_cancelled_delete_rejected boolean := false;
 begin
   insert into public.members (id, display_name, status, training_level, training_profile)
   values (
@@ -146,12 +156,75 @@ begin
     raise exception 'stale second writer changed winning item data or planned snapshot';
   end if;
 
+  begin
+    perform public.member_delete_planned_training_session(v_session_id, 2);
+    raise exception 'completed session unexpectedly allowed deletion';
+  exception when check_violation then
+    v_completed_delete_rejected := true;
+  end;
+  if not v_completed_delete_rejected then
+    raise exception 'completed session deletion was not rejected';
+  end if;
+
+  v_delete_snapshot := jsonb_set(v_snapshot, '{session,id}', to_jsonb(v_delete_session_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{session,idempotencyKey}', to_jsonb('member-v1-db-gate-delete-' || v_delete_session_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{items,0,id}', to_jsonb(v_delete_item_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{items,0,sessionId}', to_jsonb(v_delete_session_id::text));
+  perform public.member_save_planned_session(v_delete_snapshot);
+
+  begin
+    perform public.member_delete_planned_training_session(v_delete_session_id, 2);
+    raise exception 'stale planned-session deletion unexpectedly succeeded';
+  exception when serialization_failure then
+    v_stale_delete_rejected := true;
+  end;
+  if not v_stale_delete_rejected
+    or not exists (select 1 from public.training_sessions where id = v_delete_session_id and status = 'PLANNED' and revision = 1)
+    or (select count(*) from public.training_session_items where session_id = v_delete_session_id) <> 1 then
+    raise exception 'stale deletion changed the planned session or its item';
+  end if;
+
+  v_deleted := public.member_delete_planned_training_session(v_delete_session_id, 1);
+  if v_deleted->>'sessionId' <> v_delete_session_id::text
+    or v_deleted->>'status' <> 'DELETED'
+    or v_deleted->>'deleted' <> 'true'
+    or (v_deleted->>'revision')::integer <> 2 then
+    raise exception 'planned session deletion returned an invalid result';
+  end if;
+  if exists (select 1 from public.training_sessions where id = v_delete_session_id)
+    or exists (select 1 from public.training_session_items where session_id = v_delete_session_id) then
+    raise exception 'planned session deletion did not remove its row and cascade its item';
+  end if;
+
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{session,id}', to_jsonb(v_cancel_session_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{session,idempotencyKey}', to_jsonb('member-v1-db-gate-cancel-' || v_cancel_session_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{items,0,id}', to_jsonb(v_cancel_item_id::text));
+  v_delete_snapshot := jsonb_set(v_delete_snapshot, '{items,0,sessionId}', to_jsonb(v_cancel_session_id::text));
+  perform public.member_save_planned_session(v_delete_snapshot);
+  v_cancelled := public.member_cancel_training_session(v_cancel_session_id, 1);
+  if v_cancelled->>'status' <> 'CANCELLED' then
+    raise exception 'cancelled-session fixture did not enter CANCELLED';
+  end if;
+
+  begin
+    perform public.member_delete_planned_training_session(v_cancel_session_id, 2);
+    raise exception 'cancelled session unexpectedly allowed deletion';
+  exception when check_violation then
+    v_cancelled_delete_rejected := true;
+  end;
+  if not v_cancelled_delete_rejected
+    or not exists (select 1 from public.training_sessions where id = v_cancel_session_id and status = 'CANCELLED')
+    or (select count(*) from public.training_session_items where session_id = v_cancel_session_id) <> 1 then
+    raise exception 'cancelled session or its item changed during rejected deletion';
+  end if;
+
   delete from public.training_sessions where id = v_session_id;
+  delete from public.training_sessions where id = v_cancel_session_id;
   delete from public.members where id = v_member_id;
-  raise notice 'Member V1 release gate PASS: replay is idempotent and stale revision writes preserve the winning data';
+  raise notice 'Member V1 release gate PASS: planned deletion is revision-safe, cascades items, and preserves completed/cancelled history';
 exception when others then
   raise;
 end;
 $member_management_v1_release_gate$;
 
-select 'PASS: planned save replay is idempotent and stale revision writes preserve winning data' as member_v1_database_release_gate;
+select 'PASS: planned deletion is revision-safe, cascades items, and preserves completed/cancelled history' as member_v1_database_release_gate;

@@ -108,9 +108,10 @@
     const items=rows.map(session=>{
       const title=session.sessionTitle||session.templateKey||'训练课程';
       const canCopy=canReceiveTraining&&['PLANNED','COMPLETED'].includes(session.status);
-      return `<li data-timeline-session="${esc(session.id)}"><span class="member-timeline-mark ${String(session.status||'').toLowerCase()}" aria-hidden="true"></span><div class="member-timeline-content"><div class="member-timeline-row"><div><span class="member-session-status ${String(session.status||'').toLowerCase()}" data-session-status="${esc(session.status)}">${statusLabel(session.status)}</span><time datetime="${esc(session.sessionDate)}">${dateLabel(session.sessionDate)}</time><h3>${esc(title)}</h3><p>${esc(session.templateKey||'课程')}${session.levelSnapshot?` · ${esc(session.levelSnapshot)}`:''}</p></div><div class="member-timeline-actions"><button type="button" data-open-session-detail data-session-id="${esc(session.id)}" aria-label="查看 ${esc(title)} 课程详情">查看课程</button>${canCopy?`<button type="button" data-copy-session-to-member data-session-id="${esc(session.id)}" aria-label="将 ${esc(title)} 复制给会员">复制给会员</button>`:''}</div></div>${canCopy?'<span class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></span>':''}</div></li>`;
+      const canDelete=session.status==='PLANNED';
+      return `<li data-timeline-session="${esc(session.id)}"><span class="member-timeline-mark ${String(session.status||'').toLowerCase()}" aria-hidden="true"></span><div class="member-timeline-content"><div class="member-timeline-row"><div><span class="member-session-status ${String(session.status||'').toLowerCase()}" data-session-status="${esc(session.status)}">${statusLabel(session.status)}</span><time datetime="${esc(session.sessionDate)}">${dateLabel(session.sessionDate)}</time><h3>${esc(title)}</h3><p>${esc(session.templateKey||'课程')}${session.levelSnapshot?` · ${esc(session.levelSnapshot)}`:''}</p></div><div class="member-timeline-actions"><button type="button" data-open-session-detail data-session-id="${esc(session.id)}" aria-label="查看 ${esc(title)} 课程详情">查看课程</button>${canCopy?`<button type="button" data-copy-session-to-member data-session-id="${esc(session.id)}" aria-label="将 ${esc(title)} 复制给会员">复制给会员</button>`:''}${canDelete?`<button type="button" class="member-session-delete-action" data-delete-planned-session data-session-id="${esc(session.id)}" aria-label="删除 ${esc(title)} 待训练课程">删除</button>`:''}</div></div>${canCopy?'<span class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></span>':''}</div></li>`;
     }).join('');
-    return `<section class="member-timeline" data-member-timeline aria-labelledby="member-timeline-title" aria-busy="${timelineLoading}"><div class="member-section-heading"><div><h2 id="member-timeline-title">训练记录</h2><p>待训练、已完成与已取消的课程都保留在时间线上。</p></div></div><p class="member-copy-inline-status" data-member-copy-feedback role="status" aria-live="polite"></p>${items?`<ol>${items}</ol>`:'<p class="member-state-note">还没有课程记录。</p>'}${timelineLoadError?'<p class="member-load-more-error" role="alert">更早的课程记录暂时无法读取，请重试。</p>':''}${timelineHasMore?`<button class="member-load-more" type="button" data-member-load-more ${timelineLoading?'disabled':''}>${timelineLoading?'正在加载…':'加载更早记录'}</button>`:''}</section>`;
+    return `<section class="member-timeline" data-member-timeline aria-labelledby="member-timeline-title" aria-busy="${timelineLoading}"><div class="member-section-heading"><div><h2 id="member-timeline-title">训练记录</h2><p>待训练、已完成与已取消的课程都保留在时间线上。</p></div></div><p class="member-copy-inline-status" data-member-copy-feedback role="status" aria-live="polite"></p><p class="member-timeline-feedback" data-member-timeline-feedback role="status" aria-live="polite"></p>${items?`<ol>${items}</ol>`:'<p class="member-state-note">还没有课程记录。</p>'}${timelineLoadError?'<p class="member-load-more-error" role="alert">更早的课程记录暂时无法读取，请重试。</p>':''}${timelineHasMore?`<button class="member-load-more" type="button" data-member-load-more ${timelineLoading?'disabled':''}>${timelineLoading?'正在加载…':'加载更早记录'}</button>`:''}</section>`;
   }
 
   function renderMemberDetail(member,context,sessions){
@@ -173,6 +174,49 @@
     if(!status)return;
     status.className=`member-copy-inline-status ${kind}`.trim();
     status.textContent=message||'';
+  }
+
+  function setTimelineFeedback(root,message,kind=''){
+    const status=root?.querySelector('[data-member-timeline-feedback]');
+    if(!status)return;
+    status.className=`member-timeline-feedback ${kind}`.trim();
+    status.textContent=message||'';
+  }
+
+  async function deletePlannedSession(button,root){
+    const sessionId=button?.dataset?.sessionId;
+    const session=currentSessions.find(value=>value.id===sessionId);
+    if(!session||session.status!=='PLANNED'||!Number.isSafeInteger(session.revision)||session.revision<1)return;
+    const title=session.sessionTitle||session.templateKey||'训练课程';
+    if(!window.confirm(`确定永久删除“${title}”这条待训练课程吗？课程记录及计划明细都会一并移除。`))return;
+    const startedRouteVersion=routeVersion;
+    const rowIndex=currentSessions.findIndex(value=>value.id===sessionId);
+    const focusSessionId=currentSessions[rowIndex+1]?.id||currentSessions[rowIndex-1]?.id||'';
+    button.disabled=true;button.textContent='正在删除…';
+    try{
+      await window.V14MemberAPI.deletePlannedSession(sessionId,session.revision);
+      if(startedRouteVersion!==routeVersion||route?.page!=='member-detail'||route.memberId!==session.memberId)return;
+      await loadDetail(root);
+      if(startedRouteVersion!==routeVersion||route?.page!=='member-detail'||route.memberId!==session.memberId)return;
+      const focusTarget=focusSessionId?root.querySelector(`[data-open-session-detail][data-session-id="${CSS.escape(focusSessionId)}"]`):null;
+      const fallback=root.querySelector('[data-member-timeline]');
+      if(focusTarget)focusTarget.focus();
+      else if(fallback){fallback.setAttribute('tabindex','-1');fallback.focus();}
+      setTimelineFeedback(root,'待训练课程已删除。','success');
+    }catch(error){
+      if(startedRouteVersion!==routeVersion||route?.page!=='member-detail'||route.memberId!==session.memberId)return;
+      await loadDetail(root);
+      if(startedRouteVersion!==routeVersion||route?.page!=='member-detail'||route.memberId!==session.memberId)return;
+      const message=error?.status===401?'教练登录已失效，请重新验证后再删除。'
+        :error?.code==='stale_update'?'课程记录已更新，我已刷新时间线，请重新确认。'
+          :error?.code==='invalid_status_transition'?'只有待训练课程可以删除，时间线已刷新。'
+            :error?.code==='session_not_found'?'课程记录已不存在，时间线已刷新。'
+              :error?.code==='network_error'?'没有收到删除结果，请刷新时间线确认课程状态。'
+                :'删除失败，请检查网络后重试。';
+      setTimelineFeedback(root,message,'error');
+    }finally{
+      if(button.isConnected){button.disabled=false;button.textContent='删除';}
+    }
   }
 
   function memberCopyPayload(source,resolvedSession,plannedItems){
@@ -393,6 +437,7 @@
     if(target.matches('[data-member-detail-retry]')){void loadDetail(root);return;}
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
     if(target.matches('[data-copy-session-to-member]')){void copyTrainingToMember(target,root);return;}
+    if(target.matches('[data-delete-planned-session]')){void deletePlannedSession(target,root);return;}
     if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
   }
 

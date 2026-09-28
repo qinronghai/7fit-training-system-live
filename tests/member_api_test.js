@@ -36,6 +36,7 @@ function repository(overrides = {}) {
     async updateSession() { return null; },
     async completeSession() { return { sessionId: plannedFixture.session.id, revision: 2, status: 'COMPLETED', idempotentReplay: false }; },
     async cancelSession() { return { sessionId: plannedFixture.session.id, revision: 2, status: 'CANCELLED' }; },
+    async deletePlannedSession(value) { return { sessionId: value.sessionId, revision: value.expectedRevision + 1, status: 'DELETED', deleted: true }; },
     ...overrides,
   };
 }
@@ -303,6 +304,46 @@ async function main() {
   assert.equal(cancelled.response.status, 200);
   assert.equal(cancelled.body.status, 'CANCELLED');
   assert.equal(cancelledRequest.expectedRevision, 1);
+
+  let deletedRequest;
+  let deleteCalls = 0;
+  const deleteApi = createMemberApi({
+    auth: createAuth(), now: () => NOW,
+    repository: repository({
+      async deletePlannedSession(value) {
+        deleteCalls += 1;
+        deletedRequest = value;
+        return { sessionId: value.sessionId, revision: value.expectedRevision + 1, status: 'DELETED', deleted: true };
+      },
+    }),
+  });
+  const deleted = await call(deleteApi, 'delete-planned-session', {
+    method: 'POST', body: { sessionId: plannedFixture.session.id, expectedRevision: 1 },
+  });
+  assert.equal(deleted.response.status, 200);
+  assert.deepEqual(deleted.body, { sessionId: plannedFixture.session.id, revision: 2, status: 'DELETED', deleted: true });
+  assert.deepEqual(deletedRequest, { sessionId: plannedFixture.session.id, expectedRevision: 1 });
+  const invalidDelete = await call(deleteApi, 'delete-planned-session', {
+    method: 'POST', body: { sessionId: plannedFixture.session.id, expectedRevision: 0 },
+  });
+  assert.equal(invalidDelete.response.status, 400);
+  assert.equal(invalidDelete.body.error, 'invalid_session');
+  assert.equal(deleteCalls, 1);
+  const deniedDelete = await call(deleteApi, 'delete-planned-session', {
+    method: 'POST', token: '', body: { sessionId: plannedFixture.session.id, expectedRevision: 1 },
+  });
+  assert.equal(deniedDelete.response.status, 401);
+  assert.equal(deleteCalls, 1);
+
+  const staleDeleteApi = createMemberApi({
+    auth: createAuth(), now: () => NOW,
+    repository: repository({ async deletePlannedSession() { throw { code: '40001', message: 'MEMBER_REVISION_CONFLICT' }; } }),
+  });
+  const staleDelete = await call(staleDeleteApi, 'delete-planned-session', {
+    method: 'POST', body: { sessionId: plannedFixture.session.id, expectedRevision: 1 },
+  });
+  assert.equal(staleDelete.response.status, 409);
+  assert.equal(staleDelete.body.error, 'stale_update');
 
   let forbiddenCompleteCalls = 0;
   const cancelledSessionApi = createMemberApi({

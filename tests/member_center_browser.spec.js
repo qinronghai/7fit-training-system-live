@@ -88,6 +88,7 @@ async function mockMemberApi(page, state = {}) {
   state.calls ||= [];
   state.completions ||= [];
   state.completionAttempts ||= [];
+  state.deletions ||= [];
   state.savedSnapshots ||= [];
   await page.route(`${API}**`, async route => {
     const request = route.request();
@@ -189,6 +190,16 @@ async function mockMemberApi(page, state = {}) {
       if (!session) return respond({ error: 'session_not_found' }, 404);
       Object.assign(session, { status: 'CANCELLED', revision: (session.revision || 1) + 1 });
       return respond({ sessionId: session.id, status: 'CANCELLED', revision: session.revision });
+    }
+    if (action === 'delete-planned-session') {
+      const session = state.sessions.find(value => value.id === body.sessionId);
+      if (!session) return respond({ error: 'session_not_found' }, 404);
+      if (session.revision !== body.expectedRevision) return respond({ error: 'stale_update' }, 409);
+      if (session.status !== 'PLANNED') return respond({ error: 'invalid_status_transition' }, 409);
+      state.deletions.push(body);
+      state.sessions = state.sessions.filter(value => value.id !== session.id);
+      if (state.itemsBySession) delete state.itemsBySession[session.id];
+      return respond({ sessionId: session.id, revision: session.revision + 1, status: 'DELETED', deleted: true });
     }
     throw new Error(`unexpected member API action ${action}`);
   });
@@ -605,6 +616,41 @@ test('A planned session requires an explicit second action before cancellation',
   await expect(page.locator(`[data-timeline-session="${sessionSummaries[0].id}"] [data-session-status="CANCELLED"]`)).toBeVisible();
   expect(state.calls.some(call => call.action === 'cancel-session' && call.body.expectedRevision === 1)).toBeTruthy();
   expect(state.completions).toHaveLength(0);
+});
+
+test('Only a planned course can be deleted from the timeline after confirmation', async ({ page }, testInfo) => {
+  const state = await mockMemberApi(page);
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  const plannedRow = page.locator(`[data-timeline-session="${sessionSummaries[0].id}"]`);
+  const completedRow = page.locator(`[data-timeline-session="${sessionSummaries[1].id}"]`);
+  const cancelledRow = page.locator(`[data-timeline-session="${sessionSummaries[2].id}"]`);
+
+  await expect(plannedRow.locator('[data-delete-planned-session]')).toHaveCount(1);
+  await expect(plannedRow.locator('[data-delete-planned-session]')).toHaveText('删除');
+  await expect(completedRow.locator('[data-delete-planned-session]')).toHaveCount(0);
+  await expect(cancelledRow.locator('[data-delete-planned-session]')).toHaveCount(0);
+  await page.setViewportSize({ width: 1440, height: 960 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: testInfo.outputPath('planned-session-delete-desktop.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await plannedRow.scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: testInfo.outputPath('planned-session-delete-mobile.png') });
+
+  page.once('dialog', dialog => dialog.dismiss());
+  await plannedRow.locator('[data-delete-planned-session]').click();
+  await expect(plannedRow).toBeVisible();
+  expect(state.deletions).toHaveLength(0);
+
+  page.once('dialog', dialog => dialog.accept());
+  await plannedRow.locator('[data-delete-planned-session]').click();
+  await expect(page.locator(`[data-timeline-session="${sessionSummaries[0].id}"]`)).toHaveCount(0);
+  await expect(page.locator('[data-member-timeline-feedback]')).toContainText('已删除');
+  expect(state.deletions).toEqual([{ sessionId: sessionSummaries[0].id, expectedRevision: 1 }]);
+  expect(state.sessions).toHaveLength(2);
+  expect(state.calls.filter(call => call.action === 'delete-planned-session')).toHaveLength(1);
+  await expect.poll(() => page.evaluate(() => document.activeElement?.matches('[data-open-session-detail]') ? document.activeElement.dataset.sessionId : '')).toBe(sessionSummaries[1].id);
+  await page.screenshot({ path: testInfo.outputPath('planned-session-delete-after.png') });
 });
 
 test('closing a completed session returns keyboard focus to the rebuilt timeline trigger', async ({ page }) => {

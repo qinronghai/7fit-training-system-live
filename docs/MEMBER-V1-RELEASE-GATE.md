@@ -62,6 +62,15 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - Follow-up PR [#169](https://github.com/qinronghai/7fit-training-system-live/pull/169) merged as `317a3bbd7335117f27fe3d3b7a07f03ff87de1b9`; master workflow run `36342696929` passed `verify`, `browser-smoke`, and `deploy`.
 - Live Pages URL: [7fit-training-system-live](https://qinronghai.github.io/7fit-training-system-live/). The deployed `7fit-build` marker is **`317a3bbd`**. The live F111 Member-first route displayed the completed session and all six recent actions.
 
+## Planned Session Deletion (2026-09-28)
+
+- Member detail timeline: only `PLANNED` sessions show **删除**. The action asks for confirmation, submits the displayed revision, and refreshes the timeline. The database rejects stale revisions and every status except `PLANNED`; the parent session and its items are removed together. Completed and cancelled history stays intact.
+- Local Python suite: **276 passed**. Node runtime suite: **97 `tests/*_test.js` files passed**; built-in ESM suite: **8 passed**. Full Chromium suite: **140 passed**; integrated Member V1 browser gate: **2 passed**; focused deletion flow: **1 passed**. System data, schema, JavaScript syntax, and static artifact hygiene checks passed.
+- Desktop and mobile screenshots were captured and visually inspected: `/Users/ronny/.codex/worktrees/member-v1/7fitWebOS/output/playwright/member-planned-delete-desktop-2026-09-28.png`, `member-planned-delete-mobile-2026-09-28.png`, and `member-planned-delete-after-2026-09-28.png`.
+- Staging project `wxvyjfvhyoudoxjuwlcp`: migration `20260928071813`; `member-api` version **2**; unauthenticated request returned **401**. Database release gate passed; anon access fixture passed; anon cannot execute the deletion RPC, while `service_role` can execute it and delete sessions. Security Advisor: 4 intentional INFO notices; Performance Advisor: 1 INFO unused-index notice.
+- Production project `ynsodlyanpmixbbxblqh`: migration `20260928072525`; `member-api` version **2**; unauthenticated request returned **401**. Database release gate passed; anon access fixture passed; catalog check confirmed the function and service-role grants while anon execute remains false. Security Advisor: 6 intentional INFO notices; Performance Advisor: 1 INFO unused-index notice.
+- Database release-gate runs used generated fixture members/sessions and cleaned them up; no real member record was deleted.
+
 ## Completion Record
 
 | Evidence | Result | Reference |
@@ -86,3 +95,6 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 | GitHub verify/browser-smoke/deploy | PASS | PR #168 run `36340633579`; PR #169 run `36342696929` |
 | Pages live build marker and URL | PASS: `317a3bbd` | `https://qinronghai.github.io/7fit-training-system-live/` |
 | Production live screenshot | PASS: captured and visually inspected at 1280×720 | `live-production-member-context-desktop.jpg` |
+| Planned-session deletion local suites | PASS: 276 Python, 97 Node runtime, 8 ESM, 140 Chromium, 2 integrated gate, 1 focused browser test | 2026-09-28; screenshots under `output/playwright/` |
+| Planned-session deletion staging release | PASS: migration `20260928071813`; `member-api` v2; database/access gates; unauthenticated request 401 | Free staging project `wxvyjfvhyoudoxjuwlcp` |
+| Planned-session deletion production release | PASS: migration `20260928072525`; `member-api` v2; database/access gates; unauthenticated request 401 | Production project `ynsodlyanpmixbbxblqh` |
