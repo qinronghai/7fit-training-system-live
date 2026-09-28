@@ -65,8 +65,9 @@ for(const hidden of ['主要训练部位：','T3','SUP-S3','CORE-L3','RIR','POST
 
 const composer=api.formatMember({
   brand:'7Fit',recipeName:'单腿拉 + 水平推',level:'L4',foam:[],warmups:[],slots:[],recovery:[],postCardio:'内部 cardio'
-},{now:'2026-09-10T12:00:00+08:00'});
+},{now:'2026-09-10T12:00:00+08:00',memberName:'梦影'});
 assert(composer.includes('单腿后侧链 × 上肢推 × 核心稳定'));
+assert(composer.includes('会员：梦影'));
 assert(composer.includes('L4｜完整能力'));
 assert(composer.includes('今天以单腿后侧链和上肢推力为主，在更高阶段的负重与动作控制下，进一步整合核心稳定和全身协调。'));
 assert(composer.includes('今日训练重点\n单腿后侧链 · 上肢推力 · 核心稳定'));
@@ -101,5 +102,13 @@ assert(pullMember.includes('泡沫轴放松：大腿前侧、肩后侧、臀部�
 assert(pullMember.includes('坐姿腿屈伸｜2 × 12\n   大腿前侧强化'));
 assert(pullMember.includes('哑铃俯身反向飞鸟｜2 × 15\n   肩后侧与上背强化'));
 assert(pullMember.endsWith('课后有氧｜约 30 分钟\n选择跑步机爬坡、爬楼梯机、快走或其他有氧，时间 30 分钟左右，平均心率 130 到 140 左右（燃烧脂肪心率）。'));
+
+const detailedMember=api.formatMember({
+  brand:'7Fit',recipeName:'单腿拉 + 水平拉',level:'L4',foam:[],
+  warmups:[{name:'半跪姿弓步髋屈肌动态伸展',sequencePhase:'floor',prescription:'1–2组 × 6–8次/侧'}],
+  slots:[],recovery:['大腿后侧拉伸 · 45 秒']
+},{now:'2026-09-10T12:00:00+08:00',memberName:'梦影'});
+assert(detailedMember.includes('1. 半跪姿弓步髋屈肌动态伸展 · 1–2 × 6–8 / 侧'));
+assert(detailedMember.includes('训练后恢复\n大腿后侧拉伸 · 45 秒'));
 
 console.log('session copy member v2.1: PASS');

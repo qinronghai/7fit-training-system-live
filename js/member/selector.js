@@ -197,7 +197,7 @@
       return;
     }
     try{
-      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(current.resolvedSession,{memberId:selectedMember.id,sessionDate:current.sessionDate,plannedItems:current.plannedItems});
+      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(current.resolvedSession,{memberId:selectedMember.id,sessionDate:current.sessionDate,plannedItems:current.plannedItems,sessionDetails:current.sessionDetails});
       if(version!==selectionVersion||!current||select.value!==selectedMember.id)return;
       current.selectedIntent=intent;
       if(intent?.status==='SAVED'){
@@ -241,7 +241,7 @@
     dialog.querySelectorAll('[data-member-save-close],[data-member-save-cancel],[data-member-save-select],[data-member-save-search],[data-member-save-new-intent]').forEach(control=>{control.disabled=true;});
     setStatus('正在保存到会员训练记录…','info');
     try{
-      const intent=current.selectedIntent||await window.V14MemberSnapshots.prepareIntent(current.resolvedSession,{memberId,sessionDate:current.sessionDate,allowNewAfterPendingIntentKey:current.allowNewAfterPendingIntentKey,plannedItems:current.plannedItems});
+      const intent=current.selectedIntent||await window.V14MemberSnapshots.prepareIntent(current.resolvedSession,{memberId,sessionDate:current.sessionDate,allowNewAfterPendingIntentKey:current.allowNewAfterPendingIntentKey,plannedItems:current.plannedItems,sessionDetails:current.sessionDetails});
       current.intent=intent;
       current.selectedIntent=intent;
       current.allowNewAfterPendingIntentKey=null;
@@ -267,7 +267,7 @@
   async function open(trigger,resolvedSession,memberId=null,options={}){
     selectionVersion++;previousFocus=trigger||document.activeElement;excludedMemberId=typeof options?.excludeMemberId==='string'?options.excludeMemberId:'';busy=false;
     directoryLoading=false;
-    current={resolvedSession,memberId:typeof memberId==='string'&&memberId?memberId:null,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null,plannedItems:Array.isArray(options?.plannedItems)?options.plannedItems:null};
+    current={resolvedSession,memberId:typeof memberId==='string'&&memberId?memberId:null,sessionDate:window.V14MemberSnapshots.localDate(),intent:null,selectedIntent:null,plannedItems:Array.isArray(options?.plannedItems)?options.plannedItems:null,sessionDetails:options?.sessionDetails&&typeof options.sessionDetails==='object'?options.sessionDetails:null};
     const opening=current;
     const root=ensureDialog();root.querySelector('[data-member-save-search]').value='';root.querySelector('[data-member-save-select]').innerHTML='<option value="">加载会员中…</option>';
     root.querySelector('[data-member-save-submit]').hidden=false;root.querySelector('[data-member-save-new-intent]').hidden=true;
@@ -276,17 +276,17 @@
     loadDirectoryImmediately();
     if(options?.deferIntentLookup===true)return;
     try{
-      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{memberId:current.memberId||undefined,sessionDate:current.sessionDate,plannedItems:current.plannedItems});
+      const intent=await window.V14MemberSnapshots.findIntentForResolvedSession(resolvedSession,{memberId:current.memberId||undefined,sessionDate:current.sessionDate,plannedItems:current.plannedItems,sessionDetails:current.sessionDetails});
       if(current!==opening)return;
       current.intent=intent;
       await restoreIntentSelection(memberSearchVersion);
     }catch(error){showError(error);}
   }
 
-  function bind(root,getResolvedSession,getMemberId){
+  function bind(root,getResolvedSession,getMemberId,getSessionDetails){
     if(!root)return;
     root.querySelectorAll('[data-save-member-session]').forEach(button=>button.addEventListener('click',()=>{
-      try{void open(button,getResolvedSession(),getMemberId?.()||null);}
+      try{void open(button,getResolvedSession(),getMemberId?.()||null,{sessionDetails:getSessionDetails?.()||null});}
       catch(_){button.focus();}
     }));
   }

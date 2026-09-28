@@ -140,6 +140,18 @@ async function main() {
   assert.equal(midnightRequests.length, 2);
   assert.deepEqual(midnightRequests[0], midnightRequests[1]);
 
+  const legacyPendingStorage=makeStorage();
+  const legacyPendingPage=await loadClient({storage:legacyPendingStorage,fetchImpl,domain});
+  const legacyPending=await legacyPendingPage.V14MemberSnapshots.prepareIntent(resolved,{
+    memberId,sessionDate:'2026-09-27',now:fixedNow,
+  });
+  const currentDetails={warmups:[{slotKey:'MOB-L',prepId:'PREP-L1',actionId:'ACT-MOB-1',name:'髋部活动',prescription:'1 × 8'}]};
+  const matchedLegacyPending=await legacyPendingPage.V14MemberSnapshots.findIntentForResolvedSession(resolved,{
+    memberId,sessionDate:'2026-09-28',now:new Date('2026-09-28T08:00:00.000Z'),sessionDetails:currentDetails,
+  });
+  assert.equal(matchedLegacyPending.key,legacyPending.key,'unresolved legacy saves remain retryable after details snapshots are introduced');
+  assert.deepEqual(JSON.parse(JSON.stringify(matchedLegacyPending.snapshot)),JSON.parse(JSON.stringify(legacyPending.snapshot)));
+
   const anotherMemberIntent = await refreshedPage.V14MemberSnapshots.prepareIntent(resolved, {
     memberId: otherMemberId, sessionDate: '2026-09-27', now: fixedNow,
   });

@@ -141,7 +141,7 @@
 
   function resolvedItems(resolved){
     return orderedSlots(resolved).filter(slot=>slot.actionId).map(slot=>({
-      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,
+      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,movementFamily:slot.movementFamily,role:slot.role,route:slot.route,targetPatterns:slot.targetPatterns,regions:slot.regions,caLevel:slot.caLevel,
     }));
   }
 

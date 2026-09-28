@@ -153,12 +153,27 @@
 
   function composerRecovery(ctx){return D().sessionViews?.[`F111-01-${ctx.level}`]||{};}
 
+  function buildComposerSessionDetails(ctx){
+    const resolvedSession=ctx.resolvedSession||window.V15TemplateResolver.resolve('f111',{mode:'composer',level:ctx.level,lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,coreDemand:ctx.coreDemand,selections:window.V14State?.getComposerSelections?.(ctx.stateKey)||{},includeExpandedMain:!!ctx.includeExpandedMain,includeExpandedSupport:!!ctx.includeExpandedSupport,includeExpandedCore:!!ctx.includeExpandedCore});
+    const view=composerRecovery(ctx),prepResolved=M.Prep.resolveComposerPrep({...ctx,resolvedSession}),recoveryResult=window.V14RecoveryMatcher.match(resolvedSession);
+    return {
+      foam:M.Foam.composerFoamItems(ctx).map(item=>({foamId:item.foamId,name:item.name,muscles:item.muscles||[],prescription:item.prescription,safety:item.safety||''})),
+      warmups:M.Prep.resolvedItems(prepResolved),
+      prepContext:prepResolved.context,
+      recovery:window.V14RecoveryMatcher.copyItems(recoveryResult),
+      recoveryDetails:(recoveryResult.items||[]).map(({id,region,regionLabel,name,prescription,reason,detail})=>({id,region,regionLabel,name,prescription,reason,detail})),
+      recoveryStatus:recoveryResult.status||'unavailable',
+      recoveryMessage:recoveryResult.message||'',
+      postCardio:view.postCardio||'',
+      postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(ctx.stateKey):null,
+    };
+  }
+
   function buildComposerCopyPayload(ctx){
     const resolvedSession=ctx.resolvedSession||window.V15TemplateResolver.resolve('f111',{mode:'composer',level:ctx.level,lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,coreDemand:ctx.coreDemand,selections:window.V14State?.getComposerSelections?.(ctx.stateKey)||{},includeExpandedMain:!!ctx.includeExpandedMain,includeExpandedSupport:!!ctx.includeExpandedSupport,includeExpandedCore:!!ctx.includeExpandedCore});
     const summary=resolvedSession.anatomyContext||{primary:[],secondary:[],stabilizers:[]};
-    const result=resolvedSession.conflictContext||{issues:[]};
-    const recoveryResult=window.V14RecoveryMatcher.match(resolvedSession),view=composerRecovery(ctx),prepResolved=M.Prep.resolveComposerPrep(ctx);
-    return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',foam:M.Foam.composerFoamItems(ctx).map(x=>({name:x.name,prescription:x.prescription})),warmups:M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription,sequencePhase:x.sequencePhase})),slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:window.V14ModuleCopy?.prescriptionForF111Slot?.(x.key)||x.prescription||window.V14ModuleCopy?.prescriptionForAction?.(x.actionId,{level:ctx.level})||''})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},recovery:window.V14RecoveryMatcher.copyItems(recoveryResult),postCardio:view.postCardio||'',postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(ctx.stateKey):null,conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};
+    const result=resolvedSession.conflictContext||{issues:[]},details=buildComposerSessionDetails({...ctx,resolvedSession});
+    return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',...details,slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:window.V14ModuleCopy?.prescriptionForF111Slot?.(x.key)||x.prescription||window.V14ModuleCopy?.prescriptionForAction?.(x.actionId,{level:ctx.level})||''})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};
   }
 
   function strengthSection(ctx){
@@ -191,5 +206,5 @@
     return memberContextMarkup(route)+courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+recoverySection(recovery)+(M.PostCardio?M.PostCardio.render(ctx.stateKey):'')+courseOutputSection();
   }
 
-  M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,render,bindMemberContext,resetMemberContextBinding};
+  M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,buildComposerSessionDetails,render,bindMemberContext,resetMemberContextBinding};
 })();

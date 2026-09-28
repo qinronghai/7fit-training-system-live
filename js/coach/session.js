@@ -17,12 +17,25 @@
     });
     return out;
   }
+  function buildSessionDetails(sessionId,recipeId,level,resolvedSession=resolveResolvedSession(sessionId,recipeId,level)){
+    const data=D(),view=data.sessionViews[sessionId]||{},selected=resolvedSession.main.content.map(slot=>slot.actionId),groups=selectedTrainingIds(sessionId,selected);
+    const foam=M.Foam.matchedFoamRolls(recipeId,level,groups.foam).map(item=>({foamId:item.foamId,name:item.name,muscles:item.muscles||[],prescription:item.prescription,safety:item.safety||''}));
+    const prepResolved=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected),recoveryResult=window.V14RecoveryMatcher.match(resolvedSession);
+    return {
+      foam,
+      warmups:M.Prep.resolvedItems(prepResolved),
+      prepContext:prepResolved.context,
+      recovery:window.V14RecoveryMatcher.copyItems(recoveryResult),
+      recoveryDetails:(recoveryResult.items||[]).map(({id,region,regionLabel,name,prescription,reason,detail})=>({id,region,regionLabel,name,prescription,reason,detail})),
+      recoveryStatus:recoveryResult.status||'unavailable',
+      recoveryMessage:recoveryResult.message||'',
+      postCardio:view.postCardio||'',
+      postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(sessionId):null,
+    };
+  }
   function buildCopyPayload(sessionId,recipeId,level){
     const data=D(),s=data.sessions[sessionId],view=data.sessionViews[sessionId]||{},recipe=data.recipes[recipeId]||{};
-    const resolvedSession=resolveResolvedSession(sessionId,recipeId,level),selected=resolvedSession.main.content.map(slot=>slot.actionId),groups=selectedTrainingIds(sessionId,selected),result=resolvedSession.conflictContext;
-    const foam=M.Foam.matchedFoamRolls(recipeId,level,groups.foam).map(x=>({name:x.name,prescription:x.prescription}));
-    const prepResolved=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
-    const warmups=M.Prep.resolvedItems(prepResolved).map(x=>({name:x.name,prescription:x.prescription,sequencePhase:x.sequencePhase}));
+    const resolvedSession=resolveResolvedSession(sessionId,recipeId,level),selected=resolvedSession.main.content.map(slot=>slot.actionId),result=resolvedSession.conflictContext,details=buildSessionDetails(sessionId,recipeId,level,resolvedSession);
     const slots=(s?.slots||[]).map((slot,i)=>{
       const actionId=selected[i],a=data.actions[actionId]||{};
       const tier=window.V14ModuleCopy?.tierForAction?.(actionId)||(/^T[1-4]$/.test(a.tier||'')?a.tier:'');
@@ -32,9 +45,8 @@
       return {slot:slot.slotName,name:a.name||actionId,tier,grade,prescription};
     });
     const summary=resolvedSession.anatomyContext||{primary:[],secondary:[],stabilizers:[]};
-    const recoveryResult=window.V14RecoveryMatcher.match(resolvedSession),recovery=window.V14RecoveryMatcher.copyItems(recoveryResult);
     const conflicts=(result.issues||[]).map(x=>`${x.title}：${x.text}`);
-    return {brand:'7Fit',recipeId,recipeName:recipe.name||recipeId,level,summary:view.summary||'',foam,warmups,slots,muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},recovery,postCardio:view.postCardio||'',postCardioPlan:M.PostCardio?.plan?M.PostCardio.plan(sessionId):null,conflicts};
+    return {brand:'7Fit',recipeId,recipeName:recipe.name||recipeId,level,summary:view.summary||'',...details,slots,muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},conflicts};
   }
   function render(route){
     const data=D(),recipeId=route.recipeId,level=route.level;
@@ -48,5 +60,5 @@
     const levelLinks=[1,2,3,4].map(n=>`<a class="${level===`L${n}`?'active':''}" href="#/coach/f111/${recipeId.toLowerCase()}/l${n}">L${n}</a>`).join('');
     return `<a class="back-link" href="#/coach/f111">← 返回 F111 编课</a>`+hero(`${recipeId}｜${data.recipes[recipeId].name}`,`${level}｜${view?.summary||''}`,[level,'2F PREP','1F STRENGTH','2F RECOVERY'])+`<div class="session-toolbar"><div class="level-switch">${levelLinks}</div><div class="session-toolbar-actions">${copyToolbar()}${M.MemberSelector?.buttonMarkup?.()||''}<button id="reset-session" data-session="${sessionId}" type="button">恢复默认</button></div></div>`+`<section class="route-strip"><span>2F PREP</span><i>↓</i><span>1F STRENGTH</span><i>↑</i><span>2F RECOVERY</span><small>课后有氧独立</small></section>`+`<section class="section-card prep-section"><div class="section-head"><div><h2>2F｜PREP</h2><p>下楼前完成泡沫轴、关节活动、目标激活和动作模式复习；热身动作根据当天 A / B 主训练自动匹配。</p></div><span class="time-badge">约 10–12 分钟</span></div>${M.Foam.foamRollCards(recipeId,level,groups.foam)}${M.Prep.warmupCards(recipeId,level,groups.main)}<details class="legacy-prep-flow"><summary>查看原有馆内固定流程参考</summary><div class="flow-grid">${prep}</div></details></section>`+`<section class="section-card strength-card"><div class="section-head"><div><h2>1F｜STRENGTH</h2><p>A / B / C 为主结构；D1 / D2 / CORE 为辅助结构。</p></div><span class="time-badge">约 40–43 分钟</span></div>${M.Summary.render(groups.all)}<div id="conflict-mount">${M.ConflictView.render(result)}</div><div class="slot-grid primary">${top}</div><div class="slot-grid secondary">${bottom}</div></section>`+`<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head"><div><h2>完成拉伸｜约 5–8 分钟</h2><p>训练结束后完成 3 个主要部位拉伸。</p></div><span class="time-badge">RECOVERY</span></div>${window.V14RecoveryMatcher.render(recoveryResult)}</section>`+`${M.PostCardio?M.PostCardio.render(sessionId):''}`+(M.SavedSessionsUI?.controls?.(route)||'');
   }
-  M.Session={resolveResolvedSession,selectedTrainingIds,buildCopyPayload,render};
+  M.Session={resolveResolvedSession,selectedTrainingIds,buildSessionDetails,buildCopyPayload,render};
 })();
