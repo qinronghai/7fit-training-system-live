@@ -453,6 +453,86 @@ async function copySourceRecordToCurrentMember(page, testInfo, status, sessionId
   expect(state.savedSnapshots).toHaveLength(1);
 }
 
+async function copyFromSessionDrawerToCurrentMember(page, testInfo, status, sessionId) {
+  const source = sourceDetailForCopy(status, sessionId);
+  const state = await mockMemberApi(page, {
+    sessionDetailsById: { [sessionId]: source },
+  });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+
+  const row = page.locator(`[data-timeline-session="${sessionId}"]`);
+  await row.locator('[data-open-session-detail]').click();
+  const detail = page.locator('[data-member-session-detail]');
+  await expect(detail).toBeVisible();
+  const copyButton = detail.locator('[data-session-copy-to-member]');
+  await expect(copyButton).toHaveCount(1);
+  await expect(copyButton).toHaveText('复制给会员');
+
+  for (const viewport of [
+    { width: 390, height: 844, name: '390x844' },
+    { width: 1440, height: 1000, name: '1440x1000' },
+  ]) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await copyButton.scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+    await page.screenshot({ path: testInfo.outputPath(`member-copy-drawer-${status.toLowerCase()}-${viewport.name}.png`) });
+  }
+
+  await copyButton.click();
+  await expect.poll(() => state.savedSnapshots).toHaveLength(1);
+  await expect(detail.locator('[data-member-copy-status]')).toContainText('已复制给 林同学');
+  const copied = state.savedSnapshots[0];
+  expect(copied.session.memberId).toBe(MEMBER_ID);
+  expect(copied.session.status).toBe('PLANNED');
+  expect(copied.session.id).not.toBe(sessionId);
+  expect(copied.items.map(item => ({
+    plannedActionId: item.plannedActionId,
+    plannedActionSnapshot: item.plannedActionSnapshot,
+    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
+    performedActionId: item.performedActionId,
+    performedActionSnapshot: item.performedActionSnapshot,
+    performedPrescription: item.performedPrescription,
+    sets: item.sets,
+    reps: item.reps,
+    loadKg: item.loadKg,
+    completed: item.completed,
+    note: item.note,
+  }))).toEqual(source.items.map(item => ({
+    plannedActionId: item.plannedActionId,
+    plannedActionSnapshot: item.plannedActionSnapshot,
+    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
+    performedActionId: null,
+    performedActionSnapshot: null,
+    performedPrescription: null,
+    sets: null,
+    reps: null,
+    loadKg: null,
+    completed: false,
+    note: null,
+  })));
+  expect(state.calls.filter(call => call.action === 'list-members')).toHaveLength(0);
+  await expect(page.locator(`[data-timeline-session="${copied.session.id}"] [data-session-status]`)).toHaveAttribute('data-session-status', 'PLANNED');
+}
+
+test('a planned training record can be copied to the current member from its detail drawer', async ({ page }, testInfo) => {
+  await copyFromSessionDrawerToCurrentMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
+});
+
+test('a completed training record can be copied to the current member from its detail drawer using only the original plan', async ({ page }, testInfo) => {
+  await copyFromSessionDrawerToCurrentMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
+});
+
+test('a cancelled training record cannot be copied from its detail drawer', async ({ page }) => {
+  await mockMemberApi(page);
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+
+  const row = page.locator(`[data-timeline-session="${sessionSummaries[2].id}"]`);
+  await row.locator('[data-open-session-detail]').click();
+  const detail = page.locator('[data-member-session-detail]');
+  await expect(detail).toBeVisible();
+  await expect(detail.locator('[data-session-copy-to-member]')).toHaveCount(0);
+});
+
 test('a planned training record can be copied to the member on the current detail page', async ({ page }, testInfo) => {
   await copySourceRecordToCurrentMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
 });

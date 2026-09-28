@@ -85,7 +85,21 @@
 
   function executionActions(){
     if(currentSession?.status!=='PLANNED')return '';
-    return `<div class="member-session-actions"><button type="button" data-session-cancel-request data-session-mutation>取消计划课程</button><button type="submit" class="primary" data-session-complete data-session-mutation>完成本节课</button></div><div class="member-session-cancel-confirmation" data-session-cancel-confirmation hidden role="group" aria-label="确认取消计划课程"><p>取消后，这节课会保留在训练记录中，但不会计入最近训练情况。</p><div><button type="button" data-session-cancel-dismiss>返回记录</button><button type="button" class="danger" data-session-cancel-confirm data-session-mutation>确认取消课程</button></div></div>`;
+    return `<div class="member-session-actions">${copyButtonMarkup()}<button type="button" data-session-cancel-request data-session-mutation>取消计划课程</button><button type="submit" class="primary" data-session-complete data-session-mutation>完成本节课</button></div>${copyStatusMarkup()}<div class="member-session-cancel-confirmation" data-session-cancel-confirmation hidden role="group" aria-label="确认取消计划课程"><p>取消后，这节课会保留在训练记录中，但不会计入最近训练情况。</p><div><button type="button" data-session-cancel-dismiss>返回记录</button><button type="button" class="danger" data-session-cancel-confirm data-session-mutation>确认取消课程</button></div></div>`;
+  }
+
+  function copyButtonMarkup(){
+    if(!['PLANNED','COMPLETED'].includes(currentSession?.status)||!window.V14CoachModules?.MemberCenter?.canCopySessionToCurrentMember?.())return '';
+    return `<button type="button" data-session-copy-to-member data-session-id="${esc(currentSession.id)}">复制给会员</button>`;
+  }
+
+  function copyStatusMarkup(){
+    return '<p class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></p>';
+  }
+
+  function readOnlyActions(){
+    if(!['PLANNED','COMPLETED'].includes(currentSession?.status)||!window.V14CoachModules?.MemberCenter?.canCopySessionToCurrentMember?.())return '';
+    return `<div class="member-session-actions">${copyButtonMarkup()}</div>${copyStatusMarkup()}`;
   }
 
   function renderSession(data){
@@ -96,7 +110,7 @@
     const itemRows=currentSession.status==='PLANNED'
       ?`<form data-session-execution novalidate><ol class="member-session-execution-list">${currentItems.map(executionItemMarkup).join('')}</ol>${executionActions()}</form>`
       :currentItems.length?`<ol class="member-session-items">${currentItems.map(item=>readOnlyItemMarkup(item,currentSession)).join('')}</ol>`:'<p class="member-state-note">这节课没有动作记录。</p>';
-    dialog.querySelector('[data-session-detail-content]').innerHTML=`<div class="member-session-summary"><h3>${esc(currentSession.sessionTitle||currentSession.templateKey||'训练课程')}</h3><p>${esc(currentSession.templateKey||'课程')} · ${esc(currentSession.levelSnapshot||'等级未记录')}</p>${currentSession.coachNote?`<p>${esc(currentSession.coachNote)}</p>`:''}</div>${currentItems.length?itemRows:itemRows}<div class="member-session-mutation-error" data-session-mutation-error role="alert" hidden></div>`;
+    dialog.querySelector('[data-session-detail-content]').innerHTML=`<div class="member-session-summary"><h3>${esc(currentSession.sessionTitle||currentSession.templateKey||'训练课程')}</h3><p>${esc(currentSession.templateKey||'课程')} · ${esc(currentSession.levelSnapshot||'等级未记录')}</p>${currentSession.coachNote?`<p>${esc(currentSession.coachNote)}</p>`:''}</div>${currentItems.length?itemRows:itemRows}${currentSession.status==='PLANNED'?'':readOnlyActions()}<div class="member-session-mutation-error" data-session-mutation-error role="alert" hidden></div>`;
   }
 
   function ensureDialog(){
@@ -112,6 +126,7 @@
       if(event.target===dialog){if(!mutationInFlight)dialog.close();return;}
       const target=event.target.closest('button');
       if(!target)return;
+      if(target.matches('[data-session-copy-to-member]')){window.V14CoachModules?.MemberCenter?.copySessionToCurrentMember?.(target);return;}
       if(target.matches('[data-session-detail-retry]'))void loadSession(currentSessionId,requestVersion);
       if(target.matches('[data-session-cancel-request]')){
         const confirmation=dialog.querySelector('[data-session-cancel-confirmation]');
