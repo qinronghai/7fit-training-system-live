@@ -56,14 +56,39 @@
     return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
   }
 
-  async function fingerprint(resolvedSession,sessionDate){
-    const bytes=new TextEncoder().encode(JSON.stringify({schemaVersion:1,sessionDate,resolvedSession}));
+  function normalizePlannedItems(resolvedSession,plannedItems){
+    if(plannedItems===undefined||plannedItems===null)return null;
+    const slots=resolvedSession?.main?.content;
+    if(!Array.isArray(plannedItems)||!Array.isArray(slots)||plannedItems.length!==slots.length)throw Object.assign(new TypeError('source planned items do not match the resolved session'),{code:'invalid_source_plan'});
+    const ordered=plannedItems.slice().sort((left,right)=>(left?.sortOrder??0)-(right?.sortOrder??0));
+    return ordered.map((item,index)=>{
+      const slot=slots[index],expectedSlotKey=typeof slot?.key==='string'?slot.key:null;
+      if(!item||item.sortOrder!==index||item.slotKey!==expectedSlotKey||item.plannedActionId!==slot?.actionId||!item.plannedActionSnapshot||item.plannedActionSnapshot.actionId!==item.plannedActionId||!item.plannedPrescriptionSnapshot||typeof item.plannedPrescriptionSnapshot!=='object'){
+        throw Object.assign(new TypeError('source planned item snapshot is incomplete'),{code:'invalid_source_plan'});
+      }
+      return {
+        phase:item.phase,
+        slotKey:item.slotKey,
+        sortOrder:index,
+        plannedActionId:item.plannedActionId,
+        plannedActionSnapshot:clone(item.plannedActionSnapshot),
+        plannedPrescriptionSnapshot:clone(item.plannedPrescriptionSnapshot),
+      };
+    });
+  }
+
+  async function fingerprint(resolvedSession,sessionDate,plannedItems=null){
+    const payload={schemaVersion:1,sessionDate,resolvedSession};
+    if(plannedItems)payload.plannedItems=plannedItems;
+    const bytes=new TextEncoder().encode(JSON.stringify(payload));
     const digest=await (window.crypto||globalThis.crypto).subtle.digest('SHA-256',bytes);
     return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
   }
 
-  async function contentFingerprint(resolvedSession){
-    const bytes=new TextEncoder().encode(JSON.stringify({schemaVersion:1,resolvedSession}));
+  async function contentFingerprint(resolvedSession,plannedItems=null){
+    const payload={schemaVersion:1,resolvedSession};
+    if(plannedItems)payload.plannedItems=plannedItems;
+    const bytes=new TextEncoder().encode(JSON.stringify(payload));
     const digest=await (window.crypto||globalThis.crypto).subtle.digest('SHA-256',bytes);
     return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
   }
@@ -74,7 +99,10 @@
       if(intent?.status!=='PENDING'||(memberId&&intent.memberId!==memberId))continue;
       let savedContentFingerprint=intent.contentFingerprint;
       if(typeof savedContentFingerprint!=='string'&&intent.snapshot?.session?.resolvedSessionSnapshot){
-        savedContentFingerprint=await contentFingerprint(intent.snapshot.session.resolvedSessionSnapshot);
+        const resolved=intent.snapshot.session.resolvedSessionSnapshot;
+        let savedPlan=null;
+        try{savedPlan=normalizePlannedItems(resolved,intent.snapshot.items);}catch(_){/* legacy or incomplete save intent */}
+        savedContentFingerprint=await contentFingerprint(resolved,savedPlan);
       }
       if(savedContentFingerprint===expectedContentFingerprint)matches.push(intent);
     }
@@ -86,14 +114,15 @@
     return matches[0]||null;
   }
 
-  async function intentKey(resolvedSession,memberId,sessionDate){
-    const baseFingerprint=await fingerprint(resolvedSession,sessionDate);
+  async function intentKey(resolvedSession,memberId,sessionDate,plannedItems=null){
+    const baseFingerprint=await fingerprint(resolvedSession,sessionDate,plannedItems);
     return {baseFingerprint,key:`${baseFingerprint}:${memberId}`};
   }
 
-  async function prepareIntent(resolvedSession,{memberId,sessionDate,now=new Date(),createId=makeUuid,allowNewAfterPendingIntentKey=null}={}){
+  async function prepareIntent(resolvedSession,{memberId,sessionDate,now=new Date(),createId=makeUuid,allowNewAfterPendingIntentKey=null,plannedItems=null}={}){
     if(typeof memberId!=='string'||!memberId)throw Object.assign(new TypeError('memberId is required'),{code:'invalid_member'});
-    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession),{baseFingerprint,key}=await intentKey(resolvedSession,memberId,date),store=readStore();
+    const preservedPlan=normalizePlannedItems(resolvedSession,plannedItems);
+    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan),{baseFingerprint,key}=await intentKey(resolvedSession,memberId,date,preservedPlan),store=readStore();
     if(store[key])return clone(store[key]);
     const pendingIntent=await findPendingIntent(store,contentFingerprintValue,memberId,date);
     if(pendingIntent){
@@ -124,14 +153,18 @@
           ||'';
       },
     });
+    if(preservedPlan){
+      snapshot.items=snapshot.items.map((item,index)=>({...item,...clone(preservedPlan[index])}));
+    }
     const intent={key,baseFingerprint,contentFingerprint:contentFingerprintValue,memberId,sessionDate:date,status:'PENDING',snapshot,createdAt:timestamp,updatedAt:timestamp,savedSessionId:null};
     store[key]=intent;writeStore(store);
     return clone(intent);
   }
 
-  async function findIntentForResolvedSession(resolvedSession,{memberId,sessionDate,now=new Date()}={}){
-    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession),store=readStore();
-    const baseFingerprint=await fingerprint(resolvedSession,date);
+  async function findIntentForResolvedSession(resolvedSession,{memberId,sessionDate,now=new Date(),plannedItems=null}={}){
+    const preservedPlan=normalizePlannedItems(resolvedSession,plannedItems);
+    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan),store=readStore();
+    const baseFingerprint=await fingerprint(resolvedSession,date,preservedPlan);
     const matches=Object.values(store).filter(value=>value?.baseFingerprint===baseFingerprint&&value?.sessionDate===date&&(!memberId||value.memberId===memberId));
     matches.sort((left,right)=>String(right.updatedAt||'').localeCompare(String(left.updatedAt||'')));
     if(matches.length)return clone(matches[0]);

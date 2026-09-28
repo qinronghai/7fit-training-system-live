@@ -4,6 +4,8 @@ const API = 'https://ynsodlyanpmixbbxblqh.supabase.co/functions/v1/member-api';
 const MEMBER_ID = 'e1000000-0000-4000-8000-000000000001';
 const ARCHIVED_ID = 'e1000000-0000-4000-8000-000000000002';
 const CREATED_ID = 'e1000000-0000-4000-8000-000000000099';
+const COPY_TARGET_ID = 'e1000000-0000-4000-8000-000000000098';
+const completedCopyFixture = require('./fixtures/member-v1/replaced-action-completed.json');
 
 function member(id, displayName, status = 'ACTIVE', archivedAt = null) {
   return {
@@ -22,6 +24,31 @@ function plannedItem(sessionId, action = { id: 'barbell_front_squat', name: '杠
     plannedPrescriptionSnapshot: { schemaVersion: 1, sets: null, reps: null, rir: null, restSeconds: null, tempo: null, loadPrescription: null, rawText: '4 组 × 8 次' },
     performedPrescription: null, sets: null, reps: null, loadKg: null, rir: null, rpe: null, completed: false, note: null,
   };
+}
+
+function sourceDetailForCopy(status, sessionId) {
+  const fixture = JSON.parse(JSON.stringify(completedCopyFixture));
+  const summary = sessionSummaries.find(value => value.id === sessionId);
+  fixture.session = {
+    ...fixture.session,
+    id: sessionId,
+    memberId: MEMBER_ID,
+    sessionDate: summary.sessionDate,
+    status,
+    sessionTitle: summary.sessionTitle,
+    completedAt: status === 'COMPLETED' ? fixture.session.completedAt : null,
+  };
+  fixture.items = fixture.items.map(item => {
+    const source = { ...item, sessionId };
+    if (status === 'PLANNED') {
+      Object.assign(source, {
+        performedActionId: null, performedActionSnapshot: null, performedPrescription: null,
+        sets: null, reps: null, loadKg: null, rir: null, rpe: null, completed: false, note: null,
+      });
+    }
+    return source;
+  });
+  return { session: fixture.session, items: fixture.items };
 }
 
 const activeMember = member(MEMBER_ID, '林同学');
@@ -62,6 +89,7 @@ async function mockMemberApi(page, state = {}) {
   state.calls ||= [];
   state.completions ||= [];
   state.completionAttempts ||= [];
+  state.savedSnapshots ||= [];
   await page.route(`${API}**`, async route => {
     const request = route.request();
     const url = new URL(request.url());
@@ -118,12 +146,18 @@ async function mockMemberApi(page, state = {}) {
       return respond({ sessions: state.sessions.slice(offset, offset + limit) });
     }
     if (action === 'get-session') {
-      const session = state.sessions.find(value => value.id === url.searchParams.get('sessionId')) || sessionSummaries[1];
+      const requestedId = url.searchParams.get('sessionId');
+      if (state.sessionDetailsById?.[requestedId]) return respond(state.sessionDetailsById[requestedId]);
+      const session = state.sessions.find(value => value.id === requestedId) || sessionSummaries[1];
       const defaultItems = [plannedItem(session.id)];
       const items = state.itemsBySession?.[session.id] || (session.status === 'COMPLETED'
         ? defaultItems.map(value => ({ ...value, performedActionId: value.plannedActionId, performedActionSnapshot: value.plannedActionSnapshot, completed: true, sets: 4, reps: '8', loadKg: 40 }))
         : defaultItems);
       return respond({ session, items });
+    }
+    if (action === 'save-planned-session') {
+      state.savedSnapshots.push(JSON.parse(JSON.stringify(body.snapshot)));
+      return respond({ sessionId: body.snapshot.session.id, revision: 1, status: 'PLANNED', idempotentReplay: false });
     }
     if (action === 'complete-session') {
       const session = state.sessions.find(value => value.id === body.sessionId);
@@ -343,6 +377,85 @@ test('Member detail leads with recent training context and opens session detail 
   await page.keyboard.press('Escape');
   await expect(detail).not.toBeVisible();
   await expect(trigger).toBeFocused();
+});
+
+async function copySourceRecordToAnotherMember(page, testInfo, status, sessionId) {
+  const source = sourceDetailForCopy(status, sessionId);
+  const original = JSON.parse(JSON.stringify(source));
+  const state = await mockMemberApi(page, {
+    members: [activeMember, archivedMember, member(COPY_TARGET_ID, '赵同学')],
+    sessionDetailsById: { [sessionId]: source },
+  });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+
+  const plannedRow = page.locator(`[data-timeline-session="${sessionSummaries[0].id}"]`);
+  const completedRow = page.locator(`[data-timeline-session="${sessionSummaries[1].id}"]`);
+  const cancelledRow = page.locator(`[data-timeline-session="${sessionSummaries[2].id}"]`);
+  await expect(plannedRow.locator('[data-copy-session-to-member]')).toHaveCount(1);
+  await expect(completedRow.locator('[data-copy-session-to-member]')).toHaveCount(1);
+  await expect(cancelledRow.locator('[data-copy-session-to-member]')).toHaveCount(0);
+
+  for (const viewport of [
+    { width: 390, height: 844, name: '390x844' },
+    { width: 1440, height: 1000, name: '1440x1000' },
+  ]) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    const row = page.locator(`[data-timeline-session="${sessionId}"]`);
+    await row.scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+    await page.screenshot({ path: testInfo.outputPath(`member-copy-${status.toLowerCase()}-${viewport.name}.png`) });
+  }
+
+  const row = page.locator(`[data-timeline-session="${sessionId}"]`);
+  await row.locator('[data-copy-session-to-member]').click();
+  const dialog = page.locator('[data-member-save-dialog]');
+  await expect(dialog).toBeVisible();
+  const select = dialog.locator('[data-member-save-select]');
+  await expect(select.locator('option')).toHaveCount(2);
+  await expect(select.locator(`option[value="${COPY_TARGET_ID}"]`)).toHaveText('赵同学');
+  await expect(select.locator(`option[value="${MEMBER_ID}"]`)).toHaveCount(0);
+  await select.selectOption(COPY_TARGET_ID);
+  await expect(dialog.locator('[data-member-save-submit]')).toBeEnabled();
+  await dialog.locator('[data-member-save-submit]').click();
+  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 赵同学 · PLANNED');
+
+  expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(1);
+  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
+  expect(state.savedSnapshots).toHaveLength(1);
+  const copied = state.savedSnapshots[0];
+  expect(copied.session.memberId).toBe(COPY_TARGET_ID);
+  expect(copied.session.status).toBe('PLANNED');
+  expect(copied.session.id).not.toBe(sessionId);
+  expect(copied.session.idempotencyKey).not.toBe(source.session.idempotencyKey);
+  expect(copied.items.map(item => ({
+    phase: item.phase,
+    slotKey: item.slotKey,
+    sortOrder: item.sortOrder,
+    plannedActionId: item.plannedActionId,
+    plannedActionSnapshot: item.plannedActionSnapshot,
+    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
+  }))).toEqual(original.items.map(item => ({
+    phase: item.phase,
+    slotKey: item.slotKey,
+    sortOrder: item.sortOrder,
+    plannedActionId: item.plannedActionId,
+    plannedActionSnapshot: item.plannedActionSnapshot,
+    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
+  })));
+  for (const item of copied.items) {
+    expect(item.id).not.toBe(original.items.find(sourceItem => sourceItem.sortOrder === item.sortOrder).id);
+    expect(item.sessionId).toBe(copied.session.id);
+    expect(item).toMatchObject({ performedActionId: null, performedActionSnapshot: null, performedPrescription: null, sets: null, reps: null, loadKg: null, rir: null, rpe: null, completed: false, note: null });
+  }
+  expect(source).toEqual(original);
+}
+
+test('a planned training record can be copied to another active member', async ({ page }, testInfo) => {
+  await copySourceRecordToAnotherMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
+});
+
+test('a completed training record copies only its original plan to another active member', async ({ page }, testInfo) => {
+  await copySourceRecordToAnotherMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
 });
 
 test('Member with no completed history can still enter F111 at her training level', async ({ page }) => {
