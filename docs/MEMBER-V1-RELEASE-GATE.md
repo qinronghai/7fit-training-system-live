@@ -60,7 +60,7 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - UI visibility correction: PR [#169](https://github.com/qinronghai/7fit-training-system-live/pull/169) removes the four-action display cap that hid alphabetically late actions. Its browser regression uses six completed actions and asserts that the performed snapshot is shown instead of the original planned name.
 - Feature PR [#168](https://github.com/qinronghai/7fit-training-system-live/pull/168) merged as `470f592e6779c502eaa0cac9fc5dd1ad4686de13`; master workflow run `36340633579` passed `verify`, `browser-smoke`, and `deploy`.
 - Follow-up PR [#169](https://github.com/qinronghai/7fit-training-system-live/pull/169) merged as `317a3bbd7335117f27fe3d3b7a07f03ff87de1b9`; master workflow run `36342696929` passed `verify`, `browser-smoke`, and `deploy`.
-- Live Pages URL: [7fit-training-system-live](https://qinronghai.github.io/7fit-training-system-live/). The deployed `7fit-build` marker is **`317a3bbd`**. The live F111 Member-first route displayed the completed session and all six recent actions.
+- Live Pages URL: [7fit-training-system-live](https://qinronghai.github.io/7fit-training-system-live/). The performed-action visibility release used build marker **`317a3bbd`**; the live F111 Member-first route displayed the completed session and all six recent actions.
 
 ## Planned Session Deletion (2026-09-28)
 
@@ -70,6 +70,8 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - Staging project `wxvyjfvhyoudoxjuwlcp`: migration `20260928071813`; `member-api` version **2**; unauthenticated request returned **401**. Database release gate passed; anon access fixture passed; anon cannot execute the deletion RPC, while `service_role` can execute it and delete sessions. Security Advisor: 4 intentional INFO notices; Performance Advisor: 1 INFO unused-index notice.
 - Production project `ynsodlyanpmixbbxblqh`: migration `20260928072525`; `member-api` version **2**; unauthenticated request returned **401**. Database release gate passed; anon access fixture passed; catalog check confirmed the function and service-role grants while anon execute remains false. Security Advisor: 6 intentional INFO notices; Performance Advisor: 1 INFO unused-index notice.
 - Database release-gate runs used generated fixture members/sessions and cleaned them up; no real member record was deleted.
+- PR [#175](https://github.com/qinronghai/7fit-training-system-live/pull/175) merged as `a9a69159fbb4e87d59c9d52f88d5e58615a01c6e`. Master workflow run `36392308688` passed `verify`, `browser-smoke`, and `deploy`.
+- The planned-session deletion UI first shipped with Pages build marker **`a9a69159`**. A live fetch verified that marker and confirmed the published stylesheet contains the delete-button styling and `js/member/center.js` contains the deletion action.
 
 ## Completion Record
 
@@ -98,3 +100,5 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 | Planned-session deletion local suites | PASS: 276 Python, 97 Node runtime, 8 ESM, 140 Chromium, 2 integrated gate, 1 focused browser test | 2026-09-28; screenshots under `output/playwright/` |
 | Planned-session deletion staging release | PASS: migration `20260928071813`; `member-api` v2; database/access gates; unauthenticated request 401 | Free staging project `wxvyjfvhyoudoxjuwlcp` |
 | Planned-session deletion production release | PASS: migration `20260928072525`; `member-api` v2; database/access gates; unauthenticated request 401 | Production project `ynsodlyanpmixbbxblqh` |
+| Planned-session deletion PR and Actions release | PASS: PR #175 merged; `verify`, `browser-smoke`, and `deploy` succeeded | Master workflow run `36392308688` |
+| Planned-session deletion Pages publication | PASS: live marker `a9a69159`; published CSS and JS checked | [Live site](https://qinronghai.github.io/7fit-training-system-live/) |
