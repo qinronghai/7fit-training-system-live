@@ -104,7 +104,7 @@
 
   function timelineMarkup(sessions){
     const rows=Array.isArray(sessions)?sessions:[];
-    const canReceiveTraining=currentMember?.status==='ACTIVE'&&!currentMember?.archivedAt;
+    const canReceiveTraining=canCopySessionToCurrentMember();
     const items=rows.map(session=>{
       const title=session.sessionTitle||session.templateKey||'训练课程';
       const canCopy=canReceiveTraining&&['PLANNED','COMPLETED'].includes(session.status);
@@ -147,8 +147,22 @@
 
   function memberFor(id){return currentMember?.id===id?currentMember:membersById.get(id)||null;}
 
+  function canCopySessionToCurrentMember(){
+    return route?.page==='member-detail'
+      &&currentMember?.id===route.memberId
+      &&currentMember.status==='ACTIVE'
+      &&!currentMember.archivedAt;
+  }
+
+  function copySessionToCurrentMember(button){
+    if(!canCopySessionToCurrentMember()||!button?.dataset?.sessionId)return;
+    const root=document.querySelector('[data-member-center-page="detail"]');
+    if(root)void copyTrainingToMember(button,root);
+  }
+
   function setCopyStatus(button,message,kind=''){
-    const status=button.closest('[data-timeline-session]')?.querySelector('[data-member-copy-status]');
+    const scope=button.closest('[data-timeline-session], [data-session-detail-content]');
+    const status=scope?.querySelector('[data-member-copy-status]');
     if(!status)return;
     status.className=`member-copy-inline-status ${kind}`.trim();
     status.textContent=message||'';
@@ -191,7 +205,9 @@
       const timeline=root?.querySelector('[data-member-timeline]');
       if(timeline)timeline.outerHTML=timelineMarkup(currentSessions);
       const alreadyCopied=intent.status==='SAVED'||saved.idempotentReplay===true;
-      setCopyFeedback(root,alreadyCopied?'今天已复制过这份计划，已保留待训练记录。':`已复制给 ${currentMember.displayName||'当前会员'}，新增一条待训练记录。`,'success');
+      const message=alreadyCopied?'今天已复制过这份计划，已保留待训练记录。':`已复制给 ${currentMember.displayName||'当前会员'}，新增一条待训练记录。`;
+      setCopyStatus(button,message,'success');
+      setCopyFeedback(root,message,'success');
     }catch(error){
       if(button.isConnected){
         const message=error?.status===401?'教练登录已失效，请完成验证后重试。':error?.message||'复制课程计划失败，请重试。';
@@ -381,7 +397,7 @@
     route=next;
   }
 
-  const module={render,bind,routeChanged};
+  const module={render,bind,routeChanged,canCopySessionToCurrentMember,copySessionToCurrentMember};
   window.V14CoachModules=window.V14CoachModules||{};
   window.V14CoachModules.MemberCenter=module;
 })();
