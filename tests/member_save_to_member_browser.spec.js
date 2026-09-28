@@ -156,6 +156,25 @@ test('Composer F111 copy and cancel do not save; explicit save works', async ({ 
   expect(saved).toHaveLength(1);
   expect(saved[0].session.memberId).toBe(members[1].id);
   expect(saved[0].session.status).toBe('PLANNED');
+  const details = saved[0].session.resolvedSessionSnapshot.memberDetails;
+  expect(details.warmups.length).toBeGreaterThan(0);
+  expect(details.foam.length).toBeGreaterThan(0);
+  expect(details.recoveryDetails.length).toBeGreaterThan(0);
+  expect(saved[0].items.filter(item => item.phase === 'PREP')).toHaveLength(details.warmups.length);
+  expect(saved[0].items.map(item => item.sortOrder)).toEqual(saved[0].items.map((_, index) => index));
+  expect(details.warmups[0]).toMatchObject({
+    actionId: expect.any(String),
+    prepId: expect.any(String),
+    slotKey: expect.any(String),
+    prescription: expect.any(String),
+    sequencePhase: expect.any(String),
+  });
+  const prepValidation = await page.evaluate(async snapshot => {
+    const domain = await window.V14MemberDomainPromise;
+    return snapshot.items.filter(item => item.phase === 'PREP').map(item => domain.validateTrainingSessionItem(item).ok);
+  }, saved[0]);
+  expect(prepValidation.length).toBe(details.warmups.length);
+  expect(prepValidation.every(Boolean)).toBeTruthy();
 });
 
 test('refresh after an unknown save result retries the same intent without creating a duplicate', async ({ page }) => {

@@ -165,7 +165,10 @@
   function orderedMemberWarmups(items){
     return (items||[])
       .filter(x=>x&&typeof x==='object'&&clean(x.sequencePhase))
-      .map(warmupMemberName);
+      .map(item=>{
+        const name=warmupMemberName(item),prescription=memberPrescription(item.prescription||'');
+        return name&&prescription?`${name} · ${prescription}`:name;
+      });
   }
   function memberPrescription(p){
     let s=window.V14ModuleCopy?.memberPrescription?window.V14ModuleCopy.memberPrescription(p):clean(p).replace(/\s*[｜|]\s*RIR[^｜|\n]*/ig,'').replace(/RIR[^｜|\n]*/ig,'').trim().replace(/[｜|]\s*$/,'');
@@ -245,7 +248,10 @@
   }
   function formatMember(p,options={}){
     const theme=memberTheme(p),level=clean(p.level),meta=levelMeta(level),groups=prepGroups(p),orderedWarmups=orderedMemberWarmups(p.warmups);
-    const lines=[formatDate(options.now),`${clean(p.brand)||'7Fit'}｜今日训练`,'',theme.title,`${level||'L'}｜${meta.label}`,'',memberReason(theme,level),'','课前准备｜约 10–12 分钟'];
+    const memberName=clean(options.memberName);
+    const lines=[formatDate(options.now),`${clean(p.brand)||'7Fit'}｜今日训练`];
+    if(memberName)lines.push(`会员：${memberName}`);
+    lines.push('',theme.title,`${level||'L'}｜${meta.label}`,'',memberReason(theme,level),'','课前准备｜约 10–12 分钟');
     if(groups.foam.length)lines.push(`泡沫轴放松：${lineList(groups.foam)}`);
     if(orderedWarmups.length)lines.push('热身顺序：',...orderedWarmups.map((name,index)=>`${index+1}. ${name}`));
     else {

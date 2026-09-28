@@ -123,7 +123,7 @@
       const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
       document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));
       document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
-      M.MemberSelector?.bind?.(root,()=>ComposerView.composerContext(window.V14Router.parseHash(location.hash)).resolvedSession,()=>window.V14Router.parseHash(location.hash).query?.memberId||null);
+      M.MemberSelector?.bind?.(root,()=>ctx.resolvedSession,()=>ctx.memberId,()=>ComposerView.buildComposerSessionDetails(ctx));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindPostCardio(rerender);
       M.F111ActionDrawer?.bind?.(root,ctx,rerender);
@@ -160,7 +160,7 @@
     const doCopy=async audience=>{const payload=Session.buildCopyPayload(sessionId,route.recipeId,route.level),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function'||typeof window.V14SessionCopy?.copyText!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';setTimeout(()=>{if(status.textContent==='已复制，可直接发送'){status.textContent='';status.className='';}},1800);}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
-    M.MemberSelector?.bind?.(root,()=>Session.resolveResolvedSession(sessionId,route.recipeId,route.level),()=>window.V14Router.parseHash(location.hash).query?.memberId||null);
+    M.MemberSelector?.bind?.(root,()=>Session.resolveResolvedSession(sessionId,route.recipeId,route.level),()=>route.query?.memberId||null,()=>Session.buildSessionDetails(sessionId,route.recipeId,route.level));
     const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
     M.F111ActionDrawer?.bind?.(root,null,rerender);
     bindPostCardio(rerender);

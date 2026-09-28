@@ -47,6 +47,37 @@ function sourceDetailForCopy(status, sessionId) {
     }
     return source;
   });
+  const warmup = {
+    slotKey: 'MOB-L', actionId: 'warmup_halfkneeling_lunge_hipflexor', prepId: 'PREP-16',
+    name: '半跪姿弓步髋屈肌动态伸展', prepGrade: 'P1', role: '髋屈肌动态活动',
+    targetPatterns: ['蹲', '髋伸展', '单腿'], regions: ['髋屈肌', '股四头肌近端'],
+    sequencePhase: 'floor', prescription: '1–2组 × 6–8次/侧', source: 'auto',
+  };
+  fixture.session.resolvedSessionSnapshot.memberDetails = {
+    foam: [{ foamId: 'FOAM-01', name: '泡沫轴松解-大腿前侧', prescription: '30 秒' }],
+    warmups: [warmup],
+    prepContext: fixture.session.resolvedSessionSnapshot.prepContext,
+    recovery: ['大腿后侧拉伸 · 45 秒'],
+    recoveryDetails: [{ id: 'stretch_hamstring', region: '大腿后侧', regionLabel: '大腿后侧', name: '大腿后侧拉伸', prescription: '45 秒' }],
+    postCardio: '', postCardioPlan: null,
+  };
+  fixture.items.push({
+    schemaVersion: 1, id: 'e1000000-0000-4000-8000-000000000099', sessionId,
+    phase: 'PREP', slotKey: 'PREP:MOB-L', sortOrder: fixture.items.length,
+    plannedActionId: warmup.actionId,
+    plannedActionSnapshot: {
+      schemaVersion: 1, actionId: warmup.actionId, name: warmup.name, pattern: '髋伸展', level: warmup.prepGrade,
+      primaryMuscles: ['髂腰肌'], secondaryMuscles: ['股四头肌'], equipment: '自重 / 垫子', stationId: null,
+    },
+    performedActionId: status === 'COMPLETED' ? warmup.actionId : null,
+    performedActionSnapshot: status === 'COMPLETED' ? {
+      schemaVersion: 1, actionId: warmup.actionId, name: warmup.name, pattern: '髋伸展', level: warmup.prepGrade,
+      primaryMuscles: ['髂腰肌'], secondaryMuscles: ['股四头肌'], equipment: '自重 / 垫子', stationId: null,
+    } : null,
+    plannedPrescriptionSnapshot: { schemaVersion: 1, sets: null, reps: null, rir: null, restSeconds: null, tempo: null, loadPrescription: null, rawText: warmup.prescription },
+    performedPrescription: null, sets: null, reps: null, loadKg: null, rir: null, rpe: null,
+    completed: status === 'COMPLETED', note: null,
+  });
   return { session: fixture.session, items: fixture.items };
 }
 
@@ -389,6 +420,44 @@ test('Member detail leads with recent training context and opens session detail 
   await expect(trigger).toBeFocused();
 });
 
+test('planned session detail shows saved warm-ups, legal PREP replacements, and recovery stretches', async ({ page }, testInfo) => {
+  const source = sourceDetailForCopy('PLANNED', sessionSummaries[0].id);
+  const state = await mockMemberApi(page, { itemsBySession: { [sessionSummaries[0].id]: source.items } });
+  Object.assign(state.sessions.find(session => session.id === sessionSummaries[0].id), source.session);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await page.locator(`[data-timeline-session="${sessionSummaries[0].id}"] [data-open-session-detail]`).click();
+
+  const detail = page.locator('[data-member-session-detail]');
+  await expect(detail.locator('[data-member-session-prep]')).toContainText('半跪姿弓步髋屈肌动态伸展');
+  await expect(detail.locator('[data-member-session-prep]')).toContainText('1–2组 × 6–8次/侧');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: testInfo.outputPath('member-session-prep-390x844.png') });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: testInfo.outputPath('member-session-prep-1440x1000.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await detail.locator('[data-member-session-recovery]').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('member-session-recovery-390x844.png') });
+  await detail.locator('[data-member-session-prep]').scrollIntoViewIfNeeded();
+  const prepItem = detail.locator('[data-session-item="e1000000-0000-4000-8000-000000000099"]');
+  const replacement = prepItem.locator('[data-session-prep-replacement]');
+  await expect(replacement).toBeVisible();
+  expect(await replacement.locator('option').count()).toBeGreaterThan(1);
+  await replacement.selectOption({ index: 1 });
+  await expect(replacement).not.toHaveValue('');
+  const replacementId = await replacement.inputValue();
+  const replacementName = (await replacement.locator('option:checked').textContent()).split(' · ')[0];
+  await expect(detail.locator('[data-member-session-recovery]')).toContainText('大腿后侧拉伸');
+  await expect(detail.locator('[data-member-session-recovery]')).toContainText('45 秒');
+  await detail.locator('[data-session-complete]').click();
+  await expect.poll(() => state.completions.length).toBe(1);
+  const savedPrep = state.completions[0].items.find(item => item.id === 'e1000000-0000-4000-8000-000000000099');
+  expect(savedPrep.performedActionId).toBe(replacementId);
+  expect(savedPrep.performedActionSnapshot.actionId).toBe(replacementId);
+  await expect(detail.locator('[data-member-session-prep]')).toContainText(`实际：${replacementName}`);
+});
+
 async function recordClipboardWrites(page) {
   await page.addInitScript(() => {
     window.__memberClipboardWrites = [];
@@ -406,7 +475,10 @@ async function expectMemberPlanCopied(page, state, source, sessionId, expectedGe
   await expect.poll(() => page.evaluate(() => window.__memberClipboardWrites.length)).toBe(1);
   const [text] = await page.evaluate(() => window.__memberClipboardWrites);
   expect(text).toContain('今日训练');
+  expect(text).toContain('会员：林同学');
   expect(text).toContain('主要训练');
+  expect(text).toContain('半跪姿弓步髋屈肌动态伸展 · 1–2 × 6–8 / 侧');
+  expect(text).toContain('大腿后侧拉伸 · 45 秒');
   for (const item of source.items) {
     expect(text).toContain(item.plannedActionSnapshot.name);
     if (item.plannedPrescriptionSnapshot.rawText) {

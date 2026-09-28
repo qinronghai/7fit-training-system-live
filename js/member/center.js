@@ -222,6 +222,16 @@
   function memberCopyPayload(source,resolvedSession,plannedItems){
     const slots=resolvedSession.main.content;
     const byKey=new Map(slots.map(slot=>[slot.key,slot]));
+    const details=resolvedSession.memberDetails||{},prepItems=plannedItems.filter(item=>item.phase==='PREP');
+    const prepBySlot=new Map(prepItems.map(item=>[String(item.slotKey||'').replace(/^PREP:/,''),item]));
+    const savedWarmups=Array.isArray(details.warmups)?details.warmups:Array.isArray(resolvedSession.warmups)?resolvedSession.warmups:[];
+    const warmups=savedWarmups.length?savedWarmups.map(warmup=>{
+      const item=prepBySlot.get(warmup.slotKey);
+      return {...warmup,name:item?.plannedActionSnapshot?.name||warmup.name,prescription:item?.plannedPrescriptionSnapshot?.rawText||warmup.prescription};
+    }):prepItems.map(item=>({name:item.plannedActionSnapshot?.name||item.plannedActionId,prescription:item.plannedPrescriptionSnapshot?.rawText||'',sequencePhase:'floor'}));
+    const recovery=Array.isArray(details.recovery)&&details.recovery.length?details.recovery
+      :Array.isArray(details.recoveryDetails)?details.recoveryDetails.map(item=>`${item.name}${item.prescription?` · ${item.prescription}`:''}`)
+        :Array.isArray(resolvedSession.recovery)?resolvedSession.recovery:[];
     const anatomy=resolvedSession.anatomyContext||{};
     return {
       brand:'7Fit',
@@ -230,7 +240,7 @@
       sessionTitle:source.sessionTitle||resolvedSession.title||source.templateKey,
       level:source.levelSnapshot||resolvedSession.level||'',
       summary:resolvedSession.summary||'',
-      slots:plannedItems.map(item=>{
+      slots:plannedItems.filter(item=>item.phase!=='PREP').map(item=>{
         const slot=byKey.get(item.slotKey)||{};
         const action=item.plannedActionSnapshot||{};
         return {
@@ -250,11 +260,11 @@
         secondary:Array.isArray(anatomy.secondary)?anatomy.secondary:[],
         stabilizers:Array.isArray(anatomy.stabilizers)?anatomy.stabilizers:[],
       },
-      foam:Array.isArray(resolvedSession.foam)?resolvedSession.foam:[],
-      warmups:Array.isArray(resolvedSession.warmups)?resolvedSession.warmups:[],
-      recovery:Array.isArray(resolvedSession.recovery)?resolvedSession.recovery:[],
-      postCardio:typeof resolvedSession.postCardio==='string'?resolvedSession.postCardio:'',
-      postCardioPlan:resolvedSession.postCardioPlan||null,
+      foam:Array.isArray(details.foam)?details.foam:Array.isArray(resolvedSession.foam)?resolvedSession.foam:[],
+      warmups,
+      recovery,
+      postCardio:typeof details.postCardio==='string'?details.postCardio:typeof resolvedSession.postCardio==='string'?resolvedSession.postCardio:'',
+      postCardioPlan:details.postCardioPlan||resolvedSession.postCardioPlan||null,
     };
   }
 
@@ -272,16 +282,18 @@
       if(!source||source.memberId!==sourceMemberId)throw new Error('课程记录已变化，请刷新会员详情后重试。');
       if(!['PLANNED','COMPLETED'].includes(source.status))throw new Error('已取消的课程不能复制。');
       if(currentMember?.id!==sourceMemberId||currentMember.status!=='ACTIVE'||currentMember.archivedAt)throw new Error('当前会员已停用或归档，不能接收训练课。');
-      if(resolvedSession?.main?.kind!=='SLOT'||!Array.isArray(resolvedSession.main.content)||plannedItems.length!==resolvedSession.main.content.length)throw new Error('这条课程记录缺少可复制的原计划。');
-      for(let index=0;index<plannedItems.length;index++){
-        const item=plannedItems[index],slot=resolvedSession.main.content[index];
+      if(resolvedSession?.main?.kind!=='SLOT'||!Array.isArray(resolvedSession.main.content))throw new Error('这条课程记录缺少可复制的原计划。');
+      const mainItems=plannedItems.filter(item=>item.phase!=='PREP');
+      if(mainItems.length!==resolvedSession.main.content.length)throw new Error('这条课程记录缺少可复制的原计划。');
+      for(let index=0;index<mainItems.length;index++){
+        const item=mainItems[index],slot=resolvedSession.main.content[index];
         if(item.plannedActionId!==slot.actionId||item.slotKey!==(typeof slot.key==='string'?slot.key:null)||!item.plannedActionSnapshot||!item.plannedPrescriptionSnapshot)throw new Error('课程计划快照不完整，请刷新后重试。');
       }
       const copy=window.V14SessionCopy;
       if(typeof copy?.copyText!=='function')throw new Error('课程文字复制功能暂不可用，请刷新页面后重试。');
-      const text=typeof source.memberCopyText==='string'&&source.memberCopyText.trim()
-        ?source.memberCopyText
-        :typeof copy.formatMember==='function'?copy.formatMember(memberCopyPayload(source,resolvedSession,plannedItems)):'';
+      const text=typeof copy.formatMember==='function'
+        ?copy.formatMember(memberCopyPayload(source,resolvedSession,plannedItems),{memberName:currentMember.displayName})
+        :typeof source.memberCopyText==='string'?source.memberCopyText:'';
       if(!text)throw new Error('课程记录缺少会员版文字，请刷新后重试。');
       await copy.copyText(text);
       if(!stillOnSourceDetail())return;
