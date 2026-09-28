@@ -104,12 +104,13 @@
 
   function timelineMarkup(sessions){
     const rows=Array.isArray(sessions)?sessions:[];
+    const canReceiveTraining=currentMember?.status==='ACTIVE'&&!currentMember?.archivedAt;
     const items=rows.map(session=>{
       const title=session.sessionTitle||session.templateKey||'训练课程';
-      const canCopy=['PLANNED','COMPLETED'].includes(session.status);
-      return `<li data-timeline-session="${esc(session.id)}"><span class="member-timeline-mark ${String(session.status||'').toLowerCase()}" aria-hidden="true"></span><div class="member-timeline-content"><div class="member-timeline-row"><div><span class="member-session-status ${String(session.status||'').toLowerCase()}" data-session-status="${esc(session.status)}">${statusLabel(session.status)}</span><time datetime="${esc(session.sessionDate)}">${dateLabel(session.sessionDate)}</time><h3>${esc(title)}</h3><p>${esc(session.templateKey||'课程')}${session.levelSnapshot?` · ${esc(session.levelSnapshot)}`:''}</p></div><div class="member-timeline-actions"><button type="button" data-open-session-detail data-session-id="${esc(session.id)}" aria-label="查看 ${esc(title)} 课程详情">查看课程</button>${canCopy?`<button type="button" data-copy-session-to-member data-session-id="${esc(session.id)}" aria-label="将 ${esc(title)} 复制到会员">复制到会员</button>`:''}</div></div>${canCopy?'<span class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></span>':''}</div></li>`;
+      const canCopy=canReceiveTraining&&['PLANNED','COMPLETED'].includes(session.status);
+      return `<li data-timeline-session="${esc(session.id)}"><span class="member-timeline-mark ${String(session.status||'').toLowerCase()}" aria-hidden="true"></span><div class="member-timeline-content"><div class="member-timeline-row"><div><span class="member-session-status ${String(session.status||'').toLowerCase()}" data-session-status="${esc(session.status)}">${statusLabel(session.status)}</span><time datetime="${esc(session.sessionDate)}">${dateLabel(session.sessionDate)}</time><h3>${esc(title)}</h3><p>${esc(session.templateKey||'课程')}${session.levelSnapshot?` · ${esc(session.levelSnapshot)}`:''}</p></div><div class="member-timeline-actions"><button type="button" data-open-session-detail data-session-id="${esc(session.id)}" aria-label="查看 ${esc(title)} 课程详情">查看课程</button>${canCopy?`<button type="button" data-copy-session-to-member data-session-id="${esc(session.id)}" aria-label="将 ${esc(title)} 复制给会员">复制给会员</button>`:''}</div></div>${canCopy?'<span class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></span>':''}</div></li>`;
     }).join('');
-    return `<section class="member-timeline" data-member-timeline aria-labelledby="member-timeline-title" aria-busy="${timelineLoading}"><div class="member-section-heading"><div><h2 id="member-timeline-title">训练记录</h2><p>待训练、已完成与已取消的课程都保留在时间线上。</p></div></div>${items?`<ol>${items}</ol>`:'<p class="member-state-note">还没有课程记录。</p>'}${timelineLoadError?'<p class="member-load-more-error" role="alert">更早的课程记录暂时无法读取，请重试。</p>':''}${timelineHasMore?`<button class="member-load-more" type="button" data-member-load-more ${timelineLoading?'disabled':''}>${timelineLoading?'正在加载…':'加载更早记录'}</button>`:''}</section>`;
+    return `<section class="member-timeline" data-member-timeline aria-labelledby="member-timeline-title" aria-busy="${timelineLoading}"><div class="member-section-heading"><div><h2 id="member-timeline-title">训练记录</h2><p>待训练、已完成与已取消的课程都保留在时间线上。</p></div></div><p class="member-copy-inline-status" data-member-copy-feedback role="status" aria-live="polite"></p>${items?`<ol>${items}</ol>`:'<p class="member-state-note">还没有课程记录。</p>'}${timelineLoadError?'<p class="member-load-more-error" role="alert">更早的课程记录暂时无法读取，请重试。</p>':''}${timelineHasMore?`<button class="member-load-more" type="button" data-member-load-more ${timelineLoading?'disabled':''}>${timelineLoading?'正在加载…':'加载更早记录'}</button>`:''}</section>`;
   }
 
   function renderMemberDetail(member,context,sessions){
@@ -153,29 +154,51 @@
     status.textContent=message||'';
   }
 
-  async function copyTrainingToMember(button){
+  function setCopyFeedback(root,message,kind=''){
+    const status=root?.querySelector('[data-member-copy-feedback]');
+    if(!status)return;
+    status.className=`member-copy-inline-status ${kind}`.trim();
+    status.textContent=message||'';
+  }
+
+  async function copyTrainingToMember(button,root){
     const sessionId=button.dataset.sessionId,sourceMemberId=route?.memberId;
     const startedRouteVersion=routeVersion,startedDetailVersion=detailVersion;
     if(!sessionId||!sourceMemberId)return;
-    button.disabled=true;button.textContent='读取计划…';setCopyStatus(button,'');
+    const stillOnSourceDetail=()=>startedRouteVersion===routeVersion&&startedDetailVersion===detailVersion&&route?.page==='member-detail'&&route.memberId===sourceMemberId&&button.isConnected;
+    button.disabled=true;button.textContent='复制中…';setCopyStatus(button,'正在读取计划…');setCopyFeedback(root,'');
     try{
       const result=await window.V14MemberAPI.getSession(sessionId);
-      if(startedRouteVersion!==routeVersion||startedDetailVersion!==detailVersion||route?.page!=='member-detail'||route.memberId!==sourceMemberId||!button.isConnected)return;
+      if(!stillOnSourceDetail())return;
       const source=result?.session,resolvedSession=source?.resolvedSessionSnapshot,plannedItems=Array.isArray(result?.items)?result.items.slice().sort((left,right)=>(left.sortOrder??0)-(right.sortOrder??0)):[];
       if(!source||source.memberId!==sourceMemberId)throw new Error('课程记录已变化，请刷新会员详情后重试。');
       if(!['PLANNED','COMPLETED'].includes(source.status))throw new Error('已取消的课程不能复制。');
+      if(currentMember?.id!==sourceMemberId||currentMember.status!=='ACTIVE'||currentMember.archivedAt)throw new Error('当前会员已停用或归档，不能接收训练课。');
       if(resolvedSession?.main?.kind!=='SLOT'||!Array.isArray(resolvedSession.main.content)||plannedItems.length!==resolvedSession.main.content.length)throw new Error('这条课程记录缺少可复制的原计划。');
       for(let index=0;index<plannedItems.length;index++){
         const item=plannedItems[index],slot=resolvedSession.main.content[index];
         if(item.plannedActionId!==slot.actionId||item.slotKey!==(typeof slot.key==='string'?slot.key:null)||!item.plannedActionSnapshot||!item.plannedPrescriptionSnapshot)throw new Error('课程计划快照不完整，请刷新后重试。');
       }
-      const selector=window.V14MemberSelector;
-      if(typeof selector?.open!=='function')throw new Error('会员保存入口暂不可用，请刷新页面后重试。');
-      await selector.open(button,resolvedSession,null,{plannedItems,excludeMemberId:sourceMemberId,deferIntentLookup:true});
+      const snapshots=window.V14MemberSnapshots;
+      if(typeof snapshots?.prepareIntent!=='function'||typeof snapshots?.send!=='function')throw new Error('会员保存入口暂不可用，请刷新页面后重试。');
+      const intent=await snapshots.prepareIntent(resolvedSession,{memberId:sourceMemberId,sessionDate:snapshots.localDate(),plannedItems,copyFromSessionId:sessionId});
+      if(!stillOnSourceDetail())return;
+      setCopyStatus(button,'正在保存为待训练课程…');
+      const saved=await snapshots.send(intent);
+      if(!stillOnSourceDetail())return;
+      const copiedSession={...intent.snapshot.session,id:saved.sessionId||intent.snapshot.session.id,status:'PLANNED',completedAt:null,revision:saved.revision||1};
+      currentSessions=[copiedSession,...currentSessions.filter(session=>session.id!==copiedSession.id)];
+      const timeline=root?.querySelector('[data-member-timeline]');
+      if(timeline)timeline.outerHTML=timelineMarkup(currentSessions);
+      const alreadyCopied=intent.status==='SAVED'||saved.idempotentReplay===true;
+      setCopyFeedback(root,alreadyCopied?'今天已复制过这份计划，已保留待训练记录。':`已复制给 ${currentMember.displayName||'当前会员'}，新增一条待训练记录。`,'success');
     }catch(error){
-      if(button.isConnected)setCopyStatus(button,error?.status===401?'教练登录已失效，请完成验证后重试。':error?.message||'读取课程计划失败，请重试。','error');
+      if(button.isConnected){
+        const message=error?.status===401?'教练登录已失效，请完成验证后重试。':error?.message||'复制课程计划失败，请重试。';
+        setCopyStatus(button,message,'error');setCopyFeedback(root,message,'error');
+      }
     }finally{
-      if(button.isConnected){button.disabled=false;button.textContent='复制到会员';}
+      if(button.isConnected){button.disabled=false;button.textContent='复制给会员';}
     }
   }
 
@@ -317,7 +340,7 @@
     if(target.matches('[data-member-load-more-members]')){loadMoreMembers();return;}
     if(target.matches('[data-member-detail-retry]')){void loadDetail(root);return;}
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
-    if(target.matches('[data-copy-session-to-member]')){void copyTrainingToMember(target);return;}
+    if(target.matches('[data-copy-session-to-member]')){void copyTrainingToMember(target,root);return;}
     if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
   }
 

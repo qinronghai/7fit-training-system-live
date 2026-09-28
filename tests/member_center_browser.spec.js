@@ -379,7 +379,7 @@ test('Member detail leads with recent training context and opens session detail 
   await expect(trigger).toBeFocused();
 });
 
-async function copySourceRecordToAnotherMember(page, testInfo, status, sessionId) {
+async function copySourceRecordToCurrentMember(page, testInfo, status, sessionId) {
   const source = sourceDetailForCopy(status, sessionId);
   const original = JSON.parse(JSON.stringify(source));
   const state = await mockMemberApi(page, {
@@ -394,6 +394,8 @@ async function copySourceRecordToAnotherMember(page, testInfo, status, sessionId
   await expect(plannedRow.locator('[data-copy-session-to-member]')).toHaveCount(1);
   await expect(completedRow.locator('[data-copy-session-to-member]')).toHaveCount(1);
   await expect(cancelledRow.locator('[data-copy-session-to-member]')).toHaveCount(0);
+  await expect(plannedRow.locator('[data-copy-session-to-member]')).toHaveText('复制给会员');
+  await expect(completedRow.locator('[data-copy-session-to-member]')).toHaveText('复制给会员');
 
   for (const viewport of [
     { width: 390, height: 844, name: '390x844' },
@@ -409,21 +411,17 @@ async function copySourceRecordToAnotherMember(page, testInfo, status, sessionId
   const row = page.locator(`[data-timeline-session="${sessionId}"]`);
   await row.locator('[data-copy-session-to-member]').click();
   const dialog = page.locator('[data-member-save-dialog]');
-  await expect(dialog).toBeVisible();
-  const select = dialog.locator('[data-member-save-select]');
-  await expect(select.locator('option')).toHaveCount(2);
-  await expect(select.locator(`option[value="${COPY_TARGET_ID}"]`)).toHaveText('赵同学');
-  await expect(select.locator(`option[value="${MEMBER_ID}"]`)).toHaveCount(0);
-  await select.selectOption(COPY_TARGET_ID);
-  await expect(dialog.locator('[data-member-save-submit]')).toBeEnabled();
-  await dialog.locator('[data-member-save-submit]').click();
-  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 赵同学 · PLANNED');
+  await expect.poll(() => state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('[data-member-copy-feedback]')).toContainText('已复制给 林同学');
+  await expect(page.locator(`[data-timeline-session="${state.savedSnapshots[0].session.id}"] [data-session-status]`)).toHaveAttribute('data-session-status', 'PLANNED');
 
   expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(1);
   expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
+  expect(state.calls.filter(call => call.action === 'list-members')).toHaveLength(0);
   expect(state.savedSnapshots).toHaveLength(1);
   const copied = state.savedSnapshots[0];
-  expect(copied.session.memberId).toBe(COPY_TARGET_ID);
+  expect(copied.session.memberId).toBe(MEMBER_ID);
   expect(copied.session.status).toBe('PLANNED');
   expect(copied.session.id).not.toBe(sessionId);
   expect(copied.session.idempotencyKey).not.toBe(source.session.idempotencyKey);
@@ -448,14 +446,19 @@ async function copySourceRecordToAnotherMember(page, testInfo, status, sessionId
     expect(item).toMatchObject({ performedActionId: null, performedActionSnapshot: null, performedPrescription: null, sets: null, reps: null, loadKg: null, rir: null, rpe: null, completed: false, note: null });
   }
   expect(source).toEqual(original);
+
+  await row.locator('[data-copy-session-to-member]').click();
+  await expect(page.locator('[data-member-copy-feedback]')).toContainText('今天已复制过这份计划');
+  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
+  expect(state.savedSnapshots).toHaveLength(1);
 }
 
-test('a planned training record can be copied to another active member', async ({ page }, testInfo) => {
-  await copySourceRecordToAnotherMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
+test('a planned training record can be copied to the member on the current detail page', async ({ page }, testInfo) => {
+  await copySourceRecordToCurrentMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
 });
 
-test('a completed training record copies only its original plan to another active member', async ({ page }, testInfo) => {
-  await copySourceRecordToAnotherMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
+test('a completed training record copies only its original plan to the member on the current detail page', async ({ page }, testInfo) => {
+  await copySourceRecordToCurrentMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
 });
 
 test('Member with no completed history can still enter F111 at her training level', async ({ page }) => {
