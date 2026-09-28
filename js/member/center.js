@@ -175,11 +175,51 @@
     status.textContent=message||'';
   }
 
+  function memberCopyPayload(source,resolvedSession,plannedItems){
+    const slots=resolvedSession.main.content;
+    const byKey=new Map(slots.map(slot=>[slot.key,slot]));
+    const anatomy=resolvedSession.anatomyContext||{};
+    return {
+      brand:'7Fit',
+      recipeId:resolvedSession.familyId||resolvedSession.templateId||source.templateKey,
+      recipeName:resolvedSession.title||source.sessionTitle||source.templateKey,
+      sessionTitle:source.sessionTitle||resolvedSession.title||source.templateKey,
+      level:source.levelSnapshot||resolvedSession.level||'',
+      summary:resolvedSession.summary||'',
+      slots:plannedItems.map(item=>{
+        const slot=byKey.get(item.slotKey)||{};
+        const action=item.plannedActionSnapshot||{};
+        return {
+          slot:slot.label||item.slotKey,
+          name:action.name||item.plannedActionId,
+          actionId:item.plannedActionId,
+          pattern:action.pattern,
+          primaryMuscles:action.primaryMuscles,
+          secondaryMuscles:action.secondaryMuscles,
+          tier:slot.tier||'',
+          grade:slot.grade||'',
+          prescription:item.plannedPrescriptionSnapshot?.rawText||'',
+        };
+      }),
+      muscles:{
+        primary:Array.isArray(anatomy.primary)?anatomy.primary:[],
+        secondary:Array.isArray(anatomy.secondary)?anatomy.secondary:[],
+        stabilizers:Array.isArray(anatomy.stabilizers)?anatomy.stabilizers:[],
+      },
+      foam:Array.isArray(resolvedSession.foam)?resolvedSession.foam:[],
+      warmups:Array.isArray(resolvedSession.warmups)?resolvedSession.warmups:[],
+      recovery:Array.isArray(resolvedSession.recovery)?resolvedSession.recovery:[],
+      postCardio:typeof resolvedSession.postCardio==='string'?resolvedSession.postCardio:'',
+      postCardioPlan:resolvedSession.postCardioPlan||null,
+    };
+  }
+
   async function copyTrainingToMember(button,root){
     const sessionId=button.dataset.sessionId,sourceMemberId=route?.memberId;
     const startedRouteVersion=routeVersion,startedDetailVersion=detailVersion;
     if(!sessionId||!sourceMemberId)return;
     const stillOnSourceDetail=()=>startedRouteVersion===routeVersion&&startedDetailVersion===detailVersion&&route?.page==='member-detail'&&route.memberId===sourceMemberId&&button.isConnected;
+    const originalButtonText=button.textContent||'复制给会员';
     button.disabled=true;button.textContent='复制中…';setCopyStatus(button,'正在读取计划…');setCopyFeedback(root,'');
     try{
       const result=await window.V14MemberAPI.getSession(sessionId);
@@ -193,19 +233,15 @@
         const item=plannedItems[index],slot=resolvedSession.main.content[index];
         if(item.plannedActionId!==slot.actionId||item.slotKey!==(typeof slot.key==='string'?slot.key:null)||!item.plannedActionSnapshot||!item.plannedPrescriptionSnapshot)throw new Error('课程计划快照不完整，请刷新后重试。');
       }
-      const snapshots=window.V14MemberSnapshots;
-      if(typeof snapshots?.prepareIntent!=='function'||typeof snapshots?.send!=='function')throw new Error('会员保存入口暂不可用，请刷新页面后重试。');
-      const intent=await snapshots.prepareIntent(resolvedSession,{memberId:sourceMemberId,sessionDate:snapshots.localDate(),plannedItems,copyFromSessionId:sessionId});
+      const copy=window.V14SessionCopy;
+      if(typeof copy?.copyText!=='function')throw new Error('课程文字复制功能暂不可用，请刷新页面后重试。');
+      const text=typeof source.memberCopyText==='string'&&source.memberCopyText.trim()
+        ?source.memberCopyText
+        :typeof copy.formatMember==='function'?copy.formatMember(memberCopyPayload(source,resolvedSession,plannedItems)):'';
+      if(!text)throw new Error('课程记录缺少会员版文字，请刷新后重试。');
+      await copy.copyText(text);
       if(!stillOnSourceDetail())return;
-      setCopyStatus(button,'正在保存为待训练课程…');
-      const saved=await snapshots.send(intent);
-      if(!stillOnSourceDetail())return;
-      const copiedSession={...intent.snapshot.session,id:saved.sessionId||intent.snapshot.session.id,status:'PLANNED',completedAt:null,revision:saved.revision||1};
-      currentSessions=[copiedSession,...currentSessions.filter(session=>session.id!==copiedSession.id)];
-      const timeline=root?.querySelector('[data-member-timeline]');
-      if(timeline)timeline.outerHTML=timelineMarkup(currentSessions);
-      const alreadyCopied=intent.status==='SAVED'||saved.idempotentReplay===true;
-      const message=alreadyCopied?'今天已复制过这份计划，已保留待训练记录。':`已复制给 ${currentMember.displayName||'当前会员'}，新增一条待训练记录。`;
+      const message='会员版训练文字已复制，可粘贴发送给会员。';
       setCopyStatus(button,message,'success');
       setCopyFeedback(root,message,'success');
     }catch(error){
@@ -214,7 +250,7 @@
         setCopyStatus(button,message,'error');setCopyFeedback(root,message,'error');
       }
     }finally{
-      if(button.isConnected){button.disabled=false;button.textContent='复制给会员';}
+      if(button.isConnected){button.disabled=false;button.textContent=originalButtonText;}
     }
   }
 

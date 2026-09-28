@@ -4,7 +4,6 @@ const API = 'https://ynsodlyanpmixbbxblqh.supabase.co/functions/v1/member-api';
 const MEMBER_ID = 'e1000000-0000-4000-8000-000000000001';
 const ARCHIVED_ID = 'e1000000-0000-4000-8000-000000000002';
 const CREATED_ID = 'e1000000-0000-4000-8000-000000000099';
-const COPY_TARGET_ID = 'e1000000-0000-4000-8000-000000000098';
 const completedCopyFixture = require('./fixtures/member-v1/replaced-action-completed.json');
 
 function member(id, displayName, status = 'ACTIVE', archivedAt = null) {
@@ -379,13 +378,52 @@ test('Member detail leads with recent training context and opens session detail 
   await expect(trigger).toBeFocused();
 });
 
-async function copySourceRecordToCurrentMember(page, testInfo, status, sessionId) {
+async function recordClipboardWrites(page) {
+  await page.addInitScript(() => {
+    window.__memberClipboardWrites = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async text => window.__memberClipboardWrites.push(String(text)),
+        readText: async () => window.__memberClipboardWrites.at(-1) || '',
+      },
+    });
+  });
+}
+
+async function expectMemberPlanCopied(page, state, source, sessionId, expectedGetSessionCalls) {
+  await expect.poll(() => page.evaluate(() => window.__memberClipboardWrites.length)).toBe(1);
+  const [text] = await page.evaluate(() => window.__memberClipboardWrites);
+  expect(text).toContain('今日训练');
+  expect(text).toContain('主要训练');
+  for (const item of source.items) {
+    expect(text).toContain(item.plannedActionSnapshot.name);
+    if (item.plannedPrescriptionSnapshot.rawText) {
+      const formattedPrescription = await page.evaluate(rawText => window.V14SessionCopy.memberPrescription(rawText), item.plannedPrescriptionSnapshot.rawText);
+      expect(text).toContain(formattedPrescription);
+    }
+  }
+  const performedOnlyNames = source.items
+    .filter(item => item.performedActionId && item.performedActionId !== item.plannedActionId)
+    .map(item => item.performedActionSnapshot?.name)
+    .filter(Boolean);
+  for (const name of performedOnlyNames) expect(text).not.toContain(name);
+
+  await expect(page.locator('[data-member-copy-feedback]')).toContainText('会员版训练文字已复制');
+  await expect(page.locator('[data-member-copy-feedback]')).not.toContainText('新增待训练记录');
+  await expect(page.locator('[data-timeline-session]')).toHaveCount(state.sessions.length);
+  expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(expectedGetSessionCalls);
+  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(0);
+  expect(state.savedSnapshots).toHaveLength(0);
+}
+
+async function copySourceRecordToClipboard(page, testInfo, status, sessionId) {
   const source = sourceDetailForCopy(status, sessionId);
-  const original = JSON.parse(JSON.stringify(source));
   const state = await mockMemberApi(page, {
-    members: [activeMember, archivedMember, member(COPY_TARGET_ID, '赵同学')],
+    members: [activeMember, archivedMember],
     sessionDetailsById: { [sessionId]: source },
   });
+  await recordClipboardWrites(page);
   await page.goto(`/#/coach/members/${MEMBER_ID}`);
 
   const plannedRow = page.locator(`[data-timeline-session="${sessionSummaries[0].id}"]`);
@@ -410,54 +448,25 @@ async function copySourceRecordToCurrentMember(page, testInfo, status, sessionId
 
   const row = page.locator(`[data-timeline-session="${sessionId}"]`);
   await row.locator('[data-copy-session-to-member]').click();
-  const dialog = page.locator('[data-member-save-dialog]');
-  await expect.poll(() => state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
-  await expect(dialog).toHaveCount(0);
-  await expect(page.locator('[data-member-copy-feedback]')).toContainText('已复制给 林同学');
-  await expect(page.locator(`[data-timeline-session="${state.savedSnapshots[0].session.id}"] [data-session-status]`)).toHaveAttribute('data-session-status', 'PLANNED');
+  await expectMemberPlanCopied(page, state, source, sessionId, 1);
+  await expect(row.locator('[data-copy-session-to-member]')).toHaveText('复制给会员');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await row.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath(`member-copy-after-click-${status.toLowerCase()}-390x844.png`) });
 
-  expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(1);
-  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
-  expect(state.calls.filter(call => call.action === 'list-members')).toHaveLength(0);
-  expect(state.savedSnapshots).toHaveLength(1);
-  const copied = state.savedSnapshots[0];
-  expect(copied.session.memberId).toBe(MEMBER_ID);
-  expect(copied.session.status).toBe('PLANNED');
-  expect(copied.session.id).not.toBe(sessionId);
-  expect(copied.session.idempotencyKey).not.toBe(source.session.idempotencyKey);
-  expect(copied.items.map(item => ({
-    phase: item.phase,
-    slotKey: item.slotKey,
-    sortOrder: item.sortOrder,
-    plannedActionId: item.plannedActionId,
-    plannedActionSnapshot: item.plannedActionSnapshot,
-    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
-  }))).toEqual(original.items.map(item => ({
-    phase: item.phase,
-    slotKey: item.slotKey,
-    sortOrder: item.sortOrder,
-    plannedActionId: item.plannedActionId,
-    plannedActionSnapshot: item.plannedActionSnapshot,
-    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
-  })));
-  for (const item of copied.items) {
-    expect(item.id).not.toBe(original.items.find(sourceItem => sourceItem.sortOrder === item.sortOrder).id);
-    expect(item.sessionId).toBe(copied.session.id);
-    expect(item).toMatchObject({ performedActionId: null, performedActionSnapshot: null, performedPrescription: null, sets: null, reps: null, loadKg: null, rir: null, rpe: null, completed: false, note: null });
-  }
-  expect(source).toEqual(original);
-
+  // Copying again may replace the clipboard text, but must never add a record.
   await row.locator('[data-copy-session-to-member]').click();
-  await expect(page.locator('[data-member-copy-feedback]')).toContainText('今天已复制过这份计划');
-  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
-  expect(state.savedSnapshots).toHaveLength(1);
+  await expect.poll(() => page.evaluate(() => window.__memberClipboardWrites.length)).toBe(2);
+  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(0);
+  expect(state.savedSnapshots).toHaveLength(0);
 }
 
-async function copyFromSessionDrawerToCurrentMember(page, testInfo, status, sessionId) {
+async function copyFromSessionDrawerToClipboard(page, testInfo, status, sessionId) {
   const source = sourceDetailForCopy(status, sessionId);
   const state = await mockMemberApi(page, {
     sessionDetailsById: { [sessionId]: source },
   });
+  await recordClipboardWrites(page);
   await page.goto(`/#/coach/members/${MEMBER_ID}`);
 
   const row = page.locator(`[data-timeline-session="${sessionId}"]`);
@@ -479,47 +488,19 @@ async function copyFromSessionDrawerToCurrentMember(page, testInfo, status, sess
   }
 
   await copyButton.click();
-  await expect.poll(() => state.savedSnapshots).toHaveLength(1);
-  await expect(detail.locator('[data-member-copy-status]')).toContainText('已复制给 林同学');
-  const copied = state.savedSnapshots[0];
-  expect(copied.session.memberId).toBe(MEMBER_ID);
-  expect(copied.session.status).toBe('PLANNED');
-  expect(copied.session.id).not.toBe(sessionId);
-  expect(copied.items.map(item => ({
-    plannedActionId: item.plannedActionId,
-    plannedActionSnapshot: item.plannedActionSnapshot,
-    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
-    performedActionId: item.performedActionId,
-    performedActionSnapshot: item.performedActionSnapshot,
-    performedPrescription: item.performedPrescription,
-    sets: item.sets,
-    reps: item.reps,
-    loadKg: item.loadKg,
-    completed: item.completed,
-    note: item.note,
-  }))).toEqual(source.items.map(item => ({
-    plannedActionId: item.plannedActionId,
-    plannedActionSnapshot: item.plannedActionSnapshot,
-    plannedPrescriptionSnapshot: item.plannedPrescriptionSnapshot,
-    performedActionId: null,
-    performedActionSnapshot: null,
-    performedPrescription: null,
-    sets: null,
-    reps: null,
-    loadKg: null,
-    completed: false,
-    note: null,
-  })));
-  expect(state.calls.filter(call => call.action === 'list-members')).toHaveLength(0);
-  await expect(page.locator(`[data-timeline-session="${copied.session.id}"] [data-session-status]`)).toHaveAttribute('data-session-status', 'PLANNED');
+  await expectMemberPlanCopied(page, state, source, sessionId, 2);
+  await expect(detail.locator('[data-session-copy-to-member]')).toHaveText('复制给会员');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await detail.locator('[data-session-copy-to-member]').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath(`member-copy-drawer-after-click-${status.toLowerCase()}-390x844.png`) });
 }
 
-test('a planned training record can be copied to the current member from its detail drawer', async ({ page }, testInfo) => {
-  await copyFromSessionDrawerToCurrentMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
+test('a planned training record copies its member text to the clipboard from its detail drawer', async ({ page }, testInfo) => {
+  await copyFromSessionDrawerToClipboard(page, testInfo, 'PLANNED', sessionSummaries[0].id);
 });
 
-test('a completed training record can be copied to the current member from its detail drawer using only the original plan', async ({ page }, testInfo) => {
-  await copyFromSessionDrawerToCurrentMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
+test('a completed training record copies its original plan text from its detail drawer', async ({ page }, testInfo) => {
+  await copyFromSessionDrawerToClipboard(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
 });
 
 test('a cancelled training record cannot be copied from its detail drawer', async ({ page }) => {
@@ -533,12 +514,12 @@ test('a cancelled training record cannot be copied from its detail drawer', asyn
   await expect(detail.locator('[data-session-copy-to-member]')).toHaveCount(0);
 });
 
-test('a planned training record can be copied to the member on the current detail page', async ({ page }, testInfo) => {
-  await copySourceRecordToCurrentMember(page, testInfo, 'PLANNED', sessionSummaries[0].id);
+test('a planned training record copies member text without adding another timeline record', async ({ page }, testInfo) => {
+  await copySourceRecordToClipboard(page, testInfo, 'PLANNED', sessionSummaries[0].id);
 });
 
-test('a completed training record copies only its original plan to the member on the current detail page', async ({ page }, testInfo) => {
-  await copySourceRecordToCurrentMember(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
+test('a completed training record copies only its original plan text from the timeline', async ({ page }, testInfo) => {
+  await copySourceRecordToClipboard(page, testInfo, 'COMPLETED', sessionSummaries[1].id);
 });
 
 test('Member with no completed history can still enter F111 at her training level', async ({ page }) => {
