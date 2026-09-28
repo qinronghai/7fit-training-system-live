@@ -77,17 +77,19 @@
     });
   }
 
-  async function fingerprint(resolvedSession,sessionDate,plannedItems=null){
+  async function fingerprint(resolvedSession,sessionDate,plannedItems=null,copyFromSessionId=null){
     const payload={schemaVersion:1,sessionDate,resolvedSession};
     if(plannedItems)payload.plannedItems=plannedItems;
+    if(typeof copyFromSessionId==='string'&&copyFromSessionId)payload.copyFromSessionId=copyFromSessionId;
     const bytes=new TextEncoder().encode(JSON.stringify(payload));
     const digest=await (window.crypto||globalThis.crypto).subtle.digest('SHA-256',bytes);
     return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
   }
 
-  async function contentFingerprint(resolvedSession,plannedItems=null){
+  async function contentFingerprint(resolvedSession,plannedItems=null,copyFromSessionId=null){
     const payload={schemaVersion:1,resolvedSession};
     if(plannedItems)payload.plannedItems=plannedItems;
+    if(typeof copyFromSessionId==='string'&&copyFromSessionId)payload.copyFromSessionId=copyFromSessionId;
     const bytes=new TextEncoder().encode(JSON.stringify(payload));
     const digest=await (window.crypto||globalThis.crypto).subtle.digest('SHA-256',bytes);
     return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
@@ -114,15 +116,15 @@
     return matches[0]||null;
   }
 
-  async function intentKey(resolvedSession,memberId,sessionDate,plannedItems=null){
-    const baseFingerprint=await fingerprint(resolvedSession,sessionDate,plannedItems);
+  async function intentKey(resolvedSession,memberId,sessionDate,plannedItems=null,copyFromSessionId=null){
+    const baseFingerprint=await fingerprint(resolvedSession,sessionDate,plannedItems,copyFromSessionId);
     return {baseFingerprint,key:`${baseFingerprint}:${memberId}`};
   }
 
-  async function prepareIntent(resolvedSession,{memberId,sessionDate,now=new Date(),createId=makeUuid,allowNewAfterPendingIntentKey=null,plannedItems=null}={}){
+  async function prepareIntent(resolvedSession,{memberId,sessionDate,now=new Date(),createId=makeUuid,allowNewAfterPendingIntentKey=null,plannedItems=null,copyFromSessionId=null}={}){
     if(typeof memberId!=='string'||!memberId)throw Object.assign(new TypeError('memberId is required'),{code:'invalid_member'});
     const preservedPlan=normalizePlannedItems(resolvedSession,plannedItems);
-    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan),{baseFingerprint,key}=await intentKey(resolvedSession,memberId,date,preservedPlan),store=readStore();
+    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan,copyFromSessionId),{baseFingerprint,key}=await intentKey(resolvedSession,memberId,date,preservedPlan,copyFromSessionId),store=readStore();
     if(store[key])return clone(store[key]);
     const pendingIntent=await findPendingIntent(store,contentFingerprintValue,memberId,date);
     if(pendingIntent){
@@ -156,15 +158,15 @@
     if(preservedPlan){
       snapshot.items=snapshot.items.map((item,index)=>({...item,...clone(preservedPlan[index])}));
     }
-    const intent={key,baseFingerprint,contentFingerprint:contentFingerprintValue,memberId,sessionDate:date,status:'PENDING',snapshot,createdAt:timestamp,updatedAt:timestamp,savedSessionId:null};
+    const intent={key,baseFingerprint,contentFingerprint:contentFingerprintValue,memberId,sessionDate:date,copyFromSessionId:typeof copyFromSessionId==='string'&&copyFromSessionId?copyFromSessionId:null,status:'PENDING',snapshot,createdAt:timestamp,updatedAt:timestamp,savedSessionId:null};
     store[key]=intent;writeStore(store);
     return clone(intent);
   }
 
-  async function findIntentForResolvedSession(resolvedSession,{memberId,sessionDate,now=new Date(),plannedItems=null}={}){
+  async function findIntentForResolvedSession(resolvedSession,{memberId,sessionDate,now=new Date(),plannedItems=null,copyFromSessionId=null}={}){
     const preservedPlan=normalizePlannedItems(resolvedSession,plannedItems);
-    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan),store=readStore();
-    const baseFingerprint=await fingerprint(resolvedSession,date,preservedPlan);
+    const date=sessionDate||localDate(now),contentFingerprintValue=await contentFingerprint(resolvedSession,preservedPlan,copyFromSessionId),store=readStore();
+    const baseFingerprint=await fingerprint(resolvedSession,date,preservedPlan,copyFromSessionId);
     const matches=Object.values(store).filter(value=>value?.baseFingerprint===baseFingerprint&&value?.sessionDate===date&&(!memberId||value.memberId===memberId));
     matches.sort((left,right)=>String(right.updatedAt||'').localeCompare(String(left.updatedAt||'')));
     if(matches.length)return clone(matches[0]);
