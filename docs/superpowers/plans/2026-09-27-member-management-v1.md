@@ -143,8 +143,8 @@
 - [x] Create and archive the unique non-sensitive release-test member after the real database flow is verified.
 - [x] Run all local Python tests, schema/build checks, all Node tests, all JS syntax checks, all Playwright tests, and Case/F111/Body/Conditioning/HYROX regressions.
 - [x] Run Security/Performance Advisors, execute anon-denial checks, and verify the persisted Member API flow on the isolated free database project.
-- [ ] Merge only after the full gate; verify the master `verify`, `browser-smoke`, and `deploy` jobs, deployed build marker, Pages URL, and live Member workflows.
-- [ ] Update Issues #160–#167 with evidence and close only verified issues; close Epic #159 only after every dependency and live gate is green.
+- [x] Merge only after the full gate; verify the master `verify`, `browser-smoke`, and `deploy` jobs, deployed build marker, Pages URL, and live Member workflows. Rechecked against master `51a48df`, workflow `36400784093`, and live build marker `51a48dfd` on 2026-09-29.
+- [x] Update Issues #160–#167 with evidence and close only verified issues; close Epic #159 only after every dependency and live gate is green. All eight child issues and the Epic are closed with evidence comments.
 - [x] Commit the local Release Gate, changelog, and evidence documentation.
 
 ## Plan Self-Review
