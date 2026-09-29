@@ -137,7 +137,7 @@
 
   function executionActions(){
     if(currentSession?.status!=='PLANNED')return '';
-    return `<div class="member-session-actions">${copyButtonMarkup()}<button type="button" data-session-cancel-request data-session-mutation>取消计划课程</button><button type="submit" class="primary" data-session-complete data-session-mutation>完成本节课</button></div>${copyStatusMarkup()}<div class="member-session-cancel-confirmation" data-session-cancel-confirmation hidden role="group" aria-label="确认取消计划课程"><p>取消后，这节课会保留在训练记录中，但不会计入最近训练情况。</p><div><button type="button" data-session-cancel-dismiss>返回记录</button><button type="button" class="danger" data-session-cancel-confirm data-session-mutation>确认取消课程</button></div></div>`;
+    return `${copyStatusMarkup()}<div class="member-session-cancel-confirmation" data-session-cancel-confirmation hidden role="group" aria-label="确认取消计划课程"><p>取消后，这节课会保留在训练记录中，但不会计入最近训练情况。</p><div><button type="button" data-session-cancel-dismiss>返回记录</button><button type="button" class="danger" data-session-cancel-confirm data-session-mutation>确认取消课程</button></div></div><div class="member-session-actions">${copyButtonMarkup()}<button type="button" data-session-cancel-request data-session-mutation>取消计划课程</button><button type="submit" class="primary" data-session-complete data-session-mutation>完成本节课</button></div>`;
   }
 
   function copyButtonMarkup(){

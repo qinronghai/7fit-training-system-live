@@ -73,6 +73,15 @@ The CI Playwright tests use an in-memory Member API. The separate browser run be
 - PR [#175](https://github.com/qinronghai/7fit-training-system-live/pull/175) merged as `a9a69159fbb4e87d59c9d52f88d5e58615a01c6e`. Master workflow run `36392308688` passed `verify`, `browser-smoke`, and `deploy`.
 - The planned-session deletion UI first shipped with Pages build marker **`a9a69159`**. A live fetch verified that marker and confirmed the published stylesheet contains the delete-button styling and `js/member/center.js` contains the deletion action.
 
+## Current Production Audit and Member UI Follow-up (2026-09-29)
+
+- Epic #159 and Issues #160–#167 are closed. Each has an evidence comment; the implementation plan's two stale #167 release/update checkboxes are now checked against current GitHub state.
+- PR [#177](https://github.com/qinronghai/7fit-training-system-live/pull/177) merged at **`51a48dfdc4afbafd81827632d2d5c2ed1888cf6a`**. Master workflow **`36400784093`** completed `verify`, `browser-smoke`, and `deploy` successfully. The live Pages `7fit-build` marker is **`51a48dfd`**; the served `js/member/session.js`, `js/member/center.js`, and `js/session-copy.js` assets were fetched and checked for the warm-up/recovery and copy-to-member changes.
+- Current Supabase organization plan is **Free**. Production and isolated staging projects are `ACTIVE_HEALTHY`; both have the Member migrations through planned-session deletion and `member-api` version 2 deployed.
+- Read-only catalog checks on both projects confirmed RLS enabled and `anon` table `SELECT` denied for `members`, `training_sessions`, and `training_session_items`. Member RPC execution is denied to `anon` and granted to `service_role`. Current Security Advisors report only the intentional INFO-level RLS-enabled/no-policy findings; Performance Advisors report only the INFO unused `members_archived_at_idx`. An unauthenticated production Member API request returned **401**. No database writes were made during this audit.
+- The separate member-training UI polish is still local on `codex/member-training-ui` at the `51a48df` base. It updates member-flow CSS, keeps the planned-session cancel confirmation ahead of the sticky footer, and adds `tests/member_ui_polish_test.js`. Local verification: Python **276 passed**, Node runtime **98 passed**, ESM **8 passed**, JS syntax, schema, system-data freshness, static artifact hygiene, Impeccable layout scan (`[]` from the prior source audit), and `git diff --check` all passed. The cancel-confirmation regression now also passes; browser visual acceptance of the local changes is still pending.
+- No commit or deployment has been made for the local follow-up. This does not change the already verified production status above.
+
 ## Completion Record
 
 | Evidence | Result | Reference |
