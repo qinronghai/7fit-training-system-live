@@ -1,5 +1,25 @@
-# 7Fit Photo Retouching V1.1 — implementation and limits
+# 7Fit Photo Retouching V1.2 — workflow contract
 
+V1.2 introduces a user-approved aesthetic standard and **engine routing**; the checked-in `scripts/retouch.py` remains the **tested V1.1 local, non-generative renderer**. Adding this reference does not install, configure, or verify a native generative backend in Codex.
+
+## Editorial vs evidence decision
+
+- `EDITORIAL_ENHANCE`: social media course photo / gym marketing / portrait. Authorized image-generation/editing tool preferred to obtain a clean, bright, naturally lit premium appearance **only after source & consent checks**. Prefer mask-constrained edits, maintain source fidelity, compare results. Use the V1.1 renderer or installed darktable for source-only fallback.
+- `DOCUMENTARY_LOCKED`: real teaching/medical-ish movement recording. The original composition, anatomy, load, camera geometry and equipment remain source-aligned. Use deterministic/non-generative editing.
+- `EVIDENCE_LOCKED`: posture and progress/before-after photos. No generation, body retouch, recomposition or misleading comparative grading.
+- `CREATIVE_COMPOSITE`: expressly requested montage, poster or stylization; keep a separate labeled creative deliverable, never claim documentary fidelity.
+
+## Consent / privacy / quality gates
+
+Do not upload identifiable members to unknown or unapproved cloud model endpoints. A consent to publish is not necessarily consent to third-party model processing. Source-lock instructions cannot guarantee generative face/body identity; manual comparison against original is mandatory. Apply final privacy masking as a separate deterministic step when a face is visible; inspect full/side/reflected faces and contextual identification. Human-reviewed `safe_to_publish` clearance is never implied by a successful command.
+
+## Existing deterministic CLI (unchanged)
+
+The existing tested V1.1 code requires Python 3.10+, Pillow, optionally OpenCV + numpy for *unreviewed frontal face suggestions*. It handles original SHA, EXIF orientation, per-file annotations, bounded global grading, manually reviewed crops, blur and independent JPEG variants. It cannot do generative image editing, semantic masks, object removal or true RAW/XMP color management. See the preserved V1.1 implementation below for exact commands.
+
+---
+
+## Legacy V1.1 local renderer — exact setup and limits
 ## Dependencies
 
 - Python 3.10+ (uses `Path.is_relative_to`), Pillow (`python -m pip install Pillow`).
