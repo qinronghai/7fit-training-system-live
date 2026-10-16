@@ -1,0 +1,118 @@
+{
+  "generated": "2026-09-17",
+  "method": "git worktree replay on origin/master (61beb976); `git merge --no-ff` per PR branch in sequence, `git merge --abort` on conflict",
+  "base": { "branch": "master", "head": "61beb976ddfdf4feb711b2ce7a430a84e3974fa0" },
+  "chains": {
+    "A": {
+      "label": "recovery-ux",
+      "prs": [115, 117, 118],
+      "branches": [
+        "feature/issue-73-prep-responsive-filters",
+        "feature/issue-79-auxiliary-modules",
+        "feature/issue-80-recovery-ux"
+      ],
+      "ancestry_verified": "115 ancestor-of 117 ancestor-of 118: true",
+      "clean_on_master": true,
+      "files_vs_master": 24
+    },
+    "B": {
+      "label": "body-level-pools",
+      "prs": [111, 112, 114],
+      "branches": [
+        "feature/issue-93-body-level-pools",
+        "feature/issue-94-venue-load-rules",
+        "feature/issue-95-equipment-station-diversity"
+      ],
+      "ancestry_verified": "111 ancestor-of 112 ancestor-of 114: true",
+      "clean_on_master": true,
+      "files_vs_master": 34
+    },
+    "C": {
+      "label": "conditioning-blueprint",
+      "prs": [113],
+      "branches": ["feature/issue-85-conditioning-blueprint"],
+      "ancestry_verified": "based directly on master",
+      "clean_on_master": true,
+      "files_vs_master": 44,
+      "independent_claim": "FALSE - conflicts with both A and B"
+    },
+    "standalone_clean": {
+      "prs": [119, 120, 121],
+      "branches": [
+        "feature/issue-90-benchmark-hardening",
+        "feature/issue-12-favorites",
+        "feature/issue-13-evidence-review-metadata"
+      ],
+      "clean_on_master": true
+    }
+  },
+  "pairwise_conflicts": {
+    "A_into_B": { "clean": true },
+    "B_into_A": { "clean": false, "files": ["playwright.config.js", "data/change-log.js", "data/src/actions.json", "data/system-data.js", "schemas/v14.8/action.schema.json"] },
+    "A_into_C": { "clean": true },
+    "C_into_A": { "clean": false, "files": ["assets/app.css", "data/system-data.js", "js/views-coach.js", "playwright.config.js"] },
+    "B_into_C": { "clean": true },
+    "C_into_B": { "clean": false, "files": ["data/system-data.js", "js/state.js", "playwright.config.js"] },
+    "119_then_120": { "clean": false, "files": ["assets/app.css"] },
+    "119_then_121": { "clean": false, "files": ["assets/app.css"] }
+  },
+  "orderings_tested": {
+    "A,B,C": { "conflict_files": 14 },
+    "B,C,A": { "conflict_files": 14 },
+    "C,A,B": { "conflict_files": 11 }
+  },
+  "recommended_order": {
+    "sequence": ["C", "A", "B", "E", "D", "F"],
+    "pr_sequence": [113, 115, 117, 118, 111, 112, 114, 120, 119, 121],
+    "conflict_resolutions": 7,
+    "conflict_files": [
+      "assets/app.css",
+      "js/views-coach.js",
+      "js/state.js",
+      "data/system-data.js",
+      "playwright.config.js"
+    ],
+    "note": "D/E/F slot anywhere without changing the count; A/B must be A-before-B, and C must come before A and B."
+  },
+  "execution": {
+    "branch": "integ/all-verified",
+    "final_head": "2e851b2de1ed8bd0c4197ee0fc0e64cb971e9fe5",
+    "pushed": false,
+    "master_untouched": true,
+    "orphan_branches_deleted": 0,
+    "commits": 81,
+    "files_changed": 106,
+    "insertions": 16593,
+    "deletions": 498,
+    "gates": {
+      "pytest": "250 passed",
+      "node": "70 passed / 0 failed",
+      "playwright": "62 passed",
+      "build_system_data_check": "PASS",
+      "validate_v148_schema": "PASS",
+      "node_check": "PASS",
+      "prepare_static_site": "PASS"
+    },
+    "data_preservation": {
+      "recovery_2f_with_region": "0 -> 14",
+      "equipment_class": "0 -> 15",
+      "station_group": "0 -> 9",
+      "station_id": "0 -> 6",
+      "conditioning_con01_l3_stations": "2 -> 3"
+    },
+    "regressions_fixed": [
+      "data/src/actions.json silently lost #118 recovery metadata in the first (wrong-order) attempt; fixed by recommended order + per-step field assertions",
+      "playwright.config.js shared testMatch line; replaced with computed explicit-union-directory list (also surfaced 2 unregistered specs)",
+      "app.css re-appended rule after the mobile media query overrode the 620px breakpoint; removed the redundant rule"
+    ],
+    "verification_interference_note": "Two intermediate full browser runs showed 4 HYROX and 1 issue73 failures caused by a background python http.server holding Playwright port 4173 and serving a stale _site; clean re-run is 62 passed."
+  },
+  "conflict_causes": {
+    "playwright.config.js": "every PR appends a spec filename to one single-line testMatch array; 12 distinct versions across 14 branches. Structural fix: glob-based testMatch.",
+    "data/system-data.js": "generated bundle with warmupDetails on one physical line; both sides edit different regions of the same line. Fix: merge data/src/*.json then regenerate with tools/build_system_data.py.",
+    "js/views-coach.js": "A and C both independently added PREP keyboard navigation (bindPrepSelect vs bindPrepKeyboard). Semantic duplicate, not additive.",
+    "js/state.js": "both sides insert one distinct const at the same anchor; additive, keep both.",
+    "assets/app.css": "all sides append CSS rules; largely additive.",
+    "data/change-log.js": "both sides prepend a changelog entry; keep both."
+  }
+}

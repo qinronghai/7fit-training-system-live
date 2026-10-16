@@ -1,0 +1,842 @@
+{
+  "master": {
+    "f111-L3": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "f111-L1": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L1": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L4": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-02-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "健美式塑形",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-family": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-01-L3": {
+      "prepTitle": "PREP / PRIMER｜动态热身 · 动作排演",
+      "selects": [
+        [
+          ".conditioning-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复 · 约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "体能训练",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-L3": {
+      "prepTitle": "PREP｜动态热身 · Station 准备",
+      "selects": [
+        [
+          ".hyrox-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "HYROX 训练",
+      "emptyH2": 0,
+      "overflow": 0
+    }
+  },
+  "A118": {
+    "f111-L3": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 3,
+      "recSectionTitles": [
+        "完成拉伸｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "f111-L1": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 3,
+      "recSectionTitles": [
+        "完成拉伸｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L1": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L4": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-02-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "健美式塑形",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-family": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-01-L3": {
+      "prepTitle": "PREP / PRIMER｜动态热身 · 动作排演",
+      "selects": [
+        [
+          ".conditioning-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复 · 约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "体能训练",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-L3": {
+      "prepTitle": "PREP｜动态热身 · Station 准备",
+      "selects": [
+        [
+          ".hyrox-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "HYROX 训练",
+      "emptyH2": 0,
+      "overflow": 0
+    }
+  },
+  "B114": {
+    "f111-L3": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "f111-L1": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L1": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L4": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-02-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "健美式塑形",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-family": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-01-L3": {
+      "prepTitle": "PREP / PRIMER｜动态热身 · 动作排演",
+      "selects": [
+        [
+          ".conditioning-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复 · 约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "体能训练",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-L3": {
+      "prepTitle": "PREP｜动态热身 · Station 准备",
+      "selects": [
+        [
+          ".hyrox-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "HYROX 训练",
+      "emptyH2": 0,
+      "overflow": 0
+    }
+  },
+  "C113": {
+    "f111-L3": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "f111-L1": {
+      "prepTitle": "2F｜PREP",
+      "selects": [
+        [
+          ".prep-slot-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "2F｜RECOVERY",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": true,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "F111 女性综合 1+1+1",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L1": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-01-L4": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-02-L3": {
+      "prepTitle": "PREP｜动态热身 / 激活",
+      "selects": [
+        [
+          ".body-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "训练后恢复｜约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "健美式塑形",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "body-family": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-01-L3": {
+      "prepTitle": "PREP / PRIMER｜动态热身 · 动作排演",
+      "selects": [
+        [
+          ".conditioning-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复 · 约 5–8 分钟",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": true,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "con-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "体能训练",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-L3": {
+      "prepTitle": "PREP｜动态热身 · Station 准备",
+      "selects": [
+        [
+          ".hyrox-prep-select",
+          5
+        ]
+      ],
+      "recCards": 0,
+      "recSectionTitles": [
+        "RECOVERY｜训练后恢复",
+        "保存 / 恢复当前课程"
+      ],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "Multi-Template Coach Center",
+      "emptyH2": 0,
+      "overflow": 0
+    },
+    "hyrox-home": {
+      "prepTitle": null,
+      "selects": [],
+      "recCards": 0,
+      "recSectionTitles": [],
+      "foam": false,
+      "foamText": false,
+      "postCardioSelect": 0,
+      "subtitle": "HYROX 训练",
+      "emptyH2": 0,
+      "overflow": 0
+    }
+  }
+}

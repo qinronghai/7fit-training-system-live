@@ -1,0 +1,33 @@
+POST CARDIO ONLY｜课后自主有氧 selector — 真实浏览器实测（端口 4298，构建号 cardio2）
+================================================================================
+
+【默认值 = 复现原有文案】（所以旧断言全部继续成立）
+  coach  : 课后有氧｜约 30 分钟 / 器械：跑步机 / 平均心率：130–140 bpm 左右（燃烧脂肪心率）
+  member : 选择跑步机，时间 30 分钟左右，平均心率 130 到 140 左右（燃烧脂肪心率）。
+
+【器械选项来自数据，不是硬编码】
+  跑步机(venue_treadmill_zone2) / 楼梯机(venue_stair_zone2) / 其他有氧(post_cardio_other)
+  前两项 = 场馆 POST_CARDIO_ONLY 动作；此前 js/ 里无任何代码消费该 route
+
+【实际操作验证：改 器械→楼梯机 / 时长→40 / 心率→140-150】
+  F111-01-L3（预设）
+    badge    : 约 40 分钟
+    summary  : 楼梯机 · 约 40 分钟 · 平均心率 140–150 bpm
+    plan     : {actionId:venue_stair_zone2, equipment:楼梯机, minutes:40, heartRate:[140,150]}
+    coach 复制: 课后有氧｜约 40 分钟 / 器械：楼梯机 / 平均心率：140–150 bpm 左右（燃烧脂肪心率）
+    member 复制: 课后有氧｜约 40 分钟 / 选择楼梯机，时间 40 分钟左右，平均心率 140 到 150 左右（燃烧脂肪心率）。
+    pageerror: 0
+
+  F111-C-SQ-HR-L3（自由组合，独立 state key）
+    sessionKey: F111-C-SQ-HR-L3
+    改 时长→45 后 summary: 跑步机 · 约 45 分钟 · 平均心率 130–140 bpm
+    → 与预设课的设置互不影响
+
+【发现并修掉的 bug（946f104）】
+  bindPostCardio 定义在 bind(route) 之外，拿不到局部的 rerender：
+  setSelection 写入了新计划后即抛 ReferenceError，导致「下拉框显示新值、
+  但徽标与摘要仍是旧值」。改为传入 rerender（与该块其他处理器一致）。
+
+【门禁】
+  pytest 250 / node 73（新增 tests/post_cardio_runtime_test.js）/ Playwright 62
+  build_system_data --check / validate_v148_schema / node --check / prepare_static_site 全 PASS

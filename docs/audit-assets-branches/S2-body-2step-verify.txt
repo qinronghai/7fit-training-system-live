@@ -1,0 +1,39 @@
+Body 层级压到 2 步 —— 实测（端口 4302，构建号 body）
+======================================================
+
+【点击深度：编课中心 → Body → 课程 = 2 次】
+  click 1 -> http://127.0.0.1:4302/index.html#/coach/body
+  click 2 -> http://127.0.0.1:4302/index.html#/coach/body/body-02/l3
+  session visible: true
+  back-link: #/coach/body/body-02
+
+【首页结构】
+  families=4  levelRows=4  levelLinks=16  modes=6
+  → 4 张 Family 卡，每张带 L1/L2/L3/L4 四个直达链接（共 16 个）
+
+【改前 / 改后】
+  改前：编课中心 → Body（6 张模式卡 + 4 张 Family 卡，只有「查看 X →」）
+        → Family 页（仅 L1–L4）→ 课程            = 3 次点击
+  改后：编课中心 → Body（Family × L1–L4 一次选完）→ 课程 = 2 次点击
+        Family 页保留为详情页（动作池 / 进阶链），不再是必经层
+
+【顺带证据：CSS 本来就为这个设计写了样式】
+  assets/app.css 里早已存在 `.body-family-card .level-links{margin-top:auto}`
+  —— 说明「Family 卡直接带等级链接」是原设计，等级只是后来被挪到了第二页。
+
+【锁住旧结构、已同步更新的两处断言】
+  tests/body_coach_browser.spec.js
+      - await expect(page.locator('.body-family-card .level-links')).toHaveCount(0)
+      + await expect(page.locator('.body-family-card .level-links')).toHaveCount(4)
+      + for(const level of ['l1','l2','l3','l4']) ... a[href$="/${level}"]).toHaveCount(4)
+      + 新增：从 #/coach 点两次直达课程
+  tests/body_coach_session_runtime_test.js
+      - assert(!home.includes('.../l1'),'must not expose Level links on home')
+      + for(const level of ['l1','l2','l3','l4']) assert(home.includes('.../${level}'))
+  tests/browser_smoke.spec.js
+      - getByText('先选择本节训练 Family')
+      + getByText('选择本节训练 Family 与等级')
+
+【门禁】
+  pytest 250 / node 74 / Playwright 62（含新的两次点击断言）
+  build_system_data --check / validate_v148_schema / node --check / prepare_static_site 全 PASS

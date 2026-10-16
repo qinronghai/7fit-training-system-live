@@ -1,0 +1,12 @@
+Body family          subtitle="健美式塑形 · 臀腿｜股四主导"  prep-section=0 prep-card=0 prep-select=0
+Body session         subtitle="健美式塑形 · 臀腿｜股四主导 · L3"  prep-section=1 prep-card=5 prep-select=5
+Conditioning session subtitle="体能训练 · 基础有氧 · L3"  prep-section=1 prep-card=5 prep-select=5
+HYROX session        subtitle="HYROX 训练 · 技术学习 · L3"  prep-section=1 prep-card=5 prep-select=5
+Body home            subtitle="健美式塑形"  prep-section=0 prep-card=0 prep-select=0
+Body family          subtitle="健美式塑形 · 臀腿｜股四主导"  prep-section=0 prep-card=0 prep-select=0
+Body session         subtitle="健美式塑形 · 臀腿｜股四主导 · L3"  prep-section=1 prep-card=5 prep-select=5
+Conditioning session subtitle="体能训练 · 基础有氧 · L3"  prep-section=1 prep-card=5 prep-select=5
+HYROX session        subtitle="HYROX 训练 · 技术学习 · L3"  prep-section=1 prep-card=5 prep-select=5
+Body home            subtitle="健美式塑形"  prep-section=0 prep-card=0 prep-select=0
+F111 preset      prep-section=1 prep-card=5 prep-select=5 (legacy prep-slot-select=5)
+F111 composer    prep-section=1 prep-card=5 prep-select=5 (legacy prep-slot-select=5)
