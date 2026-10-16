@@ -5,6 +5,7 @@
   const D=()=>window.V14_DATA||{};
   const S=()=>window.V15TemplateSearch;
   const F=()=>window.V15Favorites;
+  const FOAM_ROLLER_QUERY='泡沫轴';
   let filters={q:'',templateId:'',kind:'',pattern:'',tier:'',zone:'',equipment:'',category:'',status:''};
 
   function uniq(key){return [...new Set(Object.values(D().actions||{}).map(a=>a[key]).filter(Boolean))].sort();}
@@ -19,6 +20,15 @@
 
   function searchOptions(overrides={}){
     return {...filters,...overrides};
+  }
+
+  function foamRollerFilterActive(){
+    return filters.q===FOAM_ROLLER_QUERY&&filters.kind==='action'&&Object.entries(filters).every(([key,value])=>key==='q'||key==='kind'||!value);
+  }
+
+  function quickFiltersHtml(){
+    const active=foamRollerFilterActive();
+    return `<div class="library-quick-filters" aria-label="快捷筛选"><span>快捷筛选</span><button class="library-quick-filter ${active?'active':''}" type="button" data-quick-filter="foam" aria-pressed="${active?'true':'false'}">泡沫轴</button></div>`;
   }
 
   function searchResults(f=filters){
@@ -105,6 +115,7 @@
           <select aria-label="类别筛选" data-filter="category">${opts(uniq('category'),'全部类别')}</select>
           <select aria-label="编排状态筛选" data-filter="status">${opts(uniq('status'),'全部编排状态')}</select>
         </div>
+        ${quickFiltersHtml()}
         <div class="library-result-head"><b id="library-count">${items.length} 个结果</b><span>动作打开详情；编课结果进入当前合法 Composer Context</span></div>
         <div id="action-results" class="action-results template-search-results">${resultsHtml(items)}</div>
       </section>`;
@@ -131,6 +142,7 @@
       if(count)count.textContent=items.length+' 个结果';
       bindRows();
       syncActionFilters();
+      syncQuickFilters();
     };
 
     const search=document.getElementById('action-search');
@@ -143,6 +155,15 @@
         rerender();
       });
     }
+
+    const foamQuickFilter=document.querySelector('[data-quick-filter="foam"]');
+    foamQuickFilter?.addEventListener('click',()=>{
+      const clear=foamRollerFilterActive();
+      filters={q:clear?'':FOAM_ROLLER_QUERY,templateId:'',kind:clear?'':'action',pattern:'',tier:'',zone:'',equipment:'',category:'',status:''};
+      if(search)search.value=filters.q;
+      document.querySelectorAll('[data-filter]').forEach(select=>{select.value=filters[select.dataset.filter]||'';});
+      rerender();
+    });
 
     document.querySelectorAll('[data-filter]').forEach(select=>{
       const key=select.dataset.filter;
@@ -166,8 +187,17 @@
       }));
     }
 
+    function syncQuickFilters(){
+      const button=document.querySelector('[data-quick-filter="foam"]');
+      if(!button)return;
+      const active=foamRollerFilterActive();
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',active?'true':'false');
+    }
+
     bindRows();
     syncActionFilters();
+    syncQuickFilters();
     if(route.query?.focus)window.V14ActionDetail.open(route.query.focus,{systemMode:window.V14State.getMode()==='system'});
   }
 
