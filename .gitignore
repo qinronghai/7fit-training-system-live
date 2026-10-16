@@ -1,0 +1,8 @@
+# Local browser and visual-inspection run artifacts
+.playwright-cli/
+.dsh-vision-router/artifacts/.runs/
+
+# Local Impeccable state and generated reviews
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+.impeccable/critique/
