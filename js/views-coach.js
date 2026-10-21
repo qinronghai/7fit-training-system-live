@@ -116,7 +116,10 @@
         window.V14State.setComposerSelection(ctx.stateKey,slotKey,actionId);
         rerender();
       }));
-      document.querySelectorAll('.prep-slot-select').forEach(sel=>bindPrepSelect(sel,()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
+      document.querySelectorAll('.prep-slot-select').forEach(sel=>bindPrepSelect(sel,()=>{
+        M.Prep.recordSelection(sel,ctx.level);
+        M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();
+      }));
       document.querySelectorAll('.f111-foam-select').forEach(sel=>sel.addEventListener('change',()=>{M.Foam?.setComposerFoamSelection?.(sel.dataset.foamSession,sel.dataset.foamSlot,sel.value,ctx.level);rerender();}));
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
       const status=document.getElementById('copy-session-status');
@@ -155,7 +158,10 @@
       window.V14State.setSelection(sessionId,slotKey,actionId);
       rerender();
     }));
-    document.querySelectorAll('.prep-slot-select').forEach(sel=>bindPrepSelect(sel,()=>{M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();}));
+    document.querySelectorAll('.prep-slot-select').forEach(sel=>bindPrepSelect(sel,()=>{
+      M.Prep.recordSelection(sel,route.level);
+      M.Prep.setPrepSelection(sel.dataset.prepSession,sel.dataset.prepSlot,sel.value);rerender();
+    }));
     const status=document.getElementById('copy-session-status');
     const doCopy=async audience=>{const payload=Session.buildCopyPayload(sessionId,route.recipeId,route.level),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function'||typeof window.V14SessionCopy?.copyText!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';setTimeout(()=>{if(status.textContent==='已复制，可直接发送'){status.textContent='';status.className='';}},1800);}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));

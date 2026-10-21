@@ -706,6 +706,7 @@ body{font-size:14px;line-height:1.55}
 .conditioning-no-cardio{background:#f3f0fa;border:1px solid #ddd3f3}
 .conditioning-no-cardio b{color:var(--purple-dark)}
 .prep-fallback-notice{font-size:11px;line-height:1.5;color:#8a5c00;background:#fff9eb;border:1px solid #f1dfaf;border-radius:10px;padding:8px 10px;margin-bottom:10px}
+.prep-recent-note{font-size:8px;line-height:1.3;color:#8a5c00;background:#fff9eb;border:1px solid #f1dfaf;border-radius:999px;padding:2px 5px;white-space:nowrap}
 @media(max-width:980px){
   .conditioning-prep-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .conditioning-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}

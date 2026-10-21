@@ -32,6 +32,24 @@
   const PRIMER_RE=/动作模式|激活|唤醒|稳定|外旋|侧向|臀桥/;
   const CORE_RE=/核心|支撑|死虫|平板|腹壁|躯干/;
   const INTEGRATED_RE=/全身动态|整合|多关节/;
+  const CORE_ROLE_RE=/核心|支撑|抗伸展|抗旋转|抗侧屈|躯干|呼吸|腹压/;
+  const CORE_EXCLUDE_RE=/周期性器械|全身整合|火箭推|药球|深蹲推举|弓步配合上举|单腿燕子|燕子平衡|髋飞机|单腿臀桥|单侧臀伸|BOSU|瑜伽球/;
+  const INTEGRATED_ROLE_RE=/整合|全身|周期性器械|单腿.*控制|髋.*动态|动态活动|模式准备|深蹲.*活动|后侧链动态|侧向髋|弓步/;
+  const INTEGRATED_EXCLUDE_RE=/药球|壶铃高脚杯深蹲到推举|火箭推/;
+  const MOVEMENT_FAMILY_BY_PREP_ID=Object.freeze({
+    'PREP-01':'support-quadruped','PREP-02':'mobility-thoracic-quadruped','PREP-03':'integrated-lunge-thoracic',
+    'PREP-04':'mobility-shoulder-circumduction','PREP-05':'mobility-scapula-circumduction','PREP-06':'activation-rotator-cuff','PREP-07':'activation-rotator-cuff',
+    'PREP-08':'core-anti-extension','PREP-09A':'core-bracing-supine','PREP-09B':'core-anti-extension-dead-bug','PREP-09C':'core-anti-extension-dead-bug',
+    'PREP-10':'mobility-hamstring-dynamic','PREP-11':'mobility-adductor-floor','PREP-12':'mobility-hip-rotation','PREP-13':'mobility-hip-rotation','PREP-14':'mobility-adductor-floor',
+    'PREP-15':'primer-hip-hinge','PREP-16':'mobility-hip-flexor','PREP-17':'activation-glute-medial','PREP-18':'activation-single-leg-glute',
+    'PREP-19':'core-anti-extension','PREP-20':'core-anti-extension','PREP-21':'core-anti-extension-supine','PREP-22':'core-anti-rotation','PREP-23':'core-anti-extension-dynamic',
+    'PREP-24':'core-anti-extension-instability','PREP-25':'core-rotation-control','PREP-26':'core-anti-lateral-flexion','PREP-27':'core-anti-extension-instability','PREP-28':'core-anti-lateral-flexion-single-leg',
+    'PREP-29':'mobility-thoracic-spine','PREP-30':'mobility-thoracic-spine-tool','PREP-31':'mobility-shoulder-thoracic-tool','PREP-32':'mobility-latissimus-tool','PREP-33':'activation-scapula-upward-rotation',
+    'PREP-34':'core-anti-rotation','PREP-35':'mobility-ankle','PREP-36':'mobility-adductor-floor','PREP-37':'primer-squat','PREP-38':'integrated-lunge-thoracic',
+    'PREP-39':'integrated-lateral-squat','PREP-40':'integrated-single-leg-hip','PREP-41':'activation-glute-max','PREP-42':'activation-glute-medial','PREP-43':'activation-glute-max',
+    'PREP-44':'activation-glute-bridge-abduction','PREP-45':'activation-single-leg-glute','PREP-46':'integrated-rower','PREP-47':'integrated-ski-erg','PREP-48':'integrated-hip-drive-press',
+    'PREP-49':'integrated-squat-press','PREP-50':'integrated-squat-press','PREP-51':'mobility-ankle','PREP-52':'primer-squat','PREP-53':'integrated-single-leg-hip','PREP-54':'integrated-single-leg-posterior-chain',
+  });
 
   const D=()=>window.V14_DATA||{};
   const G=()=>window.V14PrepGrade||null;
@@ -74,9 +92,13 @@
       mainActionIds,
       formalActionIds,
       targetMuscles:unique(input.targetMuscles),
+      supportPatterns:unique(input.supportPatterns),
+      coreDemands:unique(input.coreDemands),
       modalities:unique(input.modalities),
       impactDemand:typeof input.impactDemand==='string'?input.impactDemand:'',
       powerDemand:typeof input.powerDemand==='string'?input.powerDemand:'',
+      recentPrepActionIds:unique(input.recentPrepActionIds),
+      recentPrepFamilies:unique(input.recentPrepFamilies),
     };
   }
 
@@ -86,6 +108,7 @@
       ...input,
       template:'f111',
       mainPatterns:unique([recipe.lower,recipe.upper,...(input.mainPatterns||[])]),
+      supportPatterns:unique([recipe.support,...(input.supportPatterns||[])]),
     });
   }
 
@@ -145,7 +168,7 @@
       prepId:w.prepId,
       actionId:w.actionId,
       name:w.name||w.actionId,
-      movementFamily:w.movementFamily||'',
+      movementFamily:w.movementFamily||MOVEMENT_FAMILY_BY_PREP_ID[w.prepId]||'',
       sequencePhase:w.sequencePhase||'',
       prepGrade:w.prepGrade||'',
       role:w.role||'',
@@ -158,7 +181,14 @@
     };
   }
 
-  function candidateFamily(candidate){
+  function movementFamilyFor(prepId){
+    return MOVEMENT_FAMILY_BY_PREP_ID[prepId]||D().warmupDetails?.[prepId]?.movementFamily||'';
+  }
+
+  function candidateFamily(candidate,ctx){
+    // Keep L1-L3's established deterministic defaults intact. L4 is the
+    // long-term rotation tier where functional-family dedupe is intentional.
+    if(ctx?.level!=='L4')return `action:${candidate?.actionId||''}`;
     return candidate?.movementFamily||`action:${candidate?.actionId||''}`;
   }
 
@@ -297,11 +327,21 @@
     if(slotKey==='CORE-ACT'){
       const ca=caLevelFor(candidate),allowed=CA_WINDOWS[ctx.level]||[];
       if(!CORE_RE.test(text)||!allowed.includes(ca))return null;
-      return 9+(candidate.role.includes('核心')?2:0)+(candidate.role.includes('支撑')?1:0)+patterns;
+      const coreText=`${candidate.name} ${candidate.role}`;
+      if(!CORE_ROLE_RE.test(coreText)||CORE_EXCLUDE_RE.test(coreText))return null;
+      const demandFit=(ctx.coreDemands||[]).reduce((sum,demand)=>{
+        if(/抗旋转/.test(demand)&&/抗旋转|旋转|对侧/.test(coreText))return sum+3;
+        if(/抗侧屈/.test(demand)&&/抗侧屈|侧支撑|抗侧/.test(coreText))return sum+3;
+        if(/抗伸展/.test(demand)&&/抗伸展|平板|死虫|空心/.test(coreText))return sum+3;
+        if(/骨盆|基础控制/.test(demand)&&/骨盆|基础控制|躯干/.test(coreText))return sum+2;
+        return sum;
+      },0);
+      return 9+(candidate.role.includes('核心')?2:0)+(candidate.role.includes('支撑')?1:0)+patterns+demandFit;
     }
     if(slotKey==='INTEGRATED'){
-      const broad=(candidate.targetPatterns||[]).length>=4&&(candidate.regions||[]).length>=2;
-      if(!INTEGRATED_RE.test(text)&&!(broad&&(/动态|支撑/.test(text))))return null;
+      if(candidate.sequencePhase!=='standing-dynamic')return null;
+      if(INTEGRATED_EXCLUDE_RE.test(text))return null;
+      if(!INTEGRATED_ROLE_RE.test(text)&&!INTEGRATED_RE.test(text))return null;
       if((ctx.mainPatterns||[]).length&&!patterns)return null;
       return 6+(INTEGRATED_RE.test(text)?5:0)
         +Math.min(3,patterns)
@@ -328,15 +368,39 @@
     'MOB-U':1,
     'PRIMER':0,
     'CORE-ACT':0,
-    'INTEGRATED':1,
+    'INTEGRATED':0,
   });
 
   function gradeDistance(slotKey,ctx,grade){
     const gradeApi=G();if(!gradeApi)return 0;
     const allowed=gradeApi.allowedGrades(ctx.level)||[];
     if(!allowed.length)return 0;
-    const target=Math.min(SLOT_GRADE_TARGET[slotKey]??0,allowed.length-1);
+    let target=Math.min(SLOT_GRADE_TARGET[slotKey]??0,allowed.length-1);
+    // L4 has enough P3 candidates to rotate without lowering the preparation
+    // below the member's level. Keep the highest grade for some contexts and
+    // deliberately open the P3 band for others, instead of selecting the one
+    // P4 core drill in every recipe.
+    if(ctx.level==='L4'&&ctx.recipeId){
+      const rotate=stableHash(`${ctx.recipeId}|${ctx.level}|${slotKey}`)%3;
+      if(rotate===0)target=Math.min(target+1,allowed.length-1);
+    }
     return Math.abs(gradeApi.gradeRank(ctx.level,grade)-target);
+  }
+
+  function recentRank(candidate,ctx){
+    const recentActions=new Set(ctx.recentPrepActionIds||[]),recentFamilies=new Set(ctx.recentPrepFamilies||[]);
+    return {
+      action:recentActions.has(candidate.actionId)?1:0,
+      family:recentFamilies.has(candidate.movementFamily)?1:0,
+    };
+  }
+
+  function pickAutomaticCandidate(candidates,slotKey,ctx,used,usedFamilies){
+    const available=(candidates||[]).filter(candidate=>!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate,ctx)));
+    if(!available.length)return null;
+    if(ctx.level!=='L4'||!ctx.recipeId||available.length<2)return available[0];
+    const offset=stableHash(`${ctx.recipeId}|${ctx.level}|${slotKey}|rotation`)%Math.min(3,available.length);
+    return available[offset]||available[0];
   }
 
   function stableHash(value){
@@ -351,6 +415,13 @@
   function rotationRank(candidate,slotKey,ctx){
     const seed=[ctx.recipeId||ctx.template,ctx.level,slotKey,...(ctx.mainPatterns||[])].join('|');
     return stableHash(`${seed}|${candidate.actionId}`);
+  }
+
+  function estimateSlotMinutes(candidate){
+    const prescription=String(candidate?.prescription||'');
+    const minuteRange=prescription.match(/(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*分钟/);
+    if(minuteRange)return (Number(minuteRange[1])+Number(minuteRange[2]))/2;
+    return 1.5;
   }
 
   function rankSlotCandidates(slotKey,ctx,{limit=5}={}){
@@ -385,13 +456,19 @@
     // with P4/P3. Within the same grade band, movement fit still wins; close
     // candidates rotate by recipe/level so a global curated first item cannot
     // monopolise every template. The hash keeps the result deterministic.
-    items.sort((a,b)=>gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
-      ||b.fitBand-a.fitBand
-      ||rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx)
+    items.sort((a,b)=>{
+      const recentA=recentRank(a,ctx),recentB=recentRank(b,ctx);
+      const rotatedOrder=ctx.level==='L4';
+      return recentA.action-recentB.action
+      ||recentA.family-recentB.family
+      ||gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
+      ||(rotatedOrder?rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx):b.fitBand-a.fitBand)
+      ||(rotatedOrder?b.fitBand-a.fitBand:rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx))
       ||b.fit-a.fit
       ||b.slotScore-a.slotScore
       ||a.curatedPriority-b.curatedPriority
-      ||a.prepId.localeCompare(b.prepId));
+      ||a.prepId.localeCompare(b.prepId);
+    });
     const seen=new Set(),all=[];
     for(const item of items){
       if(seen.has(item.actionId))continue;
@@ -421,17 +498,20 @@
 
   function resolve(inputContext,{selections={}}={}){
     const ctx=normalizeContext(inputContext),normalizedSelections=normalizeSelections(selections);
-    const candidateMap={};
-    SLOT_ORDER.forEach(slotKey=>{candidateMap[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:5});});
+    const candidatePool={},candidateMap={};
+    SLOT_ORDER.forEach(slotKey=>{
+      candidatePool[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:99});
+      candidateMap[slotKey]=candidatePool[slotKey].slice(0,5);
+    });
 
     const used=new Set(),usedFamilies=new Set(),resolvedMap={};
     SLOT_ORDER.forEach(slotKey=>{
       const selected=normalizedSelections[slotKey];
       if(!selected||selected.source!=='manual')return;
-      const candidate=candidateMap[slotKey].find(c=>c.actionId===selected.actionId);
-      if(candidate&&!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate))){
+      const candidate=candidatePool[slotKey].find(c=>c.actionId===selected.actionId);
+      if(candidate&&!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate,ctx))){
         used.add(candidate.actionId);
-        usedFamilies.add(candidateFamily(candidate));
+        usedFamilies.add(candidateFamily(candidate,ctx));
         resolvedMap[slotKey]={candidate,source:'manual',fallbackReason:''};
       }else{
         resolvedMap[slotKey]={candidate:null,source:'auto',fallbackReason:'manual-selection-ineligible'};
@@ -440,10 +520,11 @@
 
     SLOT_ORDER.forEach(slotKey=>{
       if(resolvedMap[slotKey]?.candidate)return;
-      const candidate=candidateMap[slotKey].find(c=>!used.has(c.actionId)&&!usedFamilies.has(candidateFamily(c)))||null;
+      const pool=(ctx.recentPrepActionIds?.length||ctx.recentPrepFamilies?.length)?candidatePool[slotKey]:candidateMap[slotKey];
+      const candidate=pickAutomaticCandidate(pool,slotKey,ctx,used,usedFamilies);
       if(candidate){
         used.add(candidate.actionId);
-        usedFamilies.add(candidateFamily(candidate));
+        usedFamilies.add(candidateFamily(candidate,ctx));
       }
       const fallbackReason=resolvedMap[slotKey]?.fallbackReason||(!candidate?'no-eligible-candidate':'');
       resolvedMap[slotKey]={candidate,source:'auto',fallbackReason};
@@ -451,6 +532,7 @@
 
     const slots=SLOT_ORDER.map(slotKey=>{
       const entry=resolvedMap[slotKey],candidate=entry.candidate;
+      const recentActionIds=new Set(ctx.recentPrepActionIds||[]),recentFamilies=new Set(ctx.recentPrepFamilies||[]);
       return {
         slotKey,
         slotName:SLOT_META[slotKey].name,
@@ -461,6 +543,13 @@
         name:candidate?.name||'',
         sequencePhase:candidate?.sequencePhase||'',
         prepGrade:candidate?.prepGrade||'',
+        role:candidate?.role||'',
+        movementFamily:candidate?.movementFamily||'',
+        targetPatterns:candidate?.targetPatterns||[],
+        regions:candidate?.regions||[],
+        route:candidate?.route||'',
+        recentlyUsed:!!candidate&&(recentActionIds.has(candidate.actionId)||recentFamilies.has(candidate.movementFamily)),
+        recentlyUsedExact:!!candidate&&recentActionIds.has(candidate.actionId),
         caLevel:slotKey==='CORE-ACT'?(candidate?.caLevel||''):'',
         prescription:candidate?.prescription||'',
         why:candidate?.why||'',
@@ -474,6 +563,7 @@
       version:2,
       context:ctx,
       slots,
+      estimatedMinutes:Number(slots.reduce((sum,slot)=>sum+estimateSlotMinutes(slot),0).toFixed(1)),
       selections:Object.fromEntries(slots.filter(s=>s.actionId).map(s=>[s.slotKey,{actionId:s.actionId,source:s.source}])),
       warnings:slots.filter(s=>!s.actionId).map(s=>`${s.slotKey}:no-eligible-candidate`),
     };
@@ -481,7 +571,7 @@
 
   window.V14PrepResolver={
     SLOT_ORDER,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
-    isPrepRouteAllowed,isActionPrepEligible,caLevelFor,
+    isPrepRouteAllowed,isActionPrepEligible,caLevelFor,movementFamilyFor,
     normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,contextFromHyrox,normalizeSelections,
     candidateFromWarmup,rankSlotCandidates,resolve,
   };

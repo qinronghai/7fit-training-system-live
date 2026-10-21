@@ -16,6 +16,9 @@
     f111Composer({lowerMode,upperMode,level,coreDemand,slotKey}={}){
       return `composer|${clean(lowerMode)}|${clean(upperMode)}|${clean(level)}|${clean(coreDemand)}|${clean(slotKey)}`;
     },
+    f111Prep({level,slotKey}={}){
+      return `prep|f111|${clean(level)}|${clean(slotKey)}`;
+    },
     body({familyId,level,slotKey}={}){
       return `body|${clean(familyId)}|${clean(level)}|${clean(slotKey)}`;
     },

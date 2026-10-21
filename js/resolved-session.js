@@ -69,15 +69,16 @@
   }
 
   function validatePrep(ctx,errors){
-    const path='prepContext',keys=['template','level','recipeId','mainPatterns','mainActionIds','formalActionIds','targetMuscles','modalities','impactDemand','powerDemand'];
+    const path='prepContext',keys=['template','level','recipeId','mainPatterns','mainActionIds','formalActionIds','targetMuscles','modalities','impactDemand','powerDemand'],optionalKeys=['supportPatterns','coreDemands','recentPrepActionIds','recentPrepFamilies'];
     if(!isObject(ctx)){push(errors,path,'must be an object');return;}
     keys.forEach(key=>{if(!(key in ctx))push(errors,`${path}.${key}`,'is required');});
     if(!isNonEmpty(ctx.template))push(errors,`${path}.template`,'must be a non-empty string');
     if(!/^L[1-4]$/.test(ctx.level||''))push(errors,`${path}.level`,'must be L1-L4');
     if(!isString(ctx.recipeId))push(errors,`${path}.recipeId`,'must be a string');
     ['mainPatterns','mainActionIds','formalActionIds','targetMuscles','modalities'].forEach(key=>{if(!stringArray(ctx[key]))push(errors,`${path}.${key}`,'must be a unique non-empty string array');});
+    optionalKeys.forEach(key=>{if(key in ctx&&!stringArray(ctx[key]))push(errors,`${path}.${key}`,'must be a unique non-empty string array');});
     ['impactDemand','powerDemand'].forEach(key=>{if(!isString(ctx[key]))push(errors,`${path}.${key}`,'must be a string');});
-    Object.keys(ctx).forEach(key=>{if(!keys.includes(key))push(errors,`${path}.${key}`,'is not allowed');});
+    Object.keys(ctx).forEach(key=>{if(!keys.includes(key)&&!optionalKeys.includes(key))push(errors,`${path}.${key}`,'is not allowed');});
   }
 
   function validateAnatomy(ctx,errors){

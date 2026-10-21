@@ -44,6 +44,7 @@ const eq=(a,b)=>assert.deepStrictEqual(plain(a),b);
   assert.strictEqual(ctx,'body|BODY-02|L3|A');
   const f111=Recent.context.f111Composer({lowerMode:'single_leg_hinge',upperMode:'horizontal_push',level:'L3',coreDemand:'anti_extension',slotKey:'A'});
   assert.strictEqual(f111,'composer|single_leg_hinge|horizontal_push|L3|anti_extension|A');
+  assert.strictEqual(Recent.context.f111Prep({level:'L4',slotKey:'CORE-ACT'}),'prep|f111|L4|CORE-ACT');
   const conditioning=Recent.context.conditioning({familyId:'CON-03',level:'L2',protocolId:'CIRCUIT',stationKey:'S1'});
   assert.strictEqual(conditioning,'conditioning|CON-03|L2|CIRCUIT|S1');
 

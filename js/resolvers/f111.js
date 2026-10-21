@@ -59,11 +59,22 @@
 
   function contexts({level,recipeId='',title,summary,slots,mainActionIds,conflict}){
     const actionIds=unique(slots.map(slot=>slot.actionId));
+    const session=D().sessions?.[`${recipeId}-${level}`];
+    const supportPatterns=unique(slots
+      .filter(slot=>slot.key==='SUPPORT')
+      .map(slot=>D().actions?.[slot.actionId]?.pattern)
+      .filter(Boolean));
+    const coreDemands=unique((session?.slots||[])
+      .filter(slot=>slotKey(slot,0)==='CORE')
+      .map(slot=>slot.baselineCoreDemand)
+      .filter(Boolean));
     const prepContext=window.V14PrepResolver.contextFromF111({
       level,
       recipeId,
       mainActionIds:unique(mainActionIds),
       formalActionIds:actionIds,
+      supportPatterns,
+      coreDemands,
       mainPatterns:[],
     });
     const conflictContext=publicConflict(conflict);
@@ -162,6 +173,8 @@
       mainPatterns:unique([resolved.lower?.name,resolved.upper?.name]),
       mainActionIds,
       formalActionIds:actionIds,
+      supportPatterns:slots.filter(slot=>slot.key==='SUPPORT').map(slot=>D().actions?.[slot.actionId]?.pattern).filter(Boolean),
+      coreDemands:input.coreDemand?[input.coreDemand]:[],
     });
     const conflictContext=publicConflict(window.V14Conflict.evaluateComposer(resolved));
     const anatomyContext=publicAnatomy(actionIds);
