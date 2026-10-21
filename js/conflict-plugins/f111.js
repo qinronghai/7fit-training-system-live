@@ -49,6 +49,7 @@
   function evaluateComposer(resolvedSession,context){
     const data=D(),resolved=context.resolved||{},slots=currentSlots(resolvedSession,resolved),issues=[];
     const c=slots.find(x=>x.slotKey==='C');
+    const A=slots.find(x=>x.slotKey==='A'),B=slots.find(x=>x.slotKey==='B');
     if(c?.grade&&!(resolved?.windows?.support?.normal||[]).includes(c.grade)){
       issues.push(makeIssue('warn','支撑等级超出常规范围',c.grade+' 超出 '+resolved.level+' 常规 '+(resolved.windows.support.normal||[]).join('–')+' 候选窗口。','GRADE_OUTSIDE_NORMAL_WINDOW',2000));
     }
@@ -56,7 +57,23 @@
     if(core?.grade&&!(resolved?.windows?.core?.normal||[]).includes(core.grade)){
       issues.push(makeIssue('warn','核心等级超出常规范围',core.grade+' 超出 '+resolved.level+' 常规核心候选窗口。','GRADE_OUTSIDE_NORMAL_WINDOW',2010));
     }
-    const A=slots.find(x=>x.slotKey==='A'),B=slots.find(x=>x.slotKey==='B');
+    const supportMeta=data.supportMeta?.[c?.actionId]||{};
+    const supportDemands=Array.isArray(c?.supportDemand)?c.supportDemand:[];
+    const coreDemand=String(core?.coreDemand||data.actions?.[core?.actionId]?.coreDemand||'');
+    const repeatedDemand=supportDemands.find(demand=>coreDemand.includes(demand));
+    if(repeatedDemand){
+      issues.push(makeIssue('warn','支撑与 CORE 任务重复',`C｜支撑模式与 CORE 都承担「${repeatedDemand}」，请确认是否有意重复训练。`,'SUPPORT_DEMAND_DUPLICATION',2020));
+    }
+    if(supportMeta.fatigueCost==='high'){
+      const mainIds=[A?.actionId,B?.actionId].filter(Boolean);
+      const highMain=mainIds.filter(id=>['high','very_high'].includes(data.actions?.[id]?.fatigueCost||data.bodyActionMeta?.[id]?.fatigueCost)).length;
+      if(highMain){
+        issues.push(makeIssue('warn','支撑局部疲劳偏高',`${c.name||c.actionId} 为高疲劳支撑，且主项已有 ${highMain} 个高疲劳动作；建议降级或减少剂量。`,'SUPPORT_LOCAL_FATIGUE_OVERLAP',2030));
+      }
+    }
+    if(c?.needsConfirmation){
+      issues.push(makeIssue('warn','支撑动作需确认',(c.tradeoffs||[]).join('；'),'SUPPORT_REVIEW_REQUIRED',2040));
+    }
     ['D1','D2'].forEach((key,keyIndex)=>{
       const x=slots.find(slot=>slot.slotKey===key),action=data.actions?.[x?.actionId]||{};
       if(!x||!action.pattern)return;

@@ -32,7 +32,11 @@
     const options=canonicalIds.length
       ? canonicalIds.map(id=>{
         const action=data.actions?.[id]||{};
-        return {id,name:action.name||id,grade:action.supportGrade||action.coreGrade||action.grade||action.tier||id.split('-').slice(0,2).join('-'),pattern:action.pattern||'',disabled:!currentOptions.some(option=>option.id===id)};
+        const supportDecision=slotKey==='C'&&window.V14Composer?.supportDecision?.(id,{level:ctx.level,coreDemand:ctx.coreDemand})||null;
+        const detail=slotKey==='C'&&supportDecision
+          ? `${supportDecision.fatigueCost==='low'?'低':supportDecision.fatigueCost==='medium'?'中':'高'}疲劳 · ${supportDecision.memberFeeling}${supportDecision.needsConfirmation?' · 需确认':''}`
+          : '';
+        return {id,name:action.name||id,grade:action.supportGrade||action.coreGrade||action.grade||action.tier||id.split('-').slice(0,2).join('-'),pattern:action.pattern||'',detail,disabled:!currentOptions.some(option=>option.id===id)};
       })
       : currentOptions.map(option=>({...option,disabled:false}));
     const legalIds=new Set(currentOptions.map(option=>option.id));
@@ -40,7 +44,7 @@
     options.forEach(option=>{
       const grade=String(option.grade||option.tier||'未分级');
       if(!map.has(grade))map.set(grade,[]);
-      map.get(grade).push({id:String(option.id||''),name:String(option.name||option.id||''),grade,pattern:String(option.pattern||''),disabled:option.disabled??!legalIds.has(option.id),selected:option.id===ctx.resolved?.slots?.find(slot=>slot.slotKey===slotKey)?.actionId});
+      map.get(grade).push({id:String(option.id||''),name:String(option.name||option.id||''),grade,pattern:String(option.pattern||''),detail:String(option.detail||''),disabled:option.disabled??!legalIds.has(option.id),selected:option.id===ctx.resolved?.slots?.find(slot=>slot.slotKey===slotKey)?.actionId});
     });
     const grades=[...order,...map.keys().filter(grade=>!order.includes(grade))];
     const labelFor=(grade,items)=>{

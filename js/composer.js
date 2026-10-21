@@ -19,6 +19,53 @@
     const a=D().actions?.[id]||{};
     return {id,name:a.name||id,tier:a.tier||'',grade:a.supportGrade||a.grade||a.coreGrade||'',coreDemand:a.coreDemand||'',pattern:a.pattern||'',route:a.route||'',status:a.status||''};
   }
+  const SUPPORT_DEMAND_BY_CORE=Object.freeze({
+    anti_extension:['抗伸展'],
+    anti_rotation:['抗旋转'],
+    anti_lateral_flexion:['抗侧屈'],
+    dynamic_rotation:['旋转控制'],
+    breathing_pressure:['骨盆控制','抗伸展'],
+    loaded_integration:['抗伸展','抗旋转'],
+  });
+  function supportMetaFor(id){
+    const meta=D().supportMeta?.[id]||{};
+    return {
+      supportDemand:Array.isArray(meta.supportDemand)?meta.supportDemand:[],
+      posture:meta.posture||'',challengeType:meta.challengeType||'',fatigueCost:meta.fatigueCost||'medium',
+      jointLoad:Array.isArray(meta.jointLoad)?meta.jointLoad:[],spaceRequirement:meta.spaceRequirement||'',
+      memberFeeling:meta.memberFeeling||'',recommendedDose:meta.recommendedDose||'',
+      regressionId:meta.regressionId||'',progressionId:meta.progressionId||'',sameDemandIds:Array.isArray(meta.sameDemandIds)?meta.sameDemandIds:[],
+      autoRecommendable:meta.autoRecommendable!==false,
+    };
+  }
+  function supportDecision(id,context={}){
+    const action=actionView(id),meta=supportMetaFor(id),level=context.level||'L1',window=supportWindow(level);
+    const normal=new Set(window.normal||[]),expanded=new Set(window.expanded||[]),tradeoffs=[],reasons=[];
+    const coreDemands=SUPPORT_DEMAND_BY_CORE[context.coreDemand]||[];
+    if(!normal.has(action.grade)){
+      tradeoffs.push(expanded.has(action.grade)?'超出当前等级常规窗口，属于扩展选项':'超出当前等级常规窗口');
+    }
+    if(coreDemands.some(demand=>meta.supportDemand.includes(demand))){
+      tradeoffs.push('与 CORE 训练任务重复');
+    }else if(coreDemands.length){
+      reasons.push('补充 CORE 未覆盖的支撑任务');
+    }
+    const selected=(context.selectedIds||[]).map(actionView);
+    if(selected.some(item=>item.pattern&&meta.supportDemand.includes(item.pattern))){
+      tradeoffs.push('与主训练模式存在局部负荷重叠');
+    }
+    if(action.grade===window.recommended)reasons.push('符合当前等级首选窗口');
+    if(meta.fatigueCost==='low')reasons.push('疲劳成本低，适合收尾');
+    if(meta.spaceRequirement==='open_lane')tradeoffs.push('需要开放通道');
+    return {
+      ...meta,
+      id,
+      supportReason:reasons.join('；')||'保持支撑任务多样性',
+      needsConfirmation:tradeoffs.length>0,
+      tradeoffs,
+      recommendationScore:(action.grade===window.recommended?30:normal.has(action.grade)?24:expanded.has(action.grade)?18:10)+(meta.fatigueCost==='low'?15:meta.fatigueCost==='medium'?8:0)+(tradeoffs.length?0:15),
+    };
+  }
   function byTier(candidates,level,includeExpanded=false,mode={}){
     const w=mainTierWindow(level),allowed=new Set([...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])]),rec=w.recommended;
     const ranked=(candidates||[]).map(candidate=>{
@@ -42,12 +89,12 @@
     const mode=(kind==='lower'?cfg().lowerModes:cfg().upperModes)?.[modeKey];
     return byTier(mode?.candidates||[],level,includeExpanded,mode||{});
   }
-  function supportCandidates(level,includeExpanded=false){
+  function supportCandidates(level,includeExpanded=false,context={}){
     const w=supportWindow(level),grades=[...(w.normal||[]),...(includeExpanded?(w.expanded||[]):[])],allowed=new Set(grades),rec=w.recommended;
-    return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return a;}).filter(x=>allowed.has(x.grade)).sort((a,b)=>(a.grade===rec?-1:0)-(b.grade===rec?-1:0));
+    return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return {...a,...supportDecision(id,{...context,level})};}).filter(x=>allowed.has(x.grade)).sort((a,b)=>(a.grade===rec?0:1)-(b.grade===rec?0:1)||b.recommendationScore-a.recommendationScore||String(a.id).localeCompare(String(b.id)));
   }
   function supportSelectionOptions(){
-    return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return a;});
+    return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return {...a,...supportMetaFor(id)};});
   }
   function matchesDemand(a,demandKey){
     const meta=cfg().coreDemands?.[demandKey]; if(!meta)return true;
@@ -95,14 +142,16 @@
     const lower=cfg().lowerModes[lowerMode],upper=cfg().upperModes[upperMode],selections=input.selections||{};
     const Aopts=mainCandidates('lower',lowerMode,level,!!input.includeExpandedMain), Bopts=mainCandidates('upper',upperMode,level,!!input.includeExpandedMain);
     const A=chooseById(Aopts,selections.A),B=chooseById(Bopts,selections.B);
-    const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport),Copts=supportSelectionOptions();
+    const Ccontext={level,coreDemand:input.coreDemand,selectedIds:[A?.id,B?.id]};
+    const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport,Ccontext),Copts=supportSelectionOptions();
     const C=Copts.find(option=>option.id===selections.C)||chooseById(CautoOptions);
+    const Cdecision=supportDecision(C?.id||'',Ccontext);
     const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:C?.id}}),D1=chooseById(D1opts,selections.D1);
     const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
     const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
     const COREautoOptions=coreCandidates(level,coreDemand,!!input.includeExpandedCore),COREopts=coreSelectionOptions();
     const CORE=COREopts.find(option=>option.id===selections.CORE)||chooseById(COREautoOptions);
-    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||''});
+    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||'',...(key==='C'?{supportReason:Cdecision.supportReason,supportDemand:Cdecision.supportDemand,fatigueCost:Cdecision.fatigueCost,memberFeeling:Cdecision.memberFeeling,recommendedDose:Cdecision.recommendedDose,alternatives:Cdecision.sameDemandIds,needsConfirmation:Cdecision.needsConfirmation,tradeoffs:Cdecision.tradeoffs}: {})});
     return {
       compositionId:`F111-C-${lower.code}-${upper.code}`,
       level,lowerMode,upperMode,lower,upper,coreDemand,
@@ -111,5 +160,5 @@
       slotOptions:{A:Aopts,B:Bopts,C:Copts,D1:D1opts,D2:D2opts,CORE:COREopts}
     };
   }
-  window.V14Composer={combinations,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,coreCandidates,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
+  window.V14Composer={combinations,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,supportMetaFor,supportDecision,coreCandidates,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
 })();
