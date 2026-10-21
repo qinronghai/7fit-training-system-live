@@ -95,7 +95,7 @@
       return;
     }
     if(isF111Composer(route)){
-      ComposerView.bindMemberContext?.(route,root);
+      ComposerView.bindMemberContext?.(route,root,rerender);
       const ctx=ComposerView.composerContext(route);
       document.querySelectorAll('.composer-slot-select').forEach(sel=>sel.addEventListener('change',()=>{
         const contextKey=Recent()?.context?.f111Composer?.({

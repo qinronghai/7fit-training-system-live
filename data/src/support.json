@@ -441,6 +441,14 @@
       }
     }
   },
+  "supportBranches": {
+    "SUP-S1": "基础静态支撑",
+    "SUP-S2": "减少支点支撑",
+    "SUP-S3": "动态支撑",
+    "SUP-S4": "位移支撑",
+    "SUP-S5": "旋转支撑",
+    "SUP-S6": "侧链单侧支撑"
+  },
   "supportMeta": {
     "SUP-S1-01": {"supportDemand":["抗伸展","肩胛稳定"],"posture":"四足跪姿","challengeType":"static","fatigueCost":"low","jointLoad":["手腕","肩部"],"spaceRequirement":"mat","memberFeeling":"腹部和肩胛稳定，呼吸自然","recommendedDose":"2–3组 × 20–30秒","regressionId":"SUP-S1-01","progressionId":"SUP-S2-01","sameDemandIds":["SUP-S1-02","SUP-S1-03"],"autoRecommendable":true},
     "SUP-S1-02": {"supportDemand":["抗伸展","肩胛稳定"],"posture":"跪姿高位平板","challengeType":"static","fatigueCost":"low","jointLoad":["手腕","肩部"],"spaceRequirement":"mat","memberFeeling":"躯干保持整体，手臂有支撑感","recommendedDose":"2–3组 × 20–30秒","regressionId":"SUP-S1-01","progressionId":"SUP-S1-04","sameDemandIds":["SUP-S1-01","SUP-S1-03"],"autoRecommendable":true},

@@ -32,13 +32,14 @@
     const upperMode=cfg.upperModes?.[q.upper]?q.upper:'horizontal_pull';
     const coreDemand=cfg.coreDemands?.[q.core]?q.core:'anti_extension';
     const flags={includeExpandedMain:q.em==='1',includeExpandedSupport:q.es==='1',includeExpandedCore:q.ec==='1'};
-    const input={mode:'composer',level,lowerMode,upperMode,coreDemand,...flags};
+    const memberContext=memberContextMemberId===q.memberId&&memberContextState?.status==='ready'?memberContextState.context:null;
+    const input={mode:'composer',level,lowerMode,upperMode,coreDemand,recentContext:memberContext,...flags};
     const probeSession=window.V15TemplateResolver.resolve('f111',input);
     const stateKey=`${probeSession.familyId}-${level}`;
     const selections=window.V14State.getComposerSelections(stateKey);
     const resolvedSession=window.V15TemplateResolver.resolve('f111',{...input,selections});
-    const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,...flags});
-    return {level,lowerMode,upperMode,coreDemand,stateKey,resolved,resolvedSession,memberId:q.memberId||null,...flags};
+    const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,recentContext:memberContext,...flags});
+    return {level,lowerMode,upperMode,coreDemand,stateKey,resolved,resolvedSession,memberId:q.memberId||null,memberContext,...flags};
   }
 
   function sessionAgoLabel(sessionsAgo){
@@ -95,7 +96,7 @@
     if(liveRegion)liveRegion.innerHTML=memberContextContentMarkup(route,state);
   }
 
-  function bindMemberContext(route,root){
+  function bindMemberContext(route,root,rerender){
     if(!isF111ComposerRoute(route)||!route.query?.memberId){resetMemberContextBinding();return;}
     if(root.dataset.memberContextRetryBound!=='1'){
       root.dataset.memberContextRetryBound='1';
@@ -106,7 +107,7 @@
         const panel=root.querySelector('[data-member-first-context]');
         const liveRegion=panel?.querySelector('[data-member-context-live]');
         if(liveRegion)liveRegion.innerHTML=memberContextContentMarkup(current,null);
-        bindMemberContext(current,root);
+        bindMemberContext(current,root,rerender);
       });
     }
     const memberId=route.query.memberId;
@@ -118,7 +119,8 @@
       Promise.all([window.V14MemberAPI.getMember(memberId),window.V14MemberAPI.getMemberTrainingContext(memberId)]).then(([member,context])=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
         memberContextState={status:'ready',member,context};
-        updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
+        if(typeof rerender==='function')rerender();
+        else updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
       }).catch(error=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
         memberContextState={status:'error',errorStatus:error?.status||0};

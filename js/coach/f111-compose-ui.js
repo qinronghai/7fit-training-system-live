@@ -32,9 +32,13 @@
     const options=canonicalIds.length
       ? canonicalIds.map(id=>{
         const action=data.actions?.[id]||{};
-        const supportDecision=slotKey==='C'&&window.V14Composer?.supportDecision?.(id,{level:ctx.level,coreDemand:ctx.coreDemand})||null;
+        const selectedCore=ctx.resolved?.slots?.find(slot=>slot.slotKey==='CORE');
+        const supportDecision=slotKey==='C'&&window.V14Composer?.supportDecision?.(id,{level:ctx.level,coreDemand:ctx.coreDemand,coreDemandText:selectedCore?.coreDemand})||null;
+        const coreMeta=slotKey==='CORE'&&window.V14Composer?.coreMetaFor?.(id)||null;
         const detail=slotKey==='C'&&supportDecision
-          ? `${supportDecision.fatigueCost==='low'?'低':supportDecision.fatigueCost==='medium'?'中':'高'}疲劳 · ${supportDecision.memberFeeling}${supportDecision.needsConfirmation?' · 需确认':''}`
+          ? `${supportDecision.branch} · ${supportDecision.fatigueCost==='low'?'低':supportDecision.fatigueCost==='medium'?'中':'高'}疲劳 · ${supportDecision.memberFeeling}${supportDecision.recentNote?' · '+supportDecision.recentNote:''}${supportDecision.needsConfirmation?' · 需确认':''}`
+          : slotKey==='CORE'&&coreMeta
+            ? `${coreMeta.branch} · ${coreMeta.fatigueCost==='low'?'低':coreMeta.fatigueCost==='medium'?'中':'高'}疲劳 · 会员感受：${coreMeta.memberFeeling}`
           : '';
         return {id,name:action.name||id,grade:action.supportGrade||action.coreGrade||action.grade||action.tier||id.split('-').slice(0,2).join('-'),pattern:action.pattern||'',detail,disabled:!currentOptions.some(option=>option.id===id)};
       })

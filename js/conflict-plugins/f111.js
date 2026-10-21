@@ -57,6 +57,10 @@
     if(core?.grade&&!(resolved?.windows?.core?.normal||[]).includes(core.grade)){
       issues.push(makeIssue('warn','核心等级超出常规范围',core.grade+' 超出 '+resolved.level+' 常规核心候选窗口。','GRADE_OUTSIDE_NORMAL_WINDOW',2010));
     }
+    if(core?.coreDemandMatch==='NO_MATCH'){
+      const mismatch=(core.coreTradeoffs||[]).includes('当前选择与 CORE 训练任务不匹配');
+      issues.push(makeIssue('warn',mismatch?'CORE 任务与选择不匹配':'当前等级没有该 CORE 任务动作',core.coreTradeoffs?.join('；')||'请从同级替代中确认 CORE 动作。',mismatch?'CORE_DEMAND_MISMATCH':'CORE_DEMAND_UNAVAILABLE',2015));
+    }
     const supportMeta=data.supportMeta?.[c?.actionId]||{};
     const supportDemands=Array.isArray(c?.supportDemand)?c.supportDemand:[];
     const coreDemand=String(core?.coreDemand||data.actions?.[core?.actionId]?.coreDemand||'');
@@ -73,6 +77,19 @@
     }
     if(c?.needsConfirmation){
       issues.push(makeIssue('warn','支撑动作需确认',(c.tradeoffs||[]).join('；'),'SUPPORT_REVIEW_REQUIRED',2040));
+    }
+    const supportSpace=supportMeta.spaceRequirement||'';
+    const coreMeta=data.coreMeta?.[core?.actionId]||{};
+    const coreSpace=coreMeta.spaceRequirement||'';
+    if(supportSpace==='open_lane'||coreSpace==='walk_lane'||data.actions?.[core?.actionId]?.space==='WALK_LANE'){
+      const requirements=[];
+      if(supportSpace==='open_lane')requirements.push('支撑需要开放通道');
+      if(coreSpace==='walk_lane'||data.actions?.[core?.actionId]?.space==='WALK_LANE')requirements.push('CORE 需要行走通道');
+      issues.push(makeIssue('warn','场地可实施性',requirements.join('；')+'，请确认当前场地可执行。','VENUE_FEASIBILITY',2050));
+    }
+    if(resolved?.trunkLoadAudit?.overBudget){
+      const audit=resolved.trunkLoadAudit;
+      issues.push(makeIssue('warn','躯干负荷集中','当前组合躯干负荷 '+audit.total+' 超过 '+resolved.level+' 建议上限 '+audit.budget+'；建议降低 C/CORE 或辅助动作负荷。','TRUNK_LOAD_OVER_BUDGET',2060));
     }
     ['D1','D2'].forEach((key,keyIndex)=>{
       const x=slots.find(slot=>slot.slotKey===key),action=data.actions?.[x?.actionId]||{};

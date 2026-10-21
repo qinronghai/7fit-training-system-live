@@ -61,6 +61,9 @@
 .composer-support-info{display:grid;gap:3px;margin-top:7px;padding:7px 8px;border-radius:9px;background:#faf8ff;color:var(--muted);font-size:9px;line-height:1.4}
 .composer-support-info small{display:block}
 .composer-support-warning{color:#9a5b14;font-weight:800}
+.composer-core-info{display:grid;gap:3px;margin-top:7px;padding:7px 8px;border-radius:9px;background:#f7fbff;color:var(--muted);font-size:9px;line-height:1.4}
+.composer-core-info small{display:block}
+.composer-core-warning{color:#9a5b14;font-weight:800}
 .f111-slot-card .composer-slot-head span{font-size:9px;line-height:1.25}
 .f111-slot-card .composer-slot-head b{justify-self:start;background:transparent;padding:0;color:var(--muted);font-size:9px}
 .f111-slot-main{position:relative;display:block;padding:8px 25px 4px 0;color:var(--ink);text-decoration:none}
