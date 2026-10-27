@@ -42,15 +42,13 @@
     const main=document.getElementById('app-main');
     if(!window.V14Router.isValid(route)){
       document.getElementById('page-title').textContent='页面不存在';
-      document.getElementById('page-subtitle').textContent='请返回编课中心';
       setActive('');
-      main.innerHTML='<section class="empty-state"><b>页面不存在</b><span>这个地址不属于当前训练系统信息架构。</span><a href="#/coach">返回编课中心</a></section>';
+      main.innerHTML='<section class="empty-state" aria-labelledby="route-error-title"><h1 id="route-error-title"><b>页面不存在</b></h1><span>这个地址不属于当前训练系统信息架构。当前内容没有被修改。</span><div class="empty-state-actions"><a href="#/coach">返回编课中心</a><button type="button" data-feedback-open>反馈问题</button></div></section>';
       main.focus({preventScroll:true});
       return;
     }
-    const [title,sub]=labels(route);
+    const [title]=labels(route);
     document.getElementById('page-title').textContent=title;
-    document.getElementById('page-subtitle').textContent=sub;
     setActive(route.area);
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
@@ -63,9 +61,22 @@
   window.addEventListener('DOMContentLoaded',()=>{
     const mode=window.V14State?.getMode?.()||'coach'; document.body.dataset.mode=mode;
     const btn=document.getElementById('mode-toggle');
+    const mobileMenu=document.getElementById('mobile-menu-button');
+    const sidebar=document.getElementById('app-sidebar');
+    const setMobileMenu=(open)=>{
+      if(!mobileMenu||!sidebar)return;
+      sidebar.classList.toggle('is-mobile-open',open);
+      mobileMenu.setAttribute('aria-expanded',String(open));
+      mobileMenu.setAttribute('aria-label',open?'关闭导航':'打开导航');
+    };
+    if(mobileMenu&&sidebar){
+      mobileMenu.addEventListener('click',()=>setMobileMenu(!sidebar.classList.contains('is-mobile-open')));
+      sidebar.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setMobileMenu(false)));
+      document.addEventListener('keydown',event=>{if(event.key==='Escape')setMobileMenu(false);});
+    }
     function syncModeButton(){const m=window.V14State.getMode();btn.dataset.mode=m;btn.querySelector('b').textContent=m==='system'?'系统管理':'教练模式';btn.querySelector('small').textContent=m==='system'?'管理训练数据和规则':'编写课程、查找动作和收藏常用训练';}
     syncModeButton();
-    btn.addEventListener('click',()=>{const next=window.V14State.getMode()==='coach'?'system':'coach';window.V14State.setMode(next);syncModeButton();renderRoute(window.V14Router.parseHash(location.hash));});
+    btn.addEventListener('click',()=>{const next=window.V14State.getMode()==='coach'?'system':'coach';window.V14State.setMode(next);syncModeButton();setMobileMenu(false);renderRoute(window.V14Router.parseHash(location.hash));});
     window.V14Router.start(renderRoute);
   });
 })();

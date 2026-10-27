@@ -31,13 +31,14 @@
 </aside>
 <section class="app-column">
 <header class="topbar" id="app-header">
-<button aria-label="打开导航" class="mobile-menu-button" id="mobile-menu-button" type="button">☰</button>
-<div class="topbar-copy"><b id="page-title">编课中心</b><span id="page-subtitle">Multi-Template Coach Center</span></div>
+<button id="mobile-menu-button" aria-controls="app-sidebar" aria-expanded="false" aria-label="打开导航" class="mobile-menu-button" type="button">☰</button>
+<div class="topbar-copy"><b id="page-title">编课中心</b></div>
 <div class="topbar-actions">
+<button class="quick-feedback" data-feedback-open type="button" aria-label="反馈问题">反馈</button>
 <a class="quick-library" href="#/library">搜索动作</a>
 </div>
 </header>
-<main aria-live="polite" id="app-main" tabindex="-1"></main>
+<main id="app-main" tabindex="-1"></main>
 </section>
 </div>
 <nav aria-label="移动端主导航" class="mobile-nav" id="mobile-nav">
@@ -47,8 +48,10 @@
 <a data-area="library" href="#/library"><span>动作库</span></a>
 <a data-area="maintenance" href="#/maintenance"><span>更多</span></a>
 </nav>
-<div class="drawer" hidden="" id="global-drawer"></div>
+<div aria-modal="true" class="drawer" hidden="" id="global-drawer" role="dialog"></div>
 <script src="data/system-data.js"></script>
+<script src="data/opengym-candidates.js"></script>
+<script src="data/workout-guide-media.js"></script>
 <script src="data/anatomy-data.js"></script>
 <script src="data/change-log.js"></script>
 <script src="js/router.js"></script>
@@ -134,6 +137,7 @@
 <script src="js/views-library.js"></script>
 <script src="js/content-review.js"></script>
 <script src="js/views-maintenance.js"></script>
+<script src="js/feedback.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

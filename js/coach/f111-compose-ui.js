@@ -36,7 +36,7 @@
         const supportDecision=slotKey==='C'&&window.V14Composer?.supportDecision?.(id,{level:ctx.level,coreDemand:ctx.coreDemand,coreDemandText:selectedCore?.coreDemand})||null;
         const coreMeta=slotKey==='CORE'&&window.V14Composer?.coreMetaFor?.(id)||null;
         const detail=slotKey==='C'&&supportDecision
-          ? `${supportDecision.branch} · ${supportDecision.fatigueCost==='low'?'低':supportDecision.fatigueCost==='medium'?'中':'高'}疲劳 · ${supportDecision.memberFeeling}${supportDecision.recentNote?' · '+supportDecision.recentNote:''}${supportDecision.needsConfirmation?' · 需确认':''}`
+          ? `${supportDecision.branch} · ${supportDecision.fatigueCost==='low'?'低':supportDecision.fatigueCost==='medium'?'中':'高'}疲劳 · ${supportDecision.memberFeeling}${supportDecision.supportReason?' · '+supportDecision.supportReason:''}${supportDecision.tradeoffs?.length?' · '+supportDecision.tradeoffs.join('；'):''}${supportDecision.recentNote?' · '+supportDecision.recentNote:''}${supportDecision.needsConfirmation?' · 需确认':''}`
           : slotKey==='CORE'&&coreMeta
             ? `${coreMeta.branch} · ${coreMeta.fatigueCost==='low'?'低':coreMeta.fatigueCost==='medium'?'中':'高'}疲劳 · 会员感受：${coreMeta.memberFeeling}`
           : '';

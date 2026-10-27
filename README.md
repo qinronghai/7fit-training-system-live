@@ -52,6 +52,10 @@ V14 is the information-architecture rebuild of the V13.2 static training system.
 
 V14 remains a dependency-free static web application. No backend, login, cloud sync, member profile, or AI auto-programming is introduced in this rebuild.
 
+## UX baseline
+
+页面设计、异常状态和反馈入口统一遵循 [UX Operating Principles](docs/UX-OPERATING-PRINCIPLES.md)：让用户看得懂、出错后能恢复，并能在问题现场找到反馈路径。
+
 ## Open
 
 - Modular app: open `index.html` from the extracted folder.

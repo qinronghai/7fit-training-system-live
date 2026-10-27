@@ -73,3 +73,26 @@ test('template-aware search finds actions and legal multi-template coach entries
   await expect390(page);
   expect(errors,errors.join(' | ')).toEqual([]);
 });
+
+test('foam roller quick filter switches the library to the formal foam catalog',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/library');
+
+  const foamIds=await page.evaluate(()=>window.V14_DATA.foamRollIds.map(id=>window.V14_DATA.foamRollDetails[id].actionId));
+  const quickFilter=page.locator('[data-quick-filter="foam"]');
+  await expect(quickFilter).toHaveText('泡沫轴');
+  await quickFilter.click();
+
+  await expect(page.locator('#action-search')).toHaveValue('泡沫轴');
+  await expect(page.locator('[data-filter="kind"]')).toHaveValue('action');
+  await expect(page.locator('#library-count')).toHaveText(`${foamIds.length} 个结果`);
+  const visibleIds=await page.locator('#action-results [data-search-result-kind="action"]').evaluateAll(nodes=>nodes.map(node=>node.dataset.searchResultId));
+  expect(visibleIds.sort()).toEqual(foamIds.slice().sort());
+  await expect(page.locator('#action-results [data-search-result-id="warmup_foamroller_overhead_reach"]')).toHaveCount(0);
+  await expect(quickFilter).toHaveAttribute('aria-pressed','true');
+
+  await quickFilter.click();
+  await expect(page.locator('#action-search')).toHaveValue('');
+  await expect(page.locator('[data-filter="kind"]')).toHaveValue('');
+  await expect(quickFilter).toHaveAttribute('aria-pressed','false');
+});

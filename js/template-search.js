@@ -2,6 +2,7 @@
   'use strict';
 
   const D=()=>window.V14_DATA||{};
+  const OG=()=>window.V14_OPENGYM||{};
   const MAX_QUERY_LENGTH=200;
   const normalizeQuery=value=>String(value??'').slice(0,MAX_QUERY_LENGTH);
   const clean=value=>String(value??'').trim();
@@ -107,8 +108,46 @@
         equipment:action.equipment||'',
         category:action.category||'',
         status:action.status||'',
+        source:'formal',
       },
     };
+  }
+
+  function opengymEntry(candidate){
+    const patterns=candidate.mapping?.patterns||[];
+    const muscles=[candidate.target,...(candidate.secondaryMuscles||[])].filter(Boolean);
+    const haystack=[
+      candidate.id,candidate.sourceExerciseId,candidate.name,candidate.bodyPart,
+      candidate.equipment,candidate.target,candidate.category,candidate.description,
+      ...(candidate.secondaryMuscles||[]),...(candidate.instructions||[]),
+      ...patterns,candidate.mapping?.equipmentId,candidate.reviewStatus,
+      'OpenGym 外部候选 待人工验收',
+    ].filter(Boolean).join(' ');
+    return {
+      kind:'opengym-action',
+      source:'opengym',
+      id:candidate.id,
+      title:candidate.name||candidate.id,
+      subtitle:['OpenGym 候选',candidate.bodyPart,candidate.equipment,patterns[0]].filter(Boolean).join(' · '),
+      templates:[],
+      href:`#/library?focus=${encodeURIComponent(candidate.id)}`,
+      searchText:lower(haystack),
+      meta:{
+        pattern:patterns[0]||'',
+        tier:'',
+        zone:'',
+        equipment:candidate.equipment||'',
+        category:candidate.category||'',
+        status:candidate.reviewStatus||'待人工验收',
+        source:'opengym',
+        target:candidate.target||'',
+        muscles,
+      },
+    };
+  }
+
+  function opengymEntries(){
+    return (OG().candidates||[]).map(opengymEntry);
   }
 
   function f111PresetEntries(){
@@ -246,6 +285,7 @@
     const actions=Object.values(data.actions||{}).map(actionEntry);
     return [
       ...actions,
+      ...opengymEntries(),
       ...f111PresetEntries(),
       ...f111CombinationEntries(),
       ...bodyFamilyEntries(),
@@ -255,13 +295,13 @@
   }
 
   function kindGroup(kind){
-    return kind==='action'?'action':'session';
+    return kind==='action'||kind.endsWith?.('-action')?'action':'session';
   }
 
   function matchesActionFilters(entry,filters){
-    if(entry.kind!=='action')return true;
+    if(kindGroup(entry.kind)!=='action')return true;
     const meta=entry.meta||{};
-    for(const key of ['pattern','tier','zone','equipment','category','status']){
+    for(const key of ['pattern','tier','zone','equipment','category','status','source']){
       if(filters[key]&&meta[key]!==filters[key])return false;
     }
     return true;

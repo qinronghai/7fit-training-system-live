@@ -67,9 +67,7 @@
     const anatomy=anatomyCoverage(),tenPatterns=d.tenPatternCatalog||[],freeCombos=window.V14Composer?.combinations?.()||[];
     return tabs('home')+hero('系统维护','这里是馆主 / 开发维护层。普通教练无需在日常编课时阅读这些内容。')+
       `<section class="health-grid">${kpi(tenPatterns.length+'/10','十大动作模式','Ten Pattern Catalog')}${kpi(freeCombos.length+'/20','自由组合','20/20 主模式矩阵')}${kpi('2/2','单腿双分支','单腿蹲 + 单腿拉')}${kpi(d.meta.baselineActionCards,'动作库总数','来源动作详情')}${kpi(auto,'可编排节点','含 SUPPORT / CORE Canon')}${kpi((c.supportPending||0)+(c.corePending||0),'待回写','SUPPORT + CORE')}${kpi(c.tierDiff||0,'层级差异','Source Tier vs V1.1')}${kpi(c.venueOverlay||0,'Venue Overlay','场馆覆盖动作')}${kpi(anatomy.runtimeCovered+'/'+anatomy.runtimeExpected,'Runtime Anatomy',anatomy.runtimeCovered+' / '+anatomy.runtimeExpected)}</section>`+
-      changelogPanel()+
-      anatomyPanel()+
-      contentReviewPanel()+
+      `<details class="maintenance-deep-dive"><summary>查看维护明细 <span>变更记录 · Anatomy · Content Review</span></summary><div class="maintenance-deep-dive-body">${changelogPanel()}${anatomyPanel()}${contentReviewPanel()}</div></details>`+
       `<section class="section-card"><div class="section-head"><div><h2>当前维护重点</h2><p>系统层规则已经可用，但数据源仍有待回写项。</p></div></div><div class="maintenance-list"><a href="#/maintenance/audit"><b>V1.1 同步审计</b><span>查看源 T 与冻结标准差异、场馆覆盖节点。</span></a><a href="#/maintenance/venue"><b>Venue Truth</b><span>查看真实器械和楼层资料。</span></a><details><summary><b>当前动作库需要补齐的地方</b><span>点击展开</span></summary><div class="legacy-panel">${d.legacyHtml.dataGaps||'<p>暂无记录。</p>'}</div></details><details><summary><b>完整替换矩阵（高级资料）</b><span>点击展开</span></summary><div class="legacy-panel">${d.legacyHtml.replacementMatrix||'<p>暂无记录。</p>'}</div></details></div></section>`;
   }
   function cleanTier(v){const m=String(v||'').match(/T[1-4]/);return m?m[0]:'';}

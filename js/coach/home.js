@@ -1,10 +1,6 @@
 (function(){
   const M=window.V14CoachModules=window.V14CoachModules||{},C=M.Common;
   const {esc,D}=C;
-  const CAPABILITY_LABELS={
-    preset:'推荐课程',composer:'自由编课',prep:'热身建议',anatomy:'肌群概览',
-    copy:'复制课程',save:'保存课程',volume:'训练量',conditioningMetrics:'体能指标'
-  };
   const HOME_TITLES={
     f111:'女性全身塑形',
     body:'健美式塑形训练',
@@ -12,13 +8,6 @@
     hyrox:'HYROX 训练',
     posture:'体态评估与调整'
   };
-
-  function capabilityChips(record){
-    return Object.entries(record.capabilities||{})
-      .filter(([,enabled])=>enabled)
-      .map(([key])=>`<span>${esc(CAPABILITY_LABELS[key]||key)}</span>`)
-      .join('');
-  }
 
   function card(id){
     const record=D().templateRegistry?.[id];
@@ -30,7 +19,6 @@
       <div class="template-card-topline"><span class="recipe-code">${esc(record.shortName)}</span><span class="template-status ${future?'future':'active'}">${status}</span></div>
       <h3>${esc(title)}</h3>
       <p class="template-description">${esc(record.description)}</p>
-      <div class="recipe-tags" aria-label="${esc(title)} 支持的功能">${capabilityChips(record)||'<span>即将开放</span>'}</div>
       <a class="template-entry" href="${esc(record.routeBase)}" aria-label="${future?'查看':'选择'}${esc(title)}">${action}<span aria-hidden="true">→</span></a>
     </article>`;
   }
@@ -40,7 +28,6 @@
     const count=(data.templateIds||[]).length;
     return `<section class="view-hero coach-home-hero" aria-labelledby="coach-home-title">
       <div class="coach-home-hero-main">
-        <span class="eyebrow">7FIT / 教练工作台</span>
         <h1 id="coach-home-title">选择模板，开始编课</h1>
         <p class="coach-home-lead">根据本次训练目标选择模板，安排动作并保存课程。</p>
       </div>
