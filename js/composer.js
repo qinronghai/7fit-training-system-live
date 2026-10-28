@@ -88,6 +88,33 @@
     return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
   }
   function chooseById(options,id){return options.find(x=>x.id===id)||options[0]||null;}
+  // Overnight pairing fix: D2 auto-pick must complement B instead of restating it.
+  // Manual D2 selections are untouched (chooseById above). For auto-pick only:
+  // +10 when the candidate's direct targets are disjoint from B's (a fresh muscle
+  // group instead of reloading B's prime movers), +4/+3 for isolation/accessory
+  // class, -8 for a compound (a second main-style movement). Candidates without
+  // bodyActionMeta stay neutral (0) so they are never excluded, only unboosted.
+  // Ties keep the original auxiliaryRules list order. Deliberately no pattern
+  // penalty: pattern labels are coarse (a rear-delt fly is labelled 水平拉 like
+  // a row, yet it is a legitimate isolation complement), and the conflict
+  // plugin already surfaces true pattern duplication as a warning for the
+  // coach to confirm, rather than silently overriding the pick.
+  function chooseUpperAuxAuto(options,mainAction){
+    if(!options.length)return null;
+    const metaOf=id=>(D().bodyActionMeta||{})[id]||{};
+    const mainTargets=new Set(metaOf(mainAction?.id).directTargets||[]);
+    let best=null,bestScore=-Infinity;
+    options.forEach((option,index)=>{
+      const meta=metaOf(option.id),targets=meta.directTargets||[];
+      let score=0;
+      if(targets.length&&!targets.some(t=>mainTargets.has(t)))score+=10;
+      if(meta.exerciseClass==='isolation')score+=4;
+      else if(meta.exerciseClass==='accessory')score+=3;
+      else if(meta.exerciseClass==='compound')score-=8;
+      if(score>bestScore){bestScore=score;best=option;}
+    });
+    return best||options[0];
+  }
   function resolve(input={}){
     const level=/^L[1-4]$/.test(input.level)?input.level:'L1';
     const lowerMode=cfg().lowerModes?.[input.lowerMode]?input.lowerMode:Object.keys(cfg().lowerModes||{})[0];
@@ -98,7 +125,7 @@
     const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport),Copts=supportSelectionOptions();
     const C=Copts.find(option=>option.id===selections.C)||chooseById(CautoOptions);
     const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:C?.id}}),D1=chooseById(D1opts,selections.D1);
-    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
+    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=selections.D2?chooseById(D2opts,selections.D2):chooseUpperAuxAuto(D2opts,B);
     const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
     const COREautoOptions=coreCandidates(level,coreDemand,!!input.includeExpandedCore),COREopts=coreSelectionOptions();
     const CORE=COREopts.find(option=>option.id===selections.CORE)||chooseById(COREautoOptions);

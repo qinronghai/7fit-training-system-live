@@ -35,7 +35,17 @@
     if(!(items||[]).length)return [`${prefix}：—`];
     if((items||[]).every(x=>typeof x==='string'))return [`${prefix}：${lineList(items)}`];
     const out=[`${prefix}：`];
-    items.forEach(x=>out.push(`- ${clean(x.name)}${clean(x.prescription)?`｜${clean(x.prescription)}`:''}`));
+    // Overnight PREP copy fix: the full-course copy previously dropped the
+    // grade and the selection reason that the PREP module copy already
+    // carries, so a copied course lost exactly the information a coach
+    // needs to judge the warm-up. Keep name + prescription first, then
+    // append grade and why when the resolved item carries them.
+    items.forEach(x=>{
+      const grade=clean(x.prepGrade||x.grade);
+      const slot=clean(x.slotKey);
+      out.push(`- ${slot?`[${slot}] `:''}${clean(x.name)}${clean(x.prescription)?`｜${clean(x.prescription)}`:''}${grade?`｜${grade}`:''}`);
+      if(clean(x.why))out.push(`  目的：${clean(x.why)}`);
+    });
     return out;
   }
   function formatCoach(p){
