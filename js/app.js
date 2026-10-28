@@ -37,6 +37,31 @@
     return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
   }
   function renderRoute(route){
+    // Member lazy loading gate: member scripts are no longer in index.html.
+    // On first member need, show the member loading state (reusing the
+    // member module's own loading wording), load the five scripts in order,
+    // then re-render the same route only if the user is still on it.
+    // On failure, show an error state with a retry that re-attempts the
+    // same original files; non-member routes never touch this path.
+    const loader=window.V14MemberLoader;
+    if(loader&&loader.needsMemberScripts(route)&&!loader.isReady()){
+      const main=document.getElementById('app-main');
+      const capturedHash=location.hash;
+      const [gateTitle,gateSub]=labels(route);
+      document.getElementById('page-title').textContent=gateTitle;
+      document.getElementById('page-subtitle').textContent=gateSub;
+      setActive(route.area);
+      main.innerHTML='<section class="member-center-page"><div class="member-state-loading" data-member-loading>正在加载会员功能…</div></section>';
+      loader.ensure().then(()=>{
+        if(location.hash===capturedHash)renderRoute(window.V14Router.parseHash(location.hash));
+      }).catch(()=>{
+        if(location.hash!==capturedHash)return;
+        main.innerHTML='<section class="empty-state"><b>会员功能加载失败</b><span>会员脚本未能加载（'+(loader.failedFile()||'网络或文件异常')+'）。非会员功能不受影响。</span><button type="button" data-member-retry>重试加载会员功能</button><a href="#/coach">返回编课中心</a></section>';
+        const retry=main.querySelector('[data-member-retry]');
+        if(retry)retry.addEventListener('click',()=>renderRoute(window.V14Router.parseHash(location.hash)));
+      });
+      return;
+    }
     window.V14CoachModules?.MemberCenter?.routeChanged?.(route);
     if(!isF111ComposerRoute(route))window.V14CoachModules?.ComposerView?.resetMemberContextBinding?.();
     const main=document.getElementById('app-main');

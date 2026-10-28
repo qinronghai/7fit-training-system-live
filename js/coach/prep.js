@@ -147,16 +147,28 @@
 
   function resolvedGrid(resolved,sessionKey,replaceInMeta=false){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
-    const cards=orderedSlots(resolved).map(slot=>{
+    const cards=orderedSlots(resolved).map((slot,stepIndex)=>{
       const detailHref=slot.prepId?`#/system/prep?focus=${encodeURIComponent(slot.prepId)}`:'';
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
       const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const role=slot.role||record?.role||'训练前激活';
       const prescription=slot.prescription||record?.prescription||'';
+      // Overnight PREP presentation fix: cards previously showed only role +
+      // name + prescription, so a coach could not tell which of the five
+      // functional slots an item filled, why it was chosen, or its order.
+      // All four fields below already exist on the resolved slot (see
+      // js/prep-resolver.js slot output); this change only surfaces them.
+      const stepLabel=`第${stepIndex+1}步`;
+      const slotLabel=slot.slotName||slot.slotKey||'';
+      const gradeLabel=slot.prepGrade||'';
+      const sourceText=sourceLabel(slot.source);
+      const metaLine=[stepLabel,slotLabel,gradeLabel,sourceText].filter(Boolean).join(' · ');
+      const purposeLine=slot.purpose?`<p class="prep-card-purpose">槽位目的：${esc(slot.purpose)}</p>`:'';
+      const whyLine=slot.why?`<p class="prep-card-why">选择理由：${esc(slot.why)}</p>`:'';
       const metaReplace=replaceInMeta?replace:'';
       const titleReplace=replaceInMeta?'':replace;
-      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}><div class="prep-card-meta"><span>${esc(role)}</span>${metaReplace}</div><div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
+      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}><div class="prep-card-meta"><span>${esc(role)}</span><span class="prep-card-slot">${esc(metaLine)}</span>${metaReplace}</div><div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p>${purposeLine}${whyLine}<select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
     return `${fallback}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }

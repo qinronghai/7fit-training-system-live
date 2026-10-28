@@ -235,7 +235,6 @@
     const lowerMode=clean(input.lowerMode);
     const selectedIds=currentActionIds(input);
     const legacyPool=D().composer?.auxiliaryRules?.lower?.[lowerMode]||[];
-    const legacyDefault=legacyPool[0]||'';
     const result=catalog().entries.filter(item=>
       item.consumers.f111D1
       &&item.action.route==='1F_ONLY'
@@ -271,8 +270,7 @@
         legacySourcePools:[...item.sourcePoolKeys],
       };
     }).sort((a,b)=>
-      (b.actionId===legacyDefault?1:0)-(a.actionId===legacyDefault?1:0)
-      ||b.recommendationScore-a.recommendationScore
+      b.recommendationScore-a.recommendationScore
       ||a.actionId.localeCompare(b.actionId)
     );
     return {

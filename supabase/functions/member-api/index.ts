@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStaffAuthService } from "../_shared/staff-auth.mjs";
+import { likeContains } from "../_shared/like-escape.mjs";
 import { createMemberApi } from "./service.mjs";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -130,7 +131,7 @@ const repository = {
     else if (status === "ARCHIVED") query = query.not("archived_at", "is", null);
     else if (status === "INACTIVE") query = query.eq("status", "INACTIVE").is("archived_at", null);
     else if (!includeArchived) query = query.eq("status", "ACTIVE").is("archived_at", null);
-    if (search) query = query.ilike("display_name", `%${search}%`);
+    if (search) query = query.ilike("display_name", likeContains(search));
     query = query.range(offset, offset + limit - 1);
     const { data, error } = await query;
     throwOnError(error);
