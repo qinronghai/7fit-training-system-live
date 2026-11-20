@@ -193,6 +193,9 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await sessionDetail.locator('[data-session-detail-close]').click();
   await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
 
+  await page.reload();
+  await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
+
   const plannedActionBeforeMetadataChange = structuredClone(plannedBefore.plannedActionSnapshot);
   const performedActionBeforeMetadataChange = structuredClone(completedItem.performedActionSnapshot);
   const plannedActionId = plannedBefore.plannedActionId;
@@ -215,6 +218,8 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await page.locator(`[data-open-session-detail][data-session-id="${firstSessionId}"]`).click();
   await expect(sessionDetail).toContainText(`计划：${plannedActionBeforeMetadataChange.name}`);
   await expect(sessionDetail).toContainText(`实际：${performedActionBeforeMetadataChange.name}`);
+  const reopenedItem=sessionDetail.locator('.member-session-item').filter({hasText:'实际：'+replacementName});
+  for(const actual of ['3 组','10 次','20 kg']) await expect(reopenedItem).toContainText(actual);
   await expect(sessionDetail).not.toContainText('目录更新后的计划动作');
   await expect(sessionDetail).not.toContainText('目录更新后的实际动作');
   expect(completedItem.plannedActionSnapshot).toEqual(plannedActionBeforeMetadataChange);
@@ -227,9 +232,26 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(refreshedContext).toContainText(replacementName);
   expect(state.calls.filter(call => call.action === 'get-member-training-context').length).toBeGreaterThanOrEqual(4);
 
+  await page.locator('[data-f111-mode-drawer="upper"]').click();
+  await page.locator('[data-f111-mode-choice="vertical_pull"]').click();
+  await expect(page).toHaveURL(/memberId=/);
+  await page.locator('[data-save-member-session]').click();
+  await expect(saveDialog.locator('[data-member-save-select]')).toHaveValue(MEMBER_ID);
+  await saveDialog.locator('[data-member-save-submit]').click();
+  await expect(saveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学');
+  const nextPlan=state.snapshots[1];
+  expect(nextPlan.session.memberId).toBe(MEMBER_ID);
+  expect(nextPlan.items.find(item=>item.slotKey==='B').plannedActionId)
+    .not.toBe(firstSnapshot.items.find(item=>item.slotKey==='B').plannedActionId);
+  await saveDialog.locator('[data-member-save-cancel]').click();
+  await page.locator(`.member-first-context a[href="#/coach/members/${MEMBER_ID}"]`).click();
+  await expect(page.locator(`[data-timeline-session="${nextPlan.session.id}"] [data-session-status="PLANNED"]`)).toBeVisible();
+  await expect(page.locator(`[data-timeline-session="${firstSessionId}"] [data-session-status="COMPLETED"]`)).toBeVisible();
+  await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
+
   await page.goto('/#/coach/f111?level=L3&lower=squat&upper=horizontal_pull&core=anti_extension');
   await page.locator('#copy-member-session').click();
-  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(1);
+  expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(2);
   await page.locator('[data-save-member-session]').click();
   const templateSaveDialog = page.locator('[data-member-save-dialog]');
   const templateMemberSelect = templateSaveDialog.locator('[data-member-save-select]');
@@ -237,10 +259,10 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await templateMemberSelect.selectOption(MEMBER_ID);
   await templateSaveDialog.locator('[data-member-save-submit]').click();
   await expect(templateSaveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · PLANNED');
-  expect(state.snapshots).toHaveLength(2);
-  expect(state.snapshots[1].session.memberId).toBe(MEMBER_ID);
-  expect(state.snapshots[1].session.status).toBe('PLANNED');
-  expect(state.snapshots[1].session.id).not.toBe(firstSessionId);
+  expect(state.snapshots).toHaveLength(3);
+  expect(state.snapshots[2].session.memberId).toBe(MEMBER_ID);
+  expect(state.snapshots[2].session.status).toBe('PLANNED');
+  expect(state.snapshots[2].session.id).not.toBe(firstSessionId);
 
   const plannedPrescriptions = new Map(firstSnapshot.items.map(item => [item.slotKey, item.plannedPrescriptionSnapshot]));
   expect(plannedPrescriptions.get('C').rawText).toBeTruthy();

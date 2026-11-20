@@ -72,6 +72,21 @@
     return state.ensureSession('f111',sessionKey,metadata);
   }
 
+  function recentPrepSignals(level){
+    const state=S(),recent=window.V15RecentActions,data=D();
+    if(!state?.listRecentActions||!recent?.context?.f111Prep)return {recentPrepActionIds:[],recentPrepFamilies:[]};
+    const items=[];
+    (R()?.SLOT_ORDER||[]).forEach(slotKey=>{
+      const contextKey=recent.context.f111Prep({level,slotKey});
+      state.listRecentActions('f111',contextKey,{limit:4}).forEach(item=>items.push({...item,slotKey}));
+    });
+    items.sort((a,b)=>String(b.usedAt||'').localeCompare(String(a.usedAt||'')));
+    const actionIds=[...new Set(items.map(item=>item.actionId).filter(Boolean))].slice(0,12);
+    const byAction=new Map(Object.values(data.warmupDetails||{}).map(item=>[item.actionId,item]));
+    const families=[...new Set(actionIds.map(actionId=>R()?.movementFamilyFor?.(byAction.get(actionId)?.prepId)||byAction.get(actionId)?.movementFamily).filter(Boolean))];
+    return {recentPrepActionIds:actionIds,recentPrepFamilies:families};
+  }
+
   function reconcileResolved(sessionKey,context,metadata){
     const state=S(),resolver=R();
     if(!resolver)throw new Error('V14PrepResolver is unavailable');
@@ -96,12 +111,8 @@
   function presetContext(sessionId,recipeId,level,selectedIds=[]){
     const data=D(),session=data.sessions?.[sessionId];
     const ids=Array.isArray(selectedIds)&&selectedIds.length?selectedIds:(window.V14State?.getSessionSelections?.(sessionId)||[]);
-    const formalActionIds=ids.filter(Boolean),mainActionIds=[];
-    (session?.slots||[]).forEach((slot,index)=>{
-      const key=String(slot.slotKey||'').includes('__')?String(slot.slotKey).split('__').pop():String(slot.slotName||'').split('｜')[0];
-      if(['A','B'].includes(key)&&ids[index])mainActionIds.push(ids[index]);
-    });
-    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds});
+    const mainActionIds=(session?.slots||[]).flatMap((slot,index)=>/__([AB])$/.test(slot.slotKey)?[ids[index]]:[]).filter(Boolean);
+    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds:ids,...recentPrepSignals(level)});
   }
 
   function resolvePresetPrep(sessionId,recipeId,level,selectedIds=[]){
@@ -113,6 +124,7 @@
     return R().contextFromF111({
       level:ctx.level,recipeId:'',mainActionIds,formalActionIds,
       mainPatterns:[ctx.resolved?.lower?.name,ctx.resolved?.upper?.name].filter(Boolean),
+      ...recentPrepSignals(ctx.level),
     });
   }
 
@@ -123,6 +135,13 @@
 
   function setPrepSelection(sessionKey,slotKey,actionId){
     return S().setPrepSelection('f111',sessionKey,slotKey,actionId,'manual');
+  }
+
+  function recordSelection(select,level){
+    const recent=window.V15RecentActions,slotKey=select?.dataset?.prepSlot,actionId=select?.value;
+    if(!recent?.record||!slotKey||!actionId)return false;
+    const contextKey=recent.context?.f111Prep?.({level,slotKey});
+    return recent.record({templateId:'f111',contextKey,actionId,candidates:Array.from(select.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}))});
   }
 
   function sourceLabel(source){return source==='manual'?'手动选择':'系统推荐';}
@@ -141,7 +160,7 @@
 
   function resolvedItems(resolved){
     return orderedSlots(resolved).filter(slot=>slot.actionId).map(slot=>({
-      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,movementFamily:slot.movementFamily,role:slot.role,route:slot.route,targetPatterns:slot.targetPatterns,regions:slot.regions,caLevel:slot.caLevel,
+      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,matchReason:slot.matchReason,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,movementFamily:slot.movementFamily,role:slot.role,route:slot.route,targetPatterns:slot.targetPatterns,regions:slot.regions,caLevel:slot.caLevel,
     }));
   }
 
@@ -152,13 +171,18 @@
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
       const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
-      const role=slot.role||record?.role||'训练前激活';
       const prescription=slot.prescription||record?.prescription||'';
+      const recentNotice=slot.recentlyUsed?'<small class="prep-recent-note">近期用过，可按需替换</small>':'';
       const metaReplace=replaceInMeta?replace:'';
       const titleReplace=replaceInMeta?'':replace;
-      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}><div class="prep-card-meta"><span>${esc(role)}</span>${metaReplace}</div><div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
+      const role=slot.role?`<small>${esc(slot.role)}</small>`:'';
+      const meta=[role,recentNotice,metaReplace].filter(Boolean).join('');
+      const metaMarkup=meta?`<div class="prep-card-meta">${meta}</div>`:'';
+      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${metaMarkup}<div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
-    return `${fallback}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
+    const timeNote=Number.isFinite(resolved?.estimatedMinutes)
+      ?`<small class="prep-time-note">动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，按动作质量调整，不做到疲劳。</small>`:'';
+    return `${fallback}${timeNote}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }
 
   function registerCopy(key,title,resolved){
@@ -194,6 +218,6 @@
 
   M.Prep={
     legacyMatchedWarmups,matchedWarmups,warmupCards,composerPrepItems,composerPrepHtml,
-    resolvePresetPrep,resolveComposerPrep,setPrepSelection,orderedSlots,resolvedItems,resolvedGrid,
+    resolvePresetPrep,resolveComposerPrep,setPrepSelection,recordSelection,orderedSlots,resolvedItems,resolvedGrid,
   };
 })();

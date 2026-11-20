@@ -59,7 +59,7 @@
     const level=LEVELS.has(q.level)?q.level:'L1';
     const lowerMode=cfg.lowerModes?.[q.lower]?q.lower:Object.keys(cfg.lowerModes||{})[0];
     const upperMode=cfg.upperModes?.[q.upper]?q.upper:Object.keys(cfg.upperModes||{})[0];
-    const coreDemand=cfg.coreDemands?.[q.core]?q.core:'anti_extension';
+    const coreDemand=cfg.coreDemands?.[q.core]?q.core:window.V14Composer.defaultCoreDemand(level,lowerMode,upperMode);
     const flags={
       includeExpandedMain:q.em==='1',
       includeExpandedSupport:q.es==='1',

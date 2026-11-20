@@ -55,7 +55,9 @@
     "PREP-51",
     "PREP-52",
     "PREP-53",
-    "PREP-54"
+    "PREP-54",
+    "PREP-55",
+    "PREP-56"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -2144,6 +2146,87 @@
       "cue": "以支撑腿髋铰链带动动作，前腿/浮腿沿脚尖方向做捞取；保持骨盆稳定，不追求手触地。",
       "why": "在猴子捞月的后侧链动态活动上增加单腿平衡与髋铰链控制，服务硬拉、RDL 和单腿拉模式，不作为蹲模式固定热身。",
       "sourceStatus": "新增 PREP 动作；动作失稳时退回双脚站姿猴子捞月",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-55": {
+      "prepId": "PREP-55",
+      "name": "弹力带站姿抗旋转保持",
+      "alias": "站姿 Pallof 抗旋转",
+      "actionId": "warmup_band_anti_rotation_hold",
+      "movementFamily": "core-anti-rotation-standing",
+      "prepGrade": "P3",
+      "role": "核心抗旋转 / 站姿骨盆控制",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "肩带"
+      ],
+      "equipment": "弹力带 / 固定点",
+      "prescription": "1组 × 6–8次/侧或15–20秒/侧",
+      "cue": "弹力带把身体向侧面拉，保持胸廓和骨盆正对前方；先减小阻力，再增加停留时间。",
+      "why": "把核心抗旋转从地面支撑带到站姿，预习髋铰链、单腿和拉类动作中的胸廓—骨盆分离控制。",
+      "sourceStatus": "新增 PREP 动作；以轻阻力和短停留为准，不做到疲劳",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-56": {
+      "prepId": "PREP-56",
+      "name": "轻负重农夫行走",
+      "alias": "短距离负重行走",
+      "actionId": "warmup_light_farmer_carry",
+      "movementFamily": "core-loaded-carry",
+      "prepGrade": "P3",
+      "role": "核心抗侧屈 / 负重整合",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "握力",
+        "髋"
+      ],
+      "equipment": "轻壶铃 / 短通道",
+      "prescription": "1组 × 10–15米/侧",
+      "cue": "轻负重贴近身体，步幅小而稳定；身体不要向负重侧塌，转身前先停稳。",
+      "why": "用很短的低负荷行走练习躯干抗侧屈、骨盆稳定和握力整合，连接站姿主动作而不提前消耗会员。",
+      "sourceStatus": "新增 PREP 动作；限轻负重、短距离，出现躯干侧倾立即降级",
       "route": "2F PREP",
       "sequencePhase": "standing-dynamic"
     }

@@ -53,7 +53,7 @@ async function composerWarnCandidate(page) {
       level: 'L3',
       lowerMode: 'single_leg_hinge',
       upperMode: 'horizontal_push',
-      coreDemand: 'anti_extension',
+      coreDemand: window.V14Composer.defaultCoreDemand('L3','single_leg_hinge','horizontal_push'),
       includeExpandedSupport: true,
     };
     const baseline = window.V14Composer.resolve(input);

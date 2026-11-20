@@ -111,6 +111,15 @@
           "hake_shendun",
           "wotu_xiong_tui"
         ],
+        "supportPatterns": [
+          "支撑",
+          "支撑模式"
+        ],
+        "coreDemands": [
+          "抗旋转"
+        ],
+        "recentPrepActionIds": [],
+        "recentPrepFamilies": [],
         "formalActionIds": [
           "hake_shendun",
           "wotu_xiong_tui",
