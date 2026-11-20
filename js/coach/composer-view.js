@@ -97,6 +97,15 @@
     if(liveRegion)liveRegion.innerHTML=memberContextContentMarkup(route,state);
   }
 
+  function refreshCourseBesideMemberPanel(root,html){
+    const panel=root.querySelector('[data-member-first-context]');
+    const template=document.createElement('template');
+    template.innerHTML=html;
+    template.content.querySelector('[data-member-first-context]').remove();
+    while(panel.nextSibling)panel.nextSibling.remove();
+    panel.after(template.content);
+  }
+
   function bindMemberContext(route,root,rerender){
     if(!isF111ComposerRoute(route)||!route.query?.memberId){resetMemberContextBinding();return;}
     if(root.dataset.memberContextRetryBound!=='1'){
@@ -120,7 +129,7 @@
       Promise.all([window.V14MemberAPI.getMember(memberId),window.V14MemberAPI.getMemberTrainingContext(memberId)]).then(([member,context])=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
         memberContextState={status:'ready',member,context};
-        if(typeof rerender==='function')rerender(true);
+        if(typeof rerender==='function')rerender(refreshCourseBesideMemberPanel);
         updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
       }).catch(error=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;

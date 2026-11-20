@@ -144,6 +144,11 @@
     return recent.record({templateId:'f111',contextKey,actionId,candidates:Array.from(select.options||[]).filter(option=>option.value).map(option=>({actionId:option.value,name:option.textContent||option.value}))});
   }
 
+  function applySelection(select,level){
+    recordSelection(select,level);
+    setPrepSelection(select.dataset.prepSession,select.dataset.prepSlot,select.value);
+  }
+
   function sourceLabel(source){return source==='manual'?'手动选择':'系统推荐';}
   function slotOptions(slot){
     if(!slot.candidates?.length)return '<option value="">暂无合法候选</option>';
@@ -218,6 +223,6 @@
 
   M.Prep={
     legacyMatchedWarmups,matchedWarmups,warmupCards,composerPrepItems,composerPrepHtml,
-    resolvePresetPrep,resolveComposerPrep,setPrepSelection,recordSelection,orderedSlots,resolvedItems,resolvedGrid,
+    resolvePresetPrep,resolveComposerPrep,setPrepSelection,applySelection,recordSelection,orderedSlots,resolvedItems,resolvedGrid,
   };
 })();
