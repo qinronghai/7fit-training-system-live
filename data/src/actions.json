@@ -4521,6 +4521,54 @@
       ],
       "isWarmupNew": true
     },
+    "warmup_band_anti_rotation_hold": {
+      "id": "warmup_band_anti_rotation_hold",
+      "name": "弹力带站姿抗旋转保持",
+      "pattern": "抗旋转",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "弹力带 / 固定点",
+      "equipmentId": "eq-band",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "核心稳定",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_light_farmer_carry": {
+      "id": "warmup_light_farmer_carry",
+      "name": "轻负重农夫行走",
+      "pattern": "抗侧屈",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "轻壶铃 / 短通道",
+      "equipmentId": "eq-kb",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "核心稳定",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P3"
+      ],
+      "isWarmupNew": true
+    },
     "warmup_hamstring_scoop": {
       "id": "warmup_hamstring_scoop",
       "name": "站姿腘绳肌动态捞月（Hamstring Scoop）",
@@ -8861,6 +8909,46 @@
         "退阶 ID": "—",
         "同级替代 ID": "—",
         "进阶 ID": "—"
+      }
+    },
+    "warmup_band_anti_rotation_hold": {
+      "summary": "弹力带站姿抗旋转保持 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_band_anti_rotation_hold",
+        "来源动作模式": "抗旋转",
+        "来源层级": "整合准备",
+        "器械": "弹力带 / 固定点",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "在站姿中练习胸廓与骨盆正对，连接髋铰链、单腿和拉类动作的抗旋转控制。",
+        "来源处方 / RPE": "1组 × 6–8次/侧或15–20秒/侧｜RPE 2–4",
+        "教练口令": "弹力带把身体向侧面拉，保持胸廓和骨盆正对；阻力宁可轻，不要憋气硬顶。",
+        "执行步骤": "站稳后双手在胸前保持或缓慢前推，控制回拉，不让躯干旋向固定点一侧。",
+        "常见错误": "用脚步移动、耸肩或腰椎扭转抵抗弹力带；停留时间过长导致疲劳。",
+        "禁忌 / 限制": "出现疼痛、头晕或无法保持正面朝向时降低阻力或改为跪姿抗旋转。",
+        "退阶 ID": "PREP-22",
+        "同级替代 ID": "PREP-34",
+        "进阶 ID": "CORE-L3-02"
+      }
+    },
+    "warmup_light_farmer_carry": {
+      "summary": "轻负重农夫行走 热身 · 2F 体能热身大厅 · 2F 专用",
+      "fields": {
+        "标准 ID": "warmup_light_farmer_carry",
+        "来源动作模式": "抗侧屈",
+        "来源层级": "整合准备",
+        "器械": "轻壶铃 / 短通道",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "用短距离低负荷行走连接躯干、骨盆、握力与步态控制，不提前消耗会员。",
+        "来源处方 / RPE": "1组 × 10–15米/侧｜RPE 2–4",
+        "教练口令": "轻负重贴近身体，步幅小而稳定；身体不要向负重侧塌，转身前先停稳。",
+        "执行步骤": "拿起轻壶铃建立直立姿势，按短距离往返行走；每一步都保持呼吸和躯干垂直。",
+        "常见错误": "负重过重、步幅过大、耸肩或身体向一侧倾斜；为了完成距离而牺牲步态。",
+        "禁忌 / 限制": "出现腰背痛、肩部不适或握力明显下降时降低负重或改为徒手行走。",
+        "退阶 ID": "PREP-34",
+        "同级替代 ID": "PREP-55",
+        "进阶 ID": "CORE-L3-03"
       }
     },
     "warmup_hamstring_scoop": {

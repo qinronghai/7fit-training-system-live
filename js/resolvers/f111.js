@@ -136,6 +136,7 @@
       lowerMode:input.lowerMode,
       upperMode:input.upperMode,
       coreDemand:input.coreDemand,
+      recentContext:input.recentContext,
       selections:input.selections||{},
       includeExpandedMain:!!input.includeExpandedMain,
       includeExpandedSupport:!!input.includeExpandedSupport,

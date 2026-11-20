@@ -67,6 +67,21 @@ const resolved=ctx.window.V14Composer.resolve({level:'L3',lowerMode:'single_leg_
 const stateKey=`${resolved.compositionId}-L3`;
 const composerCtx={level:'L3',lowerMode:'single_leg_hinge',upperMode:'horizontal_push',coreDemand:'anti_extension',stateKey,resolved};
 let composerPrep=M.Prep.resolveComposerPrep(composerCtx);
+const changed=ctx.window.V14Composer.resolve({...composerCtx,selections:{C:'SUP-S2-01',CORE:'CORE-L3-01'}});
+const prepAfterSwap=M.Prep.resolveComposerPrep({...composerCtx,resolved:changed});
+assert(prepAfterSwap.context.supportPatterns.includes('肩胛稳定'));
+assert.deepStrictEqual(plain(prepAfterSwap.context.coreDemands),[D.actions['CORE-L3-01'].coreDemand]);
+
+for(const mode of ctx.window.V14Composer.combinations()){
+  for(const level of ['L1','L2','L3','L4']){
+    const resolved=ctx.window.V14Composer.resolve({...mode,level});
+    const prep=M.Prep.resolveComposerPrep({level,stateKey:resolved.compositionId+'-'+level,resolved});
+    assert.strictEqual(prep.slots.length,5);
+    assert(prep.slots.every(slot=>slot.actionId),resolved.compositionId+' '+level+' has an empty warm-up slot');
+    const primer=prep.slots.find(slot=>slot.slotKey==='PRIMER');
+    assert(primer.targetPatterns.some(pattern=>prep.context.mainPatterns.includes(pattern)));
+  }
+}
 slot=firstReplaceableSlot(composerPrep); assert(slot,'expected replaceable Composer PREP slot');
 const composerManual=slot.candidates.find(c=>c.actionId!==slot.actionId); assert(composerManual);
 S.setPrepSelection('f111',stateKey,slot.slotKey,composerManual.actionId,'manual');

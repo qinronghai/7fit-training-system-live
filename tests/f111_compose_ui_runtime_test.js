@@ -23,4 +23,11 @@ assert(supportGroups.every(group=>group.items.length>0)&&coreGroups.every(group=
 assert(!JSON.stringify(supportGroups).includes('高位平板支撑｜示例动作'),'support grouping must not use OpenDesign demo hardcoding');
 assert(UI.actionTrigger(ctx,'C').includes('data-f111-action-drawer="C"'));
 assert(UI.actionTrigger(ctx,'CORE').includes('data-f111-action-drawer="CORE"'));
+
+const supportItems=supportGroups.flatMap(group=>group.items);
+const complementarySupport=supportItems.find(item=>item.id==='SUP-S2-01');
+assert(complementarySupport.detail.includes('补充 CORE 未覆盖的支撑任务'),'support candidates should explain complementarity');
+
+const repeatedSupport=supportItems.find(item=>item.id==='SUP-S1-04');
+assert(repeatedSupport.detail.includes('与 CORE 训练任务重复'),'repeated support demand should explain confirmation risk');
 console.log('f111_compose_ui_runtime_test: PASS');
