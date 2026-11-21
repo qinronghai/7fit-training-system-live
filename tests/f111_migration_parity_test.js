@@ -30,14 +30,14 @@ for(const recipeId of recipeIds){
     const sessionId=`${recipeId}-${level}`,session=D.sessions[sessionId];
     assert(session,`missing legacy preset ${sessionId}`);
     const ids=session.slots.map(x=>x.baselineId);
-    const legacySlots=session.slots.map((x,i)=>({key:slotKey(x,i),actionId:ids[i]}));
+    const legacySlots=window.V14Composer.orderedSlots(session.slots.map((x,i)=>({key:slotKey(x,i),label:x.slotName,actionId:ids[i]})));
     const legacyContext=window.V14PrepResolver.contextFromF111({
       level,recipeId,
       mainActionIds:legacySlots.filter(x=>['A','B'].includes(x.key)).map(x=>x.actionId),
       formalActionIds:ids,
     });
     const legacy={
-      familyId:recipeId,level,slots:legacySlots,
+      familyId:recipeId,level,slots:legacySlots.map(({key,actionId})=>({key,actionId})),
       anatomy:anatomySig(ids),
       conflict:conflictSig(window.V14Conflict.evaluate(sessionId,ids)),
       prep:prepSig(legacyContext),
@@ -52,7 +52,7 @@ for(const recipeId of recipeIds){
       prep:prepSig(next.prepContext),
     };
     assert.deepStrictEqual(modern,legacy,`${sessionId} V14/V15 preset parity mismatch`);
-    assert.deepStrictEqual(nextIds,ids,`${sessionId} six-slot action order changed`);
+    assert.deepStrictEqual(nextIds,legacySlots.map(x=>x.actionId),`${sessionId} six-slot teaching order changed`);
     presetCount++;
   }
 }
@@ -76,7 +76,7 @@ for(const lowerMode of lowerModes){
       });
       const legacy={
         familyId:legacyResolved.compositionId,level,
-        slots:legacyResolved.slots.map(x=>({key:x.slotKey,actionId:x.actionId,tier:x.tier||'',grade:x.grade||'',prescription:x.prescriptionOverride||''})),
+        slots:window.V14Composer.orderedSlots(legacyResolved.slots).map(x=>({key:x.slotKey,actionId:x.actionId,tier:x.tier||'',grade:x.grade||'',prescription:window.V14Composer.f111Prescription(x.actionId,x.slotKey)})),
         anatomy:anatomySig(legacyIds),
         conflict:conflictSig(window.V14Conflict.evaluateComposer(legacyResolved)),
         prep:prepSig(legacyContext),

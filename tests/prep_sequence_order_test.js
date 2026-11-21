@@ -94,6 +94,7 @@ function assertOrderedText(text, names, label) {
 assertOrderedText(context.window.V14SessionCopy.formatCoach(payload), expected, 'coach copy');
 const memberExpected = expected.map(name => {
   if (/90\s*\/\s*90/.test(name)) return '90/90';
+  if (/死虫/.test(name)) return '死虫';
   if (/青蛙趴/.test(name)) return '青蛙趴';
   if (/平板支撑/.test(name)) return '平板支撑';
   if (/胸椎旋转/.test(name)) return '胸椎旋转';

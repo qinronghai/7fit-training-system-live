@@ -58,13 +58,13 @@
             "source": "baseline"
           },
           {
-            "key": "SUPPORT",
-            "label": "C｜支撑模式",
-            "actionId": "SUP-S3-02",
-            "name": "高位平板交替触肩",
+            "key": "3",
+            "label": "D2｜上肢辅助",
+            "actionId": "shengsuo_santou_xiaya",
+            "name": "绳索三头下压",
             "tier": "",
-            "grade": "SUP-S3",
-            "prescription": "",
+            "grade": "",
+            "prescription": "2组 × 15次左右",
             "source": "baseline"
           },
           {
@@ -74,17 +74,17 @@
             "name": "髋内收",
             "tier": "",
             "grade": "",
-            "prescription": "",
+            "prescription": "2组 × 15次左右",
             "source": "baseline"
           },
           {
-            "key": "3",
-            "label": "D2｜上肢辅助",
-            "actionId": "shengsuo_santou_xiaya",
-            "name": "绳索三头下压",
+            "key": "SUPPORT",
+            "label": "C｜支撑模式",
+            "actionId": "SUP-S3-02",
+            "name": "高位平板交替触肩",
             "tier": "",
-            "grade": "",
-            "prescription": "",
+            "grade": "SUP-S3",
+            "prescription": "2–3组 × 6–10次/侧",
             "source": "baseline"
           },
           {
@@ -94,7 +94,7 @@
             "name": "Pallof抗旋转推举",
             "tier": "CORE-L3",
             "grade": "CORE-L3",
-            "prescription": "2组 × 15–20次",
+            "prescription": "2–3组 × 6–10次/侧",
             "source": "baseline"
           }
         ]
@@ -111,16 +111,6 @@
           "hake_shendun",
           "wotu_xiong_tui"
         ],
-        "supportPatterns": [
-          "支撑模式",
-          "抗旋转",
-          "肩胛稳定"
-        ],
-        "coreDemands": [
-          "抗旋转"
-        ],
-        "recentPrepActionIds": [],
-        "recentPrepFamilies": [],
         "formalActionIds": [
           "hake_shendun",
           "wotu_xiong_tui",
@@ -130,9 +120,19 @@
           "CORE-L3-01"
         ],
         "targetMuscles": [],
+        "supportPatterns": [
+          "支撑模式",
+          "抗旋转",
+          "肩胛稳定"
+        ],
+        "coreDemands": [
+          "抗旋转"
+        ],
         "modalities": [],
         "impactDemand": "",
-        "powerDemand": ""
+        "powerDemand": "",
+        "recentPrepActionIds": [],
+        "recentPrepFamilies": []
       },
       "anatomyContext": {
         "actionIds": [
@@ -327,24 +327,20 @@
       "id": "e1000000-0000-4000-8000-000000000018",
       "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "ACCESSORY",
-      "slotKey": "SUPPORT",
+      "slotKey": "3",
       "sortOrder": 2,
-      "plannedActionId": "SUP-S3-02",
+      "plannedActionId": "shengsuo_santou_xiaya",
       "plannedActionSnapshot": {
         "schemaVersion": 1,
-        "actionId": "SUP-S3-02",
-        "name": "高位平板交替触肩",
-        "pattern": "支撑模式",
-        "level": "SUP-S3",
+        "actionId": "shengsuo_santou_xiaya",
+        "name": "绳索三头下压",
+        "pattern": "水平推",
+        "level": null,
         "primaryMuscles": [
-          "腹横肌",
-          "腹内外斜肌"
-        ],
-        "secondaryMuscles": [
-          "前锯肌",
           "肱三头肌"
         ],
-        "equipment": "自重 / 垫子",
+        "secondaryMuscles": [],
+        "equipment": "小飞鸟 / 小龙门架",
         "stationId": null
       },
       "performedActionId": null,
@@ -357,7 +353,7 @@
         "restSeconds": null,
         "tempo": null,
         "loadPrescription": null,
-        "rawText": null
+        "rawText": "2组 × 15次左右"
       },
       "performedPrescription": null,
       "sets": null,
@@ -399,7 +395,7 @@
         "restSeconds": null,
         "tempo": null,
         "loadPrescription": null,
-        "rawText": null
+        "rawText": "2组 × 15次左右"
       },
       "performedPrescription": null,
       "sets": null,
@@ -415,20 +411,24 @@
       "id": "e1000000-0000-4000-8000-000000000020",
       "sessionId": "e1000000-0000-4000-8000-000000000002",
       "phase": "ACCESSORY",
-      "slotKey": "3",
+      "slotKey": "SUPPORT",
       "sortOrder": 4,
-      "plannedActionId": "shengsuo_santou_xiaya",
+      "plannedActionId": "SUP-S3-02",
       "plannedActionSnapshot": {
         "schemaVersion": 1,
-        "actionId": "shengsuo_santou_xiaya",
-        "name": "绳索三头下压",
-        "pattern": "水平推",
-        "level": null,
+        "actionId": "SUP-S3-02",
+        "name": "高位平板交替触肩",
+        "pattern": "支撑模式",
+        "level": "SUP-S3",
         "primaryMuscles": [
+          "腹横肌",
+          "腹内外斜肌"
+        ],
+        "secondaryMuscles": [
+          "前锯肌",
           "肱三头肌"
         ],
-        "secondaryMuscles": [],
-        "equipment": "小飞鸟 / 小龙门架",
+        "equipment": "自重 / 垫子",
         "stationId": null
       },
       "performedActionId": null,
@@ -441,7 +441,7 @@
         "restSeconds": null,
         "tempo": null,
         "loadPrescription": null,
-        "rawText": null
+        "rawText": "2–3组 × 6–10次/侧"
       },
       "performedPrescription": null,
       "sets": null,
@@ -486,7 +486,7 @@
         "restSeconds": null,
         "tempo": null,
         "loadPrescription": null,
-        "rawText": "2组 × 15–20次"
+        "rawText": "2–3组 × 6–10次/侧"
       },
       "performedPrescription": null,
       "sets": null,

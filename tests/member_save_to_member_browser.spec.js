@@ -116,14 +116,14 @@ test('preset F111 requires an explicit member save and stores a full PLANNED sna
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach/f111/f111-06/l3');
-  const displayedPrescriptions = await page.evaluate(() => Object.fromEntries(
-    ['SUPPORT', '2', '3'].map(slotKey => [slotKey, window.V14ModuleCopy.prescriptionForF111Slot(slotKey)]),
-  ));
+  const displayedPrescriptions = await page.evaluate(() => [...document.querySelectorAll('.session-slot')].map(card=>[
+    card.dataset.slot.split('__').pop(),card.querySelector('.composer-rx-note').textContent,
+  ]));
   await openAndSave(page, members[0].id);
   expect(captured).toHaveLength(1);
   const snapshot = captured[0];
-  for (const slotKey of ['SUPPORT', '2', '3']) {
-    const displayed = displayedPrescriptions[slotKey];
+  expect(snapshot.items.filter(item=>item.phase!=='PREP').map(item=>item.slotKey)).toEqual(displayedPrescriptions.map(([key])=>key));
+  for (const [slotKey,displayed] of displayedPrescriptions) {
     expect(displayed, `${slotKey} must have a displayed/copy prescription`).toBeTruthy();
     expect(snapshot.items.find(item => item.slotKey === slotKey).plannedPrescriptionSnapshot.rawText).toBe(displayed);
   }

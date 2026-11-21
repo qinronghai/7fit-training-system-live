@@ -63,8 +63,8 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
     supportGap:getComputedStyle(document.querySelector('.f111-strength-grid')).rowGap,
     coreHeader:getComputedStyle(document.querySelector('.f111-support-grid .composer-slot-head>div')).display,
     coreHeaderRows:Array.from(document.querySelectorAll('.f111-support-grid .f111-slot-card')).map(card=>{
-      const [label,grade]=card.querySelectorAll('.composer-slot-head>div>*');
-      const labelRect=label.getBoundingClientRect(),gradeRect=grade.getBoundingClientRect();
+      const label=card.querySelector('.composer-slot-head>div>span'),button=card.querySelector('[data-f111-action-drawer]');
+      const labelRect=label.getBoundingClientRect(),gradeRect=button.getBoundingClientRect();
       return {
         labelRight:labelRect.right,
         gradeLeft:gradeRect.left,

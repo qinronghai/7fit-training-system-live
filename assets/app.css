@@ -2383,3 +2383,33 @@ body{font-size:14px;line-height:1.55}
 .composer-core-info small{display:block}
 .composer-core-warning{color:#9a5b14;font-weight:800}
 .prep-recent-note{font-size:8px;line-height:1.3;color:#8a5c00;background:#fff9eb;border:1px solid #f1dfaf;border-radius:999px;padding:2px 5px;white-space:nowrap}
+
+#mobile-navigation{width:min(320px,88vw);margin:auto auto auto 0;height:100dvh;max-height:100dvh;padding:18px;border:0;background:#201c29;color:white}
+#mobile-navigation::backdrop{background:#211a2a70}
+#mobile-navigation>button{min-height:44px;margin-bottom:12px;background:transparent;color:inherit;border:0;font:inherit}
+.member-directory-row{grid-template-columns:minmax(0,1fr) auto;text-decoration:none;color:var(--ink)}
+.member-directory-row:hover,.member-directory-row:focus-visible{background:#f7f5fb}
+.member-directory-row strong{font-size:15px;overflow-wrap:anywhere}
+.member-last-practice{display:grid;gap:8px;padding:16px;border:1px solid #d7c9f4;border-radius:14px;background:#faf8ff}
+.member-last-practice h2,.member-last-practice>p,.member-practice-items p{margin:0}
+.member-last-practice h2{font-size:20px}
+.member-last-practice>p,.member-practice-items p{color:#534d60;font-size:13px}
+.member-practice-items{display:grid;gap:6px;padding:0;margin:0;list-style:none}
+.member-practice-items .member-session-item{padding:6px 0;display:block;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.member-original summary,.member-more summary,.member-reference summary,.slot-rationale summary,.member-recent-context summary{cursor:pointer;padding:9px 0;color:#594b70;font-size:13px}
+.member-original summary{padding:4px 0;width:fit-content}
+.member-original p{margin:0}
+.member-record-link{justify-self:start;border:0;background:transparent;color:var(--purple-dark);padding:8px 0;min-height:40px;font:inherit;cursor:pointer}
+.member-today-choices[open]>button{display:block;margin-top:6px}
+.member-last-practice button.member-next-session{display:inline-flex;min-height:44px;border:0;cursor:pointer}
+.member-detail-heading:has(.member-more){flex-direction:row;align-items:flex-start}
+.member-more summary,.member-reference summary,.slot-rationale summary{min-height:44px;align-content:center}
+.member-more button{min-height:44px;cursor:pointer}
+@media(max-width:979px){
+  .f111-support-grid .composer-slot-head{display:flex;align-items:center;justify-content:space-between;gap:4px}
+  .f111-support-grid .composer-slot-head>div{width:auto;min-width:0}
+}
+.slot-rationale dl{margin:0;color:#514959;font-size:13px}
+.slot-rationale dl div{display:flex;gap:8px;margin-bottom:5px}
+.slot-rationale dt{flex:none;font-weight:650}
+.slot-rationale dd{margin:0}

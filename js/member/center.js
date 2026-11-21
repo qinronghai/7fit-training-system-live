@@ -13,12 +13,12 @@
   function archiveMarkup(){return `<dialog class="member-archive-dialog" data-member-archive-dialog aria-labelledby="member-archive-title"><section><h2 id="member-archive-title">归档会员</h2><p data-member-archive-copy>归档后，历史训练记录仍会保留。</p><div class="member-archive-actions"><button type="button" data-member-archive-cancel>取消</button><button type="button" class="danger" data-member-archive-confirm>确认归档</button></div></section></dialog>`;}
 
   function renderListShell(){
-    return `<section class="member-center-page" data-member-center-page="list"><header class="member-center-heading"><div><h1>会员训练</h1><p>从最近完成训练查看会员进展，也可以继续查看课程记录。</p></div><button class="member-primary-action" type="button" data-member-create>新增会员</button></header><section class="member-directory" aria-labelledby="member-directory-title"><div class="member-directory-heading"><div><h2 id="member-directory-title">会员</h2><p>会员信息仅服务于课程编排与训练回看。</p></div><div class="member-filter-tabs" role="group" aria-label="会员状态">${[['ACTIVE','有效会员'],['ARCHIVED','已归档'],['INACTIVE','已停用']].map(([value,label])=>`<button type="button" data-member-filter="${value}" aria-pressed="${filter===value}">${label}</button>`).join('')}</div></div><label class="member-directory-search"><span>搜索会员</span><input type="search" data-member-search value="${esc(query)}" placeholder="输入姓名" autocomplete="off"></label><div class="member-results" data-member-results aria-live="polite"><p class="member-state-loading" data-member-loading>正在加载会员…</p></div></section>${formMarkup()}${archiveMarkup()}</section>`;
+    return `<section class="member-center-page" data-member-center-page="list"><header class="member-center-heading"><div><h1>会员管理</h1></div><button class="member-primary-action" type="button" data-member-create>新增会员</button></header><section class="member-directory" aria-label="会员列表"><div class="member-directory-heading"><div class="member-filter-tabs" role="group" aria-label="会员状态">${[['ACTIVE','有效会员'],['ARCHIVED','已归档'],['INACTIVE','已停用']].map(([value,label])=>`<button type="button" data-member-filter="${value}" aria-pressed="${filter===value}">${label}</button>`).join('')}</div></div><label class="member-directory-search"><span>搜索会员</span><input type="search" data-member-search value="${esc(query)}" placeholder="输入姓名" autocomplete="off"></label><div class="member-results" data-member-results aria-live="polite"><p class="member-state-loading" data-member-loading>正在加载会员…</p></div></section>${formMarkup()}${archiveMarkup()}</section>`;
   }
 
   function memberRow(member){
     const meta=[member.trainingLevel||'等级未设置',member.primaryGoal||'训练目标未设置'].filter(Boolean);
-    return `<article class="member-directory-row" data-member-row="${esc(member.id)}"><div class="member-row-main"><a data-member-open="${esc(member.id)}" href="#/coach/members/${encodeURIComponent(member.id)}">${esc(member.displayName)}</a><p>${meta.map(esc).join(' · ')}</p></div><span class="member-row-status ${member.archivedAt?'archived':''}">${member.archivedAt?'已归档':statusLabel(member.status)}</span><div class="member-row-actions">${member.archivedAt?`<button type="button" data-member-restore="${esc(member.id)}">恢复会员</button>`:`<button type="button" data-member-edit="${esc(member.id)}">编辑资料</button><button type="button" data-member-archive="${esc(member.id)}">归档</button>`}</div></article>`;
+    return `<a class="member-directory-row" data-member-row="${esc(member.id)}" data-member-open="${esc(member.id)}" href="#/coach/members/${encodeURIComponent(member.id)}"><div class="member-row-main"><strong>${esc(member.displayName)}</strong><p>${meta.map(esc).join(' · ')}</p></div><span class="member-row-status ${member.archivedAt?'archived':''}">${member.archivedAt?'已归档':statusLabel(member.status)}</span></a>`;
   }
 
   function renderListResults(rows,hasMore=listHasMore){
@@ -89,17 +89,17 @@
 
   function contextMarkup(context){
     const last=context?.lastCompletedSession;
-    if(!last)return `<section class="member-recent-empty" data-member-recent-empty><h2>最近训练重点</h2><p>暂无已完成训练。待训练和已取消的课程不会计入训练情况。</p><a class="member-next-session" data-member-next-session href="${nextSessionHref(context)}">为她编下一节 F111</a></section>`;
+    if(!last)return '';
     const patterns=Array.isArray(context.recentPatterns)?context.recentPatterns:[];
     const actions=Array.isArray(context.recentActions)?context.recentActions:[];
     const muscles=Array.isArray(context.recentPrimaryMuscles)?context.recentPrimaryMuscles:[];
-    return `<section class="member-recent-context" data-member-recent-context aria-labelledby="member-recent-title"><div class="member-context-heading"><div><h2 id="member-recent-title">最近训练重点</h2><p>基于最近三次已完成训练</p></div><span class="member-context-date">${dateLabel(last.sessionDate)}</span></div><div class="member-context-last"><span>最近完成</span><strong>${esc(last.sessionTitle||last.templateKey)}</strong></div><div class="member-context-columns"><section><h3>训练模式</h3>${patterns.length?`<ul>${patterns.map(value=>`<li><span>${esc(value.pattern)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无模式记录</p>'}</section><section><h3>主要动作</h3>${actions.length?`<ul>${actions.slice(0,4).map(value=>`<li><span>${esc(value.actionNameSnapshot||value.actionId)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无动作记录</p>'}</section><section><h3>主要肌群</h3>${muscles.length?`<ul>${muscles.slice(0,4).map(value=>`<li><span>${esc(value.muscle)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无肌群记录</p>'}</section></div><a class="member-next-session" data-member-next-session href="${nextSessionHref(context)}">为她编下一节 F111</a></section>`;
+    return `<details class="member-recent-context" data-member-trends aria-labelledby="member-recent-title"><summary id="member-recent-title">最近三次训练趋势</summary><div class="member-context-columns"><section><h3>训练模式</h3>${patterns.length?`<ul>${patterns.map(value=>`<li><span>${esc(value.pattern)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无模式记录</p>'}</section><section><h3>主要动作</h3>${actions.length?`<ul>${actions.slice(0,4).map(value=>`<li><span>${esc(value.actionNameSnapshot||value.actionId)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无动作记录</p>'}</section><section><h3>主要肌群</h3>${muscles.length?`<ul>${muscles.slice(0,4).map(value=>`<li><span>${esc(value.muscle)}</span><b>${value.countLast3} 次</b></li>`).join('')}</ul>`:'<p>暂无肌群记录</p>'}</section></div></details>`;
   }
 
   function profileMarkup(member){
     const profile=member.trainingProfile||{};
     const list=value=>Array.isArray(value)&&value.length?value.map(esc).join('、'):'未记录';
-    return `<section class="member-profile" data-member-profile aria-labelledby="member-profile-title"><div class="member-section-heading"><div><h2 id="member-profile-title">训练资料</h2><p>为教练编排课程提供参考。</p></div><button type="button" data-member-edit="${esc(member.id)}">编辑资料</button></div><dl><div><dt>训练等级</dt><dd>${esc(member.trainingLevel||'未设置')}</dd></div><div><dt>训练目标</dt><dd>${esc(member.primaryGoal||'未记录')}</dd></div><div><dt>动作限制</dt><dd>${list(profile.movementConstraints)}</dd></div><div><dt>常用器械</dt><dd>${list(profile.preferredEquipment)}</dd></div>${profile.notes?`<div><dt>训练备注</dt><dd>${esc(profile.notes)}</dd></div>`:''}${member.coachNotes?`<div><dt>教练备注</dt><dd>${esc(member.coachNotes)}</dd></div>`:''}</dl></section>`;
+    return `<section class="member-profile" data-member-profile aria-labelledby="member-profile-title"><div class="member-section-heading"><div><h2 id="member-profile-title">训练资料</h2></div><button type="button" data-member-edit="${esc(member.id)}">编辑资料</button></div><dl><div><dt>训练等级</dt><dd>${esc(member.trainingLevel||'未设置')}</dd></div><div><dt>训练目标</dt><dd>${esc(member.primaryGoal||'未记录')}</dd></div><div><dt>动作限制</dt><dd>${list(profile.movementConstraints)}</dd></div><div><dt>常用器械</dt><dd>${list(profile.preferredEquipment)}</dd></div>${profile.notes?`<div><dt>训练备注</dt><dd>${esc(profile.notes)}</dd></div>`:''}${member.coachNotes?`<div><dt>教练备注</dt><dd>${esc(member.coachNotes)}</dd></div>`:''}</dl></section>`;
   }
 
   function timelineMarkup(sessions){
@@ -108,23 +108,55 @@
     const items=rows.map(session=>{
       const title=session.sessionTitle||session.templateKey||'训练课程';
       const canCopy=canReceiveTraining&&['PLANNED','COMPLETED'].includes(session.status);
-      const canDelete=session.status==='PLANNED';
+      const canDelete=canReceiveTraining&&session.status==='PLANNED';
       return `<li data-timeline-session="${esc(session.id)}"><span class="member-timeline-mark ${String(session.status||'').toLowerCase()}" aria-hidden="true"></span><div class="member-timeline-content"><div class="member-timeline-row"><div><span class="member-session-status ${String(session.status||'').toLowerCase()}" data-session-status="${esc(session.status)}">${statusLabel(session.status)}</span><time datetime="${esc(session.sessionDate)}">${dateLabel(session.sessionDate)}</time><h3>${esc(title)}</h3><p>${esc(session.templateKey||'课程')}${session.levelSnapshot?` · ${esc(session.levelSnapshot)}`:''}</p></div><div class="member-timeline-actions"><button type="button" data-open-session-detail data-session-id="${esc(session.id)}" aria-label="查看 ${esc(title)} 课程详情">查看课程</button>${canCopy?`<button type="button" data-copy-session-to-member data-session-id="${esc(session.id)}" aria-label="将 ${esc(title)} 复制给会员">复制给会员</button>`:''}${canDelete?`<button type="button" class="member-session-delete-action" data-delete-planned-session data-session-id="${esc(session.id)}" aria-label="删除 ${esc(title)} 待训练课程">删除</button>`:''}</div></div>${canCopy?'<span class="member-copy-inline-status" data-member-copy-status role="status" aria-live="polite"></span>':''}</div></li>`;
     }).join('');
     return `<section class="member-timeline" data-member-timeline aria-labelledby="member-timeline-title" aria-busy="${timelineLoading}"><div class="member-section-heading"><div><h2 id="member-timeline-title">训练记录</h2><p>待训练、已完成与已取消的课程都保留在时间线上。</p></div></div><p class="member-copy-inline-status" data-member-copy-feedback role="status" aria-live="polite"></p><p class="member-timeline-feedback" data-member-timeline-feedback role="status" aria-live="polite"></p>${items?`<ol>${items}</ol>`:'<p class="member-state-note">还没有课程记录。</p>'}${timelineLoadError?'<p class="member-load-more-error" role="alert">更早的课程记录暂时无法读取，请重试。</p>':''}${timelineHasMore?`<button class="member-load-more" type="button" data-member-load-more ${timelineLoading?'disabled':''}>${timelineLoading?'正在加载…':'加载更早记录'}</button>`:''}</section>`;
   }
 
-  function renderMemberDetail(member,context,sessions){
+  function todayAction(member,context,sessions,todayPlans){
+    if(member.archivedAt||member.status!=='ACTIVE')return '';
+    const openButton=(session,label)=>`<button type="button" class="member-next-session" data-practice-open data-session-id="${esc(session.id)}">${esc(label)}</button>`;
+    if(todayPlans.length===1)return openButton(todayPlans[0],'继续今天的课');
+    if(todayPlans.length>1)return `<details class="member-today-choices"><summary class="member-next-session">继续今天的课</summary>${todayPlans.map(session=>openButton(session,session.sessionTitle||session.templateKey)).join('')}</details>`;
+    return `<a class="member-next-session" data-member-next-session href="${nextSessionHref(context)}">${sessions.length||context.lastCompletedSession?'编今天的课':'编第一节课'}</a>`;
+  }
+
+  function renderMemberDetail(member,context,sessions,practice,todayPlans){
     const archived=!!member.archivedAt;
-    return `<section class="member-center-page member-detail-page" data-member-center-page="detail"><a class="member-back-link" href="#/coach/members">返回会员训练</a><header class="member-detail-heading"><div><h1>${esc(member.displayName)}</h1><p>${archived?'已归档':statusLabel(member.status)}${member.trainingLevel?` · ${esc(member.trainingLevel)}`:''}</p></div><div class="member-detail-actions">${archived?`<button type="button" data-member-restore="${esc(member.id)}">恢复会员</button>`:`<button type="button" data-member-edit="${esc(member.id)}">编辑资料</button><button type="button" class="member-archive-action" data-member-archive="${esc(member.id)}">归档</button>`}</div></header>${contextMarkup(context)}${profileMarkup(member)}${timelineMarkup(sessions)}${formMarkup()}${archiveMarkup()}</section>`;
+    const last=context.lastCompletedSession;
+    const lastRecord=last?`<p>${dateLabel(last.sessionDate)} · ${esc(last.sessionTitle||last.templateKey)}</p>
+      ${window.V14MemberSessionUI.practiceMarkup(practice,3)}
+      <button type="button" class="member-record-link" data-practice-open data-session-id="${esc(last.id)}">查看完整记录</button>`:'<p data-member-recent-empty>暂无已完成训练</p>';
+    const manage=archived?`<button type="button" data-member-restore="${esc(member.id)}">恢复会员</button>`:
+      `<button type="button" class="member-archive-action" data-member-archive="${esc(member.id)}">归档</button>`;
+    return `<section class="member-center-page member-detail-page" data-member-center-page="detail">
+      <a class="member-back-link" href="#/coach/members">返回会员管理</a>
+      <header class="member-detail-heading"><div><h1>${esc(member.displayName)}</h1><p>${archived?'已归档':statusLabel(member.status)}${member.trainingLevel?' · '+esc(member.trainingLevel):''}</p></div>
+        <details class="member-more"><summary>更多操作</summary>${manage}</details></header>
+      <section class="member-last-practice" data-member-recent-context><h2>上次实练</h2>${lastRecord}${todayAction(member,context,sessions,todayPlans)}</section>
+      ${contextMarkup(context)}${profileMarkup(member)}${timelineMarkup(sessions)}${formMarkup()}${archiveMarkup()}</section>`;
   }
 
   function renderDetailShell(){
-    return `<section class="member-center-page member-detail-page" data-member-center-page="detail"><a class="member-back-link" href="#/coach/members">返回会员训练</a><div class="member-state-loading" data-member-loading>正在读取会员训练记录…</div>${formMarkup()}${archiveMarkup()}</section>`;
+    return `<section class="member-center-page member-detail-page" data-member-center-page="detail"><a class="member-back-link" href="#/coach/members">返回会员管理</a><div class="member-state-loading" data-member-loading>正在读取会员训练记录…</div>${formMarkup()}${archiveMarkup()}</section>`;
   }
 
   function loadSessions(memberId){
     return window.V14MemberAPI.listSessions(memberId,{limit:SESSION_PAGE_SIZE,offset:0});
+  }
+
+  async function todaySessions(memberId,firstPage){
+    const today=window.V14MemberSnapshots.localDate();
+    const matches=[];
+    let page=firstPage,offset=0;
+    for(;;){
+      matches.push(...page.filter(session=>session.status==='PLANNED'&&session.sessionDate===today));
+      if(page.length<SESSION_PAGE_SIZE||page[page.length-1].sessionDate<today)break;
+      offset+=page.length;
+      page=await window.V14MemberAPI.listSessions(memberId,{limit:SESSION_PAGE_SIZE,offset});
+    }
+    return matches;
   }
 
   async function loadDetail(root){
@@ -135,13 +167,14 @@
         window.V14MemberAPI.getMemberTrainingContext(memberId),
         loadSessions(memberId),
       ]);
+      const [practice,todayPlans]=await Promise.all([window.V14MemberSessionUI.lastPractice(context),todaySessions(memberId,sessions)]);
       if(version!==detailVersion||route?.page!=='member-detail'||route.memberId!==memberId)return;
       currentMember=member;currentContext=context;currentSessions=sessions;timelineHasMore=sessions.length===SESSION_PAGE_SIZE;timelineLoading=false;timelineLoadError=false;
-      root.innerHTML=renderMemberDetail(member,context,sessions);
+      root.innerHTML=renderMemberDetail(member,context,sessions,practice,todayPlans);
       bindDialogClose(root);
     }catch(error){
       if(version!==detailVersion)return;
-      const loading=root.querySelector('[data-member-loading]');
+      const loading=root.querySelector('[data-member-loading],[data-member-detail-error]')||root.querySelector('.member-detail-page');
       if(loading)loading.outerHTML=`<div class="member-state-error" data-member-detail-error role="alert">${error?.status===401?staffRecoveryMarkup():`<p>${error?.status===404?'没有找到这位会员。':'会员训练记录暂时无法读取。'}</p>`}<button type="button" data-member-detail-retry>重试</button></div>`;
     }
   }
@@ -450,7 +483,7 @@
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
     if(target.matches('[data-copy-session-to-member]')){void copyTrainingToMember(target,root);return;}
     if(target.matches('[data-delete-planned-session]')){void deletePlannedSession(target,root);return;}
-    if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
+    if(target.matches('[data-open-session-detail],[data-practice-open]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
   }
 
   function bind(routeValue,root,rerender){

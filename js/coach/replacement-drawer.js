@@ -49,6 +49,10 @@
     }
     if(grade&&name.startsWith(`${grade}｜`))name=name.slice(grade.length+1);
     if(row.family&&name.endsWith(`｜${row.family}`))name=name.slice(0,-row.family.length-1);
+    if(option.dataset.prepGroup){
+      return {id:row.id,name,pattern:[grade,option.dataset.prepEquipment].filter(Boolean).join(' · '),
+        detail:option.dataset.prepDetail,group:option.dataset.prepGroup,selected:row.selected,disabled:row.disabled};
+    }
     const state=row.selected?'当前动作':index===0?'优先候选':'合法候选';
     const pattern=[state,grade,row.family,row.role].filter(Boolean).join(' · ');
     const detail=[

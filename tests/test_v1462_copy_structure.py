@@ -24,7 +24,7 @@ def test_requested_modules_expose_copy_controls():
 
 def test_coach_payload_uses_prescription_and_tier_not_equipment_meta():
     coach=read('js/coach/session.js')
-    assert 'prescriptionForAction' in coach
+    assert 'plannedF111Prescription' in coach
     assert 'tierForAction' in coach
     assert 'prescription' in coach
     # the copy payload should no longer build meta from pattern/equipment

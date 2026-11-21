@@ -62,11 +62,7 @@
 
   function actionTrigger(ctx,slotKey){
     const slot=ctx.resolved?.slots?.find(item=>item.slotKey===slotKey)||{};
-    const label=SLOT_LABELS[slotKey]||slotKey;
-    const current=slot.name||'选择动作';
-    const groups=actionGroups(ctx,slotKey);
-    const count=groups.reduce((total,group)=>total+group.items.length,0);
-    return `<button type="button" class="f111-action-drawer-trigger" data-f111-action-drawer="${esc(slotKey)}" aria-haspopup="dialog"><span>${esc(label)}</span><b>${esc(current)}</b><i aria-hidden="true">⌄</i></button>`;
+    return `<button type="button" class="f111-replace-trigger" data-f111-action-drawer="${esc(slotKey)}" aria-haspopup="dialog" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
   }
 
   function stepper(active='select'){

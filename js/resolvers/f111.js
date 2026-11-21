@@ -52,7 +52,7 @@
       name:String(action.name||actionId||''),
       tier:String(tier||action.tier||''),
       grade:String(grade||action.supportGrade||action.grade||action.coreGrade||''),
-      prescription:String(prescription||''),
+      prescription:String(window.V14Composer?.f111Prescription(actionId,key)||prescription||''),
       source,
     };
   }
@@ -123,7 +123,7 @@
       level,
       title,
       summary,
-      main:{kind:'SLOT',content:slots},
+      main:{kind:'SLOT',content:window.V14Composer?.orderedSlots?.(slots)||slots},
       ...shared,
       source:{type:'PRESET',id:sessionId},
     };
@@ -177,7 +177,7 @@
       level,
       title,
       summary,
-      main:{kind:'SLOT',content:slots},
+      main:{kind:'SLOT',content:window.V14Composer?.orderedSlots?.(slots)||slots},
       prepContext,
       anatomyContext,
       conflictContext,

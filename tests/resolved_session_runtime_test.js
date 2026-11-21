@@ -130,7 +130,7 @@ assert.strictEqual(preset.familyId,'F111-06');
 assert.strictEqual(preset.level,'L3');
 assert.strictEqual(preset.main.kind,'SLOT');
 assert.strictEqual(preset.main.content.length,6);
-assert.deepStrictEqual(preset.main.content.map(slot=>slot.actionId),baselineIds);
+assert.deepStrictEqual(preset.main.content.map(slot=>slot.actionId),V14Composer.orderedSlots(presetSource.slots).map(slot=>slot.baselineId));
 assert(preset.main.content.every(slot=>slot.source==='baseline'));
 assert.deepStrictEqual(preset.resolvedSelections.map(x=>x.actionId),baselineIds);
 assert.strictEqual(preset.source.type,'PRESET');

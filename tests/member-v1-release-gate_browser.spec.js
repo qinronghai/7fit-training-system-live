@@ -135,6 +135,11 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(memberContext.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
   await expect(memberContext).toContainText('暂无已完成训练');
 
+  const displayedDoses={};
+  for(const key of ['CORE','C']){
+    displayedDoses[key]=await page.locator(`[data-composer-slot="${key}"] .composer-rx-note`).innerText();
+  }
+  await expect(page.locator('[data-save-member-session]')).toContainText('林同学');
   await page.locator('[data-save-member-session]').click();
   const saveDialog = page.locator('[data-member-save-dialog]');
   const firstMemberSelect = saveDialog.locator('[data-member-save-select]');
@@ -143,6 +148,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await saveDialog.locator('[data-member-save-submit]').click();
   await expect(saveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · PLANNED');
   const firstSnapshot = state.snapshots[0];
+  for(const key of ['CORE','C'])expect(firstSnapshot.items.find(item=>item.slotKey===key).plannedPrescriptionSnapshot.rawText).toBe(displayedDoses[key]);
   const firstSessionId = firstSnapshot.session.id;
   expect(firstSnapshot.session.status).toBe('PLANNED');
   expect(firstSnapshot.session.memberId).toBe(MEMBER_ID);
@@ -150,7 +156,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
 
   await page.locator(`.member-first-context a[href="#/coach/members/${MEMBER_ID}"]`).click();
   await expect(page.locator(`[data-timeline-session="${firstSessionId}"] [data-session-status="PLANNED"]`)).toBeVisible();
-  await page.locator(`[data-open-session-detail][data-session-id="${firstSessionId}"]`).click();
+  await page.getByRole('button',{name:'继续今天的课'}).click();
   const sessionDetail = page.locator('[data-member-session-detail]');
   const rows = sessionDetail.locator('[data-session-item]');
   await expect(rows.first()).toBeVisible();
@@ -167,6 +173,9 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   }
   expect(targetRow, 'a saved primary action should have a same-pattern replacement').toBeTruthy();
   const plannedItemId = await targetRow.getAttribute('data-session-item');
+  const otherRow=sessionDetail.locator(`[data-session-item]:not([data-session-item="${plannedItemId}"])`).filter({has:page.locator('[data-session-replacement]')}).last();
+  await otherRow.locator('.member-session-actual summary').click();
+  await otherRow.locator('[data-session-actual="sets"]').fill('2');
   const replacement = targetRow.locator('[data-session-replacement]');
   await replacement.selectOption(replacementActionId);
   const replacementName = await page.evaluate(actionId => window.V14_DATA.actions[actionId].name, replacementActionId);
@@ -193,8 +202,14 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await sessionDetail.locator('[data-session-detail-close]').click();
   await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
 
+  await page.goto('/#/library');
+  await page.locator('#mobile-nav [data-area="members"]').click();
+  await page.locator(`[data-member-open="${MEMBER_ID}"]`).click();
   await page.reload();
-  await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
+  const lastPractice=page.locator('[data-member-recent-context]');
+  await expect(lastPractice).toContainText(replacementName);
+  await expect(lastPractice).toContainText('3 组 × 10 次 × 20 kg');
+  await expect(lastPractice.getByText('编今天的课')).toBeInViewport();
 
   const plannedActionBeforeMetadataChange = structuredClone(plannedBefore.plannedActionSnapshot);
   const performedActionBeforeMetadataChange = structuredClone(completedItem.performedActionSnapshot);
@@ -219,6 +234,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(sessionDetail).toContainText(`计划：${plannedActionBeforeMetadataChange.name}`);
   await expect(sessionDetail).toContainText(`实际：${performedActionBeforeMetadataChange.name}`);
   const reopenedItem=sessionDetail.locator('.member-session-item').filter({hasText:'实际：'+replacementName});
+  await expect(sessionDetail.getByText(/2 组 · 重量未记录/).first()).toBeVisible();
   for(const actual of ['3 组','10 次','20 kg']) await expect(reopenedItem).toContainText(actual);
   await expect(sessionDetail).not.toContainText('目录更新后的计划动作');
   await expect(sessionDetail).not.toContainText('目录更新后的实际动作');
@@ -230,6 +246,9 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   const refreshedContext = page.locator('[data-member-first-context]');
   await expect(refreshedContext).toContainText(firstSnapshot.session.sessionTitle);
   await expect(refreshedContext).toContainText(replacementName);
+  const lastPrepIds=state.itemsBySession[firstSessionId].filter(item=>item.phase==='PREP'&&item.completed).map(item=>item.performedActionId);
+  const signals=await page.evaluate(()=>window.V14CoachModules.ComposerView.buildComposerSessionDetails(window.V14CoachModules.ComposerView.composerContext(window.V14Router.parseHash(location.hash))).prepContext.recentPrepActionIds);
+  expect(signals).toEqual(lastPrepIds);
   expect(state.calls.filter(call => call.action === 'get-member-training-context').length).toBeGreaterThanOrEqual(4);
 
   await page.locator('[data-f111-mode-drawer="upper"]').click();
@@ -316,9 +335,59 @@ test('Member-first context shows all recent actions including a late-sorting per
 
   await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   const context = page.locator('[data-member-first-context]');
-  const recentActionList = context.locator('.member-first-context-columns section').first().locator('li');
+  await context.getByText('上次实练',{exact:true}).click();
+  const recentActionList = context.locator('.member-practice-items li');
   await expect(context).toContainText('F111 验收课');
   await expect(recentActionList).toHaveCount(actualNames.length);
   await expect(context).toContainText('Z Actual Replacement');
-  await expect(context).not.toContainText('Original Planned Squat');
+  await expect(context.getByText('计划：Original Planned Squat')).toBeHidden();
+});
+
+test('F111 isolates member drafts and preserves distance units through execution', async ({ page }) => {
+  const state = await installReleaseApi(page);
+  const anotherId = 'e9000000-0000-4000-8000-000000000009';
+  state.members.push(
+    { id: MEMBER_ID, displayName: '测试会员甲', trainingLevel: 'L3', status: 'ACTIVE', trainingProfile: { movementConstraints: ['暂停过顶负重'], preferredEquipment: ['哑铃'] } },
+    { id: anotherId, displayName: '测试会员乙', trainingLevel: 'L3', status: 'ACTIVE' },
+  );
+  const route = '/#/coach/f111?level=L3&lower=hinge&upper=horizontal_pull&memberId=';
+  const heading = page.locator('#member-first-context-title');
+  const upper = page.locator('[data-composer-slot="B"] .composer-slot-select');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(route + MEMBER_ID);
+  await expect(heading).toContainText('测试会员甲');
+  await expect(page.locator('[data-member-context-profile]')).toContainText('暂停过顶负重');
+  await expect(page.locator('[data-member-context-profile]')).toContainText('哑铃');
+  const initial = await upper.inputValue();
+  const alternate = await upper.evaluate(select => [...select.options].find(option => !option.disabled && option.value !== select.value)?.value);
+  expect(alternate).toBeTruthy();
+  await upper.selectOption(alternate);
+  await page.goto(route + anotherId);
+  await expect(heading).toContainText('测试会员乙');
+  await expect(upper).toHaveValue(initial);
+  await page.goto(route + MEMBER_ID);
+  await expect(heading).toContainText('测试会员甲');
+  await expect(upper).toHaveValue(alternate);
+
+  const core = page.locator('[data-composer-slot="CORE"]');
+  await expect(core.locator('.composer-rx-note')).toContainText('米');
+  await page.locator('[data-save-member-session]').click();
+  const save = page.locator('[data-member-save-dialog]');
+  await expect(save.locator('[data-member-save-select]')).toHaveValue(MEMBER_ID);
+  await save.locator('[data-member-save-submit]').click();
+  await expect(save.locator('[data-member-save-status]')).toContainText('测试会员甲');
+  const snapshot = state.snapshots[0];
+  expect(snapshot.items.filter(item=>item.phase!=='PREP').map(item=>item.slotKey)).toEqual(['A','B','D2','D1','C','CORE']);
+  const coreId = snapshot.items.find(item=>item.slotKey==='CORE').id;
+  await save.locator('[data-member-save-cancel]').click();
+  await page.goto('/#/coach/members/' + MEMBER_ID);
+  await page.getByRole('button', { name: '继续今天的课' }).click();
+  const detail = page.locator('[data-member-session-detail]');
+  const row = detail.locator(`[data-session-item="${coreId}"]`);
+  await row.locator('.member-session-actual summary').click();
+  await expect(row.getByLabel('距离（米）')).toBeVisible();
+  await row.getByLabel('距离（米）').fill('15');
+  await detail.locator('[data-session-complete]').click();
+  await expect(detail.getByText(/^15 米(?: · 重量未记录)?$/)).toBeVisible();
+  expect(state.itemsBySession[snapshot.session.id].find(item=>item.id===coreId).reps).toBe('15 米');
 });

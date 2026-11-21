@@ -333,5 +333,26 @@
       slotOptions:{A:Aopts,B:Bopts,C:Copts,D1:D1opts,D2:D2opts,CORE:COREopts}
     };
   }
-  window.V14Composer={combinations,defaultCoreDemand,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,supportMetaFor,supportDecision,coreMetaFor,coreCandidates,coreFallbackCandidates,coreDecision,trunkLoadAudit,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
+  const FORMAL_ORDER=['A','B','D2','D1','C','CORE'];
+  function orderedSlots(slots){
+    const rank=slot=>{
+      const key=(slot.label||slot.slotName||slot.key).split('｜')[0];
+      return FORMAL_ORDER.indexOf(key);
+    };
+    return slots.slice().sort((a,b)=>rank(a)-rank(b));
+  }
+
+  function draftKey(familyId,level,memberId){
+    const base=`${familyId}-${level}`;
+    return memberId?`${base}@${encodeURIComponent(memberId)}`:base;
+  }
+
+  function f111Prescription(actionId,key){
+    const canonical=({SUPPORT:'C','2':'D1','3':'D2'})[key]||key;
+    const exerciseDose=canonical==='CORE'?D().coreMeta?.[actionId]?.recommendedDose:
+      canonical==='C'?D().supportMeta?.[actionId]?.recommendedDose:'';
+    return exerciseDose||cfg().prescriptionBySlot?.[canonical]||'';
+  }
+
+  window.V14Composer={draftKey,f111Prescription,orderedSlots,combinations,defaultCoreDemand,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,supportMetaFor,supportDecision,coreMetaFor,coreCandidates,coreFallbackCandidates,coreDecision,trunkLoadAudit,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
 })();

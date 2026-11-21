@@ -16,8 +16,8 @@
     });
     return {opts,result,recipeId,level,lowerMode};
   }
-  function sessionCard(sessionId,slot){
-    const data=D(),view=data.sessionViews[sessionId]||{},actionId=window.V14State.getSelection(sessionId,slot.slotKey),a=data.actions[actionId]||{};
+  function sessionCard(sessionId,slot,resolvedSlot){
+    const data=D(),view=data.sessionViews[sessionId]||{},actionId=resolvedSlot?.actionId||window.V14State.getSelection(sessionId,slot.slotKey),a=data.actions[actionId]||{};
     const lowerContext=lowerAssistancePresetOptions(sessionId,slot,actionId);
     let opts=lowerContext?.opts||(view.slotOptions?.[slot.slotKey]||[]);
     if(!opts.length)opts=[{id:slot.baselineId,label:(data.actions[slot.baselineId]?.name||slot.baselineId),kind:'当前'}];
@@ -36,7 +36,7 @@
     const browse=lowerContext?`<a class="lower-assistance-browse" href="#/system/patterns?focus=aux-lower&template=f111&sessionId=${encodeURIComponent(sessionId)}&slotKey=${encodeURIComponent(slot.slotKey)}&level=${encodeURIComponent(lowerContext.level)}&lower=${encodeURIComponent(lowerContext.lowerMode)}">查看全部下肢辅助与容量动作 →</a>`:'';
     const drawer=lowerContext?`<button type="button" class="lower-assistance-drawer-open" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="下肢辅助候选" data-replacement-select=".session-swap" data-replacement-title="D1｜下肢辅助替换" data-replacement-subtitle="${esc(lowerContext.level)} · 仅显示当前课程通过 Gate 的候选">打开替换抽屉</button>`:'';
     const whyHtml=why?`<small class="lower-assistance-why">推荐依据：${esc(why)}</small>`:'';
-    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div><div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${drawer}${whyHtml}${browse}${quick}</div></article>`;
+    return `<article class="session-slot" data-slot="${esc(slot.slotKey)}"><div class="slot-kicker">${esc(slot.slotName)}</div><h3>${esc(a.name||actionId)}</h3><div class="slot-meta"><span>${esc(a.tier||a.supportGrade||a.coreGrade||'未标')}</span><span>${esc(a.pattern||'')}</span><span>${esc(a.equipment||'')}</span></div>${resolvedSlot?.prescription?`<p class="composer-rx-note">${esc(resolvedSlot.prescription)}</p>`:''}<div class="slot-actions"><a href="${detailRoute}">查看动作</a><select class="session-swap" data-session="${esc(sessionId)}" data-slot-key="${esc(slot.slotKey)}">${options}</select>${drawer}${whyHtml}${browse}${quick}</div></article>`;
   }
   function windowText(slotKey,resolved){
     if(slotKey==='A'||slotKey==='B'){const w=resolved.windows.main;return `推荐 ${w.recommended}｜常规 ${(w.normal||[]).join('–')}${(w.expanded||[]).length?`｜可退阶 ${(w.expanded||[]).join(' / ')}`:''}`;}
@@ -52,17 +52,24 @@
     const grade=slot.tier||slot.grade||'';
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(slot.actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(slot.actionId)}`:`#/library?focus=${encodeURIComponent(slot.actionId)}`;
     const tierNote=slot.tierNote?`<small class="composer-tier-note">${esc(slot.tierNote)}</small>`:'';
-    const rawPrescription=slot.prescriptionOverride||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:ctx.level})||'';
+    const savedSlot=ctx.resolvedSession?.main?.content?.find(item=>item.key===slot.slotKey);
+    const rawPrescription=special&&savedSlot?window.V14ModuleCopy.plannedF111Prescription(savedSlot,ctx.level):slot.prescriptionOverride||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:ctx.level})||'';
     const prescription=window.V14ModuleCopy?.memberPrescription?.(rawPrescription)||rawPrescription;
     const rx=prescription?`<small class="composer-rx-note">${esc(prescription)}</small>`:'';
-    const supportAlternatives=slot.slotKey==='C'?(slot.alternatives||[]).map(id=>data.actions?.[id]?.name||id).slice(0,3).join('、'):'';
-    const supportInfo=slot.slotKey==='C'?`<div class="composer-support-info"><small>推荐依据：${esc(slot.supportReason||'保持支撑任务多样性')}</small><small>会员感受：${esc(slot.memberFeeling||'保持呼吸，动作不变形')}</small><small>疲劳：${esc(slot.fatigueCost==='low'?'低':slot.fatigueCost==='high'?'高':'中')} · ${esc(slot.recommendedDose||'按动作质量调整')}</small>${slot.recentNote?`<small>多样性：${esc(slot.recentNote)}</small>`:''}${supportAlternatives?`<small>同目的替代：${esc(supportAlternatives)}</small>`:''}${slot.needsConfirmation?`<small class="composer-support-warning">需确认：${esc((slot.tradeoffs||[]).join('；'))}</small>`:''}</div>`:'';
-    const coreAlternatives=slot.slotKey==='CORE'?(slot.coreAlternatives||[]).map(id=>data.actions?.[id]?.name||id).slice(0,3).join('、'):'';
-    const coreInfo=slot.slotKey==='CORE'?`<div class="composer-core-info"><small>推荐依据：${esc(slot.coreReason||'按当前等级与核心任务匹配')}</small><small>核心分支：${esc(slot.coreBranch||slot.branch||'核心控制')}</small><small>会员感受：${esc(slot.coreMemberFeeling||slot.memberFeeling||'保持呼吸，动作不变形')}</small><small>疲劳：${esc(slot.coreFatigueCost==='low'?'低':slot.coreFatigueCost==='high'?'高':'中')} · ${esc(slot.coreRecommendedDose||slot.recommendedDose||'按动作质量调整')}</small>${slot.historyNote?`<small>多样性：${esc(slot.historyNote)}</small>`:''}${coreAlternatives?`<small>同任务替代：${esc(coreAlternatives)}</small>`:''}${slot.coreNeedsConfirmation?`<small class="composer-core-warning">需确认：${esc((slot.coreTradeoffs||[]).join('；'))}</small>`:''}</div>`:'';
+    const core=slot.slotKey==='CORE';
+    const reason=core?slot.coreReason:slot.supportReason;
+    const feeling=core?slot.coreMemberFeeling:slot.memberFeeling;
+    const fatigue=core?slot.coreFatigueCost:slot.fatigueCost;
+    const history=core?slot.historyNote:slot.recentNote;
+    const reasons=[['推荐依据',reason],['核心分支',core&&slot.coreBranch],['会员感受',feeling],['疲劳',({low:'低',medium:'中',moderate:'中',high:'高'})[fatigue]||fatigue],['轮换',history]];
+    const rationale=special?`<details class="slot-rationale"><summary>编排依据</summary><dl>${reasons.filter(([,value])=>value).map(([label,value])=>`<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></details>`:'';
+    const needsConfirmation=core?slot.coreNeedsConfirmation:slot.needsConfirmation;
+    const tradeoffs=core?slot.coreTradeoffs:slot.tradeoffs;
+    const warning=special&&needsConfirmation?`<p class="composer-core-warning">需确认：${esc(tradeoffs?.join('；')||'请核对当前动作是否适合会员')}</p>`:'';
     const replace=special
       ?(M.F111ComposeUI?.actionTrigger?.(ctx,slot.slotKey)||'')
       :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="动作候选" data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
-    return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}" data-action-detail-href="${esc(detailRoute)}" tabindex="0" aria-label="查看${esc(slot.name||'动作')}详情"><div class="composer-slot-head"><div><span>${esc(slot.slotName||slot.slotKey)}</span><b>${esc(grade||'辅助')}</b></div>${replace}</div>${controls}<div class="f111-slot-main"><h3>${esc(slot.name||'暂无候选')}</h3></div>${supportInfo}${coreInfo}${rx}${tierNote}<select class="composer-slot-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select></article>`;
+    return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}" data-action-detail-href="${esc(detailRoute)}" tabindex="0" aria-label="查看${esc(slot.name||'动作')}详情"><div class="composer-slot-head"><div><span>${esc(slot.slotName||slot.slotKey)}</span>${special?'':`<b>${esc(grade||'辅助')}</b>`}</div>${replace}</div>${controls}<div class="f111-slot-main"><h3>${esc(slot.name||'暂无候选')}</h3></div>${rx}${warning}${rationale}${special?'':tierNote}<select class="composer-slot-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select></article>`;
   }
   M.Slot={sessionCard,composerCard,windowText};
 })();

@@ -7,13 +7,13 @@ for(const file of [
   'data/system-data.js','data/anatomy-data.js','js/prep-grade.js','js/anatomy.js','js/prep-resolver.js',
   'js/composer.js','js/resolved-session.js','js/conflict-core.js','js/conflict-service.js',
   'js/conflict-plugins/f111.js','js/conflict.js','js/template-resolver.js','js/resolvers/f111.js',
-  'js/coach/common.js','js/coach/f111-compose-ui.js','js/coach/slot.js','js/coach/session.js','js/coach/composer-view.js'
+  'js/module-copy.js','js/coach/common.js','js/coach/f111-compose-ui.js','js/coach/slot.js','js/coach/session.js','js/coach/composer-view.js'
 ]) load(file);
 
 const M=window.V14CoachModules;
 window.V14State={getComposerSelections:()=>({})};
 window.V14RecoveryMatcher={match:()=>({items:[]}),render:()=>'',copyItems:()=>[]};
-window.V14ModuleCopy={register:()=>{},button:()=>''};
+Object.assign(window.V14ModuleCopy,{register:()=>{},button:()=>''});
 M.Foam={composerFoamItems:()=>[]};
 M.Prep={
   composerPrepHtml:()=>'<section class="f111-prep-section"></section>',

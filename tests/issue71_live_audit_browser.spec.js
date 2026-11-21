@@ -50,6 +50,13 @@ test('Issue 71: F111 PREP uses whole-card detail navigation without a separate d
     expect(bodyText).not.toContain('\\n');
     await expectNoOverflow(page,width);
     await card.click();
+    const reason=page.locator('[data-prep-reason]');
+    await expect(page.getByRole('heading',{name:'为什么这节课安排它'})).toBeVisible();
+    await expect(reason).toContainText(/主项|辅项|全身升温|补充本节/);
+    await expect(reason).toBeInViewport();
+    await page.reload();
+    await expect(reason).toBeVisible();
+    await expect(page.getByRole('link',{name:'返回本节课'})).toHaveAttribute('href','#/coach/f111/f111-01/l1');
     await expect(page).toHaveURL(new RegExp(detailRoute.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
   }
   await expectClean(diag);

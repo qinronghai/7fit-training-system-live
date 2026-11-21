@@ -72,7 +72,11 @@
     return state.ensureSession('f111',sessionKey,metadata);
   }
 
-  function recentPrepSignals(level){
+  function recentPrepSignals(level,performedPrep){
+    if(Array.isArray(performedPrep)){
+      const byId=new Map(Object.values(D().warmupDetails||{}).map(w=>[w.actionId,w]));
+      return {recentPrepActionIds:performedPrep,recentPrepFamilies:performedPrep.map(id=>R().movementFamilyFor(byId.get(id)?.prepId)).filter(Boolean)};
+    }
     const state=S(),recent=window.V15RecentActions,data=D();
     if(!state?.listRecentActions||!recent?.context?.f111Prep)return {recentPrepActionIds:[],recentPrepFamilies:[]};
     const items=[];
@@ -112,7 +116,15 @@
     const data=D(),session=data.sessions?.[sessionId];
     const ids=Array.isArray(selectedIds)&&selectedIds.length?selectedIds:(window.V14State?.getSessionSelections?.(sessionId)||[]);
     const mainActionIds=(session?.slots||[]).flatMap((slot,index)=>/__([AB])$/.test(slot.slotKey)?[ids[index]]:[]).filter(Boolean);
-    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds:ids,...recentPrepSignals(level)});
+    const defaults=S()?.getSession?.('f111',sessionId)?.input?.useDefaultPrep;
+    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds:ids,...(defaults?{}:recentPrepSignals(level))});
+  }
+
+  function resetPreset(sessionId,recipeId,level){
+    window.V14State.resetSession(sessionId);
+    const metadata=presetMetadata(sessionId,recipeId,level);
+    metadata.input.useDefaultPrep=true;
+    ensureStateSession(sessionId,metadata);
   }
 
   function resolvePresetPrep(sessionId,recipeId,level,selectedIds=[]){
@@ -124,7 +136,7 @@
     return R().contextFromF111({
       level:ctx.level,recipeId:'',mainActionIds,formalActionIds,
       mainPatterns:[ctx.resolved?.lower?.name,ctx.resolved?.upper?.name].filter(Boolean),
-      ...recentPrepSignals(ctx.level),
+      ...recentPrepSignals(ctx.level,ctx.performedPrep),
     });
   }
 
@@ -145,6 +157,8 @@
   }
 
   function applySelection(select,level){
+    const key=select.dataset.prepSession;
+    if(S()?.getSession?.('f111',key)?.input?.useDefaultPrep)S().patchSession('f111',key,{input:{useDefaultPrep:false}});
     recordSelection(select,level);
     setPrepSelection(select.dataset.prepSession,select.dataset.prepSlot,select.value);
   }
@@ -152,7 +166,7 @@
   function sourceLabel(source){return source==='manual'?'手动选择':'系统推荐';}
   function slotOptions(slot){
     if(!slot.candidates?.length)return '<option value="">暂无合法候选</option>';
-    return slot.candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''}>${esc(candidate.prepGrade||'PREP')}｜${esc(candidate.name)}</option>`).join('');
+    return slot.candidates.map(candidate=>`<option value="${esc(candidate.actionId)}" ${candidate.actionId===slot.actionId?'selected':''} data-prep-group="${esc(candidate.replacementGroup||'')}" data-prep-detail="${esc(candidate.replacementDetail||'')}" data-prep-equipment="${esc(D().warmupDetails?.[candidate.prepId]?.equipment||'')}">${esc(candidate.prepGrade||'PREP')}｜${esc(candidate.name)}</option>`).join('');
   }
 
   function orderedSlots(resolved){
@@ -165,16 +179,26 @@
 
   function resolvedItems(resolved){
     return orderedSlots(resolved).filter(slot=>slot.actionId).map(slot=>({
-      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.why,matchReason:slot.matchReason,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,movementFamily:slot.movementFamily,role:slot.role,route:slot.route,targetPatterns:slot.targetPatterns,regions:slot.regions,caLevel:slot.caLevel,
+      slotKey:slot.slotKey,name:slot.name,grade:slot.prepGrade,prescription:slot.prescription,why:slot.matchReason||slot.why,matchReason:slot.matchReason,source:slot.source,prepId:slot.prepId,actionId:slot.actionId,sequencePhase:slot.sequencePhase,movementFamily:slot.movementFamily,role:slot.role,route:slot.route,targetPatterns:slot.targetPatterns,regions:slot.regions,caLevel:slot.caLevel,
     }));
   }
 
   function resolvedGrid(resolved,sessionKey,replaceInMeta=false){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=orderedSlots(resolved).map(slot=>{
-      const detailHref=slot.prepId?`#/system/prep?focus=${encodeURIComponent(slot.prepId)}`:'';
+      const context=resolved.context;
+      const query=new URLSearchParams({focus:slot.prepId});
+      if(context?.mainActionIds?.length){
+        query.set('slot',slot.slotKey);
+        query.set('main',context.mainActionIds.join(','));
+        query.set('assist',context.formalActionIds.filter(id=>!context.mainActionIds.includes(id)).join(','));
+        query.set('level',context.level);
+        if(typeof location!=='undefined')query.set('from',location.hash);
+      }
+      const detailHref=slot.prepId?'#/system/prep?'+query.toString():'';
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
-      const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
+      const hasAlternative=slot.candidates?.some(candidate=>candidate.actionId!==slot.actionId);
+      const replace=hasAlternative?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-replacement-select=".prep-slot-select" data-replacement-title="替换${esc(slot.name||'热身动作')}" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const prescription=slot.prescription||record?.prescription||'';
       const recentNotice=slot.recentlyUsed?'<small class="prep-recent-note">近期用过，可按需替换</small>':'';
@@ -183,7 +207,7 @@
       const role=slot.role?`<small>${esc(slot.role)}</small>`:'';
       const meta=[role,recentNotice,metaReplace].filter(Boolean).join('');
       const metaMarkup=meta?`<div class="prep-card-meta">${meta}</div>`:'';
-      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${metaMarkup}<div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
+      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${metaMarkup}<div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${hasAlternative?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
     const timeNote=Number.isFinite(resolved?.estimatedMinutes)
       ?`<small class="prep-time-note">动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，按动作质量调整，不做到疲劳。</small>`:'';
@@ -223,6 +247,6 @@
 
   M.Prep={
     legacyMatchedWarmups,matchedWarmups,warmupCards,composerPrepItems,composerPrepHtml,
-    resolvePresetPrep,resolveComposerPrep,setPrepSelection,applySelection,recordSelection,orderedSlots,resolvedItems,resolvedGrid,
+    resetPreset,resolvePresetPrep,resolveComposerPrep,setPrepSelection,applySelection,recordSelection,orderedSlots,resolvedItems,resolvedGrid,
   };
 })();

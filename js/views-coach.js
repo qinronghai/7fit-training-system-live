@@ -53,7 +53,7 @@
       if(card.dataset.detailBound==='1')return;
       card.dataset.detailBound='1';
       const navigate=event=>{
-        if(event.target.closest('button,select,a,input,textarea,[data-replacement-drawer],[data-f111-action-drawer]'))return;
+        if(event.target.closest('button,select,a,input,textarea,details,[data-replacement-drawer],[data-f111-action-drawer]'))return;
         const href=card.dataset.prepDetailHref||card.dataset.actionDetailHref;
         if(href)location.hash=href;
       };
@@ -166,7 +166,7 @@
     const coachCopy=document.getElementById('copy-coach-session');if(coachCopy)coachCopy.addEventListener('click',()=>doCopy('coach'));
     const memberCopy=document.getElementById('copy-member-session');if(memberCopy)memberCopy.addEventListener('click',()=>doCopy('member'));
     M.MemberSelector?.bind?.(root,()=>Session.resolveResolvedSession(sessionId,route.recipeId,route.level),()=>route.query?.memberId||null,()=>Session.buildSessionDetails(sessionId,route.recipeId,route.level));
-    const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{window.V14State.resetSession(sessionId);rerender();});
+    const reset=document.getElementById('reset-session');if(reset)reset.addEventListener('click',()=>{M.Prep.resetPreset(sessionId,route.recipeId,route.level);rerender();});
     M.F111ActionDrawer?.bind?.(root,null,rerender);
     bindPostCardio(rerender);
     bindReplacementDrawer();

@@ -4,8 +4,8 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   let dialog=null,current=null,members=[],previousFocus=null,busy=false,excludedMemberId='',selectionVersion=0,memberSearchVersion=0,memberSearchTimer=null,directoryLoading=false;
 
-  function buttonMarkup(){
-    return '<button class="f111-save-member-trigger" type="button" data-save-member-session>保存到会员</button>';
+  function buttonMarkup(name,disabled=false){
+    return `<button class="f111-save-member-trigger" type="button" data-save-member-session${disabled?' disabled':''}>保存到${esc(name||'会员')}</button>`;
   }
 
   function ensureDialog(){
@@ -214,7 +214,7 @@
           setStatus('上次提交结果未确认。重试会复用同一训练课编号，不会重复创建。','warn');
         }
       }else{
-        submitButton.disabled=busy;submitButton.textContent='保存训练课';
+        submitButton.disabled=busy;submitButton.textContent=`保存到 ${selectedMember.displayName}`;
         setStatus('确认会员后保存；课程会先进入“待训练”。','info');
       }
     }catch(_){if(version===selectionVersion){submitButton.disabled=true;setStatus('课程信息暂不可用，请关闭窗口后重试。','error');}}

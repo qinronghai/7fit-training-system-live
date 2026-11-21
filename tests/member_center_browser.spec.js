@@ -169,12 +169,13 @@ async function mockMemberApi(page, state = {}) {
       if (state.contextWait) await state.contextWait;
       if (state.failContext) return respond({ error: state.unauthorizedContext ? 'unauthorized' : 'network_unavailable' }, state.unauthorizedContext ? 401 : 503);
       const value = Object.hasOwn(state, 'context') ? state.context : context;
-      return respond({ context: { ...value, memberId: url.searchParams.get('memberId') } });
+      const id=url.searchParams.get('memberId');
+      return respond({ context: { ...value, memberId:id, lastCompletedSession:id===MEMBER_ID?value.lastCompletedSession:null } });
     }
     if (action === 'list-sessions') {
       const offset = Number(url.searchParams.get('offset')) || 0;
       const limit = Number(url.searchParams.get('limit')) || 30;
-      return respond({ sessions: state.sessions.slice(offset, offset + limit) });
+      return respond({ sessions: state.sessions.filter(session=>session.memberId===url.searchParams.get('memberId')).slice(offset, offset + limit) });
     }
     if (action === 'get-session') {
       const requestedId = url.searchParams.get('sessionId');
@@ -240,7 +241,7 @@ async function mockMemberApi(page, state = {}) {
 test('Member Center searches active members on the server and switches to the archived list', async ({ page }) => {
   const state = await mockMemberApi(page);
   await page.goto('/#/coach/members');
-  await expect(page.getByRole('heading', { name: '会员训练' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '会员管理' })).toBeVisible();
   await expect(page.getByText('林同学')).toBeVisible();
   await expect(page.getByText('王同学')).toHaveCount(0);
 
@@ -324,8 +325,8 @@ test('a late member detail response cannot replace the page after navigating awa
 test('Coach Center exposes the Member Training entry in its existing workflow', async ({ page }) => {
   await mockMemberApi(page);
   await page.goto('/#/coach');
-  await expect(page.getByRole('heading', { name: '会员训练记录' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /打开会员训练/ })).toHaveAttribute('href', '#/coach/members');
+  await expect(page.getByRole('heading', { name: '会员管理' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /打开会员管理/ })).toHaveAttribute('href', '#/coach/members');
 });
 
 test('Member Center creates, edits, archives, and restores a member through explicit actions', async ({ page }) => {
@@ -349,14 +350,17 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await page.locator('[data-member-form-submit]').click();
   await expect(page.getByRole('heading', { name: '赵同学（已更新）' })).toBeVisible();
 
+  await page.locator('.member-more summary').click();
   await page.locator('[data-member-archive]').click();
   const archiveDialog = page.locator('[data-member-archive-dialog]');
   await expect(archiveDialog).toBeVisible();
   await archiveDialog.locator('[data-member-archive-confirm]').click();
+  await expect(page.locator('[data-member-restore]')).toBeAttached();
+  await page.locator('.member-more summary').click();
   await expect(page.locator('[data-member-restore]')).toBeVisible();
   expect(state.calls.some(call => call.action === 'archive-member')).toBeTruthy();
   await page.locator('[data-member-restore]').click();
-  await expect(page.locator('[data-member-archive]')).toBeVisible();
+  await expect(page.locator('[data-member-archive]')).toBeAttached();
   expect(state.calls.some(call => call.action === 'restore-member')).toBeTruthy();
 });
 
@@ -365,6 +369,8 @@ test('a delayed archive response cannot rerender Coach Home over another area', 
   const archiveWait = new Promise(resolve => { releaseArchive = resolve; });
   const state = await mockMemberApi(page, { mutationWaits: { 'archive-member': archiveWait } });
   await page.goto('/#/coach/members');
+  await page.locator(`[data-member-open="${MEMBER_ID}"]`).click();
+  await page.locator('.member-more summary').click();
   await page.locator(`[data-member-archive="${MEMBER_ID}"]`).click();
   const dialog = page.locator('[data-member-archive-dialog]');
   await dialog.locator('[data-member-archive-confirm]').click();
@@ -385,6 +391,8 @@ test('a delayed restore response cannot rerender Coach Home over another area', 
   const state = await mockMemberApi(page, { mutationWaits: { 'restore-member': restoreWait } });
   await page.goto('/#/coach/members');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await page.locator(`[data-member-open="${ARCHIVED_ID}"]`).click();
+  await page.locator('.member-more summary').click();
   await page.locator(`[data-member-restore="${ARCHIVED_ID}"]`).click();
   await expect.poll(() => state.calls.filter(call => call.action === 'restore-member')).toHaveLength(1);
   await page.goto('/#/library');
@@ -495,7 +503,7 @@ async function expectMemberPlanCopied(page, state, source, sessionId, expectedGe
   await expect(page.locator('[data-member-copy-feedback]')).toContainText('会员版训练文字已复制');
   await expect(page.locator('[data-member-copy-feedback]')).not.toContainText('新增待训练记录');
   await expect(page.locator('[data-timeline-session]')).toHaveCount(state.sessions.length);
-  expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(expectedGetSessionCalls);
+  expect(state.calls.filter(call => call.action === 'get-session' && call.query.sessionId === sessionId)).toHaveLength(expectedGetSessionCalls + Number(sessionId===context.lastCompletedSession.id));
   expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(0);
   expect(state.savedSnapshots).toHaveLength(0);
 }
@@ -895,7 +903,8 @@ test('Member-first F111 reloads context after leaving Coach for another area', a
 
   await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   await expect(page.locator('[data-member-first-context]')).toContainText('刚更新的训练记录');
-  await expect(page.locator('[data-member-first-context]')).toContainText('刚更新的动作');
+  await expect(page.locator('[data-member-first-context]')).toContainText('杠铃前蹲');
+  await expect(page.locator('[data-member-first-context]')).not.toContainText('刚更新的动作');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
 
@@ -989,3 +998,48 @@ test('Member detail and course sheet fit the required responsive viewport matrix
     await page.screenshot({ path: testInfo.outputPath(`member-list-${viewport.width}x${viewport.height}.png`), fullPage: true });
   }
 });
+
+for(const width of [390,1280]){
+  test(`Member navigation, search and today's courses at ${width}px`,async({page})=>{
+    await page.setViewportSize({width,height:844});
+    await page.goto('/#/library');
+    const today=await page.evaluate(()=>window.V14MemberSnapshots.localDate());
+    const first={...sessionSummaries[0],sessionDate:today};
+    const second={...first,id:'e2000000-0000-4000-8000-000000000008',sessionTitle:'今天第二节'};
+    await mockMemberApi(page,{sessions:[first,second,...sessionSummaries.slice(1)]});
+    const nav=page.locator(width===390?'#mobile-nav':'#app-sidebar');
+    await nav.locator('[data-area="members"]').click();
+    await page.locator('[data-member-search]').fill('林');
+    const memberLink=page.locator('[data-member-row]').first();
+    await expect(memberLink).toContainText('林同学');
+    await memberLink.focus();
+    await page.keyboard.press('Enter');
+    await page.reload();
+    await expect(nav.locator('[aria-current="page"]')).toHaveAttribute('data-area','members');
+    const todayButton=page.getByText('继续今天的课',{exact:true});
+    await expect(todayButton).toBeInViewport();
+    await todayButton.click();
+    await page.getByRole('button',{name:'今天第二节',exact:true}).click();
+    await expect(page.locator('dialog[open] h3')).toHaveText('今天第二节');
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button',{name:'今天第二节',exact:true})).toBeFocused();
+    await page.locator('.member-back-link').click();
+    await page.locator('[data-member-search]').fill('林');
+    await page.locator('[data-member-row]').first().click();
+    await page.locator('.member-back-link').click();
+    await expect(page.locator('[data-member-search]')).toHaveValue('林');
+    await page.locator('[data-member-filter="ARCHIVED"]').click();
+    await page.locator('[data-member-search]').fill('');
+    await page.locator('[data-member-row]').first().click();
+    await expect(page.locator('.member-last-practice')).toBeVisible();
+    await expect(page.locator('.member-next-session')).toHaveCount(0);
+    await page.locator('.member-back-link').click();
+    await expect(page.locator('[data-member-filter="ARCHIVED"]')).toHaveAttribute('aria-pressed','true');
+    if(width===390){
+      await expect(nav.locator('a')).toHaveCount(5);
+      await page.getByRole('button',{name:'打开导航'}).click();
+      await page.locator('#mobile-navigation [data-area="rules"]').click();
+      await expect(page).toHaveURL(/#\/rules\/venue/);
+    }
+  });
+}

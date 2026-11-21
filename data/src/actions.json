@@ -5397,6 +5397,174 @@
       "impact": "低冲击",
       "loadFamily": "支撑稳定",
       "isSupport": true
+    },
+    "warmup_wall_slide": {
+      "id": "warmup_wall_slide",
+      "name": "墙面前臂滑墙",
+      "pattern": "肩胛上旋与肩关节活动",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "徒手 / 墙面",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_band_open": {
+      "id": "warmup_band_open",
+      "name": "站姿轻弹力带水平拉开",
+      "pattern": "肩胛控制与上背激活",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "轻弹力带",
+      "equipmentId": "eq-band",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_wall_scap_push": {
+      "id": "warmup_wall_scap_push",
+      "name": "靠墙肩胛推离",
+      "pattern": "肩胛控制与推前激活",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "徒手 / 墙面",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_wall_hinge": {
+      "id": "warmup_wall_hinge",
+      "name": "臀触墙髋铰链预习",
+      "pattern": "髋铰链动作模式复习",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "徒手 / 墙面",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_supported_split": {
+      "id": "warmup_supported_split",
+      "name": "扶墙前后站姿重心转移",
+      "pattern": "分腿动作模式 / 承重与髋膝控制",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "徒手 / 墙面",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_quarter_squat_reach": {
+      "id": "warmup_quarter_squat_reach",
+      "name": "浅蹲起身配合前伸",
+      "pattern": "浅蹲与上肢前伸",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_hinge_arm_sweep": {
+      "id": "warmup_hinge_arm_sweep",
+      "name": "站姿折髋配合手臂后摆",
+      "pattern": "折髋和肩带协调",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
+    },
+    "warmup_step_reach": {
+      "id": "warmup_step_reach",
+      "name": "后点步配合交替上举",
+      "pattern": "交替承重和上举",
+      "tier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 体能热身大厅",
+      "equipment": "自重 / 场地",
+      "equipmentId": "eq-mat",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "训练准备",
+      "isSupport": false,
+      "isCore": false,
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "prepGrades": [
+        "P1"
+      ],
+      "warmupEligible": true
     }
   },
   "actionDetails": {
@@ -9741,6 +9909,118 @@
         "退阶 ID": "—",
         "同级替代 ID": "—",
         "进阶 ID": "—"
+      }
+    },
+    "warmup_wall_slide": {
+      "summary": "墙面前臂滑墙 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_wall_slide",
+        "来源动作模式": "肩胛上旋与肩关节活动",
+        "来源层级": "PREP P1",
+        "器械": "徒手 / 墙面",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "练习肩胛随手臂向上转动，准备过顶推举和下拉回放。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "前臂轻贴墙向上滑，手臂上举时保持肋骨稳定。"
+      }
+    },
+    "warmup_band_open": {
+      "summary": "站姿轻弹力带水平拉开 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_band_open",
+        "来源动作模式": "肩胛控制与上背激活",
+        "来源层级": "PREP P1",
+        "器械": "轻弹力带",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "预习划船类动作中肩胛的前伸和收回。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "双手胸前握带，轻拉至舒适范围，回程让肩胛自然前移。"
+      }
+    },
+    "warmup_wall_scap_push": {
+      "summary": "靠墙肩胛推离 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_wall_scap_push",
+        "来源动作模式": "肩胛控制与推前激活",
+        "来源层级": "PREP P1",
+        "器械": "徒手 / 墙面",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "用低负荷支撑练习肩胛控制，为水平推开始前做好准备。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "双手推墙，手肘微弯，肩胛沿胸廓向前滑动后慢慢回位。"
+      }
+    },
+    "warmup_wall_hinge": {
+      "summary": "臀触墙髋铰链预习 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_wall_hinge",
+        "来源动作模式": "髋铰链动作模式复习",
+        "来源层级": "PREP P1",
+        "器械": "徒手 / 墙面",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "用墙面触点确认折髋方向，并建立躯干和骨盆控制。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "背对墙小半步，轻屈膝，把臀向后送至轻触墙。"
+      }
+    },
+    "warmup_supported_split": {
+      "summary": "扶墙前后站姿重心转移 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_supported_split",
+        "来源动作模式": "分腿动作模式 / 承重与髋膝控制",
+        "来源层级": "PREP P1",
+        "器械": "徒手 / 墙面",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "在小幅度下排练分腿蹲和单腿动作中的承重转换。",
+        "来源处方 / RPE": "1组 × 5–6次/侧",
+        "教练口令": "双脚前后站稳，手指扶墙，慢慢把重心送向前脚再回中。"
+      }
+    },
+    "warmup_quarter_squat_reach": {
+      "summary": "浅蹲起身配合前伸 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_quarter_squat_reach",
+        "来源动作模式": "全身整合 / 浅蹲与上肢前伸",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "把下肢屈伸和上肢前伸接起来，低负荷预习力量训练节奏。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "用浅蹲幅度，起身时双手向前伸，保持身体重心平稳。"
+      }
+    },
+    "warmup_hinge_arm_sweep": {
+      "summary": "站姿折髋配合手臂后摆 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_hinge_arm_sweep",
+        "来源动作模式": "全身整合 / 折髋和肩带协调",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "以连续小幅度折髋连接下肢后侧和肩带活动。",
+        "来源处方 / RPE": "1组 × 6–8次",
+        "教练口令": "折髋时手臂自然后摆，伸髋回到站姿时放松手臂。"
+      }
+    },
+    "warmup_step_reach": {
+      "summary": "后点步配合交替上举 · 二楼热身",
+      "fields": {
+        "标准 ID": "warmup_step_reach",
+        "来源动作模式": "全身整合 / 交替承重和上举",
+        "来源层级": "PREP P1",
+        "器械": "自重 / 场地",
+        "来源区域": "2F 体能热身大厅",
+        "V8 场馆路由": "2F 专用",
+        "训练目标": "让交替承重和手臂上举在低负荷下配合，连接单腿动作和过顶动作。",
+        "来源处方 / RPE": "1组 × 5–6次/侧",
+        "教练口令": "一脚向后点地，对侧手臂抬至舒适高度，然后换边。"
       }
     }
   }

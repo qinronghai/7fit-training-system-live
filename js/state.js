@@ -592,8 +592,9 @@
     return {familyId,level,resolverVersion:F111_RESOLVER_VERSION,input:{mode:'preset',recipeId:familyId,level}};
   }
   function v14ComposerMetadata(compositionKey){
-    const match=String(compositionKey||'').match(/-(L[1-4])$/),level=match?.[1]||'';
-    const familyId=level?compositionKey.slice(0,-3):compositionKey;
+    const base=String(compositionKey||'').split('@')[0];
+    const match=base.match(/-(L[1-4])$/),level=match?.[1]||'';
+    const familyId=level?base.slice(0,-3):base;
     return {familyId,level:level||'L1',resolverVersion:F111_RESOLVER_VERSION,input:{mode:'composer',legacyCompositionKey:compositionKey,...(level?{level}:{})}};
   }
   function ensureV14Preset(sessionId){

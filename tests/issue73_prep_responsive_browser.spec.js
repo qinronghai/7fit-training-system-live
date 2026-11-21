@@ -75,6 +75,22 @@ test('Issue 73: PREP replacement drawer applies a legal choice and survives relo
   await expectClean(diag);
 });
 
+test('F111 pulldown warm-up offers replacements that preserve the overhead preparation',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/#/coach/f111?level=L2&lower=squat&upper=vertical_pull');
+  const card=page.locator('[data-prep-slot-card="MOB-U"]');
+  await card.getByRole('button',{name:/替换/}).click();
+  const drawer=page.locator('#f111-action-drawer');
+  const group=drawer.locator('.f111-drawer-group').filter({has:page.getByRole('heading',{name:'延续当前目的'})});
+  const choice=group.getByRole('button',{name:/泡沫轴仰卧肩屈上举/});
+  await expect(choice).toContainText('高位下拉');
+  await expect(drawer.getByText(/^(猫牛式|弹力带肩关节前后绕环)$/)).toHaveCount(0);
+  await choice.click();
+  await expect(card.locator('.prep-card-action')).toContainText('泡沫轴仰卧肩屈上举');
+  await expect(drawer).toBeHidden();
+  await expect(card.locator('.prep-replace-trigger')).toBeFocused();
+});
+
 test('Issue 73: action-library desktop filters adapt without fixed 130px columns or overflow',async({page})=>{
   const diag=diagnostics(page);
   for(const width of [1080,1280,1440]){

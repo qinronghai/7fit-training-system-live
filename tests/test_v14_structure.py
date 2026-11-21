@@ -24,7 +24,7 @@ def test_app_shell_has_single_main_outlet():
 
 def test_primary_navigation_is_role_oriented_not_version_oriented():
     labels = [a.get_text(' ', strip=True) for a in soup().select('[data-primary-nav]')]
-    assert labels == ['编课中心', '训练体系', '编排规则', '动作库', '系统维护']
+    assert labels == ['编课中心', '会员管理', '训练体系', '编排规则', '动作库', '系统维护']
 
 def test_library_has_search_and_filter_mount_points():
     text = (ROOT / 'js' / 'views-library.js').read_text(encoding='utf-8')
@@ -69,7 +69,7 @@ def test_mobile_navigation_has_five_primary_destinations():
     s = soup()
     links = s.select('#mobile-nav a')
     assert len(links) == 5
-    assert [a.get_text(' ', strip=True) for a in links] == ['编课','体系','规则','动作库','更多']
+    assert [a.get_text(' ', strip=True) for a in links] == ['编课','会员','体系','动作库','更多']
 
 
 def test_f111_home_uses_the_composer_without_the_preset_landing():
