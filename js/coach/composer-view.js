@@ -36,11 +36,12 @@
     const memberContext=memberContextMemberId===q.memberId&&memberContextState?.status==='ready'?memberContextState.context:null;
     const input={mode:'composer',level,lowerMode,upperMode,coreDemand,recentContext:memberContext,...flags};
     const probeSession=window.V15TemplateResolver.resolve('f111',input);
-    const stateKey=`${probeSession.familyId}-${level}`;
+    const stateKey=window.V14Composer.draftKey(probeSession.familyId,level,q.memberId);
     const selections=window.V14State.getComposerSelections(stateKey);
     const resolvedSession=window.V15TemplateResolver.resolve('f111',{...input,selections});
     const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,recentContext:memberContext,...flags});
-    return {level,lowerMode,upperMode,coreDemand,explicitCoreDemand:q.core,stateKey,resolved,resolvedSession,memberId:q.memberId||null,memberContext,...flags};
+    const performedPrep=memberContext?memberContextState.practice.filter(item=>item.completed&&item.phase==='PREP').map(item=>item.performedActionId||item.plannedActionId).filter(Boolean):undefined;
+    return {level,lowerMode,upperMode,coreDemand,performedPrep,explicitCoreDemand:q.core,stateKey,resolved,resolvedSession,memberId:q.memberId||null,memberContext,...flags};
   }
 
   function sessionAgoLabel(sessionsAgo){
@@ -65,11 +66,11 @@
         content=`<p class="member-first-context-state">暂无已完成训练。待训练和已取消的课程不会计入训练上下文。</p><a class="member-first-context-empty-return" href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a>`;
       }else{
         const patterns=Array.isArray(context.recentPatterns)?context.recentPatterns:[];
-        const actions=Array.isArray(context.recentActions)?context.recentActions:[];
+
         const lastPatterns=patterns.filter(item=>item.sessionsAgo===0).slice(0,4);
-        const lastActions=actions.filter(item=>item.sessionsAgo===0);
+
         const allPatterns=patterns.slice(0,6);
-        content=`<div class="member-first-context-last"><div><span>最近完成 · ${esc(String(last.sessionDate||'日期未记录').replaceAll('-','.'))}</span><strong>${esc(last.sessionTitle||last.templateKey||'训练课程')}</strong></div><a href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a></div><div class="member-first-context-columns"><section><h3>上次训练动作</h3>${lastActions.length?`<ul>${lastActions.map(item=>`<li>${esc(item.actionNameSnapshot||item.actionId)}</li>`).join('')}</ul>`:'<p>暂无主要动作记录</p>'}</section><section><h3>近 3 节训练模式</h3>${allPatterns.length?`<ul>${allPatterns.map(item=>`<li><span>${esc(patternLabel(item.pattern))}</span><b>${esc(sessionAgoLabel(item.sessionsAgo))}</b></li>`).join('')}</ul>`:'<p>暂无主要训练模式记录</p>'}</section>${lastPatterns.length?`<p class="member-first-context-latest-patterns">上次训练：${lastPatterns.map(item=>esc(patternLabel(item.pattern))).join(' · ')}</p>`:''}</div>`;
+        content=`<div class="member-first-context-last"><div><span>最近完成 · ${esc(String(last.sessionDate||'日期未记录').replaceAll('-','.'))}</span><strong>${esc(last.sessionTitle||last.templateKey||'训练课程')}</strong></div><a href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a></div><details class="member-reference"><summary>上次实练</summary>${window.V14MemberSessionUI.practiceMarkup(state.practice)}<div class="member-first-context-columns"><section><h3>近 3 节训练模式</h3>${allPatterns.length?`<ul>${allPatterns.map(item=>`<li><span>${esc(patternLabel(item.pattern))}</span><b>${esc(sessionAgoLabel(item.sessionsAgo))}</b></li>`).join('')}</ul>`:'<p>暂无主要训练模式记录</p>'}</section>${lastPatterns.length?`<p class="member-first-context-latest-patterns">上次训练：${lastPatterns.map(item=>esc(patternLabel(item.pattern))).join(' · ')}</p>`:''}</div></details>`;
       }
     }
     return content;
@@ -82,7 +83,11 @@
     const member=state?.member,context=state?.context;
     const name=member?.displayName||context?.displayName||'会员';
     const title=`正在为${name} · ${ctx.level} 编排训练`;
-    return `<section class="member-first-context" data-member-first-context aria-labelledby="member-first-context-title"><div class="member-first-context-heading"><div><span>会员训练上下文 · 仅作编排提示</span><h2 id="member-first-context-title">${esc(title)}</h2><p>训练记录帮助回看近期安排，动作选择仍由教练决定。</p></div></div><div class="member-first-context-live" data-member-context-live aria-live="polite" aria-atomic="true">${memberContextContentMarkup(route,state)}</div></section>`;
+    const profile=member?.trainingProfile;
+    const constraints=Array.isArray(profile?.movementConstraints)?profile.movementConstraints:[];
+    const equipment=Array.isArray(profile?.preferredEquipment)?profile.preferredEquipment:[];
+    const profileInfo=`${constraints.length?`<p class="member-composer-constraints"><strong>动作限制</strong> · ${esc(constraints.join('、'))}</p>`:''}${equipment.length?`<p class="member-composer-equipment"><strong>常用器械</strong> · ${esc(equipment.join('、'))}</p>`:''}`;
+    return `<section class="member-first-context" data-member-first-context aria-labelledby="member-first-context-title"><div class="member-first-context-heading"><div><h2 id="member-first-context-title">${esc(title)}</h2></div></div><div data-member-context-profile>${profileInfo}</div><div class="member-first-context-live" data-member-context-live aria-live="polite" aria-atomic="true">${memberContextContentMarkup(route,state)}</div></section>`;
   }
 
   function updateMemberContextPanel(route,root){
@@ -101,6 +106,8 @@
     const panel=root.querySelector('[data-member-first-context]');
     const template=document.createElement('template');
     template.innerHTML=html;
+    const profile=template.content.querySelector('[data-member-first-context] [data-member-context-profile]');
+    if(profile)panel.querySelector('[data-member-context-profile]')?.replaceWith(profile);
     template.content.querySelector('[data-member-first-context]').remove();
     while(panel.nextSibling)panel.nextSibling.remove();
     panel.after(template.content);
@@ -126,9 +133,10 @@
       const requestId=memberContextRequest;
       memberContextMemberId=memberId;
       memberContextState={status:'loading'};
-      Promise.all([window.V14MemberAPI.getMember(memberId),window.V14MemberAPI.getMemberTrainingContext(memberId)]).then(([member,context])=>{
+      Promise.all([window.V14MemberAPI.getMember(memberId),window.V14MemberAPI.getMemberTrainingContext(memberId)]).then(async ([member,context])=>{
+        const practice=await window.V14MemberSessionUI.lastPractice(context);
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
-        memberContextState={status:'ready',member,context};
+        memberContextState={status:'ready',member,context,practice};
         if(typeof rerender==='function')rerender(refreshCourseBesideMemberPanel);
         updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
       }).catch(error=>{
@@ -185,14 +193,14 @@
     const resolvedSession=ctx.resolvedSession||window.V15TemplateResolver.resolve('f111',{mode:'composer',level:ctx.level,lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,coreDemand:ctx.coreDemand,selections:window.V14State?.getComposerSelections?.(ctx.stateKey)||{},includeExpandedMain:!!ctx.includeExpandedMain,includeExpandedSupport:!!ctx.includeExpandedSupport,includeExpandedCore:!!ctx.includeExpandedCore});
     const summary=resolvedSession.anatomyContext||{primary:[],secondary:[],stabilizers:[]};
     const result=resolvedSession.conflictContext||{issues:[]},details=buildComposerSessionDetails({...ctx,resolvedSession});
-    return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',...details,slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:window.V14ModuleCopy?.prescriptionForF111Slot?.(x.key)||x.prescription||window.V14ModuleCopy?.prescriptionForAction?.(x.actionId,{level:ctx.level})||''})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};
+    return {brand:'7Fit',sessionTitle:`自由组合｜${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,recipeName:`${ctx.resolved.lower.name} + ${ctx.resolved.upper.name}`,level:ctx.level,summary:'F111 自由组合｜一下肢 + 一上肢 + 一支撑',...details,slots:resolvedSession.main.content.map(x=>({slot:x.label,name:x.name,tier:x.tier,grade:x.grade,prescription:window.V14ModuleCopy.plannedF111Prescription(x,ctx.level)})),muscles:{primary:summary.primary.slice(0,6),secondary:summary.secondary.slice(0,6),stabilizers:summary.stabilizers.slice(0,6)},conflicts:(result.issues||[]).map(x=>`${x.title}：${x.text}`)};
   }
 
   function strengthSection(ctx){
     const slotsByKey=new Map(ctx.resolved.slots.map(slot=>[slot.slotKey,slot]));
     const slots=['A','B','D2','D1','C','CORE'].map(key=>slotsByKey.get(key)).filter(Boolean);
     const cardHtml=key=>slots.filter(slot=>slot.slotKey===key).map(slot=>M.Slot.composerCard(ctx,slot,'')).join('');
-    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>各级剂量相同；组数、次数见卡片。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div></section>`;
+    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>按卡片上的组数、时间、距离或次数执行。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div></section>`;
   }
 
   function anatomySection(ctx){
@@ -205,8 +213,9 @@
     return M.SavedSessionsUI?.compactControls?.(route)||'';
   }
 
-  function courseOutputSection(){
-    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}${M.MemberSelector?.buttonMarkup?.()||''}</div></section>`;
+  function courseOutputSection(ctx){
+    const name=ctx.memberContext?.displayName;
+    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}${M.MemberSelector?.buttonMarkup?.(name,Boolean(ctx.memberId&&!ctx.memberContext))||''}</div></section>`;
   }
 
   function recoverySection(recovery){
@@ -215,7 +224,7 @@
 
   function render(route){
     const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
-    return memberContextMarkup(route)+courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+recoverySection(recovery)+(M.PostCardio?M.PostCardio.render(ctx.stateKey):'')+courseOutputSection();
+    return memberContextMarkup(route)+courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+recoverySection(recovery)+(M.PostCardio?M.PostCardio.render(ctx.stateKey):'')+courseOutputSection(ctx);
   }
 
   M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,buildComposerSessionDetails,render,bindMemberContext,resetMemberContextBinding};

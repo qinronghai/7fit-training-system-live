@@ -56,6 +56,9 @@
     const canonicalKey=({SUPPORT:'C','2':'D1','3':'D2'})[key]||key;
     return clean(D().composer?.prescriptionBySlot?.[canonicalKey]);
   }
+  function plannedF111Prescription(slot,level){
+    return window.V14Composer?.f111Prescription(slot.actionId,slot.key)||slot.prescription||prescriptionForF111Slot(slot.key)||prescriptionForAction(slot.actionId,{level});
+  }
   function tierForAction(actionId){
     const a=D().actions?.[actionId]||{};
     const t=clean(a.tier||a.v11StandardTier);
@@ -147,5 +150,5 @@
     });
   }
 
-  window.V14ModuleCopy={rirFromRpe,prescriptionForAction,prescriptionForF111Slot,tierForAction,memberPrescription,formatAction,formatPrep,formatFoam,formatPattern,formatTenPatterns,formatKnowledge,register,button,bind,copyRegistered,copyText};
+  window.V14ModuleCopy={rirFromRpe,prescriptionForAction,prescriptionForF111Slot,plannedF111Prescription,tierForAction,memberPrescription,formatAction,formatPrep,formatFoam,formatPattern,formatTenPatterns,formatKnowledge,register,button,bind,copyRegistered,copyText};
 })();

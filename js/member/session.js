@@ -8,10 +8,14 @@
 
   function dateLabel(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)?value.replaceAll('-','.'):esc(value||'日期未记录');}
   function statusLabel(status){return ({PLANNED:'待训练',COMPLETED:'已完成',CANCELLED:'已取消'})[status]||'状态未知';}
+  function doseUnit(dose){
+    return /秒/.test(dose||'')?'秒':/米/.test(dose||'')?'米':'';
+  }
+  function unitLabel(unit){return ({秒:'时间（秒）',米:'距离（米）'})[unit]||'次数';}
   function actualSummary(item){
     return [
       item.sets!==null&&item.sets!==undefined?`${item.sets} 组`:null,
-      item.reps!==null&&item.reps!==undefined&&item.reps!==''?`${item.reps} 次`:null,
+      item.reps!==null&&item.reps!==undefined&&item.reps!==''?(/(?:秒|米|次)(?:\s*\/\s*侧)?$/.test(String(item.reps))?String(item.reps):`${item.reps} 次`):null,
       item.loadKg!==null&&item.loadKg!==undefined?`${item.loadKg} kg`:null,
       item.rir!==null&&item.rir!==undefined?`RIR ${item.rir}`:null,
       item.rpe!==null&&item.rpe!==undefined?`RPE ${item.rpe}`:null,
@@ -109,7 +113,7 @@
 
   function actualField(item,key,label,{type='text',step,max,min,inputmode}={}){
     const id=`session-${item.id}-${key}`;
-    return `<label for="${esc(id)}">${label}<input id="${esc(id)}" type="${type}" data-session-actual="${key}"${type==='number'?' min="'+min+'" max="'+max+'" step="'+step+'"':''}${inputmode?` inputmode="${inputmode}"`:''}${type==='text'?' maxlength="80"':''}></label>`;
+    return `<label for="${esc(id)}"><span${key==='reps'?' data-session-dose-label':''}>${label}</span><input id="${esc(id)}" type="${type}" data-session-actual="${key}"${type==='number'?' min="'+min+'" max="'+max+'" step="'+step+'"':''}${inputmode?` inputmode="${inputmode}"`:''}${type==='text'?' maxlength="80"':''}></label>`;
   }
 
   function executionItemMarkup(item,index){
@@ -119,20 +123,41 @@
       ?`<label class="member-session-replacement">${prep?'热身替换':'临场替换'}（可选）<select ${prep?'data-session-prep-replacement':'data-session-replacement'} aria-label="${esc(plannedName(item))} ${prep?'热身':'临场'}替换（可选）"><option value="">按计划：${esc(plannedName(item))}</option>${options}</select></label>`
       :`<p class="member-session-no-replacements">${prep?'没有找到符合此热身槽位规则的替换动作':'没有找到同训练模式的可选动作'}，仍可按计划完成。</p>`;
     const plannedPrescription=item.plannedPrescriptionSnapshot?.rawText;
+    const unit=doseUnit(plannedPrescription);
     const plannedPrescriptionMarkup=plannedPrescription?`<p class="member-session-planned-prescription" data-session-planned-prescription>计划处方：${esc(plannedPrescription)}</p>`:'';
-    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}"><div class="member-session-execution-heading"><div><span>${esc(itemPhaseLabel(item,index))}</span><strong>计划：${esc(plannedName(item))}</strong></div></div>${plannedPrescriptionMarkup}${replacement}<details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps','次数')}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
+    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}"><div class="member-session-execution-heading"><div><span>${esc(itemPhaseLabel(item,index))}</span><strong>计划：${esc(plannedName(item))}</strong></div></div>${plannedPrescriptionMarkup}${replacement}<details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps',unitLabel(unit))}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
+  }
+
+  function actualItemMarkup(item,compact=false){
+    const recorded=item.completed===true;
+    const name=recorded?performedName(item):'实练明细未记录';
+    const changed=recorded&&item.performedActionId&&item.performedActionId!==item.plannedActionId;
+    const amount=actualSummary(item);
+    const equipment=item.performedActionSnapshot?.equipment||item.plannedActionSnapshot?.equipment||'';
+    const missingLoad=recorded&&item.loadKg==null&&(amount||/杠铃|哑铃|壶铃|配重|器械|绳索/.test(equipment));
+    const metrics=[amount||'实练明细未记录',missingLoad?'重量未记录':''].filter(Boolean).join(' · ');
+    const plan=item.plannedPrescriptionSnapshot?.rawText;
+    const original=`<details class="member-original"><summary>原计划</summary><p>计划：${esc(plannedName(item))}${plan?' · '+esc(plan):''}</p></details>`;
+    return `<li class="member-session-item"><strong>${esc(changed?'实际：'+name:name)}</strong>${recorded?`<p>${esc(metrics)}</p>`:''}${compact&&!changed?'':original}${item.note?`<small>${esc(item.note)}</small>`:''}</li>`;
+  }
+
+  async function lastPractice(context){
+    const id=context?.lastCompletedSession?.id;
+    if(!id)return [];
+    const {session,items}=await window.V14MemberAPI.getSession(id);
+    if(session?.id!==id||session.memberId!==context.memberId||session.status!=='COMPLETED')throw new Error('课程记录已变更');
+    return (items||[]).slice().sort((a,b)=>a.sortOrder-b.sortOrder);
+  }
+
+  function practiceMarkup(items,limit=items.length){
+    const rows=items.filter(item=>item.completed===true&&item.phase!=='PREP').slice(0,limit);
+    return rows.length?`<ul class="member-practice-items">${rows.map(item=>actualItemMarkup(item,true)).join('')}</ul>`:'<p>实练明细未记录</p>';
   }
 
   function readOnlyItemMarkup(item,session){
-    const completed=session.status==='COMPLETED';
-    const plan=plannedName(item),actual=performedName(item);
-    const changed=completed&&item.performedActionId&&item.plannedActionId&&item.performedActionId!==item.plannedActionId;
-    const prescription=completed?(item.performedPrescription||item.plannedPrescriptionSnapshot):(item.plannedPrescriptionSnapshot||item.performedPrescription);
-    const amount=actualSummary(item)||prescription?.rawText||'训练处方未记录';
-    const actionText=completed
-      ?changed?`计划：${plan} · 实际：${actual}`:`按计划完成：${actual}`
-      :session.status==='CANCELLED'?`原计划：${plan}`:`计划：${plan}`;
-    return `<li class="member-session-item"><div><strong>${esc(actionText)}</strong><span>${esc(itemPhaseLabel(item,item.sortOrder||0))}</span></div><p>${esc(amount)}</p>${item.note?`<small>${esc(item.note)}</small>`:''}</li>`;
+    if(session.status==='COMPLETED')return actualItemMarkup(item);
+    const amount=item.plannedPrescriptionSnapshot?.rawText||'训练处方未记录';
+    return `<li class="member-session-item"><div><strong>${session.status==='CANCELLED'?'原计划':'计划'}：${esc(plannedName(item))}</strong><span>${esc(itemPhaseLabel(item,item.sortOrder||0))}</span></div><p>${esc(amount)}</p></li>`;
   }
 
   function executionActions(){
@@ -157,22 +182,23 @@
   function renderSession(data){
     currentSession=data?.session||{};
     currentItems=Array.isArray(data?.items)?data.items.slice().sort((a,b)=>(a.sortOrder??0)-(b.sortOrder??0)):[];
+    const editable=currentSession.status==='PLANNED'&&window.V14CoachModules.MemberCenter.canCopySessionToCurrentMember();
     const details=memberDetails(),prepItems=currentItems.filter(item=>item.phase==='PREP'),mainItems=currentItems.filter(item=>item.phase!=='PREP');
     const summary=`${dateLabel(currentSession.sessionDate)} · ${statusLabel(currentSession.status)}`;
     dialog.querySelector('[data-session-detail-subtitle]').textContent=summary;
     const foamRows=(Array.isArray(details.foam)?details.foam:[]).map(item=>`<li><strong>${esc(item.name||'泡沫轴动作')}</strong>${item.prescription?`<span>${esc(item.prescription)}</span>`:''}</li>`).join('');
     const prepRows=prepItems.map(executionItemMarkup).join('')||((details.warmups||[]).map(item=>`<li class="member-session-item"><div><strong>${esc(item.name||'热身动作')}</strong><span>${esc(item.role||'课前热身')}</span></div><p>${esc(item.prescription||'剂量未记录')}</p></li>`).join(''));
-    const prepFallback=prepRows?`<ol class="${currentSession.status==='PLANNED'?'member-session-execution-list':'member-session-items'}">${currentSession.status==='PLANNED'?prepRows:prepItems.map(item=>readOnlyItemMarkup(item,currentSession)).join('')||prepRows}</ol>`:'<p class="member-state-note">此历史记录未保存热身动作快照。</p>';
+    const prepFallback=prepRows?`<ol class="${editable?'member-session-execution-list':'member-session-items'}">${editable?prepRows:prepItems.map(item=>readOnlyItemMarkup(item,currentSession)).join('')||prepRows}</ol>`:'<p class="member-state-note">此历史记录未保存热身动作快照。</p>';
     const prepSection=`<section class="member-session-section" data-member-session-prep><h4>课前准备 · 热身</h4>${foamRows?`<div class="member-session-foam"><b>泡沫轴放松</b><ul>${foamRows}</ul></div>`:''}${prepSectionLabel(prepItems,details)}${prepFallback}</section>`;
     const mainRows=mainItems.length
-      ?currentSession.status==='PLANNED'?`<ol class="member-session-execution-list">${mainItems.map(executionItemMarkup).join('')}</ol>`:`<ol class="member-session-items">${mainItems.map(item=>readOnlyItemMarkup(item,currentSession)).join('')}</ol>`
+      ?editable?`<ol class="member-session-execution-list">${mainItems.map(executionItemMarkup).join('')}</ol>`:`<ol class="member-session-items">${mainItems.map(item=>readOnlyItemMarkup(item,currentSession)).join('')}</ol>`
       :'<p class="member-state-note">这节课没有主要训练动作记录。</p>';
     const trainingSection=`<section class="member-session-section"><h4>主要训练</h4>${mainRows}</section>`;
     const recoverySource=Array.isArray(details.recoveryDetails)&&details.recoveryDetails.length?details.recoveryDetails:Array.isArray(details.recovery)?details.recovery.map((text,index)=>({id:`recovery-${index}`,name:String(text)})):[];
     const recoveryRows=recoverySource.map(item=>`<li><strong>${esc(item.name||'训练后拉伸')}</strong>${item.prescription?`<span>${esc(item.prescription)}</span>`:''}${item.regionLabel?`<small>${esc(item.regionLabel)}</small>`:''}</li>`).join('');
     const recoverySection=`<section class="member-session-section" data-member-session-recovery><h4>训练后恢复 · 拉伸</h4>${recoveryRows?`<ul class="member-session-recovery-list">${recoveryRows}</ul>`:'<p class="member-state-note">此历史记录未保存训练后拉伸快照。</p>'}</section>`;
-    const actions=currentSession.status==='PLANNED'?executionActions():readOnlyActions();
-    const content=currentSession.status==='PLANNED'?`<form data-session-execution novalidate>${prepSection}${trainingSection}${recoverySection}${actions}</form>`:`${prepSection}${trainingSection}${recoverySection}${actions}`;
+    const actions=editable?executionActions():readOnlyActions();
+    const content=editable?`<form data-session-execution novalidate>${prepSection}${trainingSection}${recoverySection}${actions}</form>`:`${prepSection}${trainingSection}${recoverySection}${actions}`;
     dialog.querySelector('[data-session-detail-content]').innerHTML=`<div class="member-session-summary"><h3>${esc(currentSession.sessionTitle||currentSession.templateKey||'训练课程')}</h3><p>${esc(currentSession.templateKey||'课程')} · ${esc(currentSession.levelSnapshot||'等级未记录')}</p>${currentSession.coachNote?`<p>${esc(currentSession.coachNote)}</p>`:''}</div>${content}<div class="member-session-mutation-error" data-session-mutation-error role="alert" hidden></div>`;
   }
 
@@ -206,6 +232,12 @@
     });
     dialog.addEventListener('change',event=>{
       if(event.target.matches('[data-session-prep-replacement]'))refreshPrepReplacementOptions();
+      if(event.target.matches('[data-session-prep-replacement],[data-session-replacement]')){
+        const row=event.target.closest('[data-session-item]');
+        const item=currentItems.find(entry=>entry.id===row?.dataset.sessionItem);
+        const label=row?.querySelector('[data-session-dose-label]');
+        if(item&&label)label.textContent=unitLabel(executionUnit(item,event.target.value));
+      }
     });
     dialog.addEventListener('submit',event=>{
       const form=event.target.closest('[data-session-execution]');
@@ -248,6 +280,13 @@
     if(submit)submit.textContent=busy?'正在保存…':'完成本节课';
   }
 
+  function executionUnit(item,replacementId){
+    if(!replacementId)return doseUnit(item.plannedPrescriptionSnapshot?.rawText);
+    const dose=item.phase==='PREP'?prepReplacementCandidates(item).find(candidate=>candidate.actionId===replacementId)?.prescription:
+      window.V14Composer?.f111Prescription?.(replacementId,item.slotKey);
+    return doseUnit(dose);
+  }
+
   function executionPatches(form){
     const patches=[];
     for(const row of form.querySelectorAll('[data-session-item]')){
@@ -265,7 +304,9 @@
       for(const key of ['sets','reps','loadKg','rir','rpe','note']){
         const input=row.querySelector(`[data-session-actual="${key}"]`),value=input?.value.trim()||'';
         if(!value)continue;
-        patch[key]=key==='reps'||key==='note'?value:Number(value);
+        const unit=key==='reps'?executionUnit(original,select?.value):'';
+        patch[key]=key==='reps'&&unit&&/^\d+(?:\.\d+)?$/.test(value)?`${value} ${unit}`:
+          key==='reps'||key==='note'?value:Number(value);
       }
       if(Object.keys(patch).length>1){patch.completed=true;patches.push(patch);}
     }
@@ -324,7 +365,7 @@
     void loadSession(sessionId,version);
   }
 
-  window.V14MemberSessionUI={open};
+  window.V14MemberSessionUI={open,lastPractice,practiceMarkup};
   window.V14CoachModules=window.V14CoachModules||{};
   window.V14CoachModules.MemberSessionUI=window.V14MemberSessionUI;
 })();

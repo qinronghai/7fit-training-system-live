@@ -183,10 +183,7 @@
       actionsById:window.V14_DATA?.actions||{},anatomyById:window.V14_ANATOMY?.records||{},
       prescriptionForSlot:slot=>{
         if(resolvedSession.templateId!=='f111')return slot.prescription;
-        return window.V14ModuleCopy?.prescriptionForF111Slot?.(slot.key)
-          ||slot.prescription
-          ||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:resolvedSession.level})
-          ||'';
+        return window.V14ModuleCopy?.plannedF111Prescription?.(slot,resolvedSession.level)||slot.prescription||'';
       },
     });
     if(normalizedDetails){

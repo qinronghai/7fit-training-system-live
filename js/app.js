@@ -2,7 +2,7 @@
   function labels(route){
     if(route.area==='coach'){
       if(route.page==='home')return ['编课中心','7Fit 教练工作台'];
-      if(route.page==='member-list'||route.page==='member-detail')return ['会员训练','近期完成情况与课程记录'];
+      if(route.page==='member-list'||route.page==='member-detail')return ['会员管理',''];
       if(route.page==='template'||route.page==='template-compose'){
         if(route.templateId==='f111')return ['编课中心','女性综合 1+1+1'];
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
@@ -31,7 +31,11 @@
     return map[route.area]||['页面不存在',''];
   }
   function setActive(area){
-    document.querySelectorAll('[data-area]').forEach(a=>a.classList.toggle('active',a.dataset.area===area));
+    document.querySelectorAll('[data-area]').forEach(link=>{
+      const active=link.dataset.area===area;
+      link.classList.toggle('active',active);
+      if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
+    });
   }
   function isF111ComposerRoute(route){
     return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
@@ -51,7 +55,7 @@
     const [title,sub]=labels(route);
     document.getElementById('page-title').textContent=title;
     document.getElementById('page-subtitle').textContent=sub;
-    setActive(route.area);
+    setActive(['member-list','member-detail'].includes(route.page)?'members':route.area);
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
     if(typeof fn==='function') main.innerHTML=fn(route);
@@ -59,8 +63,13 @@
     const bind=window.V14Bind?.[route.area]; if(typeof bind==='function') bind(route);
     if(window.V14ModuleCopy?.bind) window.V14ModuleCopy.bind(main);
     main.focus({preventScroll:true});
+    if((route.page==='prep'&&route.query?.slot)||['member-detail','member-list'].includes(route.page))window.scrollTo({top:0,behavior:'instant'});
   }
   window.addEventListener('DOMContentLoaded',()=>{
+    const menu=document.getElementById('mobile-navigation');
+    menu.append(document.querySelector('.primary-nav').cloneNode(true));
+    document.getElementById('mobile-menu-button').addEventListener('click',()=>menu.showModal());
+    menu.addEventListener('click',event=>{if(event.target.closest('a,button'))menu.close();});
     const mode=window.V14State?.getMode?.()||'coach'; document.body.dataset.mode=mode;
     const btn=document.getElementById('mode-toggle');
     function syncModeButton(){const m=window.V14State.getMode();btn.dataset.mode=m;btn.querySelector('b').textContent=m==='system'?'系统管理':'教练模式';btn.querySelector('small').textContent=m==='system'?'管理训练数据和规则':'编写课程、查找动作和收藏常用训练';}

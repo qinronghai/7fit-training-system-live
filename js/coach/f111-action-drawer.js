@@ -14,7 +14,7 @@
   }
 
   function renderGroups(groups){
-    return (groups||[]).map(group=>`<section class="f111-drawer-group"><div class="f111-drawer-group-head"><h3>${esc(group.label)}</h3><span>${group.items.length} ${esc(group.countLabel||'个动作')}</span></div><div class="f111-drawer-group-list">${group.items.map(item=>`<button type="button" class="f111-drawer-action ${item.selected?'is-current':''} ${item.disabled?'is-disabled':''}" data-f111-action-choice="${esc(item.id)}" ${item.disabled?'disabled':''} ${item.selected?'aria-current="true"':''}><span><b>${esc(item.name)}</b><small>${esc(item.pattern||'')}${item.disabled?' · 当前阶段暂不可选':''}</small>${item.detail?`<small class="f111-drawer-action-detail">${esc(item.detail)}</small>`:''}</span><i aria-hidden="true">${item.selected?'✓':'›'}</i></button>`).join('')}</div></section>`).join('');
+    return (groups||[]).map(group=>`<section class="f111-drawer-group"><div class="f111-drawer-group-head"><h3>${esc(group.label)}</h3>${group.items.some(item=>item.group)?'':`<span>${group.items.length} ${esc(group.countLabel||'个动作')}</span>`}</div><div class="f111-drawer-group-list">${group.items.map(item=>`<button type="button" class="f111-drawer-action ${item.selected?'is-current':''} ${item.disabled?'is-disabled':''}" data-f111-action-choice="${esc(item.id)}" ${item.disabled?'disabled':''} ${item.selected?'aria-current="true"':''}><span><b>${esc(item.name)}</b><small>${esc(item.pattern||'')}${item.disabled?' · 当前阶段暂不可选':''}</small>${item.detail?`<small class="f111-drawer-action-detail">${esc(item.detail)}</small>`:''}</span><i aria-hidden="true">${item.selected?'✓':'›'}</i></button>`).join('')}</div></section>`).join('');
   }
 
   function ensureDrawer(){
@@ -37,6 +37,8 @@
     if(!root)return;
     root.classList.remove('is-open');
     root.hidden=true;
+    root._actionTrigger?.focus();
+    root._actionTrigger=null;
     root._sourceSelect=null;
     root._modeContext=null;
     root._axis=null;
@@ -81,6 +83,7 @@
     root._sourceSelect=select;
     root._modeContext=null;
     root._axis=null;
+    root._actionTrigger=button;
     const groups=UI.actionGroups(ctx,slotKey);
     const title=slotKey==='C'?'选择支撑动作':'选择核心动作';
     const count=groups.reduce((total,group)=>total+group.items.length,0);
@@ -116,9 +119,16 @@
     root.querySelectorAll('[data-f111-action-choice]').forEach(choice=>choice.addEventListener('click',()=>{
       const source=root._sourceSelect;
       if(!source||![...source.options].some(option=>option.value===choice.dataset.f111ActionChoice))return;
+      const slotKey=root._actionTrigger?.dataset.f111ActionDrawer;
+      const prepSlot=source.dataset.prepSlot;
       source.value=choice.dataset.f111ActionChoice;
       close();
       source.dispatchEvent(new Event('change',{bubbles:true}));
+      if(slotKey)document.querySelector(`[data-f111-action-drawer="${CSS.escape(slotKey)}"]`)?.focus();
+      if(prepSlot){
+        const card=document.querySelector(`[data-prep-slot-card="${CSS.escape(prepSlot)}"]`);
+        (card?.querySelector('.prep-replace-trigger')||card)?.focus();
+      }
     }));
   }
 
@@ -132,7 +142,15 @@
     const count=items.length;
     const subtitle=button.dataset.replacementSubtitle||`当前课程可选 ${count} 个动作，点击动作即可替换。`;
     const groupLabel=button.dataset.f111ReplacementGroup||'候选动作';
-    show(root,title,subtitle,renderGroups([{label:groupLabel,countLabel:'个候选',items}]));
+    const groups=new Map();
+    for(const item of items){
+      const label=item.group||groupLabel;
+      if(!groups.has(label))groups.set(label,{label,countLabel:'个动作',items:[]});
+      groups.get(label).items.push(item);
+    }
+    const prep=source.matches('.prep-slot-select');
+    if(prep)root._actionTrigger=button;
+    show(root,title,prep?'':subtitle,renderGroups([...groups.values()]));
     bindSelectChoices(root);
   }
 

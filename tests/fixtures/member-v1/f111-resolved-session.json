@@ -30,13 +30,13 @@
         "source": "baseline"
       },
       {
-        "key": "SUPPORT",
-        "label": "C｜支撑模式",
-        "actionId": "SUP-S3-02",
-        "name": "高位平板交替触肩",
+        "key": "3",
+        "label": "D2｜上肢辅助",
+        "actionId": "shengsuo_santou_xiaya",
+        "name": "绳索三头下压",
         "tier": "",
-        "grade": "SUP-S3",
-        "prescription": "",
+        "grade": "",
+        "prescription": "2组 × 15次左右",
         "source": "baseline"
       },
       {
@@ -46,17 +46,17 @@
         "name": "髋内收",
         "tier": "",
         "grade": "",
-        "prescription": "",
+        "prescription": "2组 × 15次左右",
         "source": "baseline"
       },
       {
-        "key": "3",
-        "label": "D2｜上肢辅助",
-        "actionId": "shengsuo_santou_xiaya",
-        "name": "绳索三头下压",
+        "key": "SUPPORT",
+        "label": "C｜支撑模式",
+        "actionId": "SUP-S3-02",
+        "name": "高位平板交替触肩",
         "tier": "",
-        "grade": "",
-        "prescription": "",
+        "grade": "SUP-S3",
+        "prescription": "2–3组 × 6–10次/侧",
         "source": "baseline"
       },
       {
@@ -66,7 +66,7 @@
         "name": "Pallof抗旋转推举",
         "tier": "CORE-L3",
         "grade": "CORE-L3",
-        "prescription": "2组 × 15–20次",
+        "prescription": "2–3组 × 6–10次/侧",
         "source": "baseline"
       }
     ]
@@ -83,16 +83,6 @@
       "hake_shendun",
       "wotu_xiong_tui"
     ],
-    "supportPatterns": [
-      "支撑模式",
-      "抗旋转",
-      "肩胛稳定"
-    ],
-    "coreDemands": [
-      "抗旋转"
-    ],
-    "recentPrepActionIds": [],
-    "recentPrepFamilies": [],
     "formalActionIds": [
       "hake_shendun",
       "wotu_xiong_tui",
@@ -102,9 +92,19 @@
       "CORE-L3-01"
     ],
     "targetMuscles": [],
+    "supportPatterns": [
+      "支撑模式",
+      "抗旋转",
+      "肩胛稳定"
+    ],
+    "coreDemands": [
+      "抗旋转"
+    ],
     "modalities": [],
     "impactDemand": "",
-    "powerDemand": ""
+    "powerDemand": "",
+    "recentPrepActionIds": [],
+    "recentPrepFamilies": []
   },
   "anatomyContext": {
     "actionIds": [

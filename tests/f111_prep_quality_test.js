@@ -58,3 +58,46 @@ assert(singleSide.supportPatterns.includes('单侧支撑'), 'F111 context must r
 assert(singleSide.coreDemands.includes('抗侧屈 / 负重整合'), 'F111 context must retain core demand');
 
 console.log('f111_prep_quality_test: PASS');
+
+// Audit the actual selected A/B and assistance slots for presets and free classes.
+for(const file of ['js/composer.js','js/resolved-session.js','js/conflict-core.js','js/conflict-service.js','js/conflict-plugins/f111.js','js/conflict.js','js/template-resolver.js','js/resolvers/f111.js']){
+  vm.runInThisContext(fs.readFileSync(file,'utf8'),{filename:file});
+}
+const courses=[];
+for(const level of levels){
+  for(const c of V14Composer.combinations())courses.push(V15TemplateResolver.resolve('f111',{mode:'composer',level,...c}));
+  for(const recipeId of Object.keys(D.recipes))courses.push(V15TemplateResolver.resolve('f111',{mode:'preset',recipeId,level}));
+}
+for(const course of courses){
+  const ctx=course.prepContext;
+  const base=R.resolve(ctx);
+  assert(base.slots.every(slot=>slot.candidates.some(choice=>choice.actionId!==slot.actionId)),course.title+' must offer a replacement for every warm-up');
+  assert.notStrictEqual(base.slots.at(-1).movementFamily,'mobility-ankle');
+  assert.deepStrictEqual(course.main.content.map(slot=>slot.label.split('｜')[0]),['A','B','D2','D1','C','CORE']);
+  for(const slot of course.main.content){
+    const dose=(D.coreMeta[slot.actionId]||D.supportMeta[slot.actionId])?.recommendedDose;
+    if(dose)assert.strictEqual(slot.prescription,dose,slot.name);
+  }
+  assert(base.slots.every(s=>s.actionId && R.isPrepRouteAllowed(s.route) && V14PrepGrade.isAllowed(ctx.level,s.prepGrade)),course.title);
+  assert(base.slots.some(s=>s.matchReason.includes('辅项')),course.title+' must prepare for at least one assistance exercise');
+  const mobility=base.slots.filter(s=>s.slotKey==='MOB-L'||s.slotKey==='MOB-U');
+  for(const s of mobility){
+    assert(s.matchReason.includes('主项') && ctx.mainActionIds.some(id=>s.matchReason.includes(D.actions[id].name)),s.matchReason);
+  }
+  for(const slot of base.slots){
+    const otherSlots=base.slots.filter(item=>item!==slot);
+    const alternatives=slot.candidates.filter(item=>item.actionId!==slot.actionId);
+    for(const choice of alternatives){
+      assert(choice.mainFit||choice.auxFit,choice.name+' must serve this F111 course');
+      assert(!otherSlots.some(other=>other.actionId===choice.actionId||other.movementFamily===choice.movementFamily),choice.name+' already appears elsewhere in the warm-up');
+      assert(choice.replacementDetail.includes('主项 ·')||choice.replacementDetail.includes('辅项 ·'),choice.name);
+      if(slot.slotKey==='INTEGRATED')assert.notStrictEqual(choice.movementFamily,'mobility-ankle');
+    }
+    assert(!/辅项「[^」]*(弯举|三头下压)」也需要回放到头顶/.test(slot.matchReason),slot.matchReason);
+  }
+  const taps=base.slots.find(s=>s.prepId==='PREP-22');
+  if(taps)assert(taps.matchReason.includes('支撑手推地') && /主项|辅项/.test(taps.matchReason));
+  const next=R.resolve({...ctx,recentPrepActionIds:base.slots.map(s=>s.actionId),recentPrepFamilies:base.slots.map(s=>s.movementFamily)});
+  assert(next.slots.some((s,i)=>s.actionId!==base.slots[i].actionId),course.title);
+}
+console.log('F111 course-aware PREP:',courses.length,'courses with actual main lifts checked');

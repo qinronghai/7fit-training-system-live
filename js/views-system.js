@@ -168,7 +168,20 @@
     }
     if(focus&&data.warmupDetails?.[focus]){
       const w=data.warmupDetails[focus],a=data.actions[w.actionId]||{},compatibleLevels=window.V14PrepGrade?.sessionLevelsForGrade(w.prepGrade)||w.sessionLevels;
-      const copy=copyControl(`prep-${focus}`,'prep',{title:w.name,items:[{name:w.name,grade:w.prepGrade,prescription:w.prescription,why:w.why}]});
+      const resolver=window.V14PrepResolver,query=route.query||{};
+      const ids=key=>(query[key]||'').split(',').filter(id=>Object.hasOwn(data.actions||{},id));
+      const main=ids('main'),aux=ids('assist');
+      const context=resolver?.contextFromF111({level:query.level,mainActionIds:main,formalActionIds:[...main,...aux]});
+      const lesson=context&&resolver.SLOT_ORDER.includes(query.slot)?resolver.courseReason(query.slot,resolver.candidateFromWarmup(w),context):'';
+      const back=lesson&&/^#\/coach\/(?:f111|compose)(?:[/?]|$)/.test(query.from||'')?query.from:'';
+      const copy=copyControl(`prep-${focus}`,'prep',{title:w.name,items:[{name:w.name,grade:w.prepGrade,prescription:w.prescription,why:lesson||w.why}]});
+      if(lesson){
+        return `<a class="back-link" href="${esc(back||'#/coach/f111')}">← 返回本节课</a>`+
+          `<header class="view-hero compact"><h1>${esc(w.name)}</h1><p>二楼 · ${esc(w.equipment)}</p></header>`+
+          `<section class="section-card detail-copy"><h2>为什么这节课安排它</h2><p data-prep-reason>${esc(lesson)}</p>
+            <h3>怎么做</h3><p>${esc(w.prescription)}</p><h3>教练观察</h3><p>${esc(w.cue)}</p>
+            <a class="text-link" href="#/system/prep?focus=${encodeURIComponent(focus)}">查看动作资料</a><div class="module-copy-row">${copy}</div></section>`;
+      }
       return tabs('prep')+`<a class="back-link" href="#/system/prep">← 返回 PREP 热身体系</a>`+
         hero(w.name,`${w.prepGrade}｜${w.role}｜${w.route}`)+
         `<section class="detail-facts prep-facts">

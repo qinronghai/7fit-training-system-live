@@ -364,8 +364,113 @@
     return patterns.filter(pattern=>wanted.has(pattern));
   }
 
+  // Compare with the actual lifts, including substitutions, before using history
+  // to rotate equally useful preparations. Broad catalogue tags are not a
+  // sufficient reason to prescribe shoulder taps for every upper-body lift.
+  const PATTERN_TRANSFER={
+    '蹲':'下蹲时保持脚掌着地，让髋膝顺畅屈伸',
+    '单腿':'单脚承重时稳住骨盆，让膝盖沿脚尖方向移动',
+    '单腿拉':'单腿向后折髋时保持骨盆朝前',
+    '髋铰链':'把髋向后送，同时维持躯干的位置',
+    '髋伸展':'伸髋时保持骨盆稳定',
+    '水平拉':'手臂向前送出、再拉回时，让肩胛沿胸廓移动',
+    '垂直拉':'回放到头顶时让肩胛跟随手臂上移，再控制下拉',
+    '水平推':'向前推时保持肩部稳定，控制手臂的回程',
+    '垂直推':'手臂上举时让肩胛随之上旋，避免用腰部后仰补幅度',
+  };
+  function liftFit(slot,candidate,action,primary){
+    const pattern=action.pattern,family=candidate.movementFamily,role=candidate.role||'';
+    const lower=LOWER_PATTERNS.has(pattern),upper=UPPER_PATTERNS.has(pattern);
+    const unilateral=/单臂|单侧|单手|单腿|分腿|弓步/.test(action.name);
+    const demand=[action.name,pattern,...(D().supportMeta?.[action.id]?.supportDemand||[]),...(D().coreMeta?.[action.id]?.coreDemand||[])].join(' ');
+    const control=['抗旋转','抗侧屈','抗伸展'].find(value=>role.includes(value)&&demand.includes(value));
+    if(slot==='CORE-ACT'){
+      if(candidate.prepId==='PREP-23'&&action.isSupport&&/交替触肩|交替伸展/.test(action.name))return {rank:2,task:'交替减少支点时稳住躯干'};
+      if(/抗旋转/.test(role)&&unilateral)return {rank:3,task:'单侧发力时保持胸口和骨盆朝前'};
+      if(control)return {rank:3,task:({'抗旋转':'抵抗转体时稳住骨盆','抗侧屈':'单侧承重时保持躯干直立','抗伸展':'四肢发力时稳住腰盆'})[control]};
+      if(candidate.prepId==='PREP-22')return null;
+      if(/抗伸展|呼吸|核心基础/.test(role)&&(lower||pattern==='垂直推'))return {rank:2,task:'发力时稳住胸廓和骨盆'};
+      return null;
+    }
+    // Some isolation lifts share their parent pattern in the catalogue (e.g.
+    // seated knee extension is tagged as a squat). Describe their actual task.
+    if(/腿屈伸|腿弯举/.test(action.name)){
+      if(/腿弯举/.test(action.name)&&/hamstring/.test(family))return {rank:2,task:'控制膝关节屈伸时的大腿后侧张力'};
+      return null;
+    }
+    if(/髋内收|髋外展/.test(action.name)){
+      if(/髋内收/.test(action.name)&&/adductor/.test(family))return {rank:3,task:'在可控幅度内收回大腿'};
+      if(/髋外展/.test(action.name)&&/glute-medial|abduction|single-leg-glute|single-leg-hip|lateral-squat/.test(family))return {rank:3,task:'大腿向外打开时稳住骨盆'};
+      return null;
+    }
+    if(slot==='MOB-U'&&/反向飞鸟|侧平举/.test(action.name))return {rank:2,task:'手臂打开时控制肩胛的位置'};
+    if(!primary)return null;
+    if(!PATTERN_TRANSFER[pattern])return null;
+    const targets=candidate.targetPatterns||[];
+    if(!targets.includes(pattern)&&!(pattern==='单腿拉'&&targets.some(value=>value==='髋铰链'||value==='单腿')))return null;
+    let fit=0;
+    if(slot==='MOB-U'&&upper){
+      const phaseFit=['mobility-wall-slide','activation-scapular-retraction','activation-wall-scapular-push'].includes(family);
+      fit=phaseFit?9:UPPER_FAMILY_SCORES[pattern]?.[family]||1;
+    }
+    if((slot==='MOB-L'||slot==='PRIMER')&&lower)fit=MODE_FAMILY_SCORES[pattern==='单腿拉'?'髋铰链':pattern]?.[slot==='MOB-L'?'mobility':'primer']?.[family]||1;
+    if(slot==='PRIMER'&&lower&&['primer-wall-hinge','primer-supported-split'].includes(family))fit=8;
+    if(slot==='INTEGRATED'){
+      if(family==='integrated-rower')fit=pattern==='水平拉'?9:0;
+      else if(family==='integrated-ski-erg')fit=pattern==='垂直拉'?9:0;
+      else if(lower&&/lunge|squat|single-leg|hinge|hamstring|ankle/.test(family))fit=3;
+    }
+    const task=/引体肩胛下沉/.test(action.name)?'保持手臂伸直，控制肩胛下沉与回放':PATTERN_TRANSFER[pattern];
+    const specific=slot==='MOB-U'?fit>=8:fit>=3;
+    return fit?{rank:specific?3:2,task}:null;
+  }
+
+  function lessonMatch(slot,candidate,ctx){
+    if(ctx.template!=='f111'||!ctx.mainActionIds.length)return null;
+    const best=(ids,primary)=>ids.reduce((match,id)=>{
+      const action=D().actions?.[id],fit=action&&liftFit(slot,candidate,action,primary);
+      return fit&&(!match||fit.rank>match.rank)?{...fit,name:action.name}:match;
+    },null);
+    const primary=best(ctx.mainActionIds,true);
+    const accessory=best(ctx.formalActionIds.filter(id=>!ctx.mainActionIds.includes(id)),false);
+    return {primary,accessory};
+  }
+
+  const UPPER_REHEARSAL={
+    'mobility-wall-slide':'先让前臂沿墙滑动，练习上举时肩胛随手臂移动',
+    'activation-scapular-retraction':'先用轻弹力带练习肩胛随手臂收回和前伸',
+    'activation-wall-scapular-push':'先用墙面降低支撑负荷，练习推离时肩胛沿胸廓滑动',
+    'mobility-latissimus-tool':'先借助长凳练习手臂向头顶延伸，同时保持肋骨和骨盆稳定',
+    'mobility-shoulder-thoracic-tool':'先在泡沫轴上练习肩屈，让手臂上举时胸廓保持稳定',
+    'activation-scapula-upward-rotation':'先沿墙向上滑动手臂，练习肩胛随手臂上旋',
+    'mobility-thoracic-quadruped':'先在骨盆稳定时转动胸椎，让上背参与活动',
+    'activation-rotator-cuff':'先用轻弹力带练习肩外旋，控制上臂位置',
+    'mobility-scapula-circumduction':'先用轻弹力带做绕环，练习手臂移动时肩胛跟着滑动',
+  };
+
+  function courseReason(slot,candidate,ctx){
+    const links=lessonMatch(slot,candidate,ctx);
+    if(!links)return '';
+    const {primary,accessory}=links;
+    const role=(candidate.role||'动作控制').replace(/\s*[+/]\s*/g,'和');
+    if(candidate.prepId==='PREP-22'&&(primary||accessory)){
+      const lift=primary||accessory;
+      const reason=`${primary?'主项':'辅项'}「${lift.name}」需要${lift.task}。交替触肩时短暂抬起一只手，先在垫上练习用支撑手推地、让骨盆保持朝前。`;
+      return primary&&accessory?reason+`辅项「${accessory.name}」也需要${accessory.task}。`:reason;
+    }
+    if(primary){
+      const rehearsal=UPPER_REHEARSAL[candidate.movementFamily]||`先做${role}，再进入正式组`;
+      const reason=`这节课的主项「${primary.name}」需要${primary.task}。${rehearsal}。`;
+      return accessory?reason+`辅项「${accessory.name}」也需要${accessory.task}。`:reason;
+    }
+    if(accessory)return `这项热身为辅项「${accessory.name}」做准备。先练${role}，带到正式动作中，能帮助会员${accessory.task}。`;
+    return slot==='INTEGRATED'?`先用低强度的连续动作升温，再进入主项「${D().actions?.[ctx.mainActionIds[0]]?.name||'主训练'}」。`:`这项动作补充本节的${role}练习。`;
+  }
+
   function matchReasonFor(slotKey,ctx,candidate){
     if(!candidate)return '';
+    const lesson=courseReason(slotKey,candidate,ctx);
+    if(lesson)return lesson;
     const lower=mainPatternsFor(ctx,'lower')[0]||'';
     const upper=mainPatternsFor(ctx,'upper')[0]||'';
     const family=candidate.movementFamily||'';
@@ -471,6 +576,7 @@
       return 9+supportFit+(candidate.role.includes('核心')?2:0)+(candidate.role.includes('支撑')?1:0)+patterns+demandFit;
     }
     if(slotKey==='INTEGRATED'){
+      if(ctx.template==='f111'&&ctx.mainActionIds.length&&candidate.movementFamily==='mobility-ankle')return null;
       if(candidate.sequencePhase!=='standing-dynamic')return null;
       if(INTEGRATED_EXCLUDE_RE.test(text))return null;
       if(!INTEGRATED_ROLE_RE.test(text)&&!INTEGRATED_RE.test(text))return null;
@@ -528,11 +634,26 @@
   }
 
   function pickAutomaticCandidate(candidates,slotKey,ctx,used,usedFamilies){
-    const available=(candidates||[]).filter(candidate=>!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate,ctx)));
+    let available=(candidates||[]).filter(candidate=>!used.has(candidate.actionId)&&!usedFamilies.has(candidateFamily(candidate,ctx)));
+    if(ctx.template==='f111'&&ctx.mainActionIds.length)available=available.filter(item=>item.prepId!=='PREP-22'||item.mainFit||item.auxFit);
     if(!available.length)return null;
+    if(ctx.template==='f111'&&ctx.mainActionIds.length){
+      const bestMain=Math.max(...available.map(item=>item.mainFit));
+      available=available.filter(item=>item.mainFit===bestMain);
+      if(!bestMain){
+        const bestAux=Math.max(...available.map(item=>item.auxFit));
+        available=available.filter(item=>item.auxFit===bestAux);
+      }
+    }
     const recentActions=new Set(ctx.recentPrepActionIds||[]),recentFamilies=new Set(ctx.recentPrepFamilies||[]);
     const fresh=available.filter(candidate=>!recentActions.has(candidate.actionId)&&!recentFamilies.has(candidate.movementFamily));
     const preferred=fresh.length?fresh:available;
+    if(ctx.template==='f111'&&ctx.mainActionIds.length&&preferred.length>1&&(!ctx.recipeId||ctx.level!=='L4')){
+      const first=preferred[0];
+      const peers=preferred.filter(item=>item.auxFit===first.auxFit&&item.prepGrade===first.prepGrade&&Math.abs(item.fitBand-first.fitBand)<=1);
+      const seed=[ctx.level,...ctx.mainActionIds,slotKey].join('|');
+      return peers.sort((left,right)=>stableHash(seed+'|'+left.actionId)-stableHash(seed+'|'+right.actionId))[0];
+    }
     if(ctx.level!=='L4'||!ctx.recipeId||preferred.length<2)return preferred[0];
     const bestModeFit=Number(preferred[0].modeFit||0);
     const modePool=slotKey==='MOB-U'
@@ -696,8 +817,11 @@
       if(affinity===null)return;
       const modeFit=modeSpecificity(candidate,slotKey,ctx);
       if(ctx.level==='L4'&&(['MOB-U','INTEGRATED'].includes(slotKey))&&!modeFit)return;
+      const match=lessonMatch(slotKey,candidate,ctx);
       items.push({
         ...candidate,
+        mainFit:match?.primary?.rank||0,
+        auxFit:match?.accessory?.rank||0,
         slotKey,
         slotScore:affinity+anatomyOverlap(candidate,ctx),
         modeFit,
@@ -714,8 +838,10 @@
     items.sort((a,b)=>{
       const recentA=recentRank(a,ctx),recentB=recentRank(b,ctx);
       const rotatedOrder=ctx.level==='L4';
-      return recentA.action-recentB.action
+      return b.mainFit-a.mainFit || (!a.mainFit?b.auxFit-a.auxFit:0)
+      ||recentA.action-recentB.action
       ||recentA.family-recentB.family
+      ||b.auxFit-a.auxFit
       ||(rotatedOrder?b.modeFit-a.modeFit:0)
       ||gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
       ||(rotatedOrder?rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx):b.fitBand-a.fitBand)
@@ -731,7 +857,9 @@
       seen.add(item.actionId);all.push(item);
     }
 
-    return gradeOptions(all,ctx,limit,gradeApi);
+    const options=gradeOptions(all,ctx,limit,gradeApi);
+    if(slotKey==='CORE-ACT'&&limit<=5&&gradeApi)options.sort((a,b)=>gradeApi.gradeRank(ctx.level,a.prepGrade)-gradeApi.gradeRank(ctx.level,b.prepGrade));
+    return options;
   }
 
   function gradeOptions(all,ctx,limit,gradeApi){
@@ -754,6 +882,48 @@
       picked.add(item.actionId);
     }
     return all.filter(item=>picked.has(item.actionId)).slice(0,cap);
+  }
+
+  function replacementGoal(slotKey,candidate,match){
+    if(slotKey==='CORE-ACT'){
+      return ['抗旋转','抗侧屈','抗伸展','旋转控制'].find(goal=>candidate.role.includes(goal))
+        || candidate.movementFamily;
+    }
+    return (match?.primary||match?.accessory)?.task;
+  }
+
+  function replacementOptions(slotKey,ctx,current,pool,otherSlots){
+    const usedIds=new Set(otherSlots.map(item=>item.actionId));
+    const usedFamilies=new Set(otherSlots.map(item=>item.movementFamily).filter(Boolean));
+    const currentMatch=current&&lessonMatch(slotKey,current,ctx);
+    const goal=current&&replacementGoal(slotKey,current,currentMatch);
+    const compatible=pool.filter(item=>{
+      if(item.actionId===current?.actionId||usedIds.has(item.actionId)||usedFamilies.has(item.movementFamily))return false;
+      if(!ctx.mainActionIds.length)return true;
+      if(slotKey==='MOB-U'&&current?.mainFit===3&&item.mainFit!==3)return false;
+      if(slotKey==='INTEGRATED'&&item.movementFamily==='mobility-ankle')return false;
+      return item.mainFit>0||item.auxFit>0;
+    });
+    const rows=compatible.map(item=>{
+      const match=lessonMatch(slotKey,item,ctx),lift=match?.primary||match?.accessory;
+      const sameGoal=goal&&replacementGoal(slotKey,item,match)===goal;
+      const group=sameGoal?'延续当前目的':'调整热身侧重';
+      const reason=lift?`${match.primary?'主项':'辅项'} · ${lift.name}`:'';
+      const detail=[reason,item.role].filter(Boolean).join('｜').replace(/\s*[+/]\s*/g,'、');
+      return {...item,replacementGroup:group,replacementDetail:detail};
+    });
+    const same=rows.filter(item=>item.replacementGroup==='延续当前目的');
+    const different=rows.filter(item=>item.replacementGroup!=='延续当前目的');
+    const ordered=[...same,...different];
+    const seen=new Set();
+    const distinct=ordered.filter(item=>{
+      const family=item.movementFamily||item.actionId;
+      if(seen.has(family))return false;
+      seen.add(family);
+      return true;
+    });
+    const alternatives=distinct.slice(0,4);
+    return current?[{...current,replacementGroup:'当前动作',replacementDetail:current.role},...alternatives]:alternatives;
   }
 
   function resolve(inputContext,{selections={}}={}){
@@ -796,8 +966,11 @@
 
     const slots=SLOT_ORDER.map(slotKey=>{
       const entry=resolvedMap[slotKey],candidate=entry.candidate;
-      let options=candidateMap[slotKey];
-      if(ctx.level!=='L4')options=gradeOptions(candidatePool[slotKey],ctx,5,G());
+      const hasCourse=ctx.template==='f111'&&ctx.mainActionIds.length;
+      const otherSlots=Object.entries(resolvedMap).filter(([key,value])=>key!==slotKey&&value.candidate).map(([,value])=>value.candidate);
+      let options=hasCourse
+        ?replacementOptions(slotKey,ctx,candidate,candidatePool[slotKey],otherSlots)
+        :ctx.level==='L4'?candidateMap[slotKey]:gradeOptions(candidatePool[slotKey],ctx,5,G());
       if(candidate&&!options.some(option=>option.actionId===candidate.actionId)){
         const peers=options.filter(option=>option.prepGrade===candidate.prepGrade);
         const replace=peers.at(-1)||options.at(-1);
@@ -845,6 +1018,6 @@
     SLOT_ORDER,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
     isPrepRouteAllowed,isActionPrepEligible,caLevelFor,movementFamilyFor,
     normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,contextFromHyrox,normalizeSelections,
-    candidateFromWarmup,rankSlotCandidates,resolve,
+    candidateFromWarmup,courseReason,rankSlotCandidates,resolve,
   };
 })();

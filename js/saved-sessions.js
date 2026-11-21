@@ -66,15 +66,17 @@
       includeExpandedCore:q.ec==='1',
     };
     const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,...flags});
+    const memberId=q.memberId||'',sessionKey=window.V14Composer.draftKey(resolved.compositionId,level,memberId);
     return {
       templateId:'f111',
-      sessionKey:`${resolved.compositionId}-${level}`,
+      sessionKey,
       familyId:resolved.compositionId,
       level,
       resolverVersion:'f111-adapter-v1',
       input:{
         mode:'composer',
-        legacyCompositionKey:`${resolved.compositionId}-${level}`,
+        legacyCompositionKey:sessionKey,
+        ...(memberId?{memberId}:{}),
         level,lowerMode,upperMode,coreDemand,...flags,
         surface:'compose',
       },
@@ -295,7 +297,8 @@
       includeExpandedCore:!!saved.includeExpandedCore,
     };
     const base={mode:'composer',level,lowerMode,upperMode,coreDemand,...flags};
-    const initial=window.V14Composer.resolve(base),sessionKey=`${initial.compositionId}-${level}`;
+    const memberId=typeof saved.memberId==='string'?saved.memberId:'';
+    const initial=window.V14Composer.resolve(base),sessionKey=window.V14Composer.draftKey(initial.compositionId,level,memberId);
     const requested=manualMap(record.selections),acceptedPlain={},accepted={},dropped=[];
     for(const key of ['A','B','C','D1','D2','CORE']){
       const entry=requested[key];
@@ -315,6 +318,7 @@
 
     const input={
       ...base,
+      ...(memberId?{memberId}:{}),
       legacyCompositionKey:sessionKey,
       surface:'compose',
     };
@@ -323,6 +327,7 @@
       resolverVersion:resolved.resolverVersion,input,selections:accepted,prepSelections:prep.accepted,
     });
     const q={level,lower:lowerMode,upper:upperMode,core:coreDemand};
+    if(memberId)q.memberId=memberId;
     if(flags.includeExpandedMain)q.em='1';
     if(flags.includeExpandedSupport)q.es='1';
     if(flags.includeExpandedCore)q.ec='1';
