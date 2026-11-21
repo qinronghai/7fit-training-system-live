@@ -18,7 +18,7 @@ def test_composer_script_is_loaded_before_coach_view():
 
 def test_f111_home_is_the_direct_free_composer():
     js=coach_source()
-    for label in ['F111｜女性综合训练','选择训练阶段','选择训练模式','1F｜力量训练']:
+    for label in ['F111｜女性综合训练','训练等级','上肢模式','1F｜力量训练']:
         assert label in js
     assert "route?.page==='template'&&route.templateId==='f111'" in js
     assert "return '#/coach/f111?'" in js
@@ -30,7 +30,7 @@ def test_free_composer_ui_exposes_stage_navigation_and_drawer_slots():
     ui=text('js/coach/f111-compose-ui.js')
     view=text('js/coach/composer-view.js')
     data=text('data/system-data.js')
-    for marker in ['f111-level-switch','f111-strength-grid','f111-support-grid']:
+    for marker in ['f111-level-switch','f111-strength-grid','f111-accessory-list']:
         assert marker in view
     assert 'data-f111-mode-drawer' in ui
     assert 'data-f111-action-drawer' in ui
@@ -44,7 +44,7 @@ def test_free_composer_ui_exposes_stage_navigation_and_drawer_slots():
 
 def test_composer_css_has_responsive_f111_layout_and_drawer_controls():
     css=text('assets/app.css')
-    for marker in ['.f111-compose-hero','.f111-level-switch','.f111-strength-grid','.f111-support-grid','.f111-action-drawer-trigger']:
+    for marker in ['.f111-compose-hero','.f111-level-switch','.f111-strength-grid','.f111-accessory-list','.f111-action-drawer-trigger']:
         assert marker in css
     assert '@media(max-width:620px)' in css
 

@@ -141,7 +141,8 @@ test('Composer F111 copy and cancel do not save; explicit save works', async ({ 
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach/f111?level=L3&lower=squat&upper=horizontal_pull&core=anti_extension');
-  await page.locator('#copy-member-session').click();
+  await page.getByRole('button', { name: '复制课程' }).click();
+  await page.getByRole('button', { name: '复制给会员' }).click();
   expect(calls.filter(call => call.action === 'save-planned-session')).toHaveLength(0);
 
   await page.locator('[data-save-member-session]').click();
@@ -313,7 +314,7 @@ test('Member-first save ignores another member’s saved intent and selects the 
   await expect(select).toHaveValue(routedMember.id);
   await expect(dialog.locator('[data-member-save-status]')).not.toContainText('已保存到 林同学');
   await dialog.locator('[data-member-save-submit]').click();
-  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 王同学 · PLANNED');
+  await expect(dialog.locator('[data-member-save-status]')).toContainText('已保存到 王同学 · 待训练');
   expect(snapshots).toHaveLength(1);
   expect(snapshots[0].session.memberId).toBe(routedMember.id);
 });
@@ -473,7 +474,7 @@ test('Member-first selector preselects a routed member outside the first 100 row
   expect(calls.some(call => call.action === 'get-member' && call.memberId === routedMember.id)).toBeTruthy();
 
   await dialog.locator('[data-member-save-submit]').click();
-  await expect(dialog.locator('[data-member-save-status]')).toContainText(`已保存到 ${routedMember.displayName} · PLANNED`);
+  await expect(dialog.locator('[data-member-save-status]')).toContainText(`已保存到 ${routedMember.displayName} · 待训练`);
   expect(snapshots).toHaveLength(1);
   expect(snapshots[0].session.memberId).toBe(routedMember.id);
 });

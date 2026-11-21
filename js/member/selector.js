@@ -182,7 +182,7 @@
         newIntentButton.hidden=false;submitButton.hidden=true;
         const savedMember=members.find(member=>member.id===current.intent.memberId);
         select.value=savedMember?.id||'';
-        setStatus(`已保存到${savedMember?.displayName?` ${savedMember.displayName}`:''} · PLANNED`,'success');
+        setStatus(`已保存到${savedMember?.displayName?` ${savedMember.displayName}`:''} · 待训练`,'success');
         submitButton.disabled=true;
         return;
       }
@@ -203,7 +203,7 @@
       if(intent?.status==='SAVED'){
         submitButton.disabled=true;submitButton.hidden=true;newIntentButton.hidden=false;
         newIntentButton.textContent='另存给其他会员';
-        setStatus(`已保存到 ${selectedMember.displayName} · PLANNED`,'success');
+        setStatus(`已保存到 ${selectedMember.displayName} · 待训练`,'success');
       }else if(intent?.status==='PENDING'){
         submitButton.disabled=busy;submitButton.textContent='重试保存';
         if(intent.sessionDate!==current.sessionDate){
@@ -249,7 +249,7 @@
       const result=await window.V14MemberSnapshots.send(intent);
       current.intent={...intent,status:'SAVED',savedSessionId:result.sessionId||intent.snapshot.session.id,revision:result.revision||1};
       await refreshSelectionState();
-      if(current.intent.status==='SAVED')setStatus(`已保存到 ${members.find(member=>member.id===memberId)?.displayName||'会员'} · PLANNED`,'success');
+      if(current.intent.status==='SAVED')setStatus(`已保存到 ${members.find(member=>member.id===memberId)?.displayName||'会员'} · 待训练`,'success');
     }catch(error){
       current.intent=current.selectedIntent||current.intent;
       showError(error);

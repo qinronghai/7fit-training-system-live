@@ -69,12 +69,14 @@ test('F111 home is the free composer and the old composer routes remain aliases'
 
   await page.goto('/#/coach/f111/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
   await expect(page.locator('.composer-slot-card')).toHaveCount(6);
-  await expect(page.getByText('L3｜单腿拉 + 水平推', { exact: false })).toBeVisible();
+  await expect(page.locator('.f111-level-switch [aria-current="true"]')).toHaveText('L3');
+  await expect(page.locator('[data-f111-mode-drawer="lower"]')).toContainText('单腿拉');
+  await expect(page.locator('[data-f111-mode-drawer="upper"]')).toContainText('水平推');
   await expect(page.locator('.f111-mode-drawer-trigger')).toHaveCount(2);
   await expect(page.locator('.f111-mode-label')).toHaveText(['下肢模式','上肢模式']);
   const composerLevelHrefs = await page.locator('.f111-level-switch a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')));
   expect(composerLevelHrefs.every(href => href && href.startsWith('#/coach/f111?'))).toBeTruthy();
-  await expect(page.locator('#page-subtitle')).toHaveText('女性综合 1+1+1');
+  await expect(page.locator('#page-title')).toHaveText('编课中心');
   await expect(page.locator('a[href^="#/coach/compose"]')).toHaveCount(0);
 
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
@@ -128,6 +130,7 @@ test('#30 canonical and legacy F111 URLs share formal and PREP state through rel
   await composerFormal.select.selectOption(composerFormal.target);
   await expect(page.locator(`.composer-slot-select[data-slot-key="${composerSlotKey}"]`)).toHaveValue(composerFormal.target);
 
+  await page.locator('.f111-prep-section summary').click();
   const composerPrep = await firstReplaceablePrep(page);
   expect(composerPrep, 'expected a replaceable composer PREP slot').toBeTruthy();
   await composerPrep.select.selectOption(composerPrep.target);

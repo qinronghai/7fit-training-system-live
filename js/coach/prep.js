@@ -198,7 +198,7 @@
       const detailHref=slot.prepId?'#/system/prep?'+query.toString():'';
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
       const hasAlternative=slot.candidates?.some(candidate=>candidate.actionId!==slot.actionId);
-      const replace=hasAlternative?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-replacement-select=".prep-slot-select" data-replacement-title="替换${esc(slot.name||'热身动作')}" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
+      const replace=hasAlternative?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-focus="prep-${esc(slot.slotKey)}" data-replacement-select=".prep-slot-select" data-replacement-title="替换${esc(slot.name||'热身动作')}" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const prescription=slot.prescription||record?.prescription||'';
       const recentNotice=slot.recentlyUsed?'<small class="prep-recent-note">近期用过，可按需替换</small>':'';
@@ -237,12 +237,13 @@
     const foamCards=foam.map((f,index)=>{
       const slotKey=`FOAM-${index+1}`;
       const options=foamOptions.map(option=>`<option value="${esc(option.foamId)}" ${option.foamId===f.foamId?'selected':''}>${esc(option.name)}</option>`).join('');
-      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div><span>放松</span><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="泡沫轴候选" data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
+      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div class="prep-card-actions"><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="泡沫轴候选" data-f111-focus="${esc(slotKey)}" data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" tabindex="-1" aria-hidden="true" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
     }).join('');
     let foamCopy='';
     if(window.V14ModuleCopy){const fk=`composer-foam-${ctx.stateKey}`;window.V14ModuleCopy.register(fk,'foam',{title:`自由组合泡沫轴｜${title}`,items:foam.map(f=>({name:f.name,prescription:f.prescription,safety:f.safety}))});foamCopy=window.V14ModuleCopy.button(fk,'复制本模块');}
     const warmCopy=registerCopy(`composer-prep-${ctx.stateKey}`,`自由组合 PREP｜${title}`,resolved);
-    return `<section class="section-card prep-section f111-prep-section"><div class="section-head"><div><h2>2F｜热身</h2><p>训练前完成活动与激活。</p></div><span class="time-badge">约 10–12 分钟</span></div><div class="subsection-label"><b>泡沫轴</b><span>训练前激活</span></div><div class="foam-grid">${foamCards}</div><div class="subsection-label"><b>动态热身与激活</b><span>按课程自动匹配</span></div>${resolvedGrid(resolved,ctx.stateKey,true)}</section>`;
+    const summary=[foam.length?'泡沫轴':'',`${resolvedItems(resolved).length} 步动态热身`].filter(Boolean).join(' · ');
+    return `<details class="prep-section f111-prep-section f111-disclosure" data-f111-disclosure="prep"><summary><div><b>2F｜热身</b><small>${esc(summary)}</small></div><small>约 10–12 分钟</small><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content"><div class="subsection-label"><b>泡沫轴</b></div><div class="foam-grid">${foamCards}</div><div class="subsection-label"><b>动态热身与激活</b></div>${resolvedGrid(resolved,ctx.stateKey,true)}</div></details>`;
   }
 
   M.Prep={

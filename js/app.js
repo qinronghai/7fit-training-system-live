@@ -58,11 +58,12 @@
     setActive(['member-list','member-detail'].includes(route.page)?'members':route.area);
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
+    const restoreUi=isF111ComposerRoute(route)?window.V14CoachModules?.ComposerView?.captureUi(main):null;
     if(typeof fn==='function') main.innerHTML=fn(route);
     else main.innerHTML='<section class="empty-state"><b>'+title+'</b><span>该模块将在后续任务中迁入训练系统。</span></section>';
     const bind=window.V14Bind?.[route.area]; if(typeof bind==='function') bind(route);
     if(window.V14ModuleCopy?.bind) window.V14ModuleCopy.bind(main);
-    main.focus({preventScroll:true});
+    if(!restoreUi?.())main.focus({preventScroll:true});
     if((route.page==='prep'&&route.query?.slot)||['member-detail','member-list'].includes(route.page))window.scrollTo({top:0,behavior:'instant'});
   }
   window.addEventListener('DOMContentLoaded',()=>{

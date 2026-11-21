@@ -84,6 +84,8 @@
 .f111-drawer-action:focus-visible,.f111-drawer-option:focus-visible,.replacement-drawer-card>button:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
 .replacement-drawer-card.is-current,.f111-drawer-action.is-current,.f111-drawer-option.is-current{border-width:1px;border-color:#d6c6f6;background:#faf7ff}
 .f111-action-drawer-panel{transform:translateX(0);transition:transform 220ms cubic-bezier(.2,.7,.2,1)}
+.f111-action-drawer-list{overscroll-behavior:contain}
+@media(prefers-reduced-motion:reduce){.f111-action-drawer-panel{transition:none}}
 .f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateX(100%)}
 @media(max-width:620px){.f111-action-drawer-shell:not(.is-open) .f111-action-drawer-panel{transform:translateY(100%)}}
 .f111-action-drawer-shell.ios-no-drawer-motion .f111-action-drawer-panel,.f111-action-drawer-shell.ios-no-drawer-motion:not(.is-open) .f111-action-drawer-panel,.replacement-drawer-shell.ios-no-drawer-motion .replacement-drawer-panel{transform:none!important;transition:none!important}

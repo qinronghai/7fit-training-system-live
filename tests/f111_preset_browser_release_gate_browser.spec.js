@@ -24,7 +24,7 @@ test('F111 home opens the free-composition page without the preset browser',asyn
     await expect(page.locator('.composer-slot-card')).toHaveCount(6);
     await expect(page.locator('[data-f111-preset-browser],.coach-mode-switch')).toHaveCount(0);
     await expect(page.getByText('7Fit 推荐预设',{exact:true})).toHaveCount(0);
-    await expect(page.locator('#page-subtitle')).toHaveText('女性综合 1+1+1');
+    await expect(page.locator('#page-title')).toHaveText('编课中心');
     await expectNoOverflow(page,width);
   }
   expect(errors).toEqual([]);
@@ -39,7 +39,9 @@ test('legacy composer URLs remain valid aliases',async({page})=>{
   for(const url of urls){
     await page.goto(url);
     await expect(page.locator('.composer-slot-card')).toHaveCount(6);
-    await expect(page.getByText('L3｜单腿拉 + 水平推',{exact:false})).toBeVisible();
+    await expect(page.locator('.f111-level-switch [aria-current="true"]')).toHaveText('L3');
+    await expect(page.locator('[data-f111-mode-drawer="lower"]')).toContainText('单腿拉');
+    await expect(page.locator('[data-f111-mode-drawer="upper"]')).toContainText('水平推');
   }
   expect(errors).toEqual([]);
 });

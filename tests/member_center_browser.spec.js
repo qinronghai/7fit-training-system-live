@@ -624,7 +624,7 @@ test('Member with no completed history can still enter F111 at her training leve
   await expect(nextSession).toHaveAttribute('href', `#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   await nextSession.click();
   const panel = page.locator('[data-member-first-context]');
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('暂无已完成训练');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
@@ -817,7 +817,7 @@ test('Member-first F111 opens at the member level with fresh context and unchang
   await nextSession.click();
   const panel = page.locator('[data-member-first-context]');
   await expect(panel).toBeVisible();
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('全身塑形');
   await expect(panel).toContainText('杠铃前蹲');
   await expect(panel).not.toContainText('下肢力量');
@@ -840,7 +840,7 @@ test('Member-first F111 opens at the member level with fresh context and unchang
     await page.goto(`/#/coach/members/${MEMBER_ID}`);
     await page.locator('[data-member-next-session]').click();
     const contextPanel = page.locator('[data-member-first-context]');
-    await expect(contextPanel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+    await expect(contextPanel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
     const dimensions = await page.evaluate(() => ({
       viewportWidth: document.documentElement.clientWidth,
       pageWidth: document.documentElement.scrollWidth,
@@ -865,7 +865,7 @@ test('Member-first F111 remains usable and can retry when context loading fails'
 
   state.failContext = false;
   await panel.locator('[data-member-context-retry]').click();
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('全身塑形');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });

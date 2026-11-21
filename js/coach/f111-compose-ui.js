@@ -20,7 +20,7 @@
     const mode=modeOptions(ctx,axis).find(item=>item.id===current)||{name:current};
     const label=axis==='lower'?'下肢模式':'上肢模式';
     const currentLabel=`${mode.name}${axis==='lower'&&mode.subtitle?`｜${mode.subtitle}`:''}`;
-    return `<label class="f111-mode-field"><span class="f111-mode-label">${esc(label)}</span><button type="button" class="f111-mode-drawer-trigger" data-f111-mode-drawer="${axis}" aria-haspopup="dialog"><span>${esc(currentLabel)}</span><i aria-hidden="true">⌄</i></button></label>`;
+    return `<button type="button" class="f111-mode-drawer-trigger" data-f111-mode-drawer="${axis}" data-f111-focus="mode-${axis}" aria-haspopup="dialog"><span><small class="f111-mode-label">${esc(label)}</small><b>${esc(currentLabel)}</b></span><i aria-hidden="true">⌄</i></button>`;
   }
 
   function actionGroups(ctx,slotKey){
@@ -61,15 +61,10 @@
   }
 
   function actionTrigger(ctx,slotKey){
-    const slot=ctx.resolved?.slots?.find(item=>item.slotKey===slotKey)||{};
-    return `<button type="button" class="f111-replace-trigger" data-f111-action-drawer="${esc(slotKey)}" aria-haspopup="dialog" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
+    const label=SLOT_LABELS[slotKey]||slotKey;
+    const name=ctx.resolved?.slots?.find(item=>item.slotKey===slotKey)?.name;
+    return `<button type="button" class="f111-action-drawer-trigger" data-f111-action-drawer="${esc(slotKey)}" data-f111-focus="slot-${esc(slotKey)}" aria-haspopup="dialog" aria-label="替换${esc(name||label)}">替换</button>`;
   }
 
-  function stepper(active='select'){
-    return `<nav class="f111-compose-stepper" aria-label="编课步骤"><span class="${active==='select'?'active':''}"><i class="f111-step-dot" aria-hidden="true">01</i><b>选择阶段</b></span><span class="${active==='compose'?'active':''}"><i class="f111-step-dot" aria-hidden="true">02</i><b>选择模式</b></span><span class="${active==='review'?'active':''}"><i class="f111-step-dot" aria-hidden="true">03</i><b>查看课程</b></span></nav>`;
-  }
-
-  function currentLabel(ctx){return `${ctx.level}｜${ctx.resolved?.lower?.name||''} + ${ctx.resolved?.upper?.name||''}`;}
-
-  M.F111ComposeUI={modeOptions,modeTrigger,actionGroups,actionTrigger,stepper,currentLabel,SLOT_LABELS};
+  M.F111ComposeUI={modeOptions,modeTrigger,actionGroups,actionTrigger,SLOT_LABELS};
 })();

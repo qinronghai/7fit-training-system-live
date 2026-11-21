@@ -132,7 +132,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(nextSession).toHaveAttribute('href', `#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   await nextSession.click();
   const memberContext = page.locator('[data-member-first-context]');
-  await expect(memberContext.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(memberContext.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(memberContext).toContainText('暂无已完成训练');
 
   const displayedDoses={};
@@ -146,7 +146,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(firstMemberSelect).toContainText('林同学');
   await firstMemberSelect.selectOption(MEMBER_ID);
   await saveDialog.locator('[data-member-save-submit]').click();
-  await expect(saveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · PLANNED');
+  await expect(saveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · 待训练');
   const firstSnapshot = state.snapshots[0];
   for(const key of ['CORE','C'])expect(firstSnapshot.items.find(item=>item.slotKey===key).plannedPrescriptionSnapshot.rawText).toBe(displayedDoses[key]);
   const firstSessionId = firstSnapshot.session.id;
@@ -246,6 +246,8 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   const refreshedContext = page.locator('[data-member-first-context]');
   await expect(refreshedContext).toContainText(firstSnapshot.session.sessionTitle);
   await expect(refreshedContext).toContainText(replacementName);
+  await refreshedContext.getByText('上次实练', { exact:true }).click();
+  await expect(refreshedContext.getByText(replacementName)).toBeVisible();
   const lastPrepIds=state.itemsBySession[firstSessionId].filter(item=>item.phase==='PREP'&&item.completed).map(item=>item.performedActionId);
   const signals=await page.evaluate(()=>window.V14CoachModules.ComposerView.buildComposerSessionDetails(window.V14CoachModules.ComposerView.composerContext(window.V14Router.parseHash(location.hash))).prepContext.recentPrepActionIds);
   expect(signals).toEqual(lastPrepIds);
@@ -269,7 +271,8 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(page.locator('[data-member-recent-context]')).toContainText(replacementName);
 
   await page.goto('/#/coach/f111?level=L3&lower=squat&upper=horizontal_pull&core=anti_extension');
-  await page.locator('#copy-member-session').click();
+  await page.getByRole('button', { name: '复制课程' }).click();
+  await page.getByRole('button', { name: '复制给会员' }).click();
   expect(state.calls.filter(call => call.action === 'save-planned-session')).toHaveLength(2);
   await page.locator('[data-save-member-session]').click();
   const templateSaveDialog = page.locator('[data-member-save-dialog]');
@@ -277,7 +280,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await expect(templateMemberSelect).toContainText('林同学');
   await templateMemberSelect.selectOption(MEMBER_ID);
   await templateSaveDialog.locator('[data-member-save-submit]').click();
-  await expect(templateSaveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · PLANNED');
+  await expect(templateSaveDialog.locator('[data-member-save-status]')).toContainText('已保存到 林同学 · 待训练');
   expect(state.snapshots).toHaveLength(3);
   expect(state.snapshots[2].session.memberId).toBe(MEMBER_ID);
   expect(state.snapshots[2].session.status).toBe('PLANNED');

@@ -66,11 +66,13 @@
 
   function bind(route){
     const root=document.getElementById('app-main');
-    const rerender=(update)=>{
+    const rerender=({preserveMemberContext=false}={})=>{
       const current=window.V14Router.parseHash(location.hash);
-      if(typeof update==='function')update(root,render(current));
+      const restoreUi=isF111Composer(current)?ComposerView.captureUi(root):null;
+      if(preserveMemberContext)ComposerView.replaceCourseContent(root,render(current));
       else root.innerHTML=render(current);
       bind(current);
+      restoreUi?.();
       if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);
     };
     if(!isF111Composer(route))ComposerView?.resetMemberContextBinding?.();
@@ -122,14 +124,11 @@
       }));
       document.querySelectorAll('.f111-foam-select').forEach(sel=>sel.addEventListener('change',()=>{M.Foam?.setComposerFoamSelection?.(sel.dataset.foamSession,sel.dataset.foamSlot,sel.value,ctx.level);rerender();}));
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
-      const status=document.getElementById('copy-session-status');
-      const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
-      document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));
-      document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
+      ComposerView.bindCopy(root);
       M.MemberSelector?.bind?.(root,()=>ctx.resolvedSession,()=>ctx.memberId,()=>ComposerView.buildComposerSessionDetails(ctx));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindPostCardio(rerender);
-      M.F111ActionDrawer?.bind?.(root,ctx,rerender);
+      M.F111ActionDrawer?.bind?.(root,ctx);
       bindReplacementDrawer();
       bindSaved();
       bindFavorites();

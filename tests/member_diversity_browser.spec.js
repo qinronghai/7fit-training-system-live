@@ -48,9 +48,7 @@ test('F111 composer uses recent-three context to diversify support and CORE reco
   expect(coreName).not.toBe('死虫式');
   for(const key of ['C','CORE']){
     const card=page.locator(`.f111-slot-card[data-composer-slot="${key}"]`);
-    await expect(card.getByText('轮换',{exact:true})).toBeHidden();
-    await card.locator('.slot-rationale summary').click();
-    await expect(card.getByText('轮换',{exact:true})).toBeVisible();
+    await expect(card.locator('details')).toHaveCount(0);
   }
 
   expect(errors).toEqual([]);

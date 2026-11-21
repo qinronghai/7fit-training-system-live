@@ -34,7 +34,7 @@ const coreItem = coreGroup.flatMap(group => group.items).find(item => item.id ==
 assert(coreItem.detail.includes('疲劳'), 'CORE drawer must show fatigue');
 assert(coreItem.detail.includes('会员感受'), 'CORE drawer must show member experience');
 const card = context.window.V14CoachModules.Slot.composerCard(ctx, core);
-assert(card.includes('<summary>编排依据</summary>'), 'CORE card must show coaching metadata');
+assert(!card.includes('编排依据') && !card.includes('推荐理由'), 'CORE row must omit the recommendation disclosure');
 assert(card.includes('当前等级没有该 CORE 任务动作'), 'CORE card must expose no-match confirmation');
 
 console.log('core_metadata_ui_test: PASS');

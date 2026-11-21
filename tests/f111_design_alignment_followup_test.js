@@ -19,7 +19,7 @@ assert(foamSource.includes('f111-foam-selections'),'foam replacement choices mus
 assert(!prepSource.includes('<a class="prep-card-action"'),'PREP action cards must not keep a separate detail-link arrow');
 assert(!prepSource.includes('<i aria-hidden="true">↗</i>'),'PREP action cards must remove the visible detail arrow');
 const slotSource=fs.readFileSync(`${root}/js/coach/slot.js`,'utf8');
-assert(slotSource.includes('data-action-detail-href'),'strength action cards must expose whole-card detail navigation');
+assert(slotSource.includes('<h3><a href='),'strength action names must link to action details');
 assert(!slotSource.includes('f111-slot-arrow'),'strength action cards must remove the visible detail arrow');
 const viewsSource=fs.readFileSync(`${root}/js/views-coach.js`,'utf8');
 assert(viewsSource.includes('data-prep-detail-href')&&viewsSource.includes('data-action-detail-href'),'coach binding must support whole-card detail navigation');
