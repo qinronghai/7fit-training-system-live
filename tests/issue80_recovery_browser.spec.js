@@ -24,7 +24,7 @@ async function expectRecovery(page,{compact=false}={}){
   if(compact){
     await expect(section.locator('summary')).toContainText('训练后拉伸');
     await expect(section.locator('summary')).toContainText('约 5–8 分钟');
-    await section.locator('summary').click();
+    await expect(section).toHaveAttribute('open', '');
     const rows=section.locator('.recovery-row[data-recovery-card]');
     await expect(rows).toHaveCount(3);
     await expect(section.locator('.recovery-detail-link')).toHaveCount(0);

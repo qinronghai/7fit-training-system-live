@@ -242,8 +242,17 @@
     let foamCopy='';
     if(window.V14ModuleCopy){const fk=`composer-foam-${ctx.stateKey}`;window.V14ModuleCopy.register(fk,'foam',{title:`自由组合泡沫轴｜${title}`,items:foam.map(f=>({name:f.name,prescription:f.prescription,safety:f.safety}))});foamCopy=window.V14ModuleCopy.button(fk,'复制本模块');}
     const warmCopy=registerCopy(`composer-prep-${ctx.stateKey}`,`自由组合 PREP｜${title}`,resolved);
-    const summary=[foam.length?'泡沫轴':'',`${resolvedItems(resolved).length} 步动态热身`].filter(Boolean).join(' · ');
-    return `<details class="prep-section f111-prep-section f111-disclosure" data-f111-disclosure="prep"><summary><div><b>2F｜热身</b><small>${esc(summary)}</small></div><small>约 10–12 分钟</small><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content"><div class="subsection-label"><b>泡沫轴</b></div><div class="foam-grid">${foamCards}</div><div class="subsection-label"><b>动态热身与激活</b></div>${resolvedGrid(resolved,ctx.stateKey,true)}</div></details>`;
+    return `<section class="prep-section f111-prep-section" aria-labelledby="f111-prep-title">
+      <div class="f111-section-heading"><h2 id="f111-prep-title">2F｜热身</h2><span class="time-badge">约 10–12 分钟</span></div>
+      <details class="f111-disclosure" data-f111-disclosure="foam">
+        <summary><div><b>泡沫轴</b></div><i aria-hidden="true">⌄</i></summary>
+        <div class="f111-disclosure-content"><div class="foam-grid">${foamCards}</div></div>
+      </details>
+      <details class="f111-disclosure" data-f111-disclosure="warmup" open>
+        <summary><div><b>动态热身与激活</b></div><i aria-hidden="true">⌄</i></summary>
+        <div class="f111-disclosure-content">${resolvedGrid(resolved,ctx.stateKey,true)}</div>
+      </details>
+    </section>`;
   }
 
   M.Prep={

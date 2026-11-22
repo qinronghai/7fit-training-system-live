@@ -174,7 +174,7 @@
   function strengthSection(ctx){
     const slotsByKey=new Map(ctx.resolved.slots.map(slot=>[slot.slotKey,slot]));
     const cards=keys=>keys.map(key=>slotsByKey.get(key)).filter(Boolean).map(slot=>M.Slot.composerCard(ctx,slot)).join('');
-    return `<section class="f111-strength-section"><div class="f111-strength-heading"><h2>1F｜力量训练</h2><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${cards(['A','B'])}</div><div class="f111-accessory-list">${cards(['D2','D1','C','CORE'])}</div></section>`;
+    return `<section class="f111-strength-section"><div class="f111-section-heading"><h2>1F｜力量训练</h2><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${cards(['A','B'])}</div><div class="f111-accessory-list">${cards(['D2','D1','C','CORE'])}</div></section>`;
   }
 
   function anatomySection(ctx){
@@ -194,7 +194,7 @@
   }
 
   function recoverySection(recovery){
-    return `<details class="f111-recovery-section f111-disclosure" data-f111-recovery data-f111-disclosure="recovery"><summary><div><b>训练后拉伸</b><small>约 5–8 分钟</small></div><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content">${recovery}</div></details>`;
+    return `<details class="f111-recovery-section f111-disclosure" data-f111-recovery data-f111-disclosure="recovery" open><summary><div><b>训练后拉伸</b><small>约 5–8 分钟</small></div><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content">${recovery}</div></details>`;
   }
 
   function render(route){

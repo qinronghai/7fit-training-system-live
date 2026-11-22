@@ -78,7 +78,6 @@ test('Issue 73: PREP replacement drawer applies a legal choice and survives relo
 test('F111 pulldown warm-up offers replacements that preserve the overhead preparation',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/f111?level=L2&lower=squat&upper=vertical_pull');
-  await page.locator('.f111-prep-section summary').click();
   const card=page.locator('[data-prep-slot-card="MOB-U"]');
   await card.getByRole('button',{name:/替换/}).click();
   const drawer=page.locator('#f111-action-drawer');

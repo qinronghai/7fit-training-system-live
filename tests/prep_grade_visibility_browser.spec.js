@@ -4,7 +4,6 @@ test('L3 PREP replacements display the grades of the course-matched options at 3
   const errors=[];page.on('pageerror',e=>errors.push(e.message||String(e)));
   await page.setViewportSize({width:390,height:844});
   await page.goto('/#/coach/f111/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
-  await page.locator('.f111-prep-section summary').click();
   const select=page.locator('.prep-slot-select[data-prep-slot="CORE-ACT"]');
   await expect(select).toBeVisible();
   const labels=await select.locator('option').allTextContents();

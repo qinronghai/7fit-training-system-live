@@ -9,8 +9,18 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
   await expect(page.locator('.f111-compose-hero h1')).toHaveText('F111｜女性综合训练');
   await expect(page.locator('.f111-compose-stepper, .f111-current-combination, .f111-compose-hero .chips')).toHaveCount(0);
   await expect(page.locator('.f111-level-switch [aria-current="true"]')).toHaveText('L1');
-  await expect(page.locator('.f111-strength-section h2')).toBeInViewport();
-  await expect(page.locator('.f111-prep-section')).not.toHaveAttribute('open', '');
+  await expect(page.locator('[data-f111-disclosure="foam"]')).not.toHaveAttribute('open', '');
+  await expect(page.locator('[data-f111-disclosure="warmup"]')).toHaveAttribute('open', '');
+  await expect(page.locator('.f111-foam-card').first()).toBeHidden();
+  await expect(page.locator('.prep-slot-card').first()).toBeVisible();
+  const recovery=page.locator('[data-f111-recovery]');
+  const cardio=page.locator('.post-cardio-section');
+  await expect(recovery).toHaveAttribute('open', '');
+  await expect(cardio).toHaveAttribute('open', '');
+  const recoveryBox=await recovery.boundingBox();
+  const cardioBox=await cardio.boundingBox();
+  expect(cardioBox.y).toBeGreaterThan(recoveryBox.y+recoveryBox.height-1);
+  expect(cardioBox.width).toBeCloseTo(recoveryBox.width,0);
   await expect(page.locator('.f111-accessory-list [data-composer-slot]')).toHaveCount(4);
   const output = page.locator('.f111-course-output-section');
   await expect(output.getByText('复制课程', {exact:true})).toBeInViewport();
@@ -52,8 +62,8 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
   await page.keyboard.press('Escape');
   await expect(page.locator('[data-f111-mode-drawer="upper"]')).toBeFocused();
 
-  const cardio=page.locator('.post-cardio-section');
-  await cardio.locator('summary').click();
+  await expect(cardio).toHaveAttribute('open', '');
+  await recovery.locator('summary').click();
   const cardioChoice=cardio.locator('[data-f111-option-drawer]').first();
   await cardioChoice.click();
   await expect(drawer).toBeVisible();
@@ -64,6 +74,7 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
   await expect(cardio.locator('.post-cardio-summary')).toContainText('楼梯机');
   await expect(cardio.locator('summary')).toContainText('楼梯机');
   await expect(cardioChoice).toBeFocused();
+  await expect(recovery).not.toHaveAttribute('open', '');
   await expect(page.locator('.post-cardio-section [data-f111-option-drawer]')).toHaveCount(3);
 
   const result=await page.evaluate(()=>({

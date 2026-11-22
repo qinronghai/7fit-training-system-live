@@ -15,8 +15,9 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
     const prep = page.locator('.f111-prep-section');
     const main = page.locator('.f111-strength-grid .f111-slot-card');
     const accessories = page.locator('.f111-accessory-list .f111-slot-card');
-    await expect(prep.locator('summary')).toContainText('5 步动态热身');
-    await expect(prep.locator('.prep-slot-card').first()).toBeHidden();
+    await expect(prep.locator('.f111-foam-card').first()).toBeHidden();
+    await expect(prep.locator('.prep-slot-card')).toHaveCount(5);
+    await expect(prep.locator('.prep-slot-card').first()).toBeVisible();
     await expect(main).toHaveCount(2);
     await expect(accessories).toHaveCount(4);
     await expect(main.first().locator('h3 a')).toHaveAttribute('href', /#\/library\?focus=/);
@@ -42,8 +43,8 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
 test('replacement and C/CORE action drawers still open, select, and close', async ({ page }) => {
   await openComposer(page, 390);
   const actionDrawer = page.locator('#f111-action-drawer');
-  const prep = page.locator('.f111-prep-section');
-  await prep.locator('summary').click();
+  const foam = page.locator('[data-f111-disclosure="foam"]');
+  await foam.locator('summary').click();
 
   const foamCard = page.locator('.f111-foam-card').first();
   const foamButton = foamCard.locator('[data-replacement-drawer]');
@@ -55,7 +56,7 @@ test('replacement and C/CORE action drawers still open, select, and close', asyn
   await foamChoice.click();
   await expect(actionDrawer).toBeHidden();
   await expect(foamButton).toBeFocused();
-  await expect(prep).toHaveAttribute('open', '');
+  await expect(foam).toHaveAttribute('open', '');
 
   const warmupCard = page.locator('.prep-slot-card').first();
   await warmupCard.locator('[data-replacement-drawer]').click();

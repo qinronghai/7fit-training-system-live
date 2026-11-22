@@ -165,7 +165,7 @@
       :'';
     const fields=`<div class="post-cardio-controls">${choiceField({label:'器械',key:'post-cardio-equipment',sessionKey:key,className:'post-cardio-equipment',current:p.actionId,options:equipment,valueOf:option=>option.actionId,labelOf:option=>option.label})}${choiceField({label:'时长',key:'post-cardio-minutes',sessionKey:key,className:'post-cardio-minutes',current:p.minutes,options:MINUTE_CHOICES,valueOf:value=>value,labelOf:value=>`约 ${value} 分钟`})}${choiceField({label:'平均心率',key:'post-cardio-heart-rate',sessionKey:key,className:'post-cardio-heart-rate',current:`${p.heartRateMin}-${p.heartRateMax}`,options:HEART_RATE_CHOICES,valueOf:pair=>`${pair[0]}-${pair[1]}`,labelOf:pair=>`${pair[0]}–${pair[1]} bpm`})}</div><div class="post-cardio-actions">${copy}</div><p class="post-cardio-summary">${esc(summary(p))}</p>`;
     const attrs=`data-post-cardio="${esc(key)}" data-module-kind="POST CARDIO ONLY"`;
-    if(compact)return `<details class="post-cardio-section f111-disclosure" ${attrs} data-f111-disclosure="cardio"><summary><div><b>课后有氧</b><small>${esc(p.equipment)} · ${p.minutes} 分钟</small></div><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content">${fields}</div></details>`;
+    if(compact)return `<details class="post-cardio-section f111-disclosure" ${attrs} data-f111-disclosure="cardio" open><summary><div><b>课后有氧</b><small>${esc(p.equipment)} · ${p.minutes} 分钟</small></div><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content">${fields}</div></details>`;
     return `<section class="section-card post-cardio-section" ${attrs}><div class="section-head"><div><h2>课后有氧</h2><p>不计入力量训练时长，按会员处方执行。</p></div><span class="time-badge">约 ${p.minutes} 分钟</span></div>${fields}</section>`;
   }
 

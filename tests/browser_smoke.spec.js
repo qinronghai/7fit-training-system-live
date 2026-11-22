@@ -258,7 +258,6 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
 
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
   await expect(page.locator('.prep-slot-card')).toHaveCount(5);
-  await page.locator('.f111-prep-section summary').click();
   const composer = await firstReplaceablePrep(page);
   expect(composer, 'expected a replaceable Composer PREP slot').toBeTruthy();
   await page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`).selectOption(composer.target);

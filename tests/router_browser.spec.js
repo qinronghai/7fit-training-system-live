@@ -130,7 +130,6 @@ test('#30 canonical and legacy F111 URLs share formal and PREP state through rel
   await composerFormal.select.selectOption(composerFormal.target);
   await expect(page.locator(`.composer-slot-select[data-slot-key="${composerSlotKey}"]`)).toHaveValue(composerFormal.target);
 
-  await page.locator('.f111-prep-section summary').click();
   const composerPrep = await firstReplaceablePrep(page);
   expect(composerPrep, 'expected a replaceable composer PREP slot').toBeTruthy();
   await composerPrep.select.selectOption(composerPrep.target);
