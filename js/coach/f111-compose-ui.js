@@ -19,8 +19,8 @@
     const current=axis==='lower'?ctx.lowerMode:ctx.upperMode;
     const mode=modeOptions(ctx,axis).find(item=>item.id===current)||{name:current};
     const label=axis==='lower'?'下肢模式':'上肢模式';
-    const currentLabel=`${mode.name}${axis==='lower'&&mode.subtitle?`｜${mode.subtitle}`:''}`;
-    return `<button type="button" class="f111-mode-drawer-trigger" data-f111-mode-drawer="${axis}" data-f111-focus="mode-${axis}" aria-haspopup="dialog"><span><small class="f111-mode-label">${esc(label)}</small><b>${esc(currentLabel)}</b></span><i aria-hidden="true">⌄</i></button>`;
+    const detail=axis==='lower'&&mode.subtitle?` <span class="f111-mode-detail">${esc(mode.subtitle)}</span>`:'';
+    return `<button type="button" class="f111-mode-drawer-trigger" data-f111-mode-drawer="${axis}" data-f111-focus="mode-${axis}" aria-haspopup="dialog"><span><small class="f111-mode-label">${esc(label)}</small><b>${esc(mode.name)}${detail}</b></span><i aria-hidden="true">⌄</i></button>`;
   }
 
   function actionGroups(ctx,slotKey){
