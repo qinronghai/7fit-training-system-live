@@ -334,12 +334,11 @@ test('member status filtering happens before paging and archived members beyond 
     && call.query.status === 'ARCHIVED' && call.query.offset === '100')).toBeTruthy();
 });
 
-test('expired staff sessions offer the demo entry from both the member list and detail', async ({ page }) => {
+test('expired staff sessions require authorization from both the member list and detail', async ({ page }) => {
   const state = await mockMemberApi(page, { unauthorizedList: true, failMember: true });
   await page.goto('/#/coach/members');
   let recovery = page.locator('[data-member-auth-recovery]');
-  await expect(recovery).toContainText('教练登录已失效');
-  await expect(recovery.locator('[data-member-auth-link]')).toHaveAttribute('href', '?member-demo=1#/coach/members');
+  await expect(recovery).toContainText('此浏览器尚未获得真实会员访问权限');
   await expect(page.locator('[data-member-retry]')).toBeVisible();
   page.memberConsoleErrors=[];
 
@@ -350,7 +349,7 @@ test('expired staff sessions offer the demo entry from both the member list and 
 
   await page.evaluate(memberId => { location.hash = `#/coach/members/${memberId}`; }, MEMBER_ID);
   recovery = page.locator('[data-member-auth-recovery]');
-  await expect(recovery).toContainText('教练登录已失效');
+  await expect(recovery).toContainText('此浏览器尚未获得真实会员访问权限');
   await expect(page.locator('[data-member-detail-retry]')).toBeVisible();
   page.memberConsoleErrors=[];
   state.failMember = false;
@@ -928,12 +927,11 @@ test('Member-first F111 remains usable and can retry when context loading fails'
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
 
-test('Member-first F111 offers the demo entry when the staff session expires', async ({ page }) => {
+test('Member-first F111 requires authorization when the staff session expires', async ({ page }) => {
   const state = await mockMemberApi(page, { failContext: true, unauthorizedContext: true });
   await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   const panel = page.locator('[data-member-first-context]');
-  await expect(panel.getByRole('alert')).toContainText('教练登录已失效');
-  await expect(panel.locator('[data-member-auth-link]')).toHaveAttribute('href', '?member-demo=1#/coach/members');
+  await expect(panel.getByRole('alert')).toContainText('此浏览器尚未获得真实会员访问权限');
   page.memberConsoleErrors=[];
   state.failContext = false;
   state.unauthorizedContext = false;

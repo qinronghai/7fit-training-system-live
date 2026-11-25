@@ -8,7 +8,7 @@ test('public member page can read and change isolated samples without a staff se
   });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/#/coach/members');
+  await page.goto('/?member-demo=1#/coach/members');
   await expect(page.getByText('示例数据', { exact: true })).toBeVisible();
   await expect(page.getByText('馆主管理 PIN')).toHaveCount(0);
   await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('14');
@@ -44,12 +44,12 @@ test('public member page can read and change isolated samples without a staff se
   expect(memberRequests).toEqual([]);
   expect(await page.evaluate(() => localStorage.getItem('7fit_case_admin_session'))).toBeNull();
 
-  const other = await browser.newPage({ baseURL: 'http://127.0.0.1:4173' });
+  const other = await browser.newPage({ baseURL: new URL(page.url()).origin });
   try {
     await other.addInitScript(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
       token: 'expired-staff-session', expiresAt: '2000-01-01T00:00:00.000Z',
     })));
-    await other.goto('/#/coach/members');
+    await other.goto('/?member-demo=1#/coach/members');
     await expect(other.locator('[data-member-count="TOTAL"]')).toHaveText('14');
     await expect(other.getByRole('link', { name: '本地体验会员' })).toHaveCount(0);
   } finally {

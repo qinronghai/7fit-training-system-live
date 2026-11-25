@@ -92,7 +92,7 @@
   }
 
   function staffRecoveryMarkup(){
-    return '<span class="member-auth-recovery" data-member-auth-recovery>教练登录已失效。 <a data-member-auth-link href="?member-demo=1#/coach/members">打开示例数据</a></span>';
+    return '<span class="member-auth-recovery" data-member-auth-recovery>此浏览器尚未获得真实会员访问权限。请使用设备授权链接。</span>';
   }
 
   function showListError(error){

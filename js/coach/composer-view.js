@@ -58,7 +58,7 @@
     if(!memberId)return '';
     const context=state?.context;
     let content='<p class="member-first-context-state" role="status">正在读取会员训练上下文…</p>';
-    if(state?.status==='error')content=`<div class="member-first-context-state error" role="alert"><p>${state.errorStatus===401?'教练登录已失效。':'会员训练上下文暂时无法读取，请检查网络。'}${state.errorStatus===401?' <a data-member-auth-link href="?member-demo=1#/coach/members">打开示例数据</a>':''}</p><button type="button" data-member-context-retry>重试</button></div>`;
+    if(state?.status==='error')content=`<div class="member-first-context-state error" role="alert"><p>${state.errorStatus===401?'此浏览器尚未获得真实会员访问权限。请使用设备授权链接。':'会员训练上下文暂时无法读取，请检查网络。'}</p><button type="button" data-member-context-retry>重试</button></div>`;
     if(state?.status==='ready'){
       const last=context?.lastCompletedSession;
       if(!last){

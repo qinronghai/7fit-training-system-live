@@ -230,6 +230,19 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
     if (request.method === 'OPTIONS') return json({ ok: true });
     if (!['GET', 'POST'].includes(request.method)) return apiError('invalid_request', 405);
 
+    const url = new URL(request.url);
+    const action = url.searchParams.get('action') || '';
+    if (request.method === 'POST' && action === 'redeem-device' && typeof auth.redeemDevice === 'function') {
+      const body = await readBody(request);
+      if (!body) return apiError('invalid_request', 400);
+      try {
+        const expiresAt = await auth.redeemDevice(body.code, body.token);
+        return expiresAt ? json({ expiresAt }) : apiError('invalid_device_enrollment', 401);
+      } catch (_) {
+        return apiError('internal_error', 500);
+      }
+    }
+
     const authorization = request.headers.get('authorization');
     let verified;
     try {
@@ -239,8 +252,6 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
     }
     if (!verified?.ok) return apiError('unauthorized', 401);
 
-    const url = new URL(request.url);
-    const action = url.searchParams.get('action') || '';
     const body = request.method === 'POST' ? await readBody(request) : {};
     if (request.method === 'POST' && !body) return apiError('invalid_request', 400);
     const timestamp = dateNow(now);

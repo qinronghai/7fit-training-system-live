@@ -21,7 +21,7 @@
           <label class="member-save-search"><span>搜索会员</span><input type="search" data-member-save-search placeholder="输入会员姓名" autocomplete="off"></label>
           <label class="member-save-member"><span>选择会员</span><select data-member-save-select><option value="">选择会员</option></select></label>
           <div class="member-save-status" data-member-save-status role="status" aria-live="polite"></div>
-          <p class="member-save-auth-note" data-member-save-auth hidden>教练登录已失效。 <a href="?member-demo=1#/coach/members">打开示例数据</a></p>
+          <p class="member-save-auth-note" data-member-save-auth hidden>此浏览器尚未获得真实会员访问权限。请使用设备授权链接。</p>
         </div>
         <footer class="member-save-actions"><button type="button" data-member-save-cancel>取消</button><button type="button" class="primary" data-member-save-submit disabled>保存训练课</button><button type="button" data-member-save-new-intent hidden>另存给其他会员</button></footer>
       </form>`;

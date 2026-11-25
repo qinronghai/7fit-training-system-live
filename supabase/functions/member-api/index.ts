@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStaffAuthService } from "../_shared/staff-auth.mjs";
 import { createMemberApi } from "./service.mjs";
+import { createMemberDeviceAuth } from "./device-auth.mjs";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const legacyServiceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -307,4 +308,28 @@ const staffAuth = createStaffAuthService({
   store: await createSessionStore(),
 });
 
-Deno.serve(createMemberApi({ auth: staffAuth, repository }));
+const auth = createMemberDeviceAuth({
+  staffAuth,
+  store: {
+    async hasDevice(tokenHash: string) {
+      const { data, error } = await supabase.from("member_device_grants")
+        .select("token_hash")
+        .eq("token_hash", tokenHash)
+        .eq("kind", "device")
+        .gt("expires_at", new Date().toISOString())
+        .maybeSingle();
+      throwOnError(error);
+      return !!data;
+    },
+    async redeem(enrollmentHash: string, deviceHash: string) {
+      const { data, error } = await supabase.rpc("member_redeem_device_grant", {
+        p_enrollment_hash: enrollmentHash,
+        p_device_hash: deviceHash,
+      });
+      throwOnError(error);
+      return data;
+    },
+  },
+});
+
+Deno.serve(createMemberApi({ auth, repository }));
