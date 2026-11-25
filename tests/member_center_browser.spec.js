@@ -104,7 +104,7 @@ test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => page.memberPageErrors.push(error.message || String(error)));
   page.on('console', message => { if (message.type() === 'error') page.memberConsoleErrors.push(message.text()); });
   await page.addInitScript(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
-    token: 'member-center-test-token', expiresAt: '2026-10-27T12:00:00.000Z',
+    token: 'member-center-test-token', expiresAt: '2099-10-27T12:00:00.000Z',
   })));
 });
 
@@ -334,27 +334,27 @@ test('member status filtering happens before paging and archived members beyond 
     && call.query.status === 'ARCHIVED' && call.query.offset === '100')).toBeTruthy();
 });
 
-test('expired staff sessions offer PIN verification recovery from both the member list and detail', async ({ page }) => {
+test('expired staff sessions offer the demo entry from both the member list and detail', async ({ page }) => {
   const state = await mockMemberApi(page, { unauthorizedList: true, failMember: true });
   await page.goto('/#/coach/members');
   let recovery = page.locator('[data-member-auth-recovery]');
-  await expect(recovery).toContainText('馆主管理 PIN 验证');
-  await expect(recovery.locator('[data-member-auth-link]')).toHaveAttribute('target', '_blank');
+  await expect(recovery).toContainText('教练登录已失效');
+  await expect(recovery.locator('[data-member-auth-link]')).toHaveAttribute('href', '?member-demo=1#/coach/members');
   await expect(page.locator('[data-member-retry]')).toBeVisible();
   page.memberConsoleErrors=[];
 
   state.unauthorizedList = false;
-  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2099-10-27T12:00:00.000Z' })));
   await page.locator('[data-member-retry]').click();
   await expect(page.locator(`[data-member-row="${MEMBER_ID}"]`)).toBeVisible();
 
   await page.evaluate(memberId => { location.hash = `#/coach/members/${memberId}`; }, MEMBER_ID);
   recovery = page.locator('[data-member-auth-recovery]');
-  await expect(recovery).toContainText('馆主管理 PIN 验证');
+  await expect(recovery).toContainText('教练登录已失效');
   await expect(page.locator('[data-member-detail-retry]')).toBeVisible();
   page.memberConsoleErrors=[];
   state.failMember = false;
-  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2099-10-27T12:00:00.000Z' })));
   await page.locator('[data-member-detail-retry]').click();
   await expect(page.getByRole('heading', { name: '林同学' })).toBeVisible();
 });
@@ -928,16 +928,16 @@ test('Member-first F111 remains usable and can retry when context loading fails'
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
 
-test('Member-first F111 offers PIN verification recovery when the staff session expires', async ({ page }) => {
+test('Member-first F111 offers the demo entry when the staff session expires', async ({ page }) => {
   const state = await mockMemberApi(page, { failContext: true, unauthorizedContext: true });
   await page.goto(`/#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   const panel = page.locator('[data-member-first-context]');
   await expect(panel.getByRole('alert')).toContainText('教练登录已失效');
-  await expect(panel.locator('[data-member-auth-link]')).toHaveAttribute('target', '_blank');
+  await expect(panel.locator('[data-member-auth-link]')).toHaveAttribute('href', '?member-demo=1#/coach/members');
   page.memberConsoleErrors=[];
   state.failContext = false;
   state.unauthorizedContext = false;
-  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2026-10-27T12:00:00.000Z' })));
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({ token: 'member-center-recovered-token', expiresAt: '2099-10-27T12:00:00.000Z' })));
   await panel.locator('[data-member-context-retry]').click();
   await expect(panel).toContainText('全身塑形');
   page.memberConsoleErrors=[];

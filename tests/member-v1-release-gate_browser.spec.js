@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
   page.on('pageerror', error => page.releasePageErrors.push(error.message || String(error)));
   page.on('console', message => { if (message.type() === 'error') page.releaseConsoleErrors.push(message.text()); });
   await page.addInitScript(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
-    token: 'member-release-gate-test-token', expiresAt: '2026-10-27T12:00:00.000Z',
+    token: 'member-release-gate-test-token', expiresAt: '2099-10-27T12:00:00.000Z',
   })));
 });
 

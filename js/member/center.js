@@ -14,9 +14,13 @@
   function formMarkup(){return `<dialog class="member-form-dialog" data-member-form-dialog aria-labelledby="member-form-title"><form class="member-form-panel" data-member-form><header class="member-form-head"><div><h2 id="member-form-title">新增会员</h2><p>只记录编排和回看训练所需的信息。</p></div><button type="button" data-member-form-cancel>取消</button></header><div class="member-form-fields"><label>会员姓名<input name="displayName" required maxlength="120" autocomplete="name"></label><label>训练等级<select name="trainingLevel"><option value="">未设置</option><option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option></select></label><label>主要训练目标<input name="primaryGoal" maxlength="240" placeholder="例如：提升下肢力量"></label><label>训练经验<select name="experienceLevel"><option value="">未设置</option><option value="BEGINNER">初级</option><option value="INTERMEDIATE">中级</option><option value="ADVANCED">进阶</option></select></label><label>动作限制<textarea name="movementConstraints" rows="2" placeholder="每行一项，例如：膝关节屈曲受限"></textarea></label><label>常用器械<textarea name="preferredEquipment" rows="2" placeholder="每行一项，例如：哑铃"></textarea></label><label>训练备注<textarea name="profileNotes" rows="2" maxlength="2000"></textarea></label><label>教练备注<textarea name="coachNotes" rows="3" maxlength="4000"></textarea></label><p class="member-form-error" data-member-form-error role="alert" hidden></p></div><footer class="member-form-actions"><button type="button" data-member-form-cancel>取消</button><button class="primary" type="submit" data-member-form-submit>保存资料</button></footer></form></dialog>`;}
   function archiveMarkup(){return `<dialog class="member-archive-dialog" data-member-archive-dialog aria-labelledby="member-archive-title"><section><h2 id="member-archive-title">归档会员</h2><p data-member-archive-copy>归档后，历史训练记录仍会保留。</p><div class="member-archive-actions"><button type="button" data-member-archive-cancel>取消</button><button type="button" class="danger" data-member-archive-confirm>确认归档</button></div></section></dialog>`;}
 
+  function demoLabel(){
+    return window.V14MemberAPI?.isDemo?'<span class="member-demo-label">示例数据</span>':'';
+  }
+
   function renderListShell(){
     return `<section class="member-center-page member-directory" data-member-center-page="list" aria-labelledby="page-title">
-      <div class="member-directory-total"><span>会员总数</span><strong data-member-count="TOTAL">—</strong><span>位</span></div>
+      <div class="member-directory-total"><span>会员总数</span><strong data-member-count="TOTAL">—</strong><span>位</span>${demoLabel()}</div>
       <label class="member-directory-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg>
         <input type="search" data-member-search aria-label="搜索会员姓名" value="${esc(query)}" placeholder="搜索会员姓名" autocomplete="off">
@@ -88,7 +92,7 @@
   }
 
   function staffRecoveryMarkup(){
-    return '<span class="member-auth-recovery" data-member-auth-recovery>教练登录已失效。请在新标签页完成馆主管理 PIN 验证，然后返回此页重试。 <a data-member-auth-link href="assets/real-results/index.html?admin=1" target="_blank" rel="noopener">打开教练验证</a></span>';
+    return '<span class="member-auth-recovery" data-member-auth-recovery>教练登录已失效。 <a data-member-auth-link href="?member-demo=1#/coach/members">打开示例数据</a></span>';
   }
 
   function showListError(error){
@@ -187,7 +191,7 @@
       `<button type="button" class="member-archive-action" data-member-archive="${esc(member.id)}">归档</button>`;
     return `<section class="member-center-page member-detail-page" data-member-center-page="detail">
       <a class="member-back-link" href="#/coach/members">返回会员管理</a>
-      <header class="member-detail-heading"><div><h1>${esc(member.displayName)}</h1><p>${archived?'已归档':statusLabel(member.status)}${member.trainingLevel?' · '+esc(member.trainingLevel):''}</p></div>
+      <header class="member-detail-heading"><div><h1>${esc(member.displayName)}</h1><p>${archived?'已归档':statusLabel(member.status)}${member.trainingLevel?' · '+esc(member.trainingLevel):''}</p>${demoLabel()}</div>
         <details class="member-more"><summary>更多操作</summary>${manage}</details></header>
       <section class="member-last-practice" data-member-recent-context><h2>上次实练</h2>${lastRecord}${todayAction(member,context,sessions,todayPlans)}</section>
       ${contextMarkup(context)}${profileMarkup(member)}${timelineMarkup(sessions)}${formMarkup()}${archiveMarkup()}</section>`;
@@ -477,7 +481,7 @@
       if(route?.page==='member-detail')rerender();
       if(route?.page==='member-list')scheduleListLoad(0);
     }catch(error){
-      if(error?.status===401)errorNode.innerHTML=`${staffRecoveryMarkup()}<span>验证完成后返回此页，再次保存资料。</span>`;
+      if(error?.status===401)errorNode.innerHTML=`${staffRecoveryMarkup()}`;
       else errorNode.textContent=error?.code==='invalid_member'?'会员资料未通过校验，请检查姓名和每项信息的长度。':'保存失败，请检查网络后重试。';
       errorNode.hidden=false;
     }finally{button.disabled=false;button.textContent=form.dataset.memberId?'保存修改':'保存资料';}
@@ -502,7 +506,7 @@
       if(startedInMemberView&&startedRouteVersion===routeVersion&&route?.area==='coach'&&['member-list','member-detail'].includes(route.page))rerender();
     }catch(error){
       const copy=dialog.querySelector('[data-member-archive-copy]');
-      if(error?.status===401)copy.innerHTML=`${staffRecoveryMarkup()}<span>验证后返回此页，再次归档。</span>`;
+      if(error?.status===401)copy.innerHTML=`${staffRecoveryMarkup()}`;
       else copy.textContent='归档失败，历史记录未变更。请检查网络后重试。';
     }
     finally{button.disabled=false;button.textContent='确认归档';}

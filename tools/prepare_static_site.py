@@ -52,6 +52,13 @@ def prepare_site(root: Path, dest: Path, build_id: str) -> None:
     member_directory.mkdir(parents=True, exist_ok=True)
     shutil.copy2(root / "supabase" / "functions" / "_shared" / "member-domain.mjs", member_directory / "member-domain.mjs")
 
+    # Publish the pure request handler and its runtime dependency for browser-local demo data.
+    demo_runtime = member_directory / "demo-runtime"
+    demo_runtime.mkdir()
+    (member_directory / "_shared").mkdir()
+    shutil.copy2(root / "supabase" / "functions" / "member-api" / "service.mjs", demo_runtime / "service.mjs")
+    shutil.copy2(member_directory / "member-domain.mjs", member_directory / "_shared" / "member-domain.mjs")
+
     index_path = dest / "index.html"
     index_path.write_text(
         version_index(index_path.read_text(encoding="utf-8"), build_id),

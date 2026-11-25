@@ -3,6 +3,16 @@
 
   const API_BASE=String(window.V14_MEMBER_API_BASE||'https://ynsodlyanpmixbbxblqh.supabase.co/functions/v1/member-api').replace(/\/+$/,'');
   const STAFF_SESSION_KEY='7fit_case_admin_session';
+  const scriptUrl=typeof document==='undefined'?null:document.currentScript?.src;
+  const apiUrl=new URL(API_BASE);
+  const localPreview=apiUrl.pathname==='/__dev/member-api'&&apiUrl.hostname==='127.0.0.1'&&apiUrl.origin===window.location.origin;
+  const initialSession=scriptUrl&&!window.V14_MEMBER_API_BASE?readStaffSession():null;
+  const browserDemo=!!scriptUrl&&!window.V14_MEMBER_API_BASE
+    &&(new URL(window.location.href).searchParams.get('member-demo')==='1'
+      ||!initialSession||Date.parse(initialSession.expiresAt)<=Date.now());
+  const demoUrl=browserDemo?new URL('./demo-api.mjs',scriptUrl):null;
+  if(demoUrl)demoUrl.search=new URL(scriptUrl).search;
+  let demoRuntime=null;
 
   class MemberApiError extends Error{
     constructor(code,status,fields=[]){super(code);this.name='MemberApiError';this.code=code;this.status=status;this.fields=fields;}
@@ -20,10 +30,9 @@
   }
 
   async function request(action,{method='GET',query={},body,signal}={}){
-    const url=new URL(API_BASE);
-    const localPreview=url.pathname==='/__dev/member-api'&&url.hostname==='127.0.0.1'&&url.origin===window.location.origin;
-    const session=localPreview?null:readStaffSession();
-    if(!localPreview&&!session)throw new MemberApiError('staff_session_required',401);
+    const url=browserDemo?new URL('./member-demo',scriptUrl):new URL(API_BASE);
+    const session=localPreview||browserDemo?null:readStaffSession();
+    if(!localPreview&&!browserDemo&&!session)throw new MemberApiError('staff_session_required',401);
     url.searchParams.set('action',action);
     for(const [key,value] of Object.entries(query)){
       if(value!==undefined&&value!==null&&value!=='')url.searchParams.set(key,String(value));
@@ -32,10 +41,14 @@
     const init={method,headers,signal,cache:'no-store'};
     if(body!==undefined){headers['content-type']='application/json';init.body=JSON.stringify(body);}
     let response;
-    try{response=await fetch(url.href,init);}
-    catch(_){throw new MemberApiError('network_error',0);}
+    try{
+      if(browserDemo){
+        demoRuntime ||= import(demoUrl.href).catch(error=>{demoRuntime=null;throw error;});
+        response=await (await demoRuntime).requestDemo(url,init);
+      }else response=await fetch(url.href,init);
+    }catch(_){throw new MemberApiError('network_error',0);}
     const payload=await response.json().catch(()=>({}));
-    if(response.status===401&&!localPreview)clearStaffSession();
+    if(response.status===401&&session)clearStaffSession();
     if(!response.ok)throw new MemberApiError(payload.error||'internal_error',response.status,payload.fields||[]);
     return payload;
   }
@@ -45,6 +58,7 @@
   }
 
   const api={
+    isDemo:localPreview||browserDemo,
     request,
     listMembers(options){return listMemberDirectory(options).then(value=>value.members||[]);},
     listMemberDirectory,

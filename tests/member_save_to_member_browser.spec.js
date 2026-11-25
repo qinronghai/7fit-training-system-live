@@ -17,7 +17,7 @@ test.afterEach(async ({ page }) => {
 
 async function installStaffSession(page) {
   await page.addInitScript(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
-    token: 'member-save-test-token', expiresAt: '2026-10-27T12:00:00.000Z',
+    token: 'member-save-test-token', expiresAt: '2099-10-27T12:00:00.000Z',
   })));
 }
 

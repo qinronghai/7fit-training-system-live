@@ -7,7 +7,7 @@ test('F111 composer uses recent-three context to diversify support and CORE reco
   const errors = [];
   page.on('pageerror', error => errors.push(error.message || String(error)));
   await page.addInitScript(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
-    token: 'member-diversity-test-token', expiresAt: '2026-10-27T12:00:00.000Z',
+    token: 'member-diversity-test-token', expiresAt: '2099-10-27T12:00:00.000Z',
   })));
   await page.route(`${API}**`, async route => {
     const url = new URL(route.request().url());
