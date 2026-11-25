@@ -41,6 +41,9 @@ def test_prepare_site_copies_runtime_and_rewrites_only_deployed_index(tmp_path: 
     member_domain = root / "supabase" / "functions" / "_shared" / "member-domain.mjs"
     member_domain.parent.mkdir(parents=True)
     member_domain.write_text("export const fixture = true;", encoding="utf-8")
+    member_service = root / "supabase" / "functions" / "member-api" / "service.mjs"
+    member_service.parent.mkdir()
+    member_service.write_text("export const serviceFixture = true;", encoding="utf-8")
 
     prepare_site(root, dest, "abcdef0123456789")
 

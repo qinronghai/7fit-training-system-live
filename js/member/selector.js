@@ -16,12 +16,12 @@
     dialog.setAttribute('aria-labelledby','member-save-title');
     dialog.innerHTML=`
       <form class="member-save-panel" method="dialog">
-        <header class="member-save-head"><div><h2 id="member-save-title">保存训练课到会员</h2><p>选择会员后，会将课程计划保存为一节待训练课程。</p></div><button type="button" class="member-save-close" data-member-save-close aria-label="关闭">×</button></header>
+        <header class="member-save-head"><div><h2 id="member-save-title">保存训练课到会员</h2><p>${window.V14MemberAPI?.isDemo?'示例数据 · 修改仅保存在当前标签页。':'选择会员后，会将课程计划保存为一节待训练课程。'}</p></div><button type="button" class="member-save-close" data-member-save-close aria-label="关闭">×</button></header>
         <div class="member-save-body">
           <label class="member-save-search"><span>搜索会员</span><input type="search" data-member-save-search placeholder="输入会员姓名" autocomplete="off"></label>
           <label class="member-save-member"><span>选择会员</span><select data-member-save-select><option value="">选择会员</option></select></label>
           <div class="member-save-status" data-member-save-status role="status" aria-live="polite"></div>
-          <p class="member-save-auth-note" data-member-save-auth hidden>教练登录已失效。请在新标签页完成馆主管理 PIN 验证后再试。 <a href="assets/real-results/index.html?admin=1" target="_blank" rel="noopener">打开教练验证</a></p>
+          <p class="member-save-auth-note" data-member-save-auth hidden>教练登录已失效。 <a href="?member-demo=1#/coach/members">打开示例数据</a></p>
         </div>
         <footer class="member-save-actions"><button type="button" data-member-save-cancel>取消</button><button type="button" class="primary" data-member-save-submit disabled>保存训练课</button><button type="button" data-member-save-new-intent hidden>另存给其他会员</button></footer>
       </form>`;

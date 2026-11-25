@@ -1920,6 +1920,8 @@ body{font-size:14px;line-height:1.55}
 }
 .member-center-page.member-directory{gap:10px}
 .member-directory-total{display:flex;align-items:baseline;gap:7px;padding:6px 14px;border-radius:9px;background:var(--purple-soft);font-size:15px;font-weight:700}
+.member-demo-label{color:var(--muted);font-size:12px;font-weight:650}
+.member-directory-total .member-demo-label{margin-inline-start:auto}
 .member-directory-total strong{color:var(--ink);font-size:27px;font-weight:850;line-height:1.25;font-variant-numeric:tabular-nums}
 .member-directory-search{display:block;position:relative;min-width:0}
 .member-directory-search svg{width:20px;height:20px;position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
