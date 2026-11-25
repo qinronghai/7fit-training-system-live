@@ -119,7 +119,7 @@ test('Member-first and Template-first F111 complete the local release flow', asy
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto('/#/coach/members');
-  await page.locator('.member-center-heading [data-member-create]').click();
+  await page.getByRole('button', { name: '新增会员', exact: true }).click();
   const memberForm = page.locator('[data-member-form-dialog]');
   await memberForm.locator('[name="displayName"]').fill('林同学');
   await memberForm.locator('[name="trainingLevel"]').selectOption('L2');

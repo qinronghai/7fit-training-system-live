@@ -136,13 +136,16 @@ async function mockMemberApi(page, state = {}) {
       const search = (url.searchParams.get('search') || '').toLocaleLowerCase();
       const status = url.searchParams.get('status') || (url.searchParams.get('includeArchived') === 'true' ? 'ALL' : 'ACTIVE');
       const offset = Number(url.searchParams.get('offset')) || 0;
-      const results = state.members.filter(value => (status === 'ALL'
-        || (status === 'ACTIVE' && value.status === 'ACTIVE' && !value.archivedAt)
-        || (status === 'ARCHIVED' && !!value.archivedAt)
-        || (status === 'INACTIVE' && value.status === 'INACTIVE' && !value.archivedAt))
+      const memberStatus = value => value.archivedAt ? 'ARCHIVED' : value.status;
+      const results = state.members.filter(value => (status === 'ALL' || status === memberStatus(value))
         && value.displayName.toLocaleLowerCase().includes(search))
         .sort((left, right) => left.displayName.localeCompare(right.displayName));
-      return respond({ members: results.slice(offset, offset + (Number(url.searchParams.get('limit')) || 100)) });
+      const payload = { members: results.slice(offset, offset + (Number(url.searchParams.get('limit')) || 100)) };
+      if (url.searchParams.get('includeCounts') === 'true') {
+        payload.counts = { ACTIVE: 0, ARCHIVED: 0, INACTIVE: 0 };
+        for (const value of state.members) payload.counts[memberStatus(value)] += 1;
+      }
+      return respond(payload);
     }
     if (action === 'get-member') {
       if (state.memberWait) await state.memberWait;
@@ -242,6 +245,8 @@ test('Member Center searches active members on the server and switches to the ar
   const state = await mockMemberApi(page);
   await page.goto('/#/coach/members');
   await expect(page.getByRole('heading', { name: '会员管理' })).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('2');
+  await expect(page.locator('[data-member-count="INACTIVE"]')).toHaveText('0');
   await expect(page.getByText('林同学')).toBeVisible();
   await expect(page.getByText('王同学')).toHaveCount(0);
 
@@ -252,7 +257,51 @@ test('Member Center searches active members on the server and switches to the ar
   await page.locator('[data-member-search]').fill('');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
   await expect(page.getByText('王同学')).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('2');
   expect(state.calls.some(call => call.action === 'list-members' && call.query.status === 'ARCHIVED')).toBeTruthy();
+  expect(state.calls.filter(call => call.query.includeCounts === 'true')).toHaveLength(1);
+});
+
+test('the mobile member directory packs cards by height while keeping keyboard order', async ({ page }, testInfo) => {
+  const names = ['林', '陈', '周', '许', '张', '王', '郑', '李', '吴', '何', '黄', '赵', '丁', '谢', '郭', '马', '罗', '孙', '刘', '高']
+    .map(name => `${name}同学`).sort((left, right) => left.localeCompare(right));
+  const goals = ['提升下肢力量', '建立每周训练习惯，提升基础力量', '提升全身力量', '改善核心稳定',
+    '掌握深蹲和髋铰链，打好力量基础', '提升上肢力量', '改善单腿稳定', '提高基础体能'];
+  const members = names.map((name, index) => ({
+    ...member(`e5000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, name),
+    trainingLevel: `L${1 + index % 3}`,
+    primaryGoal: goals[index % goals.length],
+  }));
+  await mockMemberApi(page, { members: [
+    ...members,
+    ...Array.from({ length: 3 }, (_, index) => member(`e6000000-0000-4000-8000-00000000000${index}`, `已归档${index}`, 'INACTIVE', '2026-09-20T00:00:00.000Z')),
+    member(ARCHIVED_ID, '已停用会员', 'INACTIVE'),
+  ] });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/members');
+  await expect(page.getByRole('button', { name: '新增会员', exact: true })).toBeVisible();
+  await expect(page.locator('#app-header .quick-library')).toBeHidden();
+  const cards = page.locator('[data-member-open]');
+  await expect(cards).toHaveCount(20);
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('24');
+  const boxes = await Promise.all([0, 1, 2, 3].map(index => cards.nth(index).boundingBox()));
+  expect(boxes[0].y).toBe(boxes[1].y);
+  expect(boxes[0].x).toBeLessThan(boxes[1].x);
+  expect(boxes[0].height).toBeLessThan(boxes[1].height);
+  expect(boxes[2].x).toBe(boxes[0].x);
+  expect(boxes[2].y).toBeLessThan(boxes[3].y);
+  await page.screenshot({ path: testInfo.outputPath('member-directory-390x844.png') });
+
+  await cards.first().focus();
+  await page.keyboard.press('Tab');
+  await expect(cards.nth(1)).toBeFocused();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect.poll(async () => {
+    const thirdCard = await cards.nth(2).boundingBox();
+    const secondCard = await cards.nth(1).boundingBox();
+    return thirdCard.x > secondCard.x && thirdCard.y === secondCard.y;
+  }).toBeTruthy();
 });
 
 test('member status filtering happens before paging and archived members beyond the first page are reachable', async ({ page }, testInfo) => {
@@ -269,6 +318,8 @@ test('member status filtering happens before paging and archived members beyond 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach/members');
   await expect(page.locator('[data-member-row]')).toHaveCount(100);
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('210');
+  await expect(page.locator('[data-member-count="ACTIVE"]')).toHaveText('105');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
   await expect(page.locator('[data-member-row]')).toHaveCount(100);
   await expect(page.getByText('Archived 001')).toBeVisible();
@@ -342,6 +393,7 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await expect(form).not.toBeVisible();
   expect(state.calls.some(call => call.action === 'save-member' && call.body.displayName === '赵同学')).toBeTruthy();
   await expect(page.locator(`[data-member-row="${CREATED_ID}"]`)).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('3');
 
   await page.locator(`[data-member-open="${CREATED_ID}"]`).click();
   await expect(page).toHaveURL(new RegExp(`/members/${CREATED_ID}$`));
@@ -359,6 +411,12 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await page.locator('.member-more summary').click();
   await expect(page.locator('[data-member-restore]')).toBeVisible();
   expect(state.calls.some(call => call.action === 'archive-member')).toBeTruthy();
+  await page.goto('/#/coach/members');
+  await expect(page.locator('[data-member-count="ACTIVE"]')).toHaveText('1');
+  await expect(page.locator('[data-member-count="ARCHIVED"]')).toHaveText('2');
+  await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await page.locator(`[data-member-open="${CREATED_ID}"]`).click();
+  await page.locator('.member-more summary').click();
   await page.locator('[data-member-restore]').click();
   await expect(page.locator('[data-member-archive]')).toBeAttached();
   expect(state.calls.some(call => call.action === 'restore-member')).toBeTruthy();

@@ -44,8 +44,19 @@
     window.V14CoachModules?.MemberCenter?.routeChanged?.(route);
     if(!isF111ComposerRoute(route))window.V14CoachModules?.ComposerView?.resetMemberContextBinding?.();
     const main=document.getElementById('app-main');
-    if(!window.V14Router.isValid(route)){
-      document.getElementById('page-title').textContent='页面不存在';
+    const titleNode=document.getElementById('page-title');
+    const valid=window.V14Router.isValid(route);
+    const memberDirectory=valid&&route.area==='coach'&&route.page==='member-list';
+    document.getElementById('member-directory-create').hidden=!memberDirectory;
+    if(memberDirectory){
+      titleNode.setAttribute('role','heading');
+      titleNode.setAttribute('aria-level','1');
+    }else{
+      titleNode.removeAttribute('role');
+      titleNode.removeAttribute('aria-level');
+    }
+    if(!valid){
+      titleNode.textContent='页面不存在';
       document.getElementById('page-subtitle').textContent='请返回编课中心';
       setActive('');
       main.innerHTML='<section class="empty-state"><b>页面不存在</b><span>这个地址不属于当前训练系统信息架构。</span><a href="#/coach">返回编课中心</a></section>';
@@ -53,7 +64,7 @@
       return;
     }
     const [title,sub]=labels(route);
-    document.getElementById('page-title').textContent=title;
+    titleNode.textContent=title;
     document.getElementById('page-subtitle').textContent=sub;
     setActive(['member-list','member-detail'].includes(route.page)?'members':route.area);
     const renderers=window.V14Views||{};

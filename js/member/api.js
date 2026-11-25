@@ -20,32 +20,34 @@
   }
 
   async function request(action,{method='GET',query={},body,signal}={}){
-    const session=readStaffSession();
-    if(!session)return Promise.reject(new MemberApiError('staff_session_required',401));
     const url=new URL(API_BASE);
+    const localPreview=url.pathname==='/__dev/member-api'&&url.hostname==='127.0.0.1'&&url.origin===window.location.origin;
+    const session=localPreview?null:readStaffSession();
+    if(!localPreview&&!session)throw new MemberApiError('staff_session_required',401);
     url.searchParams.set('action',action);
     for(const [key,value] of Object.entries(query)){
       if(value!==undefined&&value!==null&&value!=='')url.searchParams.set(key,String(value));
     }
-    const headers={authorization:`Bearer ${session.token}`};
+    const headers=session?{authorization:`Bearer ${session.token}`}:{};
     const init={method,headers,signal,cache:'no-store'};
     if(body!==undefined){headers['content-type']='application/json';init.body=JSON.stringify(body);}
     let response;
     try{response=await fetch(url.href,init);}
     catch(_){throw new MemberApiError('network_error',0);}
     const payload=await response.json().catch(()=>({}));
-    if(response.status===401)clearStaffSession();
+    if(response.status===401&&!localPreview)clearStaffSession();
     if(!response.ok)throw new MemberApiError(payload.error||'internal_error',response.status,payload.fields||[]);
     return payload;
   }
 
-  function listMembers({search='',status='',includeArchived=false,limit=100,offset=0}={}){
-    return request('list-members',{query:{search,status:status||'',includeArchived:includeArchived?'true':'',limit,offset}}).then(value=>value.members||[]);
+  function listMemberDirectory({search='',status='',includeArchived=false,includeCounts=false,limit=100,offset=0}={}){
+    return request('list-members',{query:{search,status:status||'',includeArchived:includeArchived?'true':'',includeCounts:includeCounts?'true':'',limit,offset}});
   }
 
   const api={
     request,
-    listMembers,
+    listMembers(options){return listMemberDirectory(options).then(value=>value.members||[]);},
+    listMemberDirectory,
     getMember(memberId){return request('get-member',{query:{memberId}}).then(value=>value.member);},
     saveMember(member){return request('save-member',{method:'POST',body:member}).then(value=>value.member);},
     archiveMember(id){return request('archive-member',{method:'POST',body:{id}}).then(value=>value.member);},
