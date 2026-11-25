@@ -127,6 +127,29 @@ async function main() {
   assert.equal(listOptions.limit, 100);
   assert.equal(listOptions.offset, 25);
 
+  let countReads = 0;
+  const counts = { ACTIVE: 110, ARCHIVED: 3, INACTIVE: 0 };
+  const directoryApi = createMemberApi({ auth: createAuth(), now: () => NOW, repository: repository({
+    async listMembers() { return [memberFixture]; },
+    async countMembers() { countReads += 1; return counts; },
+  }) });
+  const ordinaryList = await call(directoryApi, 'list-members');
+  assert.deepEqual(ordinaryList.body, { members: [memberFixture] });
+  assert.equal(countReads, 0);
+  const directory = await call(directoryApi, 'list-members', { query: '&includeCounts=true&limit=1&search=%E6%9E%97' });
+  assert.deepEqual(directory.body, { members: [memberFixture], counts });
+  assert.equal(countReads, 1);
+  const deniedCounts = await call(directoryApi, 'list-members', { token: '', query: '&includeCounts=true' });
+  assert.equal(deniedCounts.response.status, 401);
+  assert.equal(countReads, 1);
+
+  const countFailureApi = createMemberApi({ auth: createAuth(), now: () => NOW, repository: repository({
+    async listMembers() { return [memberFixture]; },
+    async countMembers() { throw new Error('Count unavailable'); },
+  }) });
+  const countFailure = await call(countFailureApi, 'list-members', { query: '&includeCounts=true' });
+  assert.deepEqual(countFailure.body, { members: [memberFixture], counts: null });
+
   const invalidMemberStatus = await call(listApi, 'list-members', { query: '&status=EVERYONE' });
   assert.equal(invalidMemberStatus.response.status, 400);
   assert.equal(invalidMemberStatus.body.error, 'invalid_request');

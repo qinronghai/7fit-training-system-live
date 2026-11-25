@@ -258,7 +258,11 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
           limit: boundedLimit(url.searchParams.get('limit')),
           offset: boundedOffset(url.searchParams.get('offset')),
         };
-        return json({ members: await repository.listMembers(options) });
+        const members = repository.listMembers(options);
+        if (url.searchParams.get('includeCounts') !== 'true') return json({ members: await members });
+        const counts = repository.countMembers().catch(() => null);
+        const [rows, totals] = await Promise.all([members, counts]);
+        return json({ members: rows, counts: totals });
       }
 
       if (request.method === 'GET' && action === 'get-member') {

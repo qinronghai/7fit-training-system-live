@@ -121,20 +121,33 @@ function fromDbItem(row: any) {
   };
 }
 
+function selectMembers(columns: string, status: string, countOnly = false) {
+  const query = supabase.from("members").select(columns, countOnly ? { count: "exact", head: true } : undefined);
+  if (status === "ARCHIVED") return query.not("archived_at", "is", null);
+  if (status === "ALL") return query;
+  return query.eq("status", status).is("archived_at", null);
+}
+
 const repository = {
   async listMembers({ status, includeArchived, search, limit, offset }: { status: string; includeArchived: boolean; search: string; limit: number; offset: number }) {
-    let query = supabase.from("members").select(MEMBER_COLUMNS)
+    let query = selectMembers(MEMBER_COLUMNS, status || (includeArchived ? "ALL" : "ACTIVE"))
       .order("display_name", { ascending: true })
       .order("id", { ascending: true });
-    if (status === "ACTIVE") query = query.eq("status", "ACTIVE").is("archived_at", null);
-    else if (status === "ARCHIVED") query = query.not("archived_at", "is", null);
-    else if (status === "INACTIVE") query = query.eq("status", "INACTIVE").is("archived_at", null);
-    else if (!includeArchived) query = query.eq("status", "ACTIVE").is("archived_at", null);
     if (search) query = query.ilike("display_name", `%${search}%`);
     query = query.range(offset, offset + limit - 1);
     const { data, error } = await query;
     throwOnError(error);
     return (data || []).map(fromDbMember);
+  },
+
+  async countMembers() {
+    const entries = await Promise.all(["ACTIVE", "ARCHIVED", "INACTIVE"].map(async (status) => {
+      const { count, error } = await selectMembers("id", status, true);
+      throwOnError(error);
+      if (count === null) throw new Error("Member count unavailable");
+      return [status, count] as const;
+    }));
+    return Object.fromEntries(entries);
   },
 
   async getMember(id: string) {

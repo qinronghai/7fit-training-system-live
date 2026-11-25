@@ -46,7 +46,6 @@ assert(
 
 for(const selector of [
   '.member-filter-tabs button',
-  '.member-row-actions button',
   '.member-detail-actions button',
   '.member-timeline-actions>button',
   '.member-session-actions button',
@@ -68,7 +67,8 @@ for(const selector of [
   '.member-directory-search input,.member-form-fields input,.member-form-fields select,.member-form-fields textarea',
   '.member-save-search input,.member-save-member select',
   '.member-session-replacement select,.member-session-actual-grid input,.member-session-actual-grid textarea',
-  '.member-primary-action,.member-detail-actions button,.member-section-heading>button,.member-row-actions button,.member-state-empty button,.member-state-error button,.member-archive-actions button,.member-form-actions button,.member-form-head>button,.member-session-head>button,.member-session-dialog button[data-session-detail-retry]',
+  '.member-primary-action,.member-detail-actions button,.member-section-heading>button,.member-state-error button,.member-archive-actions button,.member-form-actions button,.member-form-head>button,.member-session-head>button,.member-session-dialog button[data-session-detail-retry]',
+  '.member-directory-row',
   '.member-session-actual summary',
   '.member-first-context-state button',
   '.member-first-context-empty-return',
