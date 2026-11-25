@@ -18,6 +18,7 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
     await expect(prep.locator('.f111-foam-card').first()).toBeHidden();
     await expect(prep.locator('.prep-slot-card')).toHaveCount(5);
     await expect(prep.locator('.prep-slot-card').first()).toBeVisible();
+    await expect(prep.locator('.prep-slot-card p').first()).toHaveCSS('font-size', '12px');
     await expect(main).toHaveCount(2);
     await expect(accessories).toHaveCount(4);
     await expect(main.first().locator('h3 a')).toHaveAttribute('href', /#\/library\?focus=/);
@@ -37,6 +38,31 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
     expect(geometry.targets.every(height => height >= 44)).toBe(true);
     if (width < 980) expect(geometry.footerBottom).toBeCloseTo(geometry.navTop, 0);
     await page.screenshot({ path: testInfo.outputPath(`f111-${width}.png`) });
+  }
+});
+
+test('F111 mobile text wraps and the saved courses disclosure stays above the action bar', async ({ page }) => {
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`/?viewport=${width}#/coach/f111?level=L4&lower=single_leg_squat&upper=horizontal_push&core=anti_extension`);
+    const lower = page.locator('[data-f111-mode-drawer="lower"] b');
+    await expect(lower).toHaveText('单腿蹲 单侧膝主导');
+    expect(await lower.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+    const names = await page.locator('.f111-strength-grid h3').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().top));
+    expect(names[0]).toBeCloseTo(names[1], 0);
+    const warmup = page.locator('[data-f111-disclosure="warmup"] .prep-slot-card');
+    const edges = await warmup.evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().left));
+    expect(new Set(edges).size).toBe(1);
+    const save = page.getByRole('button', { name: '保存到会员', exact: true });
+    expect(await save.evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      return range.getBoundingClientRect().height <= parseFloat(getComputedStyle(node).lineHeight);
+    })).toBe(true);
+    const saved = page.locator('.f111-inline-saved-list > summary');
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await saved.click({ timeout: 3000 });
+    await expect(page.locator('.f111-inline-saved-list')).toHaveAttribute('open', '');
   }
 });
 

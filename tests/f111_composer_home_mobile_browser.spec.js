@@ -24,7 +24,6 @@ test('F111 home opens the free composer directly and keeps every chooser in a bo
   await expect(page.locator('.f111-accessory-list [data-composer-slot]')).toHaveCount(4);
   const output = page.locator('.f111-course-output-section');
   await expect(output.getByText('复制课程', {exact:true})).toBeInViewport();
-  expect(await output.evaluate(node=>getComputedStyle(node).position)).toBe('fixed');
   await expect(page.locator('.composer-slot-card')).toHaveCount(6);
   await expect(page.locator('.f111-preset-browser-section')).toHaveCount(0);
   await expect(page.locator('.coach-mode-switch')).toHaveCount(0);

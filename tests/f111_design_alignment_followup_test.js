@@ -26,7 +26,7 @@ assert(viewsSource.includes('data-prep-detail-href')&&viewsSource.includes('data
 
 const css=fs.readFileSync(`${root}/assets/app.css`,'utf8');
 assert(css.includes('.f111-replace-trigger')&&css.includes('color:#1f1b2d'),'replacement controls must use the unified dark text treatment');
-assert(css.includes('.f111-prep-section .foam-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:'),'foam cards must remain a real two-column grid at the mobile breakpoint');
+assert(css.includes('.f111-workspace .f111-prep-section :is(.foam-grid,.prep-slot-grid)'),'composer PREP must use the shared row layout');
 
 const view=fs.readFileSync(`${root}/js/coach/composer-view.js`,'utf8');
 assert(view.includes('f111-recovery-section')&&view.includes('PostCardio.render'),'recovery and post-cardio must remain rendered');

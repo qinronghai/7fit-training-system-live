@@ -183,7 +183,7 @@
     }));
   }
 
-  function resolvedGrid(resolved,sessionKey,replaceInMeta=false){
+  function resolvedGrid(resolved,sessionKey,compact=false){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=orderedSlots(resolved).map(slot=>{
       const context=resolved.context;
@@ -202,15 +202,16 @@
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const prescription=slot.prescription||record?.prescription||'';
       const recentNotice=slot.recentlyUsed?'<small class="prep-recent-note">近期用过，可按需替换</small>':'';
-      const metaReplace=replaceInMeta?replace:'';
-      const titleReplace=replaceInMeta?'':replace;
       const role=slot.role?`<small>${esc(slot.role)}</small>`:'';
-      const meta=[role,recentNotice,metaReplace].filter(Boolean).join('');
+      const meta=role+recentNotice;
       const metaMarkup=meta?`<div class="prep-card-meta">${meta}</div>`:'';
-      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${metaMarkup}<div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${hasAlternative?'':'disabled'}>${slotOptions(slot)}</select></article>`;
+      const content=compact
+        ? `<div class="f111-prep-row-text">${detail}<p>${esc(prescription)}</p>${recentNotice}</div>${replace}`
+        : `${metaMarkup}<div class="prep-card-title-row">${detail}${replace}</div><p>${esc(prescription)}</p>`;
+      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${content}<select class="prep-slot-select prep-select f111-visually-hidden" ${compact?'tabindex="-1" aria-hidden="true"':''} aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${hasAlternative?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
     const timeNote=Number.isFinite(resolved?.estimatedMinutes)
-      ?`<small class="prep-time-note">动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，按动作质量调整，不做到疲劳。</small>`:'';
+      ?`<small class="prep-time-note">${compact?'':`动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，`}按动作质量调整，不做到疲劳。</small>`:'';
     return `${fallback}${timeNote}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }
 
@@ -249,7 +250,7 @@
         <div class="f111-disclosure-content"><div class="foam-grid">${foamCards}</div></div>
       </details>
       <details class="f111-disclosure" data-f111-disclosure="warmup" open>
-        <summary><div><b>动态热身与激活</b></div><i aria-hidden="true">⌄</i></summary>
+        <summary><div><b>动态热身与激活</b></div>${Number.isFinite(resolved.estimatedMinutes)?`<small class="f111-disclosure-duration">约 ${esc(resolved.estimatedMinutes)} 分钟</small>`:''}<i aria-hidden="true">⌄</i></summary>
         <div class="f111-disclosure-content">${resolvedGrid(resolved,ctx.stateKey,true)}</div>
       </details>
     </section>`;
