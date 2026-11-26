@@ -1,0 +1,13 @@
+{
+  "back-view.jpg": {
+    "mode": "course",
+    "reviewed": true,
+    "no_visible_face": true
+  },
+  "side-face.jpg": {
+    "mode": "course",
+    "reviewed": false,
+    "faces": [[0.41, 0.16, 0.58, 0.32]],
+    "comment": "EXAMPLE ONLY: replace coordinates with the actual photograph and set reviewed=true after manual inspection"
+  }
+}

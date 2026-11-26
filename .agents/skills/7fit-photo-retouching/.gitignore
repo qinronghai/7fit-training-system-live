@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+input/
+output/
+*.xmp
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.tif
+*.tiff
+manifest.json
+face-boxes.json
