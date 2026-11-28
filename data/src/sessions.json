@@ -2544,6 +2544,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
@@ -2794,6 +2809,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "houzu_sanji",
@@ -3088,6 +3118,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
@@ -3345,6 +3390,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
@@ -3570,6 +3630,21 @@
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "shengsuo_ertou_wanju",
@@ -3837,6 +3912,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "zhibi_xiala",
@@ -4116,6 +4206,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -4378,6 +4483,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
@@ -4618,6 +4738,21 @@
             "id": "mianla",
             "label": "面拉｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "houzu_sanji",
@@ -4870,6 +5005,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "houzu_sanji",
@@ -5159,6 +5309,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
@@ -5406,6 +5571,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
@@ -5621,6 +5801,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "zhibi_xiala",
@@ -5895,6 +6090,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -6162,6 +6372,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -6424,6 +6649,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
@@ -6659,6 +6899,21 @@
             "id": "mianla",
             "label": "面拉｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "houzu_sanji",
@@ -6916,6 +7171,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "houzu_sanji",
@@ -7200,6 +7470,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
@@ -7457,6 +7742,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
@@ -7682,6 +7982,21 @@
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "hudieji_fanxiang_feiniao",
+            "label": "蝴蝶机反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -7934,6 +8249,21 @@
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "hudieji_fanxiang_feiniao",
+            "label": "蝴蝶机反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "shengsuo_santou_xiaya",
@@ -8203,6 +8533,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "hudieji_fanxiang_feiniao",
+            "label": "蝴蝶机反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "xiongjia_jiaxiong",
             "label": "蝴蝶机夹胸｜入门｜同级替换",
             "kind": "同级替换"
@@ -8450,6 +8795,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "hudieji_fanxiang_feiniao",
+            "label": "蝴蝶机反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
@@ -8672,13 +9032,23 @@
             "kind": "当前默认"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "zhibi_xiala",
+            "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -8919,13 +9289,23 @@
             "kind": "当前默认"
           },
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
+            "id": "zhibi_xiala",
+            "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9186,13 +9566,23 @@
             "kind": "当前默认"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "zhibi_xiala",
+            "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9428,13 +9818,23 @@
             "kind": "当前默认"
           },
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
+            "id": "zhibi_xiala",
+            "label": "直臂下拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9658,6 +10058,21 @@
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "shengsuo_ertou_wanju",
@@ -9920,6 +10335,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "zhibi_xiala",
@@ -10204,6 +10634,21 @@
             "kind": "当前默认"
           },
           {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -10469,6 +10914,21 @@
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "zhibi_xiala",

@@ -19,7 +19,7 @@ assert(D.supportDetails[id],'supportDetails missing new action');
 
 assert(!C.supportCandidates('L1').some(x=>x.id===id),'L1 must not see SUP-S3 action');
 for(const level of ['L2','L3','L4']){
-  assert(C.supportCandidates(level).some(x=>x.id===id),level+' should see SUP-S3 action');
+  assert(C.supportCandidates(level,level==='L4').some(x=>x.id===id),level+' should see SUP-S3 action');
   const resolved=C.resolve({level,lowerMode:'squat',upperMode:'horizontal_pull'});
   assert(resolved.slotOptions.C.some(x=>x.id===id),level+' composer C candidates missing new action');
 }

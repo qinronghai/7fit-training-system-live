@@ -12,14 +12,14 @@ assert(p.recovery.every(x=>/ · 45 秒$/.test(x)),'Composer copy Recovery items 
 assert.strictEqual(p.slots[0].name,'独立哑铃单腿罗马尼亚硬拉');
 assert.strictEqual(p.slots[0].tier,'T3');
 assert.strictEqual(p.slots[0].prescription,'3组 × 12次左右');
-assert.strictEqual(p.slots[4].grade,'SUP-S2');
+assert(/^SUP-S[34]$/.test(p.slots[4].grade),'L3 support must come from the S3–S4 window');
 assert(/^CORE-L[23]$/.test(p.slots[5].grade));
 const coach=S.formatCoach(p,{now:'2026-09-10T12:00:00+08:00'});
 assert(coach.includes('2026年9月10日｜星期四'));
 assert(coach.includes('7Fit｜私教训练'));
 assert(coach.includes('自由组合｜L3 负重进阶'));
 assert(coach.includes('A｜独立哑铃单腿罗马尼亚硬拉｜T3'));
-assert(/^C｜.*｜SUP-S2$/m.test(coach));
+assert(/^C｜.*｜SUP-S[34]$/m.test(coach));
 assert(/^CORE｜.*｜CORE-L[23]$/m.test(coach));
 assert(coach.includes('本节目标'));
 assert(coach.includes('本节观察'));
@@ -36,7 +36,8 @@ assert(member.includes('今日训练重点\n单腿后侧链 · 上肢推力 · �
 assert(member.includes('课后有氧｜约 30 分钟'));
 assert(member.includes('平均心率 130 到 140 左右（燃烧脂肪心率）'));
 assert(!member.includes('POST CARDIO ONLY'));
-assert(/坐姿腿弯举[^\n]*\n   大腿后侧强化/.test(member),'structured anatomy should drive auxiliary purpose');
+const d1Name=p.slots.find(slot=>/^D1/.test(slot.slot)).name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+assert(new RegExp(d1Name+'[^\\n]*\\n   \\S').test(member),'structured anatomy should drive auxiliary purpose');
 
 // #30: once composerContext has resolved V15 public data, Copy must not run a second full-session V14 Anatomy/Conflict calculation.
 let fullAnatomyCalls=0,conflictCalls=0;

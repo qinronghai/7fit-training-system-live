@@ -1,0 +1,127 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - button "打开导航" [ref=f1e5]: ☰
+      - generic [ref=f1e6]: 编课中心
+      - button "反馈问题" [ref=f1e9] [cursor=pointer]: 反馈
+    - main [ref=f1e10]:
+      - region [ref=f1e11]:
+        - generic [ref=f1e12]:
+          - heading "选择模板，开始编课" [level=1] [ref=f1e13]
+          - paragraph [ref=f1e14]: 根据本次训练目标选择模板，安排动作并保存课程。
+        - text: "7"
+      - region [ref=f1e15]:
+        - generic [ref=f1e16]:
+          - generic [ref=f1e17]:
+            - heading "选择训练模板" [level=2] [ref=f1e18]
+            - paragraph [ref=f1e19]: 按课程目标和训练方式选择模板。
+          - text: 5 个模板
+        - generic [ref=f1e20]:
+          - article [ref=f1e21]:
+            - generic [ref=f1e22]:
+              - generic [ref=f1e23]: F111
+              - generic [ref=f1e24]: 可使用
+            - heading "女性全身塑形" [level=3] [ref=f1e25]
+            - paragraph [ref=f1e26]: 每节课安排一个下肢动作、一个上肢动作和一个支撑动作。
+            - link "选择女性全身塑形" [ref=f1e27] [cursor=pointer]:
+              - /url: "#/coach/f111"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=f1e28]: →
+          - article [ref=f1e29]:
+            - generic [ref=f1e30]:
+              - generic [ref=f1e31]: Body
+              - generic [ref=f1e32]: 可使用
+            - heading "健美式塑形训练" [level=3] [ref=f1e33]
+            - paragraph [ref=f1e34]: 选择目标肌群和复合动作，并安排训练量。
+            - link "选择健美式塑形训练" [ref=f1e35] [cursor=pointer]:
+              - /url: "#/coach/body"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=f1e36]: →
+          - article [ref=f1e37]:
+            - generic [ref=f1e38]:
+              - generic [ref=f1e39]: Conditioning
+              - generic [ref=f1e40]: 可使用
+            - heading "体能训练" [level=3] [ref=f1e41]
+            - paragraph [ref=f1e42]: 围绕体能目标组合训练项目，安排训练顺序和强度。
+            - link "选择体能训练" [ref=f1e43] [cursor=pointer]:
+              - /url: "#/coach/conditioning"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=f1e44]: →
+          - article [ref=f1e45]:
+            - generic [ref=f1e46]:
+              - generic [ref=f1e47]: HYROX
+              - generic [ref=f1e48]: 可使用
+            - heading "HYROX 训练" [level=3] [ref=f1e49]
+            - paragraph [ref=f1e50]: 结合场地和器械，编排 HYROX 技能、体能、综合训练或体能测试。
+            - link "选择HYROX 训练" [ref=f1e51] [cursor=pointer]:
+              - /url: "#/coach/hyrox"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=f1e52]: →
+          - article [ref=f1e53]:
+            - generic [ref=f1e54]:
+              - generic [ref=f1e55]: Posture
+              - generic [ref=f1e56]: 即将开放
+            - heading "体态评估与调整" [level=3] [ref=f1e57]
+            - paragraph [ref=f1e58]: 用于体态评估和针对性训练，开放后即可使用。
+            - link "查看体态评估与调整" [ref=f1e59] [cursor=pointer]:
+              - /url: "#/coach/posture"
+              - text: 查看体态训练规划
+              - generic [aria-hidden] [ref=f1e60]: →
+      - region [ref=f1e61]:
+        - generic [ref=f1e63]:
+          - heading "常用内容" [level=2] [ref=f1e64]
+          - paragraph [ref=f1e65]: 查找收藏的动作和训练组合，或查看已保存的课程。
+        - generic [ref=f1e66]:
+          - generic [ref=f1e67]:
+            - generic [ref=f1e68]:
+              - generic [ref=f1e69]:
+                - heading "常用收藏" [level=2] [ref=f1e70]
+                - paragraph [ref=f1e71]: 收藏的动作和训练组合会显示在这里。
+              - link "打开动作库 →" [ref=f1e72] [cursor=pointer]:
+                - /url: "#/library"
+            - generic [ref=f1e73]:
+              - generic [ref=f1e74]: 还没有收藏内容
+              - generic [ref=f1e75]: 在动作库收藏动作或训练组合后，可在这里快速找到。
+          - generic [ref=f1e76]:
+            - generic [ref=f1e77]:
+              - generic [ref=f1e78]:
+                - heading "已保存课程" [level=2] [ref=f1e79]
+                - paragraph [ref=f1e80]: 课程只在本次打开期间保留，关闭页面后会清除。
+              - text: 临时保存
+            - generic [ref=f1e81]: 还没有保存的课程。
+      - region [ref=f1e82]:
+        - generic [ref=f1e83]:
+          - heading "会员训练记录" [level=2] [ref=f1e84]
+          - paragraph [ref=f1e85]: 查看近期完成训练、会员训练重点和课程历史。
+        - link "打开会员训练" [ref=f1e86] [cursor=pointer]:
+          - /url: "#/coach/members"
+          - text: 打开会员训练
+          - generic [aria-hidden] [ref=f1e87]: →
+  - navigation "移动端主导航" [ref=f1e88]:
+    - link "编课" [ref=f1e89] [cursor=pointer]:
+      - /url: "#/coach"
+    - link "体系" [ref=f1e91] [cursor=pointer]:
+      - /url: "#/system/patterns"
+    - link "规则" [ref=f1e93] [cursor=pointer]:
+      - /url: "#/rules/venue"
+    - link "动作库" [ref=f1e95] [cursor=pointer]:
+      - /url: "#/library"
+    - link "更多" [ref=f1e97] [cursor=pointer]:
+      - /url: "#/maintenance"
+  - dialog [ref=f1e99]:
+    - generic [ref=f1e100]:
+      - banner [ref=f1e101]:
+        - generic [ref=f1e102]:
+          - generic [ref=f1e103]: 问题现场
+          - heading "反馈问题" [level=2] [ref=f1e104]
+        - button "关闭反馈" [ref=f1e105] [cursor=pointer]: ×
+      - generic [ref=f1e106]:
+        - paragraph [ref=f1e107]: "页面：编课中心 · #/coach"
+        - paragraph [ref=f1e108]: 反馈内容会带上当前页面和时间，方便快速定位。
+        - generic [ref=f1e109]: 问题描述
+        - textbox "问题描述" [active] [ref=f1e110]:
+          - /placeholder: 告诉我刚才发生了什么，以及你原本想完成什么。
+        - status [ref=f1e111]
+      - contentinfo [ref=f1e112]:
+        - button "先不反馈" [ref=f1e113] [cursor=pointer]
+        - button "复制反馈内容" [ref=f1e114] [cursor=pointer]

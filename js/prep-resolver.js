@@ -396,8 +396,15 @@
     // seated knee extension is tagged as a squat). Describe their actual task.
     if(/腿屈伸|腿弯举/.test(action.name)){
       if(/腿弯举/.test(action.name)&&/hamstring/.test(family))return {rank:2,task:'控制膝关节屈伸时的大腿后侧张力'};
+      if(/腿屈伸/.test(action.name)&&/squat|ankle|lunge|split/.test(family))return {rank:2,task:'控制膝关节伸直时的大腿前侧张力'};
       return null;
     }
+    // Complementary accessories: each links to the warm-up family that prepares its joint action.
+    if(/后踢腿/.test(action.name))return /glute-max|single-leg-glute|hip-extension/.test(family)?{rank:2,task:'伸髋时稳住骨盆、让臀部发力'}:null;
+    if(slot==='MOB-U'&&/面拉/.test(action.name))return /scapular-retraction|scapula|rotator-cuff/.test(family)?{rank:2,task:'手臂拉开时让肩胛后收、肩外旋'}:null;
+    if(slot==='MOB-U'&&/夹胸/.test(action.name))return /wall-scapular-push|scapula|thoracic/.test(family)?{rank:2,task:'手臂合拢时稳住肩胛和肩前侧'}:null;
+    if(slot==='MOB-U'&&/直臂下拉/.test(action.name))return /latissimus|wall-slide|scapula/.test(family)?{rank:2,task:'手臂下压时让背阔肌发力、肩胛下沉'}:null;
+    if(slot==='MOB-U'&&/二头弯举|三头下压/.test(action.name))return /scapula|rotator-cuff|wall/.test(family)?{rank:1,task:'肘屈伸时保持上臂和肩胛稳定'}:null;
     if(/髋内收|髋外展/.test(action.name)){
       if(/髋内收/.test(action.name)&&/adductor/.test(family))return {rank:3,task:'在可控幅度内收回大腿'};
       if(/髋外展/.test(action.name)&&/glute-medial|abduction|single-leg-glute|single-leg-hip|lateral-squat/.test(family))return {rank:3,task:'大腿向外打开时稳住骨盆'};

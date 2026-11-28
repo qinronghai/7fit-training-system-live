@@ -1,0 +1,270 @@
+- generic [ref=e2]:
+  - complementary "主导航" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [aria-hidden] [ref=e5]: 7Fit
+      - generic [ref=e6]:
+        - text: 7Fit Training
+        - generic [ref=e7]: 教练工作台
+    - navigation [ref=e8]:
+      - generic [ref=e9]: 编课中心
+      - generic [ref=e11]: 训练体系
+      - generic [ref=e13]: 编排规则
+      - generic [ref=e15]: 动作库
+      - generic [ref=e17]: 系统维护
+    - generic [ref=e19]:
+      - strong [ref=e20]: 教练模式
+      - generic [ref=e21]: 按训练目标浏览体系动作，查看等级分类
+  - generic [ref=e22]:
+    - banner [ref=e23]:
+      - generic [ref=e25]:
+        - generic [ref=e26]: 训练体系
+        - generic [ref=e27]: 十大动作模式 · PREP 热身 · 热身体系模式
+      - button "搜索热身动作" [ref=e28] [cursor=pointer]:
+        - generic [ref=e32]: 搜索动作
+    - main [ref=e33]:
+      - navigation "训练体系页面" [ref=e34]:
+        - generic [ref=e35]: 十大动作模式
+        - generic [ref=e36]: PREP 热身
+        - generic [ref=e37]: 热身体系模式
+      - region [ref=e38]:
+        - generic [ref=e39]:
+          - heading "五大热身板块" [level=1] [ref=e40]
+          - paragraph [ref=e41]: 按主要训练准备目标整理动作目录。本页保留现有 56 项，并新增 35 项“建议补充”候选，优先使用 7Fit 二楼现有徒手和小工具条件。
+        - generic [ref=e42]: 动作扩充候选稿 · 仅供审核
+      - generic "动作等级数量" [ref=e43]:
+        - generic [ref=e44]: 目录扩充预览
+        - generic [ref=e45]:
+          - strong [ref=e46]: "91"
+          - text: 个条目
+        - generic [ref=e47]:
+          - strong [ref=e48]: 现有
+          - generic [ref=e49]: 56 项
+        - generic [ref=e50]:
+          - strong [ref=e51]: 建议补充
+          - generic [ref=e52]: 35 项
+        - generic [ref=e53]:
+          - strong [ref=e54]: "28"
+          - generic [ref=e55]: 项用二楼器材
+        - generic [ref=e56]:
+          - strong [ref=e57]: "7"
+          - generic [ref=e58]: 项徒手
+        - generic [ref=e59]:
+          - strong [ref=e60]: P1
+          - generic [ref=e61]: 37 个
+        - generic [ref=e62]:
+          - strong [ref=e63]: P2
+          - generic [ref=e64]: 31 个
+        - generic [ref=e65]:
+          - strong [ref=e66]: P3
+          - generic [ref=e67]: 17 个
+        - generic [ref=e68]:
+          - strong [ref=e69]: P4
+          - generic [ref=e70]: 6 个
+      - complementary [ref=e71]:
+        - generic [aria-hidden] [ref=e72]: i
+        - paragraph [ref=e73]:
+          - strong [ref=e74]: P 是热身动作等级；课程 L 决定允许使用的 P 窗口：
+          - text: L1 → P1；L2 → P2 / P1；L3 → P3 / P2 / P1；L4 → P4 / P3 / P2 / P1。T 和主动作模式只用于课程匹配上下文，不是这里的目录筛选维度。五个板块是动作分类，不表示每节课必须五类各选一个，也不等于实际执行顺序。
+      - region "筛选动作" [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]: 搜索动作名称或编号
+          - searchbox "搜索动作名称或编号" [ref=e78]
+        - group "按热身等级筛选" [ref=e79]:
+          - generic [ref=e928]: 等级
+          - button "全部等级" [pressed] [ref=e929] [cursor=pointer]
+          - button "P1" [ref=e930] [cursor=pointer]
+          - button "P2" [ref=e931] [cursor=pointer]
+          - button "P3" [ref=e932] [cursor=pointer]
+          - button "P4" [ref=e933] [cursor=pointer]
+      - generic [ref=e86]:
+        - complementary "五大热身板块" [ref=e87]:
+          - generic [ref=e88]: 按板块浏览
+          - tablist "选择热身板块" [ref=e89]:
+            - tab "全部板块 91" [ref=e934] [cursor=pointer]:
+              - generic [ref=e935]: 全部板块
+              - generic [ref=e936]: "91"
+            - tab "下肢髋踝活动 20" [ref=e937] [cursor=pointer]:
+              - generic [ref=e938]: 下肢髋踝活动
+              - generic [ref=e939]: "20"
+            - tab "上肢胸椎肩带活动 17" [ref=e940] [cursor=pointer]:
+              - generic [ref=e941]: 上肢胸椎肩带活动
+              - generic [ref=e942]: "17"
+            - tab "主动作模式准备 17" [ref=e943] [cursor=pointer]:
+              - generic [ref=e944]: 主动作模式准备
+              - generic [ref=e945]: "17"
+            - tab "核心躯干激活 22" [ref=e946] [cursor=pointer]:
+              - generic [ref=e947]: 核心躯干激活
+              - generic [ref=e948]: "22"
+            - tab "动态整合热身 15" [selected] [ref=e949] [cursor=pointer]:
+              - generic [ref=e950]: 动态整合热身
+              - generic [ref=e951]: "15"
+        - tabpanel "热身动作分类列表" [ref=e108]:
+          - article [ref=e953]:
+            - generic [ref=e954]:
+              - generic [ref=e955]:
+                - heading "动态整合热身" [level=2] [ref=e956]
+                - paragraph [ref=e957]: 连接多个区域与动作模式，并可承担轻度升温；动作连续但不做成额外体能训练。
+              - generic [ref=e958]: 15 个动作
+            - generic [ref=e959]:
+              - generic [ref=e960]:
+                - generic [ref=e961]:
+                  - generic [ref=e962]: P1
+                  - generic [ref=e963]:
+                    - strong [ref=e964]: 基础准备
+                    - generic [ref=e965]: 4 个动作
+                - generic [ref=e966]:
+                  - article [ref=e967]:
+                    - generic [ref=e968]: PREP-46
+                    - generic [ref=e970]: 划船机低强度热身
+                    - generic [ref=e971]: 全身整合 / 周期性器械热身
+                  - article [ref=e972]:
+                    - generic [ref=e973]:
+                      - generic [ref=e974]: 候选 28
+                      - generic [ref=e975]: 建议补充
+                      - generic [ref=e976]: 二楼器材
+                    - generic [ref=e977]: 划船机动作分解：手臂—躯干—整桨
+                    - generic [ref=e978]: 分段复习划船顺序，再合并为轻松整桨；作为技术与升温，不做间歇训练。
+                    - generic [ref=e979]: 二楼：划船机（轻阻力）
+                    - generic [ref=e980]:
+                      - strong [ref=e981]: 建议剂量
+                      - text: 总计 2–3 分钟；轻松可交谈，先分段再整桨。
+                  - article [ref=e982]:
+                    - generic [ref=e983]:
+                      - generic [ref=e984]: 候选 29
+                      - generic [ref=e985]: 建议补充
+                      - generic [ref=e986]: 二楼器材
+                    - generic [ref=e987]: 滑雪机轻阻力双臂下压练习
+                    - generic [ref=e988]: 用轻阻力熟悉髋铰链与躯干带动手柄下压，保持动作平顺，不追求功率。
+                    - generic [ref=e989]: 二楼：滑雪机（最低舒适阻力）
+                    - generic [ref=e990]:
+                      - strong [ref=e991]: 建议剂量
+                      - text: 1–2 分钟；每 20–30 秒检查动作，不做冲刺。
+                  - article [ref=e992]:
+                    - generic [ref=e993]:
+                      - generic [ref=e994]: 候选 34
+                      - generic [ref=e995]: 建议补充
+                      - generic [ref=e996]: 徒手
+                    - generic [ref=e997]: 原地轻踏步与对侧伸手
+                    - generic [ref=e998]: 无器械升温选项，逐渐加大摆臂与步幅，适合先开始活动的会员。
+                    - generic [ref=e999]: 二楼：徒手
+                    - generic [ref=e1000]:
+                      - strong [ref=e1001]: 建议剂量
+                      - text: 30–45 秒；轻松交谈，不追求心率冲高。
+              - generic [ref=e1002]:
+                - generic [ref=e1003]:
+                  - generic [ref=e1004]: P2
+                  - generic [ref=e1005]:
+                    - strong [ref=e1006]: 动态准备
+                    - generic [ref=e1007]: 4 个动作
+                - generic [ref=e1008]:
+                  - article [ref=e1009]:
+                    - generic [ref=e1010]: PREP-47
+                    - generic [ref=e1012]: 滑雪机低强度热身
+                    - generic [ref=e1013]: 全身整合 / 周期性器械热身
+                  - article [ref=e1014]:
+                    - generic [ref=e1015]:
+                      - generic [ref=e1016]: 候选 30
+                      - generic [ref=e1017]: 建议补充
+                      - generic [ref=e1018]: 二楼器材
+                    - generic [ref=e1019]: 低阻力雪橇推行与回拉
+                    - generic [ref=e1020]: 短距离稳定推行或回拉，连接全身支撑与步态；重量保持明显低于训练负荷。
+                    - generic [ref=e1021]: 二楼：雪橇车 + 室内跑道
+                    - generic [ref=e1022]:
+                      - strong [ref=e1023]: 建议剂量
+                      - text: 2 组 × 8–10 米；空车或最低可控阻力，RPE 约 2–3。
+                  - article [ref=e1024]:
+                    - generic [ref=e1025]:
+                      - generic [ref=e1026]: 候选 32
+                      - generic [ref=e1027]: 建议补充
+                      - generic [ref=e1028]: 二楼器材
+                    - generic [ref=e1029]: 药球斜向跨步与上举触点
+                    - generic [ref=e1030]: 轻药球配合小步跨出和斜向触点，把髋、胸椎与上肢动作串联起来。
+                    - generic [ref=e1031]: 二楼：轻药球
+                    - generic [ref=e1032]:
+                      - strong [ref=e1033]: 建议剂量
+                      - text: 每侧 4–5 次；慢速控制，不抛掷、不砸地。
+                  - article [ref=e1034]:
+                    - generic [ref=e1035]:
+                      - generic [ref=e1036]: 候选 35
+                      - generic [ref=e1037]: 建议补充
+                      - generic [ref=e1038]: 徒手
+                    - generic [ref=e1039]: 侧向点步加躯干转向
+                    - generic [ref=e1040]: 左右点步时轻轻带动胸廓转向，再回到中立，串联侧向移动与躯干活动。
+                    - generic [ref=e1041]: 二楼：徒手
+                    - generic [ref=e1042]:
+                      - strong [ref=e1043]: 建议剂量
+                      - text: 每侧 4–6 次；旋转来自胸椎，膝踝保持舒适。
+              - generic [ref=e1044]:
+                - generic [ref=e1045]:
+                  - generic [ref=e1046]: P3
+                  - generic [ref=e1047]:
+                    - strong [ref=e1048]: 整合准备
+                    - generic [ref=e1049]: 6 个动作
+                - generic [ref=e1050]:
+                  - article [ref=e1051]:
+                    - generic [ref=e1052]: PREP-03
+                    - generic [ref=e1054]: 最伟大伸展（弓步 + 胸椎旋转）
+                    - generic [ref=e1055]: 全身动态活动
+                  - article [ref=e1056]:
+                    - generic [ref=e1057]: PREP-38
+                    - generic [ref=e1059]: 反向弓步配合上举伸展
+                    - generic [ref=e1060]: 单腿 + 髋伸展 + 上举整合
+                  - article [ref=e1061]:
+                    - generic [ref=e1062]: PREP-48
+                    - generic [ref=e1064]: 轻量火箭推节奏
+                    - generic [ref=e1065]: 全身动态整合 / 伸髋推举
+                  - article [ref=e1066]:
+                    - generic [ref=e1067]: PREP-49
+                    - generic [ref=e1069]: 壶铃高脚杯深蹲到推举
+                    - generic [ref=e1070]: 全身动态整合 / 蹲推
+                  - article [ref=e1071]:
+                    - generic [ref=e1072]:
+                      - generic [ref=e1073]: 候选 31
+                      - generic [ref=e1074]: 建议补充
+                      - generic [ref=e1075]: 二楼器材
+                    - generic [ref=e1076]: 战绳低幅交替波
+                    - generic [ref=e1077]: 以小幅交替波练习手臂节奏与全身协调；严格限制总时长，避免变成体能训练。
+                    - generic [ref=e1078]: 二楼：战绳
+                    - generic [ref=e1079]:
+                      - strong [ref=e1080]: 建议剂量
+                      - text: 2 组 × 8–10 秒；轻松呼吸，动作一旦变形即停。
+                  - article [ref=e1081]:
+                    - generic [ref=e1082]:
+                      - generic [ref=e1083]: 候选 33
+                      - generic [ref=e1084]: 建议补充
+                      - generic [ref=e1085]: 二楼器材
+                    - generic [ref=e1086]: 低箱跨步绕行与对侧伸手
+                    - generic [ref=e1087]: 绕过低箱做小步跨越，配合对侧手臂前伸；练习多方向移动与身体协调。
+                    - generic [ref=e1088]: 二楼：低高度跳箱 + 地面空间
+                    - generic [ref=e1089]:
+                      - strong [ref=e1090]: 建议剂量
+                      - text: 每方向 3–4 次；步幅小，不跳箱。
+              - generic [ref=e1091]:
+                - generic [ref=e1092]:
+                  - generic [ref=e1093]: P4
+                  - generic [ref=e1094]:
+                    - strong [ref=e1095]: 专项准备
+                    - generic [ref=e1096]: 1 个动作
+                - article [ref=e1098]:
+                  - generic [ref=e1099]: PREP-50
+                  - generic [ref=e1101]: 药球深蹲推举
+                  - generic [ref=e1102]: 高阶全身动态整合 / 蹲推协调
+      - complementary [ref=e919]:
+        - paragraph [ref=e921]:
+          - strong [ref=e922]: 目录分类按动作的主要作用归类；候选已按二楼器材重新平衡。
+          - text: 本次保留正式目录 56 项，另列 35 项未发布候选：28 项明确使用二楼现有器材，7 项徒手。器材覆盖泡沫轴、弹力带、轻壶铃、药球、跳箱、平衡垫、划船机、滑雪机、雪橇和战绳。划船机与滑雪机的现有低强度热身保留；新增分段动作只做轻阻力技术准备，不做冲刺。泡沫轴短时按需使用，不是必做环节；所有固定带动作需先由教练核实锚点。现有 PREP-24 瑜伽球与 PREP-27 BOSU 球未列入当前二楼清单，仍需现场核实。动作参考包括
+          - link "OneFit 公开内容" [ref=e923] [cursor=pointer]:
+            - /url: https://www.sohu.com/a/539115153_582867
+          - text: 、
+          - link "OneFit 动态热身示例" [ref=e924] [cursor=pointer]:
+            - /url: https://www.sina.cn/news/detail/5327084732025325.html
+          - text: 、Concept2 的
+          - link "划船机分段技术热身" [ref=e925] [cursor=pointer]:
+            - /url: https://www.concept2.com/training/rowing-drills
+          - text: 与
+          - link "滑雪机技术指导" [ref=e926] [cursor=pointer]:
+            - /url: https://www.concept2.com/skierg-start
+          - text: ，以及
+          - link "公开教练准备活动动作清单" [ref=e927] [cursor=pointer]:
+            - /url: https://www.sport.gov.cn/rlzx/n5622/c28975836/part/28975888.pdf
+          - text: 。这些是动作灵感，不是 7Fit 或 OneFit 正式处方；候选及建议剂量仍需教练复核。
