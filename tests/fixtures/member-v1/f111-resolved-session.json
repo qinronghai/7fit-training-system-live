@@ -84,8 +84,9 @@
       "wotu_xiong_tui"
     ],
     "supportPatterns": [
-      "支撑",
-      "支撑模式"
+      "支撑模式",
+      "抗旋转",
+      "肩胛稳定"
     ],
     "coreDemands": [
       "抗旋转"

@@ -16,36 +16,61 @@
   }
 
   function clearStaffSession(){
-    try{window.localStorage.removeItem(STAFF_SESSION_KEY);}catch(_){}
+    try{
+      window.localStorage.removeItem(STAFF_SESSION_KEY);
+      for(const key of Object.keys(window.localStorage))if(key.startsWith('7fit_member_course_draft:'))window.localStorage.removeItem(key);
+    }catch(_){}
+  }
+
+  function isLocalPreview(url){
+    return url.pathname==='/__dev/member-api'&&url.hostname==='127.0.0.1'&&url.origin===window.location.origin;
+  }
+
+  async function draftAccess(){
+    if(isLocalPreview(new URL(API_BASE)))return {scope:'dev-preview',isCurrent:()=>true};
+    const session=readStaffSession();
+    const valid=value=>value&&(!value.expiresAt||Date.parse(value.expiresAt)>Date.now());
+    if(!valid(session)||!window.crypto?.subtle)return null;
+    const hash=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(session.token));
+    return {
+      scope:Array.from(new Uint8Array(hash),byte=>byte.toString(16).padStart(2,'0')).join(''),
+      isCurrent:()=>{
+        const current=readStaffSession();
+        return Boolean(valid(current)&&current.token===session.token);
+      },
+    };
   }
 
   async function request(action,{method='GET',query={},body,signal}={}){
-    const session=readStaffSession();
-    if(!session)return Promise.reject(new MemberApiError('staff_session_required',401));
     const url=new URL(API_BASE);
+    const localPreview=isLocalPreview(url);
+    const session=localPreview?null:readStaffSession();
+    if(!localPreview&&!session)throw new MemberApiError('staff_session_required',401);
     url.searchParams.set('action',action);
     for(const [key,value] of Object.entries(query)){
       if(value!==undefined&&value!==null&&value!=='')url.searchParams.set(key,String(value));
     }
-    const headers={authorization:`Bearer ${session.token}`};
+    const headers=session?{authorization:`Bearer ${session.token}`}:{};
     const init={method,headers,signal,cache:'no-store'};
     if(body!==undefined){headers['content-type']='application/json';init.body=JSON.stringify(body);}
     let response;
     try{response=await fetch(url.href,init);}
     catch(_){throw new MemberApiError('network_error',0);}
     const payload=await response.json().catch(()=>({}));
-    if(response.status===401)clearStaffSession();
+    if(response.status===401&&!localPreview)clearStaffSession();
     if(!response.ok)throw new MemberApiError(payload.error||'internal_error',response.status,payload.fields||[]);
     return payload;
   }
 
-  function listMembers({search='',status='',includeArchived=false,limit=100,offset=0}={}){
-    return request('list-members',{query:{search,status:status||'',includeArchived:includeArchived?'true':'',limit,offset}}).then(value=>value.members||[]);
+  function listMemberDirectory({search='',status='',includeArchived=false,includeCounts=false,limit=100,offset=0}={}){
+    return request('list-members',{query:{search,status:status||'',includeArchived:includeArchived?'true':'',includeCounts:includeCounts?'true':'',limit,offset}});
   }
 
   const api={
     request,
-    listMembers,
+    draftAccess,
+    listMembers(options){return listMemberDirectory(options).then(value=>value.members||[]);},
+    listMemberDirectory,
     getMember(memberId){return request('get-member',{query:{memberId}}).then(value=>value.member);},
     saveMember(member){return request('save-member',{method:'POST',body:member}).then(value=>value.member);},
     archiveMember(id){return request('archive-member',{method:'POST',body:{id}}).then(value=>value.member);},

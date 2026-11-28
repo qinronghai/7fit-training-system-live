@@ -2,12 +2,12 @@ import {
   deriveMemberTrainingContext,
   validateMember,
   validateTrainingSession,
-  validateTrainingSessionItem,
+  validateTrainingSessionItem, validateSessionExecution,
 } from '../_shared/member-domain.mjs';
 
 const MEMBER_INPUT_KEYS = new Set(['id', 'displayName', 'trainingLevel', 'primaryGoal', 'trainingProfile', 'coachNotes']);
 const SESSION_PATCH_KEYS = new Set(['sessionDate', 'coachNote', 'memberCopyText']);
-const PERFORMED_ITEM_KEYS = new Set(['id', 'performedActionId', 'performedActionSnapshot', 'performedPrescription', 'sets', 'reps', 'loadKg', 'rir', 'rpe', 'completed', 'note']);
+const PERFORMED_ITEM_KEYS = new Set(['id', 'performedActionId', 'performedActionSnapshot', 'performedPrescription', 'sets', 'reps', 'loadKg', 'rir', 'rpe', 'completed', 'note', 'execution']);
 const SESSION_SUMMARY_KEYS = Object.freeze([
   'id', 'memberId', 'sessionDate', 'status', 'templateKey', 'templateVersion',
   'levelSnapshot', 'sessionTitle', 'focusSnapshot', 'schemaVersion', 'revision',
@@ -127,7 +127,7 @@ function normalizeSnapshot(snapshot) {
       return;
     }
     if (item.sessionId !== snapshot.session.id) fields.push(`items.${index}.sessionId`);
-    if (item.completed !== false || item.performedActionId !== null || item.performedActionSnapshot !== null) fields.push(`items.${index}.plannedState`);
+    if (item.completed !== false || item.performedActionId !== null || item.performedActionSnapshot !== null || item.execution != null) fields.push(`items.${index}.plannedState`);
   });
   return { ok: fields.length === 0, fields };
 }
@@ -160,6 +160,25 @@ function safeExpectedRevision(value) {
   return Number.isInteger(value) && value > 0;
 }
 
+function executionProjection(execution) {
+  const performed = execution.segments.filter(segment => segment.sets.length);
+  const latest = performed.at(-1);
+  const sets = performed.flatMap(segment => segment.sets);
+  const uniform = latest && latest.mode === 'reps' && performed.every(segment =>
+    segment.mode === latest.mode && segment.actionSnapshot.actionId === latest.actionSnapshot.actionId) &&
+    sets.every(set => set.reps === sets[0].reps && set.loadKg === sets[0].loadKg);
+  return {
+    execution,
+    completed: Boolean(latest),
+    performedActionId: latest?.actionSnapshot.actionId ?? null,
+    performedActionSnapshot: latest?.actionSnapshot ?? null,
+    sets: uniform ? sets.length : null,
+    reps: uniform && sets[0].reps !== null ? String(sets[0].reps) : null,
+    loadKg: uniform ? sets[0].loadKg : null,
+    note: latest?.note ?? null,
+  };
+}
+
 function buildPerformedItems(session, storedItems, inputItems) {
   if (!Array.isArray(storedItems) || storedItems.length < 1 || storedItems.length > 80) return { error: 'invalid_session', fields: ['items'] };
   const patches = new Map();
@@ -169,12 +188,16 @@ function buildPerformedItems(session, storedItems, inputItems) {
       if (!isRecord(patch) || Object.keys(patch).some(key => !PERFORMED_ITEM_KEYS.has(key)) || !isUuid(patch.id) || patches.has(patch.id)) {
         return { error: 'invalid_session', fields: ['items'] };
       }
+      if (Object.hasOwn(patch, 'execution') && !validateSessionExecution(patch.execution).ok) {
+        return { error: 'invalid_session', fields: ['items.execution'] };
+      }
       patches.set(patch.id, patch);
     }
   }
   const storedIds = new Set(storedItems.map(item => item.id));
   if ([...patches.keys()].some(id => !storedIds.has(id))) return { error: 'invalid_session', fields: ['items.id'] };
 
+  const recorded = [...patches.values()].some(patch => patch.execution);
   const items = storedItems.map(item => {
     const patch = patches.get(item.id) || {};
     return {
@@ -205,6 +228,10 @@ function buildPerformedItems(session, storedItems, inputItems) {
       rpe: patch.rpe === undefined ? (item.rpe ?? null) : patch.rpe,
       completed: patch.completed ?? (item.completed === true || session.status === 'COMPLETED' ? item.completed : true),
       note: patch.note === undefined ? (item.note ?? null) : patch.note,
+      ...(recorded && !patches.has(item.id) ? {
+        completed: false, performedActionId: null, performedActionSnapshot: null, performedPrescription: null,
+      } : {}),
+      ...(patch.execution ? executionProjection(patch.execution) : {}),
     };
   });
   for (const item of items) {
@@ -258,7 +285,11 @@ export function createMemberApi({ auth, repository, now = () => new Date(), crea
           limit: boundedLimit(url.searchParams.get('limit')),
           offset: boundedOffset(url.searchParams.get('offset')),
         };
-        return json({ members: await repository.listMembers(options) });
+        const members = repository.listMembers(options);
+        if (url.searchParams.get('includeCounts') !== 'true') return json({ members: await members });
+        const counts = repository.countMembers().catch(() => null);
+        const [rows, totals] = await Promise.all([members, counts]);
+        return json({ members: rows, counts: totals });
       }
 
       if (request.method === 'GET' && action === 'get-member') {

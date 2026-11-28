@@ -130,9 +130,29 @@ begin
     'completed', true,
     'note', '数据库并发门禁实际记录'
   );
+  v_performed_item := v_performed_item || jsonb_build_object('execution', jsonb_build_object(
+    'schemaVersion', 1,
+    'segments', jsonb_build_array(
+      jsonb_build_object('actionSnapshot', v_snapshot#>'{items,0,plannedActionSnapshot}', 'mode', 'reps',
+        'sets', '[{"reps":10,"durationSeconds":null,"loadKg":20}]'::jsonb, 'note', null),
+      jsonb_build_object('actionSnapshot', v_performed_item->'performedActionSnapshot', 'mode', 'reps',
+        'sets', '[{"reps":8,"durationSeconds":null,"loadKg":25}]'::jsonb, 'note', null)
+    )
+  ));
   v_completion := public.member_complete_training_session(v_session_id, 1, now(), jsonb_build_array(v_performed_item));
   if v_completion->>'status' <> 'COMPLETED' or (v_completion->>'revision')::integer <> 2 then
     raise exception 'first writer did not complete at revision 2';
+  end if;
+
+  if (select execution from public.training_session_items where id = v_item_id) is distinct from v_performed_item->'execution' then
+    raise exception 'execution segments did not persist atomically';
+  end if;
+  v_replay := public.member_complete_training_session(v_session_id, 1, now(), jsonb_build_array(v_performed_item));
+  if v_replay->>'idempotentReplay' is distinct from 'true' then
+    raise exception 'identical execution did not replay';
+  end if;
+  if pg_catalog.has_function_privilege('anon', 'public.member_complete_training_session(uuid,integer,timestamptz,jsonb)', 'EXECUTE') then
+    raise exception 'anon can execute member course completion';
   end if;
 
   begin

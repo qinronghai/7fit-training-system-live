@@ -29,7 +29,7 @@ const ITEM_COLUMNS = [
   "id", "session_id", "schema_version", "phase", "slot_key", "sort_order",
   "planned_action_id", "planned_action_snapshot", "performed_action_id",
   "performed_action_snapshot", "planned_prescription_snapshot", "performed_prescription",
-  "sets", "reps", "load_kg", "rir", "rpe", "completed", "note",
+  "sets", "reps", "load_kg", "rir", "rpe", "completed", "note", "execution",
 ].join(",");
 const MEMBER_COLUMNS = [
   "id", "schema_version", "display_name", "status", "training_level", "primary_goal",
@@ -118,23 +118,37 @@ function fromDbItem(row: any) {
     rpe: row.rpe,
     completed: row.completed,
     note: row.note,
+    ...(row.execution ? { execution: row.execution } : {}),
   };
+}
+
+function selectMembers(columns: string, status: string, countOnly = false) {
+  const query = supabase.from("members").select(columns, countOnly ? { count: "exact", head: true } : undefined);
+  if (status === "ARCHIVED") return query.not("archived_at", "is", null);
+  if (status === "ALL") return query;
+  return query.eq("status", status).is("archived_at", null);
 }
 
 const repository = {
   async listMembers({ status, includeArchived, search, limit, offset }: { status: string; includeArchived: boolean; search: string; limit: number; offset: number }) {
-    let query = supabase.from("members").select(MEMBER_COLUMNS)
+    let query = selectMembers(MEMBER_COLUMNS, status || (includeArchived ? "ALL" : "ACTIVE"))
       .order("display_name", { ascending: true })
       .order("id", { ascending: true });
-    if (status === "ACTIVE") query = query.eq("status", "ACTIVE").is("archived_at", null);
-    else if (status === "ARCHIVED") query = query.not("archived_at", "is", null);
-    else if (status === "INACTIVE") query = query.eq("status", "INACTIVE").is("archived_at", null);
-    else if (!includeArchived) query = query.eq("status", "ACTIVE").is("archived_at", null);
     if (search) query = query.ilike("display_name", `%${search}%`);
     query = query.range(offset, offset + limit - 1);
     const { data, error } = await query;
     throwOnError(error);
     return (data || []).map(fromDbMember);
+  },
+
+  async countMembers() {
+    const entries = await Promise.all(["ACTIVE", "ARCHIVED", "INACTIVE"].map(async (status) => {
+      const { count, error } = await selectMembers("id", status, true);
+      throwOnError(error);
+      if (count === null) throw new Error("Member count unavailable");
+      return [status, count] as const;
+    }));
+    return Object.fromEntries(entries);
   },
 
   async getMember(id: string) {
@@ -184,7 +198,7 @@ const repository = {
 
   async getCompletedSessionsForContext(memberId: string, limit: number) {
     const contextColumns = ["id", "member_id", "session_date", "status", "template_key", "session_title", "completed_at"].join(",");
-    const contextItemColumns = ["id", "session_id", "phase", "sort_order", "planned_action_id", "planned_action_snapshot", "performed_action_id", "performed_action_snapshot", "completed"].join(",");
+    const contextItemColumns = ["id", "session_id", "phase", "sort_order", "planned_action_id", "planned_action_snapshot", "performed_action_id", "performed_action_snapshot", "completed", "execution"].join(",");
     const { data, error } = await supabase.from("training_sessions")
       .select(`${contextColumns},items:training_session_items(${contextItemColumns})`)
       .eq("member_id", memberId)
@@ -213,6 +227,7 @@ const repository = {
         performedActionId: item.performed_action_id,
         performedActionSnapshot: item.performed_action_snapshot,
         completed: item.completed,
+        ...(item.execution ? { execution: item.execution } : {}),
       })),
     }));
   },

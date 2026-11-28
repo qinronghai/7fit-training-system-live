@@ -85,6 +85,30 @@ async function main() {
   assert.deepEqual(untouched.performedActionSnapshot, untouched.plannedActionSnapshot);
   assert.equal(untouched.completed, true);
 
+  const [original, alternate] = planned.items;
+  const stages = [
+    { actionSnapshot: original.plannedActionSnapshot, mode: 'reps', sets: [{ reps: 10, durationSeconds: null, loadKg: 20 }], note: null },
+    { actionSnapshot: alternate.plannedActionSnapshot, mode: 'reps', sets: [{ reps: 8, durationSeconds: null, loadKg: 0 }], note: '更换器械' },
+  ];
+  const requestWithSets = {
+    sessionId: planned.session.id, expectedRevision: 1,
+    items: [{ id: original.id, execution: { schemaVersion: 1, segments: stages } }],
+  };
+  const actual = await call(plannedCompletionApi, 'complete-session', requestWithSets);
+  assert.equal(actual.response.status, 200, 'accepts ordered sets across a change of action');
+  assert.deepEqual(completed.items[0].execution.segments, stages);
+  assert.equal(completed.items[0].performedActionId, alternate.plannedActionId);
+  assert.equal(completed.items[0].loadKg, null);
+  assert.equal(completed.items[1].completed, false, 'an unlogged item is not counted as performed in a recorded session');
+
+  const { deriveMemberTrainingContext } = await import('../supabase/functions/_shared/member-domain.mjs');
+  const recent = deriveMemberTrainingContext({}, [{ ...planned.session, status: 'COMPLETED', completedAt: NOW.toISOString(), items: completed.items }], { generatedAt: NOW.toISOString() });
+  assert.deepEqual(new Set(recent.recentActions.map(action => action.actionId)), new Set([original.plannedActionId, alternate.plannedActionId]));
+
+  stages[1].sets[0].durationSeconds = 30;
+  const invalidMode = await call(plannedCompletionApi, 'complete-session', requestWithSets);
+  assert.equal(invalidMode.response.status, 400, 'rejects seconds in a repetition set');
+
   let cancelled;
   const cancelApi = createMemberApi({ auth, now: () => NOW, repository: repository({ async cancelSession(value) { cancelled = value; return { status: 'CANCELLED' }; } }) });
   const cancelledResponse = await call(cancelApi, 'cancel-session', { sessionId: planned.session.id, expectedRevision: 1 });

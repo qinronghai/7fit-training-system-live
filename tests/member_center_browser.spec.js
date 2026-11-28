@@ -136,13 +136,16 @@ async function mockMemberApi(page, state = {}) {
       const search = (url.searchParams.get('search') || '').toLocaleLowerCase();
       const status = url.searchParams.get('status') || (url.searchParams.get('includeArchived') === 'true' ? 'ALL' : 'ACTIVE');
       const offset = Number(url.searchParams.get('offset')) || 0;
-      const results = state.members.filter(value => (status === 'ALL'
-        || (status === 'ACTIVE' && value.status === 'ACTIVE' && !value.archivedAt)
-        || (status === 'ARCHIVED' && !!value.archivedAt)
-        || (status === 'INACTIVE' && value.status === 'INACTIVE' && !value.archivedAt))
+      const memberStatus = value => value.archivedAt ? 'ARCHIVED' : value.status;
+      const results = state.members.filter(value => (status === 'ALL' || status === memberStatus(value))
         && value.displayName.toLocaleLowerCase().includes(search))
         .sort((left, right) => left.displayName.localeCompare(right.displayName));
-      return respond({ members: results.slice(offset, offset + (Number(url.searchParams.get('limit')) || 100)) });
+      const payload = { members: results.slice(offset, offset + (Number(url.searchParams.get('limit')) || 100)) };
+      if (url.searchParams.get('includeCounts') === 'true') {
+        payload.counts = { ACTIVE: 0, ARCHIVED: 0, INACTIVE: 0 };
+        for (const value of state.members) payload.counts[memberStatus(value)] += 1;
+      }
+      return respond(payload);
     }
     if (action === 'get-member') {
       if (state.memberWait) await state.memberWait;
@@ -240,7 +243,9 @@ async function mockMemberApi(page, state = {}) {
 test('Member Center searches active members on the server and switches to the archived list', async ({ page }) => {
   const state = await mockMemberApi(page);
   await page.goto('/#/coach/members');
-  await expect(page.getByRole('heading', { name: '会员训练' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '会员管理' })).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('2');
+  await expect(page.locator('[data-member-count="INACTIVE"]')).toHaveText('0');
   await expect(page.getByText('林同学')).toBeVisible();
   await expect(page.getByText('王同学')).toHaveCount(0);
 
@@ -251,7 +256,49 @@ test('Member Center searches active members on the server and switches to the ar
   await page.locator('[data-member-search]').fill('');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
   await expect(page.getByText('王同学')).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('2');
   expect(state.calls.some(call => call.action === 'list-members' && call.query.status === 'ARCHIVED')).toBeTruthy();
+  expect(state.calls.filter(call => call.query.includeCounts === 'true')).toHaveLength(1);
+});
+
+test('the mobile member directory packs cards by height while keeping keyboard order', async ({ page }, testInfo) => {
+  const names = ['林', '陈', '周', '许', '张', '王', '郑', '李', '吴', '何', '黄', '赵', '丁', '谢', '郭', '马', '罗', '孙', '刘', '高']
+    .map(name => `${name}同学`).sort((left, right) => left.localeCompare(right));
+  const goals = ['提升下肢力量', '建立每周训练习惯，提升基础力量', '提升全身力量', '改善核心稳定',
+    '掌握深蹲和髋铰链，打好力量基础', '提升上肢力量', '改善单腿稳定', '提高基础体能'];
+  const members = names.map((name, index) => ({
+    ...member(`e5000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, name),
+    trainingLevel: `L${1 + index % 3}`,
+    primaryGoal: goals[index % goals.length],
+  }));
+  await mockMemberApi(page, { members: [
+    ...members,
+    ...Array.from({ length: 3 }, (_, index) => member(`e6000000-0000-4000-8000-00000000000${index}`, `已归档${index}`, 'INACTIVE', '2026-09-20T00:00:00.000Z')),
+    member(ARCHIVED_ID, '已停用会员', 'INACTIVE'),
+  ] });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/coach/members');
+  const cards = page.locator('[data-member-open]');
+  await expect(cards).toHaveCount(20);
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('24');
+  const boxes = await Promise.all([0, 1, 2, 3].map(index => cards.nth(index).boundingBox()));
+  expect(boxes[0].y).toBe(boxes[1].y);
+  expect(boxes[0].x).toBeLessThan(boxes[1].x);
+  expect(boxes[0].height).toBeLessThan(boxes[1].height);
+  expect(boxes[2].x).toBe(boxes[0].x);
+  expect(boxes[2].y).toBeLessThan(boxes[3].y);
+  await page.screenshot({ path: testInfo.outputPath('member-directory-390x844.png') });
+
+  await cards.first().focus();
+  await page.keyboard.press('Tab');
+  await expect(cards.nth(1)).toBeFocused();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect.poll(async () => {
+    const thirdCard = await cards.nth(2).boundingBox();
+    const secondCard = await cards.nth(1).boundingBox();
+    return thirdCard.x > secondCard.x && thirdCard.y === secondCard.y;
+  }).toBeTruthy();
 });
 
 test('member status filtering happens before paging and archived members beyond the first page are reachable', async ({ page }, testInfo) => {
@@ -268,6 +315,8 @@ test('member status filtering happens before paging and archived members beyond 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/coach/members');
   await expect(page.locator('[data-member-row]')).toHaveCount(100);
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('210');
+  await expect(page.locator('[data-member-count="ACTIVE"]')).toHaveText('105');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
   await expect(page.locator('[data-member-row]')).toHaveCount(100);
   await expect(page.getByText('Archived 001')).toBeVisible();
@@ -341,6 +390,7 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await expect(form).not.toBeVisible();
   expect(state.calls.some(call => call.action === 'save-member' && call.body.displayName === '赵同学')).toBeTruthy();
   await expect(page.locator(`[data-member-row="${CREATED_ID}"]`)).toBeVisible();
+  await expect(page.locator('[data-member-count="TOTAL"]')).toHaveText('3');
 
   await page.locator(`[data-member-open="${CREATED_ID}"]`).click();
   await expect(page).toHaveURL(new RegExp(`/members/${CREATED_ID}$`));
@@ -355,6 +405,11 @@ test('Member Center creates, edits, archives, and restores a member through expl
   await archiveDialog.locator('[data-member-archive-confirm]').click();
   await expect(page.locator('[data-member-restore]')).toBeVisible();
   expect(state.calls.some(call => call.action === 'archive-member')).toBeTruthy();
+  await page.goto('/#/coach/members');
+  await expect(page.locator('[data-member-count="ACTIVE"]')).toHaveText('1');
+  await expect(page.locator('[data-member-count="ARCHIVED"]')).toHaveText('2');
+  await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await page.locator(`[data-member-open="${CREATED_ID}"]`).click();
   await page.locator('[data-member-restore]').click();
   await expect(page.locator('[data-member-archive]')).toBeVisible();
   expect(state.calls.some(call => call.action === 'restore-member')).toBeTruthy();
@@ -365,6 +420,7 @@ test('a delayed archive response cannot rerender Coach Home over another area', 
   const archiveWait = new Promise(resolve => { releaseArchive = resolve; });
   const state = await mockMemberApi(page, { mutationWaits: { 'archive-member': archiveWait } });
   await page.goto('/#/coach/members');
+  await page.locator(`[data-member-open="${MEMBER_ID}"]`).click();
   await page.locator(`[data-member-archive="${MEMBER_ID}"]`).click();
   const dialog = page.locator('[data-member-archive-dialog]');
   await dialog.locator('[data-member-archive-confirm]').click();
@@ -385,6 +441,7 @@ test('a delayed restore response cannot rerender Coach Home over another area', 
   const state = await mockMemberApi(page, { mutationWaits: { 'restore-member': restoreWait } });
   await page.goto('/#/coach/members');
   await page.locator('[data-member-filter="ARCHIVED"]').click();
+  await page.locator(`[data-member-open="${ARCHIVED_ID}"]`).click();
   await page.locator(`[data-member-restore="${ARCHIVED_ID}"]`).click();
   await expect.poll(() => state.calls.filter(call => call.action === 'restore-member')).toHaveLength(1);
   await page.goto('/#/library');
@@ -441,6 +498,7 @@ test('planned session detail shows saved warm-ups, legal PREP replacements, and 
   await page.screenshot({ path: testInfo.outputPath('member-session-recovery-390x844.png') });
   await detail.locator('[data-member-session-prep]').scrollIntoViewIfNeeded();
   const prepItem = detail.locator('[data-session-item="e1000000-0000-4000-8000-000000000099"]');
+  await prepItem.locator('.member-session-batch > summary').click();
   const replacement = prepItem.locator('[data-session-prep-replacement]');
   await expect(replacement).toBeVisible();
   expect(await replacement.locator('option').count()).toBeGreaterThan(1);
@@ -451,6 +509,7 @@ test('planned session detail shows saved warm-ups, legal PREP replacements, and 
   await expect(detail.locator('[data-member-session-recovery]')).toContainText('大腿后侧拉伸');
   await expect(detail.locator('[data-member-session-recovery]')).toContainText('45 秒');
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '确认完成', exact: true }).click();
   await expect.poll(() => state.completions.length).toBe(1);
   const savedPrep = state.completions[0].items.find(item => item.id === 'e1000000-0000-4000-8000-000000000099');
   expect(savedPrep.performedActionId).toBe(replacementId);
@@ -616,12 +675,12 @@ test('Member with no completed history can still enter F111 at her training leve
   await expect(nextSession).toHaveAttribute('href', `#/coach/f111?memberId=${MEMBER_ID}&level=L2`);
   await nextSession.click();
   const panel = page.locator('[data-member-first-context]');
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('暂无已完成训练');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
 
-test('A planned session can be completed in one action with planned items preserved', async ({ page }, testInfo) => {
+test('A planned session can be completed explicitly as planned with items preserved', async ({ page }, testInfo) => {
   const state = await mockMemberApi(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/#/coach/members/${MEMBER_ID}`);
@@ -633,6 +692,7 @@ test('A planned session can be completed in one action with planned items preser
   await expect(execution.locator('[data-session-planned-prescription]')).toContainText('计划处方：4 组 × 8 次');
   await page.screenshot({ path: testInfo.outputPath('member-session-execution-390x844.png') });
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '按原计划完成', exact: true }).click();
 
   await expect(detail).toContainText('已完成');
   await expect(page.locator(`[data-timeline-session="${sessionSummaries[0].id}"] [data-session-status="COMPLETED"]`)).toBeVisible();
@@ -651,8 +711,9 @@ test('A planned session can save an on-site replacement and optional actual valu
   await page.goto(`/#/coach/members/${MEMBER_ID}`);
   await page.locator(`[data-open-session-detail][data-session-id="${sessionSummaries[0].id}"]`).click();
   const detail = page.locator('[data-member-session-detail]');
+  await detail.locator('.member-session-batch > summary').click();
   const replacement = detail.locator('[data-session-replacement]');
-  await replacement.selectOption('gaojiaobei_shendun');
+  await replacement.selectOption('smith_shendun');
   await detail.locator('.member-session-actual summary').click();
   await detail.locator('[data-session-actual="sets"]').fill('3');
   await detail.locator('[data-session-actual="reps"]').fill('10');
@@ -661,18 +722,19 @@ test('A planned session can save an on-site replacement and optional actual valu
   await detail.locator('[data-session-actual="rpe"]').fill('8');
   await detail.locator('[data-session-actual="note"]').fill('临时调整');
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '确认完成', exact: true }).click();
 
   await expect(detail).toContainText('计划：哈克深蹲');
-  await expect(detail).toContainText('实际：高脚杯深蹲');
+  await expect(detail).toContainText('实际：史密斯深蹲');
   expect(state.completions).toHaveLength(1);
   const patch = state.completions[0].items[0];
-  expect(patch.performedActionId).toBe('gaojiaobei_shendun');
-  expect(patch.performedActionSnapshot).toMatchObject({ actionId: 'gaojiaobei_shendun', name: '高脚杯深蹲', pattern: '蹲' });
+  expect(patch.performedActionId).toBe('smith_shendun');
+  expect(patch.performedActionSnapshot).toMatchObject({ actionId: 'smith_shendun', name: '史密斯深蹲', pattern: '蹲' });
   expect(patch).toMatchObject({ sets: 3, reps: '10', loadKg: 20, rir: 2.5, rpe: 8, note: '临时调整' });
   const saved = state.itemsBySession[sessionSummaries[0].id][0];
   expect(saved.plannedActionId).toBe('hake_shendun');
   expect(saved.plannedActionSnapshot.name).toBe('哈克深蹲');
-  expect(saved.performedActionSnapshot.name).toBe('高脚杯深蹲');
+  expect(saved.performedActionSnapshot.name).toBe('史密斯深蹲');
 });
 
 test('A planned session requires an explicit second action before cancellation', async ({ page }) => {
@@ -732,6 +794,7 @@ test('closing a completed session returns keyboard focus to the rebuilt timeline
   await page.locator(`[data-open-session-detail][data-session-id="${sessionId}"]`).click();
   const detail = page.locator('[data-member-session-detail]');
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '确认完成', exact: true }).click();
   await expect(page.locator(`[data-timeline-session="${sessionId}"] [data-session-status="COMPLETED"]`)).toBeVisible();
   await detail.locator('[data-session-detail-close]').click();
   await expect.poll(() => page.evaluate(() => {
@@ -764,6 +827,7 @@ test('A failed completion can be retried without changing the planned session', 
   await page.locator(`[data-open-session-detail][data-session-id="${sessionSummaries[0].id}"]`).click();
   const detail = page.locator('[data-member-session-detail]');
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '按原计划完成', exact: true }).click();
   await expect(detail.locator('[data-session-mutation-error]')).toContainText('暂时无法确认');
   expect(page.memberConsoleErrors).toContain('Failed to load resource: the server responded with a status of 503 (Service Unavailable)');
   page.memberConsoleErrors=[];
@@ -784,6 +848,7 @@ test('A lost completion response can be retried without creating a duplicate com
   const detail = page.locator('[data-member-session-detail]');
   const originalRequest = { completeAsPlanned: true };
   await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '按原计划完成', exact: true }).click();
   await expect(detail.locator('[data-session-mutation-error]')).toContainText('没有收到保存结果');
   expect(page.memberConsoleErrors).toContain('Failed to load resource: net::ERR_FAILED');
   page.memberConsoleErrors=[];
@@ -809,7 +874,7 @@ test('Member-first F111 opens at the member level with fresh context and unchang
   await nextSession.click();
   const panel = page.locator('[data-member-first-context]');
   await expect(panel).toBeVisible();
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('全身塑形');
   await expect(panel).toContainText('杠铃前蹲');
   await expect(panel).not.toContainText('下肢力量');
@@ -832,7 +897,7 @@ test('Member-first F111 opens at the member level with fresh context and unchang
     await page.goto(`/#/coach/members/${MEMBER_ID}`);
     await page.locator('[data-member-next-session]').click();
     const contextPanel = page.locator('[data-member-first-context]');
-    await expect(contextPanel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+    await expect(contextPanel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
     const dimensions = await page.evaluate(() => ({
       viewportWidth: document.documentElement.clientWidth,
       pageWidth: document.documentElement.scrollWidth,
@@ -857,7 +922,7 @@ test('Member-first F111 remains usable and can retry when context loading fails'
 
   state.failContext = false;
   await panel.locator('[data-member-context-retry]').click();
-  await expect(panel.getByRole('heading', { name: '正在为林同学 · L2 编排训练' })).toBeVisible();
+  await expect(panel.getByRole('heading', { name: '会员 · 林同学' })).toBeVisible();
   await expect(panel).toContainText('全身塑形');
   expect(state.calls.filter(call => call.action === 'get-member-training-context')).toHaveLength(2);
 });
@@ -988,4 +1053,115 @@ test('Member detail and course sheet fit the required responsive viewport matrix
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: testInfo.outputPath(`member-list-${viewport.width}x${viewport.height}.png`), fullPage: true });
   }
+});
+
+test('Coach logs sets, changes action through the catalog and keeps both actions in history', async ({ page }) => {
+  const session = sessionSummaries[0];
+  const original = { id: 'hake_shendun', name: '哈克深蹲', pattern: '蹲', level: 'T3', primaryMuscles: ['股四头肌'], secondaryMuscles: [], equipment: '哈克深蹲机', stationId: null };
+  const state = await mockMemberApi(page, { itemsBySession: { [session.id]: [plannedItem(session.id, original)] } });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await page.locator(`[data-open-session-detail][data-session-id="${session.id}"]`).click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.getByRole('button', { name: '开始带课' }).click();
+  const reps = detail.getByLabel('本组次数', { exact: true });
+  const load = detail.getByLabel('本组重量 kg', { exact: true });
+  await reps.fill('10');
+  await load.fill('20');
+  await reps.press('Enter');
+  await expect(reps).toHaveValue('10');
+  await expect(load).toHaveValue('20');
+  await detail.getByRole('button', { name: '记第 2 组' }).click();
+  await detail.getByRole('button', { name: '换动作' }).click();
+  await detail.getByRole('button', { name: '搜索动作库', exact: true }).click();
+  await detail.getByRole('searchbox', { name: '搜索动作' }).fill('触凳');
+  await detail.getByRole('button', { name: '换成 触凳箱式深蹲', exact: true }).click();
+  await detail.getByRole('button', { name: '确认替换' }).click();
+  await expect(reps).toHaveValue('');
+  await expect(load).toHaveValue('');
+  await reps.fill('8');
+  await load.fill('0');
+  await detail.getByRole('button', { name: '记第 3 组' }).click();
+  await detail.getByRole('button', { name: '完成本节课' }).click();
+  await detail.getByRole('button', { name: '确认完成' }).click();
+  await expect(detail).toContainText('已完成');
+  const saved = state.completions[0].items[0];
+  expect(saved.execution.segments.map(segment => [segment.actionSnapshot.actionId, segment.sets])).toEqual([
+    ['hake_shendun', [{ reps: 10, durationSeconds: null, loadKg: 20 }, { reps: 10, durationSeconds: null, loadKg: 20 }]],
+    ['movement_bench_box_squat', [{ reps: 8, durationSeconds: null, loadKg: 0 }]],
+  ]);
+  await expect(detail).toContainText('哈克深蹲');
+  await expect(detail).toContainText('触凳箱式深蹲');
+  await expect(detail).toContainText('0 kg');
+});
+
+test('Coach can resume a timed set and an unconfirmed input from a saved course draft', async ({ page }) => {
+  const session = sessionSummaries[0];
+  const item = plannedItem(session.id);
+  item.plannedPrescriptionSnapshot.rawText = '2 组 × 30 秒';
+  const state = await mockMemberApi(page, { itemsBySession: { [session.id]: [item] } });
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await page.evaluate(() => localStorage.setItem('7fit_case_admin_session', JSON.stringify({
+    token: 'member-center-draft-test', expiresAt: new Date(Date.now() + 3600000).toISOString(),
+  })));
+  const trigger = page.locator(`[data-open-session-detail][data-session-id="${session.id}"]`);
+  await trigger.click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.getByRole('button', { name: '开始带课' }).click();
+  const seconds = detail.getByLabel('本组时长（秒）');
+  await seconds.fill('30');
+  await detail.getByRole('button', { name: '记第 1 组' }).click();
+  await detail.getByRole('button', { name: '修改第 1 组' }).click();
+  await detail.getByLabel('修改时长（秒）').fill('32');
+  await detail.getByRole('button', { name: '保存修改' }).click();
+  await expect(seconds).toHaveValue('32');
+  await seconds.fill('25');
+  await detail.getByRole('button', { name: '关闭', exact: true }).click();
+  await detail.getByRole('button', { name: '保存草稿并关闭' }).click();
+  await expect(detail).toBeHidden();
+  await trigger.click();
+  await expect(detail.getByRole('status').filter({ hasText: '已恢复本机草稿' })).toBeVisible();
+  await expect(seconds).toHaveValue('25');
+  await expect(detail).toContainText('32 秒');
+  await detail.getByRole('button', { name: '完成本节课' }).click();
+  await expect(detail.getByRole('alert').filter({ hasText: '这组输入还未记录' })).toBeVisible();
+  expect(state.completions).toHaveLength(0);
+  await detail.getByRole('button', { name: '记第 2 组' }).click();
+  await detail.getByRole('button', { name: '完成本节课' }).click();
+  await detail.getByRole('button', { name: '确认完成' }).click();
+  await expect(detail).toContainText('已完成');
+  expect(state.completions[0].items[0].execution.segments[0].sets.map(set => set.durationSeconds)).toEqual([32, 25]);
+  expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('7fit_member_course_draft:')))).toEqual([]);
+});
+
+test('Coach can swap from current candidates and the action library explains an incompatible hit', async ({ page }) => {
+  const session = sessionSummaries[0];
+  const action = { id: 'hake_shendun', name: '哈克深蹲', pattern: '蹲', level: 'T3', primaryMuscles: ['股四头肌'], secondaryMuscles: [], equipment: '哈克深蹲机', stationId: null };
+  await mockMemberApi(page, { itemsBySession: { [session.id]: [plannedItem(session.id, action)] } });
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await page.locator(`[data-open-session-detail][data-session-id="${session.id}"]`).click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.getByRole('button', { name: '开始带课' }).click();
+  await detail.getByRole('button', { name: '换动作' }).click();
+  await detail.getByRole('button', { name: '换成 史密斯深蹲', exact: true }).click();
+  await detail.getByRole('button', { name: '确认替换' }).click();
+  await expect(detail.getByRole('heading', { name: '史密斯深蹲' })).toBeVisible();
+  await detail.getByRole('button', { name: '换动作' }).click();
+  await detail.getByRole('button', { name: '搜索动作库', exact: true }).click();
+  await detail.getByRole('searchbox', { name: '搜索动作' }).fill('高脚杯');
+  await expect(detail.locator('li').filter({ hasText: '高脚杯深蹲' }).filter({ hasText: '器械位于 2F' }).first()).toBeVisible();
+  await expect(detail.getByRole('button', { name: '换成 高脚杯深蹲', exact: true })).toHaveCount(0);
+});
+
+test('Finishing without logged sets keeps actual work blank unless the coach chooses completion as planned', async ({ page }) => {
+  const state = await mockMemberApi(page);
+  await page.goto(`/#/coach/members/${MEMBER_ID}`);
+  await page.locator(`[data-open-session-detail][data-session-id="${sessionSummaries[0].id}"]`).click();
+  const detail = page.locator('[data-member-session-detail]');
+  await detail.locator('[data-session-complete]').click();
+  await detail.getByRole('button', { name: '确认完成', exact: true }).click();
+  await expect(detail).toContainText('实练未记录');
+  expect(state.completions[0].completeAsPlanned).toBeUndefined();
+  expect(state.completions[0].items[0].execution).toEqual({ schemaVersion: 1, segments: [] });
 });

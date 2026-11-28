@@ -6,6 +6,7 @@ const MEMBER_KEYS = new Set(['schemaVersion', 'id', 'displayName', 'status', 'tr
 const PROFILE_KEYS = new Set(['schemaVersion', 'experienceLevel', 'movementConstraints', 'preferredEquipment', 'notes']);
 const SESSION_KEYS = new Set(['schemaVersion', 'id', 'memberId', 'sessionDate', 'status', 'templateKey', 'templateVersion', 'levelSnapshot', 'sessionTitle', 'focusSnapshot', 'resolvedSessionSnapshot', 'memberCopyText', 'coachNote', 'createdAt', 'updatedAt', 'completedAt', 'idempotencyKey']);
 const ITEM_KEYS = new Set(['schemaVersion', 'id', 'sessionId', 'phase', 'slotKey', 'sortOrder', 'plannedActionId', 'plannedActionSnapshot', 'performedActionId', 'performedActionSnapshot', 'plannedPrescriptionSnapshot', 'performedPrescription', 'sets', 'reps', 'loadKg', 'rir', 'rpe', 'completed', 'note']);
+const ITEM_OPTIONAL_KEYS = new Set([...ITEM_KEYS, 'execution']);
 const ACTION_KEYS = new Set(['schemaVersion', 'actionId', 'name', 'pattern', 'level', 'primaryMuscles', 'secondaryMuscles', 'equipment', 'stationId']);
 const PRESCRIPTION_KEYS = new Set(['schemaVersion', 'sets', 'reps', 'rir', 'restSeconds', 'tempo', 'loadPrescription', 'rawText']);
 const TRAINING_LEVELS = new Set(['L1', 'L2', 'L3', 'L4']);
@@ -187,10 +188,41 @@ function validatePrescription(value, path, errors) {
   for (const key of ['loadPrescription', 'rawText']) optionalString(value[key], `${path}.${key}`, errors, 240);
 }
 
+export function validateSessionExecution(value) {
+  const errors = [];
+  if (!isRecord(value) || value.schemaVersion !== 1 || !Array.isArray(value.segments) ||
+      value.segments.length > 100 || Object.keys(value).some(key => key !== 'schemaVersion' && key !== 'segments')) {
+    return result(['execution: expected schemaVersion 1 and segments']);
+  }
+  let count = 0;
+  value.segments.forEach((segment, index) => {
+    const path = `execution.segments.${index}`;
+    if (!isRecord(segment) || !['reps', 'perSide', 'duration'].includes(segment.mode) || !Array.isArray(segment.sets) ||
+        segment.sets.length > 100 || Object.keys(segment).length !== 4 || Object.keys(segment).some(key => !['actionSnapshot', 'mode', 'sets', 'note'].includes(key))) {
+      errors.push(`${path}: invalid segment`);
+      return;
+    }
+    validateActionSnapshot(segment.actionSnapshot, `${path}.actionSnapshot`, errors);
+    optionalString(segment.note, `${path}.note`, errors, 2000);
+    count += segment.sets.length;
+    segment.sets.forEach((set, position) => {
+      const validInteger = (value, max) => value === null || Number.isInteger(value) && value >= 1 && value <= max;
+      if (!isRecord(set) || Object.keys(set).length !== 3 || !validInteger(set.reps, 300) ||
+          !validInteger(set.durationSeconds, 3600) ||
+          !(set.loadKg === null || Number.isFinite(set.loadKg) && set.loadKg >= 0 && set.loadKg <= 2000 && Math.round(set.loadKg * 100) / 100 === set.loadKg) ||
+          (segment.mode === 'duration' ? set.reps !== null : set.durationSeconds !== null)) {
+        errors.push(`${path}.sets.${position}: invalid set for ${segment.mode}`);
+      }
+    });
+  });
+  if (count > 100) errors.push('execution: expected at most 100 sets');
+  return result(errors);
+}
+
 export function validateTrainingSessionItem(value) {
   const errors = [];
   if (!isRecord(value)) return result(['trainingSessionItem: expected object']);
-  keysAreKnown(value, ITEM_KEYS, 'trainingSessionItem', errors);
+  keysAreKnown(value, ITEM_OPTIONAL_KEYS, 'trainingSessionItem', errors);
   requireKeys(value, ITEM_KEYS, 'trainingSessionItem', errors);
   if (value.schemaVersion !== CONTRACT_VERSION) errors.push('schemaVersion: expected 1');
   requiredUuid(value.id, 'id', errors);
@@ -214,6 +246,7 @@ export function validateTrainingSessionItem(value) {
   for (const key of ['rir', 'rpe']) if (value[key] !== null && (typeof value[key] !== 'number' || value[key] < 0 || value[key] > 10)) errors.push(`${key}: expected 0-10 or null`);
   if (typeof value.completed !== 'boolean') errors.push('completed: expected boolean');
   optionalString(value.note, 'note', errors, 2000);
+  if (value.execution != null) errors.push(...validateSessionExecution(value.execution).errors);
   return result(errors);
 }
 
@@ -394,7 +427,18 @@ export function deriveMemberTrainingContext(member, sessions, options = {}) {
     .filter(session => session && session.status === 'COMPLETED' && validTimestamp(session.completedAt))
     .slice()
     .sort(compareSessions);
-  const selected = completed.slice(0, 3);
+  const selected = completed.slice(0, 3).map(session => ({
+    ...session,
+    items: asArray(session.items).flatMap(item => {
+      if (!item.execution) return [item];
+      if (!item.completed) return [];
+      return asArray(item.execution.segments).filter(segment => segment.sets?.length).map(segment => ({
+        ...item,
+        performedActionId: segment.actionSnapshot?.actionId,
+        performedActionSnapshot: segment.actionSnapshot,
+      }));
+    }),
+  }));
   const recentSessions = selected.map(recentSession);
   const patternRecords = countBySession(selected, (_item, snapshot) => snapshot.pattern, effectiveActionSnapshot);
   const actionRecords = countBySession(selected, (_item, snapshot) => snapshot.actionId, effectiveActionSnapshot);

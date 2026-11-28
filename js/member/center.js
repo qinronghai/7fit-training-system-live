@@ -4,7 +4,9 @@
   const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const LIMIT=100;
   const SESSION_PAGE_SIZE=30;
-  let route=null,routeVersion=0,query='',filter='ACTIVE',listVersion=0,detailVersion=0,listTimer=null,formReturnFocus=null,archiveTarget=null,membersById=new Map(),listRows=[],listHasMore=false,listLoadingMore=false,listMoreError=false,listMoreAuthError=false,currentMember=null,currentContext=null,currentSessions=[],timelineHasMore=false,timelineLoading=false,timelineLoadError=false;
+  const MEMBER_FILTERS=[['ACTIVE','有效会员'],['ARCHIVED','已归档'],['INACTIVE','已停用']];
+  let route=null,routeVersion=0,query='',filter='ACTIVE',listVersion=0,detailVersion=0,listTimer=null,formReturnFocus=null,archiveTarget=null,listRows=[],listHasMore=false,listLoadingMore=false,listMoreError=false,listMoreAuthError=false,currentMember=null,currentContext=null,currentSessions=[],timelineHasMore=false,timelineLoading=false,timelineLoadError=false;
+  let listCounts=null,cardObserver=null;
 
   function dateLabel(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)?value.replaceAll('-','.'):esc(value||'日期未记录');}
   function statusLabel(status){return ({ACTIVE:'有效会员',INACTIVE:'已停用',PLANNED:'待训练',COMPLETED:'已完成',CANCELLED:'已取消'})[status]||'状态未知';}
@@ -13,24 +15,76 @@
   function archiveMarkup(){return `<dialog class="member-archive-dialog" data-member-archive-dialog aria-labelledby="member-archive-title"><section><h2 id="member-archive-title">归档会员</h2><p data-member-archive-copy>归档后，历史训练记录仍会保留。</p><div class="member-archive-actions"><button type="button" data-member-archive-cancel>取消</button><button type="button" class="danger" data-member-archive-confirm>确认归档</button></div></section></dialog>`;}
 
   function renderListShell(){
-    return `<section class="member-center-page" data-member-center-page="list"><header class="member-center-heading"><div><h1>会员训练</h1><p>从最近完成训练查看会员进展，也可以继续查看课程记录。</p></div><button class="member-primary-action" type="button" data-member-create>新增会员</button></header><section class="member-directory" aria-labelledby="member-directory-title"><div class="member-directory-heading"><div><h2 id="member-directory-title">会员</h2><p>会员信息仅服务于课程编排与训练回看。</p></div><div class="member-filter-tabs" role="group" aria-label="会员状态">${[['ACTIVE','有效会员'],['ARCHIVED','已归档'],['INACTIVE','已停用']].map(([value,label])=>`<button type="button" data-member-filter="${value}" aria-pressed="${filter===value}">${label}</button>`).join('')}</div></div><label class="member-directory-search"><span>搜索会员</span><input type="search" data-member-search value="${esc(query)}" placeholder="输入姓名" autocomplete="off"></label><div class="member-results" data-member-results aria-live="polite"><p class="member-state-loading" data-member-loading>正在加载会员…</p></div></section>${formMarkup()}${archiveMarkup()}</section>`;
+    return `<section class="member-center-page member-directory" data-member-center-page="list" aria-labelledby="page-title">
+      <div class="member-directory-total"><span>会员总数</span><strong data-member-count="TOTAL">—</strong><span>位</span></div>
+      <label class="member-directory-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg>
+        <input type="search" data-member-search aria-label="搜索会员姓名" value="${esc(query)}" placeholder="搜索会员姓名" autocomplete="off">
+      </label>
+      <div class="member-filter-tabs" role="group" aria-label="会员状态">${MEMBER_FILTERS.map(([value,label])=>`<button type="button" data-member-filter="${value}" aria-pressed="${filter===value}">${label}<span data-member-count="${value}" hidden></span></button>`).join('')}</div>
+      <div class="member-results" data-member-results aria-live="polite"><p class="member-state-loading" data-member-loading>正在加载会员…</p></div>
+      ${formMarkup()}
+    </section>`;
   }
 
   function memberRow(member){
-    const meta=[member.trainingLevel||'等级未设置',member.primaryGoal||'训练目标未设置'].filter(Boolean);
-    return `<article class="member-directory-row" data-member-row="${esc(member.id)}"><div class="member-row-main"><a data-member-open="${esc(member.id)}" href="#/coach/members/${encodeURIComponent(member.id)}">${esc(member.displayName)}</a><p>${meta.map(esc).join(' · ')}</p></div><span class="member-row-status ${member.archivedAt?'archived':''}">${member.archivedAt?'已归档':statusLabel(member.status)}</span><div class="member-row-actions">${member.archivedAt?`<button type="button" data-member-restore="${esc(member.id)}">恢复会员</button>`:`<button type="button" data-member-edit="${esc(member.id)}">编辑资料</button><button type="button" data-member-archive="${esc(member.id)}">归档</button>`}</div></article>`;
+    const id=esc(member.id);
+    return `<a class="member-directory-row" data-member-row="${id}" data-member-open="${id}" href="#/coach/members/${encodeURIComponent(member.id)}">
+      <div class="member-card-heading"><strong>${esc(member.displayName)}</strong>${member.trainingLevel?`<span class="member-card-level">${esc(member.trainingLevel)}</span>`:''}</div>
+      ${member.primaryGoal?`<p>${esc(member.primaryGoal)}</p>`:''}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </a>`;
+  }
+
+  function updateListCounts(counts){
+    if(!counts||!MEMBER_FILTERS.every(([status])=>Number.isSafeInteger(counts[status])&&counts[status]>=0))return;
+    listCounts=counts;
+    const total=MEMBER_FILTERS.reduce((sum,[status])=>sum+counts[status],0);
+    for(const node of document.querySelectorAll('[data-member-count]')){
+      const key=node.dataset.memberCount;
+      node.textContent=key==='TOTAL'?total:counts[key];
+      node.hidden=false;
+    }
+  }
+
+  function layoutMemberCards(grid){
+    const styles=getComputedStyle(grid);
+    const columns=Number(styles.getPropertyValue('--member-columns'));
+    const gap=parseFloat(styles.getPropertyValue('--member-card-gap'));
+    const offsets=Array(columns).fill(0);
+    const cards=Array.from(grid.children);
+    const heights=cards.map(card=>card.getBoundingClientRect().height);
+    cards.forEach((card,index)=>{
+      const column=offsets.indexOf(Math.min(...offsets));
+      card.style.setProperty('--member-card-column',column);
+      card.style.top=`${offsets[column]}px`;
+      offsets[column]+=heights[index]+gap;
+    });
+    grid.style.height=`${Math.max(...offsets)-gap}px`;
+  }
+
+  function updateListResults(target,markup){
+    cardObserver?.disconnect();
+    cardObserver=null;
+    target.innerHTML=markup;
+    const grid=target.querySelector('.member-directory-list');
+    if(!grid||typeof ResizeObserver!=='function')return;
+    grid.classList.add('is-masonry');
+    layoutMemberCards(grid);
+    cardObserver=new ResizeObserver(()=>layoutMemberCards(grid));
+    cardObserver.observe(grid);
+    for(const card of grid.children)cardObserver.observe(card,{box:'border-box'});
   }
 
   function renderListResults(rows,hasMore=listHasMore){
     const visible=rows.filter(member=>filter==='ACTIVE'?member.status==='ACTIVE'&&!member.archivedAt:filter==='ARCHIVED'?!!member.archivedAt:member.status==='INACTIVE'&&!member.archivedAt);
-    visible.forEach(member=>membersById.set(member.id,member));
     if(!visible.length){
       const title=query?'没有找到匹配的会员':filter==='ARCHIVED'?'还没有归档会员':filter==='INACTIVE'?'没有停用会员':'还没有会员记录';
-      return `<div class="member-state-empty" data-member-empty><h3>${title}</h3><p>${query?'试试输入完整姓名或减少搜索条件。':'创建会员后，可以从这里进入她的训练记录。'}</p>${filter==='ACTIVE'?'<button type="button" data-member-create>新增会员</button>':''}</div>`;
+      return `<div class="member-state-empty" data-member-empty><p>${title}</p></div>`;
     }
     const moreError=listMoreError?`<p class="member-load-more-error" role="alert">${listMoreAuthError?staffRecoveryMarkup():'更多会员暂时无法读取，请重试。'}</p>`:'';
     const moreButton=hasMore?`<button class="member-load-more" type="button" data-member-load-more-members${listLoadingMore?' disabled':''}>${listLoadingMore?'正在加载…':listMoreError?'重试加载':'加载更多会员'}</button>`:'';
-    return `<div class="member-directory-list">${visible.map(memberRow).join('')}</div><p class="member-list-count">显示 ${visible.length} 位会员</p>${moreError}${moreButton}`;
+    return `<div class="member-directory-list">${visible.map(memberRow).join('')}</div>${moreError}${moreButton}`;
   }
 
   function staffRecoveryMarkup(){
@@ -45,8 +99,9 @@
   async function loadMemberListPage(version,{append=false}={}){
     try{
       const offset=append?listRows.length:0;
-      const rows=await window.V14MemberAPI.listMembers({search:query,status:filter,limit:LIMIT,offset});
+      const {members:rows,counts}=await window.V14MemberAPI.listMemberDirectory({search:query,status:filter,limit:LIMIT,offset,includeCounts:!append&&!listCounts});
       if(version!==listVersion||route?.page!=='member-list')return;
+      updateListCounts(counts);
       const pageRows=Array.isArray(rows)?rows:[];
       if(append){
         const known=new Set(listRows.map(member=>member.id));
@@ -55,14 +110,14 @@
       listHasMore=pageRows.length===LIMIT;
       listLoadingMore=false;listMoreError=false;listMoreAuthError=false;
       const result=document.querySelector('[data-member-results]');
-      if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+      if(result)updateListResults(result,renderListResults(listRows,listHasMore));
     }catch(error){
       if(version!==listVersion||route?.page!=='member-list')return;
       listLoadingMore=false;
       if(append){
         listMoreError=true;listMoreAuthError=error?.status===401;
         const result=document.querySelector('[data-member-results]');
-        if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+        if(result)updateListResults(result,renderListResults(listRows,listHasMore));
       }else showListError(error);
     }
   }
@@ -71,7 +126,7 @@
     if(listLoadingMore||!listHasMore||route?.page!=='member-list')return;
     listLoadingMore=true;listMoreError=false;listMoreAuthError=false;
     const result=document.querySelector('[data-member-results]');
-    if(result)result.innerHTML=renderListResults(listRows,listHasMore);
+    if(result)updateListResults(result,renderListResults(listRows,listHasMore));
     void loadMemberListPage(listVersion,{append:true});
   }
 
@@ -83,7 +138,7 @@
     clearTimeout(listTimer);
     listRows=[];listHasMore=false;listLoadingMore=false;listMoreError=false;listMoreAuthError=false;
     const target=document.querySelector('[data-member-results]');
-    if(target)target.innerHTML='<p class="member-state-loading" data-member-loading>正在加载会员…</p>';
+    if(target)updateListResults(target,'<p class="member-state-loading" data-member-loading>正在加载会员…</p>');
     listTimer=setTimeout(()=>{void loadMemberListPage(version);},delay);
   }
 
@@ -145,8 +200,6 @@
       if(loading)loading.outerHTML=`<div class="member-state-error" data-member-detail-error role="alert">${error?.status===401?staffRecoveryMarkup():`<p>${error?.status===404?'没有找到这位会员。':'会员训练记录暂时无法读取。'}</p>`}<button type="button" data-member-detail-retry>重试</button></div>`;
     }
   }
-
-  function memberFor(id){return currentMember?.id===id?currentMember:membersById.get(id)||null;}
 
   function canCopySessionToCurrentMember(){
     return route?.page==='member-detail'
@@ -370,6 +423,7 @@
 
   async function saveForm(form,root,rerender){
     const dialog=root.querySelector('[data-member-form-dialog]'),errorNode=dialog.querySelector('[data-member-form-error]'),button=dialog.querySelector('[data-member-form-submit]');
+    const startedRouteVersion=routeVersion;
     const movementConstraints=splitLines(form.elements.movementConstraints.value),preferredEquipment=splitLines(form.elements.preferredEquipment.value);
     const invalidList=movementConstraints.length>40||movementConstraints.some(value=>value.length>240)||preferredEquipment.length>80||preferredEquipment.some(value=>value.length>120);
     if(invalidList){errorNode.textContent='动作限制最多 40 项且每项不超过 240 字；常用器械最多 80 项且每项不超过 120 字。';errorNode.hidden=false;return;}
@@ -385,7 +439,10 @@
     try{
       await window.V14MemberAPI.saveMember(payload);
       dialog.close();
-      if(route?.page==='member-detail')rerender();else scheduleListLoad(0);
+      listCounts=null;
+      if(startedRouteVersion!==routeVersion)return;
+      if(route?.page==='member-detail')rerender();
+      if(route?.page==='member-list')scheduleListLoad(0);
     }catch(error){
       if(error?.status===401)errorNode.innerHTML=`${staffRecoveryMarkup()}<span>验证完成后返回此页，再次保存资料。</span>`;
       else errorNode.textContent=error?.code==='invalid_member'?'会员资料未通过校验，请检查姓名和每项信息的长度。':'保存失败，请检查网络后重试。';
@@ -439,8 +496,8 @@
       scheduleListLoad(0);return;
     }
     if(target.matches('[data-member-create]')){openForm(null,target,root);return;}
-    if(target.matches('[data-member-edit]')){const member=memberFor(target.dataset.memberEdit);if(member)openForm(member,target,root);return;}
-    if(target.matches('[data-member-archive]')){const member=memberFor(target.dataset.memberArchive);if(member)openArchive(member,root);return;}
+    if(target.matches('[data-member-edit]')){if(currentMember?.id===target.dataset.memberEdit)openForm(currentMember,target,root);return;}
+    if(target.matches('[data-member-archive]')){if(currentMember?.id===target.dataset.memberArchive)openArchive(currentMember,root);return;}
     if(target.matches('[data-member-archive-cancel]')||target.matches('[data-member-form-cancel]')){target.closest('dialog')?.close();return;}
     if(target.matches('[data-member-archive-confirm]')){void archiveMember(root,rerender);return;}
     if(target.matches('[data-member-restore]')){void restoreMember(target.dataset.memberRestore,rerender);return;}
@@ -450,13 +507,14 @@
     if(target.matches('[data-member-load-more]')){void loadMoreSessions(root);return;}
     if(target.matches('[data-copy-session-to-member]')){void copyTrainingToMember(target,root);return;}
     if(target.matches('[data-delete-planned-session]')){void deletePlannedSession(target,root);return;}
-    if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined);return;}
+    if(target.matches('[data-open-session-detail]')){window.V14MemberSessionUI?.open?.(target.dataset.sessionId,target,()=>route?.page==='member-detail'?loadDetail(root):undefined,{...currentMember,sessions:[...currentSessions,...(currentContext?.recentSessions||[]).map(value=>({...value,status:'COMPLETED'}))]});return;}
   }
 
   function bind(routeValue,root,rerender){
     route=routeValue;
     if(!root.dataset.memberCenterBound){
       root.dataset.memberCenterBound='1';
+      document.getElementById('member-directory-create').addEventListener('click',event=>openForm(null,event.currentTarget,root));
       root.addEventListener('click',event=>handleClick(event,root,rerender));
       root.addEventListener('input',event=>{if(event.target.matches('[data-member-search]'))scheduleListLoad();});
       root.addEventListener('submit',event=>{
@@ -472,7 +530,10 @@
 
   function render(routeValue){
     route=routeValue;
-    if(routeValue.page==='member-list')return renderListShell();
+    if(routeValue.page==='member-list'){
+      listCounts=null;
+      return renderListShell();
+    }
     currentMember=null;currentContext=null;currentSessions=[];timelineHasMore=false;timelineLoading=false;timelineLoadError=false;
     return renderDetailShell();
   }
@@ -485,7 +546,10 @@
     const leavingList=route?.page==='member-list'&&nextRoute?.page!=='member-list';
     const leavingDetail=route?.page==='member-detail'
       &&(nextRoute?.page!=='member-detail'||nextRoute.memberId!==route.memberId);
-    if(leavingList){listVersion++;clearTimeout(listTimer);listTimer=null;}
+    if(leavingList){
+      listVersion++;clearTimeout(listTimer);listTimer=null;
+      cardObserver?.disconnect();cardObserver=null;
+    }
     if(leavingDetail)detailVersion++;
     route=next;
   }
