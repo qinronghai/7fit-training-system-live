@@ -14,6 +14,25 @@ for(const file of [
 const D=ctx.window.V14_DATA,S=ctx.window.V15State,V14=ctx.window.V14State,M=ctx.window.V14CoachModules;
 const plain=v=>JSON.parse(JSON.stringify(v));
 
+function assertF111Alternatives(prep){
+  const currentIds=prep.slots.map(slot=>slot.actionId);
+  const {level,formalActionIds}=prep.context;
+  const primer=prep.slots.find(slot=>slot.slotKey==='PRIMER');
+  assert.strictEqual(primer.prepGrade,`P${level.slice(-1)}`,'Default mode preparation must progress with the course level');
+  for(const slot of prep.slots){
+    const label=`${level} ${prep.context.mainPatterns.join('+')} ${slot.slotKey}`;
+    const alternatives=slot.candidates.filter(item=>item.actionId!==slot.actionId);
+    assert(alternatives.length>=8,`${label} has only ${alternatives.length} replacements`);
+    assert.strictEqual(new Set(slot.candidates.map(item=>item.actionId)).size,slot.candidates.length,label);
+    assert(slot.candidates.some(item=>item.actionId===slot.actionId),`${label} must include the current selection`);
+    assert(alternatives.every(item=>!formalActionIds.includes(item.actionId)&&!currentIds.includes(item.actionId)),label);
+    assert(alternatives.every(item=>!item.f111Slot||item.f111Slot===slot.slotKey),label);
+    if(slot.slotKey==='INTEGRATED')assert(alternatives.every(item=>item.sequencePhase==='standing-dynamic'),label);
+    const ranks=slot.candidates.map(item=>ctx.window.V14PrepGrade.gradeRank(level,item.prepGrade));
+    assert(ranks.every((rank,index)=>Number.isFinite(rank)&&(index===0||rank>=ranks[index-1])),label);
+  }
+}
+
 assert.strictEqual(typeof M.Prep.resolvePresetPrep,'function','Preset PREP must use shared Phase B1 resolver');
 assert.strictEqual(typeof M.Prep.resolveComposerPrep,'function','Composer PREP must use shared Phase B1 resolver');
 
@@ -46,6 +65,7 @@ const presetHtml=M.Session.render({recipeId,level});
 assert(presetHtml.includes('prep-slot-select'),'Preset PREP must render replacement selects');
 assert(presetHtml.includes('prep-card-meta'),'Preset PREP must retain action-role metadata');
 assert(presetHtml.includes('prep-card-title-row'),'Preset PREP must keep the action and replacement control in its compact card row');
+assert(presetHtml.includes('f111-prep-purpose'),'Preset PREP must show the slot purpose beside each exercise');
 
 // Copy must consume the same resolved PREP; old matchedWarmups path must not be called.
 preset=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
@@ -67,6 +87,26 @@ const resolved=ctx.window.V14Composer.resolve({level:'L3',lowerMode:'single_leg_
 const stateKey=`${resolved.compositionId}-L3`;
 const composerCtx={level:'L3',lowerMode:'single_leg_hinge',upperMode:'horizontal_push',coreDemand:'anti_extension',stateKey,resolved};
 let composerPrep=M.Prep.resolveComposerPrep(composerCtx);
+const changed=ctx.window.V14Composer.resolve({...composerCtx,selections:{C:'SUP-S2-01',CORE:'CORE-L3-01'}});
+const prepAfterSwap=M.Prep.resolveComposerPrep({...composerCtx,resolved:changed});
+assert(prepAfterSwap.context.supportPatterns.includes('肩胛稳定'));
+assert.deepStrictEqual(plain(prepAfterSwap.context.coreDemands),[D.actions['CORE-L3-01'].coreDemand]);
+
+for(const mode of ctx.window.V14Composer.combinations()){
+  for(const level of ['L1','L2','L3','L4']){
+    const resolved=ctx.window.V14Composer.resolve({...mode,level});
+    const prep=M.Prep.resolveComposerPrep({level,stateKey:resolved.compositionId+'-'+level,resolved});
+    assert.strictEqual(prep.slots.length,5);
+    assert(prep.slots.every(slot=>slot.actionId),resolved.compositionId+' '+level+' has an empty warm-up slot');
+    assertF111Alternatives(prep);
+    const primer=prep.slots.find(slot=>slot.slotKey==='PRIMER');
+    assert(primer.targetPatterns.some(pattern=>prep.context.mainPatterns.includes(pattern)));
+  }
+}
+for(const [id,session] of Object.entries(D.sessions)){
+  if(!/^F111-\d{2}-L[1-4]$/.test(id))continue;
+  assertF111Alternatives(M.Prep.resolvePresetPrep(id,id.slice(0,-3),id.slice(-2),session.slots.map(slot=>slot.baselineId)));
+}
 slot=firstReplaceableSlot(composerPrep); assert(slot,'expected replaceable Composer PREP slot');
 const composerManual=slot.candidates.find(c=>c.actionId!==slot.actionId); assert(composerManual);
 S.setPrepSelection('f111',stateKey,slot.slotKey,composerManual.actionId,'manual');
@@ -75,6 +115,7 @@ assert.strictEqual(composerPrep.slots.find(x=>x.slotKey===slot.slotKey).actionId
 assert.strictEqual(composerPrep.slots.find(x=>x.slotKey===slot.slotKey).source,'manual');
 const composerHtml=M.Prep.composerPrepHtml(composerCtx);
 assert(composerHtml.includes('prep-slot-select'),'Composer PREP must render replacement selects');
+assert.strictEqual((composerHtml.match(/class="f111-prep-purpose"/g)||[]).length,5);
 M.Prep.composerPrepItems=()=>{throw new Error('legacy composerPrepItems must not be used by copy');};
 const composerPayload=M.ComposerView.buildComposerCopyPayload(composerCtx);
 assert(composerPayload.warmups.some(x=>x.name===composerManual.name),'Composer copy must include current manual PREP');

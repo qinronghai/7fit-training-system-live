@@ -111,17 +111,8 @@
   function presetContext(sessionId,recipeId,level,selectedIds=[]){
     const data=D(),session=data.sessions?.[sessionId];
     const ids=Array.isArray(selectedIds)&&selectedIds.length?selectedIds:(window.V14State?.getSessionSelections?.(sessionId)||[]);
-    const formalActionIds=ids.filter(Boolean),mainActionIds=[],supportPatterns=[],coreDemands=[];
-    (session?.slots||[]).forEach((slot,index)=>{
-      const key=String(slot.slotKey||'').includes('__')?String(slot.slotKey).split('__').pop():String(slot.slotName||'').split('｜')[0];
-      if(['A','B'].includes(key)&&ids[index])mainActionIds.push(ids[index]);
-      if(key==='SUPPORT'){
-        const pattern=data.actions?.[ids[index]]?.pattern||slot.baselinePattern;
-        if(pattern)supportPatterns.push(pattern);
-      }
-      if(key==='CORE'&&slot.baselineCoreDemand)coreDemands.push(slot.baselineCoreDemand);
-    });
-    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds,supportPatterns,coreDemands,...recentPrepSignals(level)});
+    const mainActionIds=(session?.slots||[]).flatMap((slot,index)=>/__([AB])$/.test(slot.slotKey)?[ids[index]]:[]).filter(Boolean);
+    return R().contextFromF111({level,recipeId,mainActionIds,formalActionIds:ids,...recentPrepSignals(level)});
   }
 
   function resolvePresetPrep(sessionId,recipeId,level,selectedIds=[]){
@@ -130,11 +121,8 @@
 
   function composerContext(ctx){
     const slots=ctx.resolved?.slots||[],mainActionIds=slots.filter(x=>['A','B'].includes(x.slotKey)).map(x=>x.actionId).filter(Boolean),formalActionIds=slots.map(x=>x.actionId).filter(Boolean);
-    const supportPatterns=slots.filter(x=>x.slotKey==='SUPPORT').map(x=>x.pattern||x.baselinePattern).filter(Boolean);
-    const coreDemands=ctx.coreDemand?[ctx.coreDemand]:[];
     return R().contextFromF111({
       level:ctx.level,recipeId:'',mainActionIds,formalActionIds,
-      supportPatterns,coreDemands,
       mainPatterns:[ctx.resolved?.lower?.name,ctx.resolved?.upper?.name].filter(Boolean),
       ...recentPrepSignals(ctx.level),
     });
@@ -176,23 +164,26 @@
     }));
   }
 
-  function resolvedGrid(resolved,sessionKey,replaceInMeta=false){
+  function resolvedGrid(resolved,sessionKey,compact=false){
     const fallback=(resolved.fallbackSlots||[]).length?`<div class="prep-fallback-notice">原热身选择已失效，已恢复系统推荐：${esc(resolved.fallbackSlots.join(' / '))}</div>`:'';
     const cards=orderedSlots(resolved).map(slot=>{
       const detailHref=slot.prepId?`#/system/prep?focus=${encodeURIComponent(slot.prepId)}`:'';
       const detail=`<div class="prep-card-action"><b>${esc(slot.name||'暂无合法候选')}</b></div>`;
-      const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
+      const replace=slot.candidates?.length?`<button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="热身候选" data-f111-focus="prep-${esc(slot.slotKey)}" data-replacement-select=".prep-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'热身动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`:'';
       const record=slot.prepId?D().warmupDetails?.[slot.prepId]:null;
       const prescription=slot.prescription||record?.prescription||'';
       const recentNotice=slot.recentlyUsed?'<small class="prep-recent-note">近期用过，可按需替换</small>':'';
-      const metaReplace=replaceInMeta?replace:'';
-      const titleReplace=replaceInMeta?'':replace;
-      const meta=[recentNotice,metaReplace].filter(Boolean).join('');
+      const purpose=slot.shortName?`<small class="f111-prep-purpose">${esc(slot.shortName)}</small>`:'';
+      const role=slot.role?`<small>${esc(slot.role)}</small>`:'';
+      const meta=role+recentNotice;
       const metaMarkup=meta?`<div class="prep-card-meta">${meta}</div>`:'';
-      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${metaMarkup}<div class="prep-card-title-row">${detail}${titleReplace}</div><p>${esc(prescription)}</p><select class="prep-slot-select prep-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
+      const content=compact
+        ? `<div class="f111-prep-row-text">${detail}<p>${esc(prescription)}</p>${recentNotice}</div>${purpose}${replace}`
+        : `${metaMarkup}<div class="prep-card-title-row">${detail}${purpose}${replace}</div><p>${esc(prescription)}</p>`;
+      return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${content}<select class="prep-slot-select prep-select f111-visually-hidden" ${compact?'tabindex="-1" aria-hidden="true"':''} aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
     const timeNote=Number.isFinite(resolved?.estimatedMinutes)
-      ?`<small class="prep-time-note">动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，按动作质量调整，不做到疲劳。</small>`:'';
+      ?`<small class="prep-time-note">${compact?'':`动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，`}按动作质量调整，不做到疲劳。</small>`:'';
     return `${fallback}${timeNote}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }
 
@@ -219,12 +210,22 @@
     const foamCards=foam.map((f,index)=>{
       const slotKey=`FOAM-${index+1}`;
       const options=foamOptions.map(option=>`<option value="${esc(option.foamId)}" ${option.foamId===f.foamId?'selected':''}>${esc(option.name)}</option>`).join('');
-      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div class="prep-card-actions"><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="泡沫轴候选" data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
+      return `<article class="session-foam-card f111-foam-card" data-foam-slot="${esc(slotKey)}"><div class="prep-card-actions"><button type="button" class="f111-replace-trigger prep-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="泡沫轴候选" data-f111-focus="${esc(slotKey)}" data-foam-replacement-drawer data-replacement-select=".f111-foam-select" data-replacement-title="泡沫轴｜替换动作" data-replacement-subtitle="选择当天更适合的训练前放松动作" aria-label="替换${esc(f.name)}"><span>替换</span><i aria-hidden="true">⌄</i></button></div><a class="f111-foam-main" href="#/system/prep?foam=${encodeURIComponent(f.foamId)}"><small>${esc((f.muscles||[]).join(' · '))}</small><b>${esc(f.name)}</b><p>${esc(f.prescription)}</p></a><select class="f111-foam-select f111-visually-hidden" tabindex="-1" aria-hidden="true" aria-label="${esc(f.name)}：替换动作" data-foam-session="${esc(ctx.stateKey)}" data-foam-slot="${esc(slotKey)}">${options}</select></article>`;
     }).join('');
     let foamCopy='';
     if(window.V14ModuleCopy){const fk=`composer-foam-${ctx.stateKey}`;window.V14ModuleCopy.register(fk,'foam',{title:`自由组合泡沫轴｜${title}`,items:foam.map(f=>({name:f.name,prescription:f.prescription,safety:f.safety}))});foamCopy=window.V14ModuleCopy.button(fk,'复制本模块');}
     const warmCopy=registerCopy(`composer-prep-${ctx.stateKey}`,`自由组合 PREP｜${title}`,resolved);
-    return `<section class="section-card prep-section f111-prep-section"><div class="section-head"><div><h2>2F｜热身</h2><p>训练前完成活动与激活。</p></div><span class="time-badge">约 10–12 分钟</span></div><div class="subsection-label"><b>泡沫轴</b></div><div class="foam-grid">${foamCards}</div><div class="subsection-label"><b>动态热身与激活</b></div>${resolvedGrid(resolved,ctx.stateKey,true)}</section>`;
+    return `<section class="prep-section f111-prep-section" aria-labelledby="f111-prep-title">
+      <div class="f111-section-heading"><h2 id="f111-prep-title">2F｜热身</h2><span class="time-badge">约 10–12 分钟</span></div>
+      <details class="f111-disclosure" data-f111-disclosure="foam">
+        <summary><div><b>泡沫轴</b></div><i aria-hidden="true">⌄</i></summary>
+        <div class="f111-disclosure-content"><div class="foam-grid">${foamCards}</div></div>
+      </details>
+      <details class="f111-disclosure" data-f111-disclosure="warmup" open>
+        <summary><div><b>动态热身与激活</b></div>${Number.isFinite(resolved.estimatedMinutes)?`<small class="f111-disclosure-duration">约 ${esc(resolved.estimatedMinutes)} 分钟</small>`:''}<i aria-hidden="true">⌄</i></summary>
+        <div class="f111-disclosure-content">${resolvedGrid(resolved,ctx.stateKey,true)}</div>
+      </details>
+    </section>`;
   }
 
   M.Prep={

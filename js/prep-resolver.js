@@ -9,6 +9,13 @@
     'CORE-ACT':Object.freeze({name:'核心 / 躯干激活',purpose:'建立呼吸、骨盆与躯干稳定，不做到疲劳'}),
     'INTEGRATED':Object.freeze({name:'整合动态热身',purpose:'把多个区域连接成连续、低疲劳的全身准备'}),
   });
+  const F111_SLOT_LABELS=Object.freeze({
+    'MOB-L':'髋踝活动',
+    'MOB-U':'胸椎肩带活动',
+    'PRIMER':'模式准备',
+    'CORE-ACT':'核心激活',
+    'INTEGRATED':'全身整合',
+  });
   const CA_WINDOWS=Object.freeze({
     L1:Object.freeze(['CA1']),
     L2:Object.freeze(['CA2','CA1']),
@@ -90,6 +97,8 @@
   const INTEGRATED_ROTATION_ACTIONS=Object.freeze({
     '水平拉':Object.freeze(['huachuanji_wentai','warmup_worlds_greatest_stretch','huachuanji_wentai']),
     '垂直拉':Object.freeze(['huaxueji_wentai','warmup_reverse_lunge_overhead_reach','huaxueji_wentai']),
+    '水平推':Object.freeze(['warmup_reverse_lunge_to_march_reach']),
+    '垂直推':Object.freeze(['warmup_reverse_lunge_to_march_reach']),
   });
   const INTEGRATED_FAMILY_SCORES=Object.freeze({
     '水平拉':Object.freeze({'integrated-rower':14,'integrated-lunge-thoracic':3}),
@@ -166,11 +175,20 @@
 
   function contextFromF111(input={}){
     const data=D(),recipe=data.recipes?.[input.recipeId]||{};
+    const actions=(input.formalActionIds||[]).map(id=>data.actions?.[id]);
+    const support=actions.find(action=>action?.isSupport);
+    const core=actions.find(action=>action?.isCore);
+    const mainPatterns=unique([recipe.lower,recipe.upper,...(input.mainPatterns||[])]);
+    // PREP uses the parent patterns for the single-leg hinge progression.
+    if(mainPatterns.includes('单腿拉')||(input.mainActionIds||[]).some(id=>data.actions?.[id]?.pattern==='单腿拉')){
+      mainPatterns.push('髋铰链','单腿');
+    }
     return normalizeContext({
       ...input,
       template:'f111',
-      mainPatterns:unique([recipe.lower,recipe.upper,...(input.mainPatterns||[])]),
-      supportPatterns:unique([recipe.support,...(input.supportPatterns||[])]),
+      mainPatterns,
+      supportPatterns:support?unique([support.pattern,...(data.supportMeta?.[support.id]?.supportDemand||[])]):unique([recipe.support,...(input.supportPatterns||[])]),
+      coreDemands:core?.coreDemand?[core.coreDemand]:input.coreDemands,
     });
   }
 
@@ -232,6 +250,7 @@
       name:w.name||w.actionId,
       movementFamily:w.movementFamily||MOVEMENT_FAMILY_BY_PREP_ID[w.prepId]||'',
       sequencePhase:w.sequencePhase||'',
+      f111Slot:w.f111Slot||'',
       prepGrade:w.prepGrade||'',
       role:w.role||'',
       route:w.route||'',
@@ -309,10 +328,10 @@
    * pattern only a few nodes prepare for count for more than 蹲, which half the
    * library claims to cover.
    */
-  function patternRarity(level){
+  function patternRarity(ctx){
     const details=D().warmupDetails||{},gradeApi=G(),eligible=(prepId)=>{
       const detail=details[prepId];
-      return !level||!gradeApi||gradeApi.isAllowed(level,detail?.prepGrade);
+      return (!detail?.f111Slot||ctx.template==='f111')&&(!gradeApi||gradeApi.isAllowed(ctx.level,detail?.prepGrade));
     },eligibleIds=(D().warmupIds||[]).filter(eligible),total=Math.max(1,eligibleIds.length),frequency=new Map();
     eligibleIds.forEach(prepId=>{
       (details[prepId]?.targetPatterns||[]).forEach(pattern=>frequency.set(pattern,(frequency.get(pattern)||0)+1));
@@ -428,6 +447,13 @@
     // `role` is the node's authoritative purpose, and it is what separates a hip
     // mobility drill from core work that merely mentions 臀部 in its regions.
     const role=String(candidate.role||'');
+    if(candidate.f111Slot){
+      if(ctx.template!=='f111'||candidate.f111Slot!==slotKey)return null;
+      if((slotKey==='MOB-L'||slotKey==='PRIMER')&&lowerPatterns.length&&!lowerHits)return null;
+      if(slotKey==='MOB-U'&&upperPatterns.length&&!upperHits)return null;
+      if(slotKey==='CORE-ACT'&&!CA_WINDOWS[ctx.level]?.includes(candidate.caLevel))return null;
+      return 10+patterns;
+    }
     if(slotKey==='MOB-L'){
       if(CORE_RE.test(role))return null;
       if(!(LOWER_RE.test(text)&&MOBILITY_RE.test(text)&&LOWER_REGION_RE.test(regionText)))return null;
@@ -458,11 +484,13 @@
         if(/骨盆|基础控制/.test(demand)&&/骨盆|基础控制|躯干/.test(coreText))return sum+2;
         return sum;
       },0);
-      return 9+(candidate.role.includes('核心')?2:0)+(candidate.role.includes('支撑')?1:0)+patterns+demandFit;
+      const supportFit=ctx.supportPatterns.some(pattern=>coreText.includes(pattern))?2:0;
+      return 9+supportFit+(candidate.role.includes('核心')?2:0)+(candidate.role.includes('支撑')?1:0)+patterns+demandFit;
     }
     if(slotKey==='INTEGRATED'){
       if(candidate.sequencePhase!=='standing-dynamic')return null;
       if(INTEGRATED_EXCLUDE_RE.test(text))return null;
+      if(ctx.template==='f111'&&CORE_ROLE_RE.test(role))return null;
       if(!INTEGRATED_ROLE_RE.test(text)&&!INTEGRATED_RE.test(text))return null;
       if((ctx.mainPatterns||[]).length&&!patterns)return null;
       return 6+(INTEGRATED_RE.test(text)?5:0)
@@ -484,8 +512,7 @@
 
   /** 0 = the level's highest legal grade (P3 for L3, P4 for L4). */
   const SLOT_GRADE_TARGET=Object.freeze({
-    // Mobility and integration stay one rung below the session ceiling so the
-    // warm-up still ramps into the main work instead of making every card P3/P4.
+    // Mobility starts one rung lower to ramp into the main work.
     'MOB-L':1,
     'MOB-U':1,
     'PRIMER':0,
@@ -502,7 +529,7 @@
     // below the member's level. Keep the highest grade for some contexts and
     // deliberately open the P3 band for others, instead of selecting the one
     // P4 core drill in every recipe.
-    if(ctx.level==='L4'&&ctx.recipeId){
+    if(ctx.level==='L4'&&ctx.recipeId&&!(ctx.template==='f111'&&slotKey==='PRIMER')){
       const rotate=stableHash(`${ctx.recipeId}|${ctx.level}|${slotKey}`)%3;
       if(rotate===0)target=Math.min(target+1,allowed.length-1);
     }
@@ -524,10 +551,14 @@
     const fresh=available.filter(candidate=>!recentActions.has(candidate.actionId)&&!recentFamilies.has(candidate.movementFamily));
     const preferred=fresh.length?fresh:available;
     if(ctx.level!=='L4'||!ctx.recipeId||preferred.length<2)return preferred[0];
-    const bestModeFit=Number(preferred[0].modeFit||0);
+    const graded=ctx.template==='f111'&&slotKey==='PRIMER'
+      ?preferred.filter(candidate=>candidate.prepGrade===preferred[0].prepGrade)
+      :preferred;
+    const bestModeFit=Number(graded[0].modeFit||0);
+    const modeMargin=ctx.template==='f111'&&slotKey==='PRIMER'?0:1;
     const modePool=slotKey==='MOB-U'
-      ?preferred
-      :preferred.filter(candidate=>Number(candidate.modeFit||0)>=bestModeFit-1);
+      ?graded
+      :graded.filter(candidate=>Number(candidate.modeFit||0)>=bestModeFit-modeMargin);
     const rotationPool=slotKey==='MOB-U'?upperRotationPool(modePool,ctx):modePool;
     if(slotKey==='MOB-U'){
       const upper=mainPatternsFor(ctx,'upper')[0];
@@ -673,7 +704,7 @@
     // an extra key.
     const fitArgs={
       anatomy:A()?.aggregate?.(ctx.mainActionIds||[]),
-      rarity:patternRarity(ctx.level),
+      rarity:patternRarity(ctx),
       mainTiers:unique((ctx.mainActionIds||[]).map(id=>D().actions?.[id]?.tier).filter(Boolean)),
     };
     (data.warmupIds||[]).forEach(prepId=>{
@@ -685,7 +716,7 @@
       const affinity=slotAffinity(candidate,slotKey,ctx);
       if(affinity===null)return;
       const modeFit=modeSpecificity(candidate,slotKey,ctx);
-      if(ctx.level==='L4'&&(['MOB-U','INTEGRATED'].includes(slotKey))&&!modeFit)return;
+      if(ctx.level==='L4'&&(['MOB-U','INTEGRATED'].includes(slotKey))&&!modeFit&&!candidate.f111Slot)return;
       items.push({
         ...candidate,
         slotKey,
@@ -704,10 +735,12 @@
     items.sort((a,b)=>{
       const recentA=recentRank(a,ctx),recentB=recentRank(b,ctx);
       const rotatedOrder=ctx.level==='L4';
+      const modeFirst=rotatedOrder&&!(ctx.template==='f111'&&slotKey==='PRIMER');
       return recentA.action-recentB.action
       ||recentA.family-recentB.family
-      ||(rotatedOrder?b.modeFit-a.modeFit:0)
+      ||(modeFirst?b.modeFit-a.modeFit:0)
       ||gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
+      ||(rotatedOrder&&!modeFirst?b.modeFit-a.modeFit:0)
       ||(rotatedOrder?rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx):b.fitBand-a.fitBand)
       ||(rotatedOrder?b.fitBand-a.fitBand:rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx))
       ||b.fit-a.fit
@@ -742,11 +775,19 @@
     return all.filter(item=>picked.has(item.actionId)).slice(0,cap);
   }
 
+  function f111Replacements(pool,slotKey,ctx,resolvedMap){
+    const otherSlots=SLOT_ORDER.filter(key=>key!==slotKey).map(key=>resolvedMap[key].candidate).filter(Boolean);
+    const occupiedIds=new Set(otherSlots.map(candidate=>candidate.actionId));
+    const occupiedFamilies=new Set(otherSlots.map(candidate=>candidateFamily(candidate,ctx)));
+    return pool.filter(item=>!occupiedIds.has(item.actionId)&&!occupiedFamilies.has(candidateFamily(item,ctx)))
+      .sort((a,b)=>a.gradeRank-b.gradeRank);
+  }
+
   function resolve(inputContext,{selections={}}={}){
     const ctx=normalizeContext(inputContext),normalizedSelections=normalizeSelections(selections);
     const candidatePool={},candidateMap={};
     SLOT_ORDER.forEach(slotKey=>{
-      candidatePool[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:99});
+      candidatePool[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:Infinity});
       candidateMap[slotKey]=ctx.level==='L4'&&slotKey==='MOB-U'
         ?diversifyUpperCandidates(candidatePool[slotKey],5)
         :ctx.template==='f111'&&ctx.level==='L4'&&slotKey==='CORE-ACT'
@@ -771,7 +812,9 @@
     SLOT_ORDER.forEach(slotKey=>{
       if(resolvedMap[slotKey]?.candidate)return;
       const pool=(ctx.recentPrepActionIds?.length||ctx.recentPrepFamilies?.length)?candidatePool[slotKey]:candidateMap[slotKey];
-      const candidate=pickAutomaticCandidate(pool,slotKey,ctx,used,usedFamilies);
+      const candidate=pickAutomaticCandidate(pool,slotKey,ctx,used,usedFamilies)
+        ??(ctx.template==='f111'&&pool!==candidatePool[slotKey]
+          ?pickAutomaticCandidate(candidatePool[slotKey],slotKey,ctx,used,usedFamilies):null);
       if(candidate){
         used.add(candidate.actionId);
         usedFamilies.add(candidateFamily(candidate,ctx));
@@ -786,6 +829,9 @@
       return {
         slotKey,
         slotName:SLOT_META[slotKey].name,
+        shortName:ctx.template==='f111'?(slotKey==='PRIMER'
+          ?`${mainPatternsFor(ctx,'lower')[0]||''}${F111_SLOT_LABELS[slotKey]}`
+          :F111_SLOT_LABELS[slotKey]):'',
         purpose:SLOT_META[slotKey].purpose,
         recommendedId:candidateMap[slotKey][0]?.actionId||'',
         actionId:candidate?.actionId||'',
@@ -806,7 +852,7 @@
         matchReason:matchReasonFor(slotKey,ctx,candidate),
         source:entry.source,
         fallbackReason:entry.fallbackReason,
-        candidates:candidateMap[slotKey],
+        candidates:ctx.template==='f111'?f111Replacements(candidatePool[slotKey],slotKey,ctx,resolvedMap):candidateMap[slotKey],
       };
     });
 

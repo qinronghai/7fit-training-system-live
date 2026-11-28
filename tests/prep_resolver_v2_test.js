@@ -68,8 +68,7 @@ assert.strictEqual(new Set(resolved.slots.map(s=>s.actionId)).size,5,'resolved P
 
 const allowed=window.V14PrepGrade.allowedGrades('L3');
 for(const slot of resolved.slots){
-  assert(slot.candidates.length>0,`${slot.slotKey} needs candidates`);
-  assert(slot.candidates.length<=5,`${slot.slotKey} candidate list is capped at five`);
+  assert(slot.candidates.filter(c=>c.actionId!==slot.actionId).length>=8,`${slot.slotKey} needs eight replacements`);
   assert(slot.candidates.every(c=>allowed.includes(c.prepGrade)),`${slot.slotKey} must obey #24 P Grade window`);
   assert(slot.candidates.every(c=>R.isPrepRouteAllowed(c.route)),`${slot.slotKey} must obey PREP route gate`);
   if(slot.slotKey==='CORE-ACT'){

@@ -40,4 +40,15 @@ const complementarySupport = complementary.slots.find(slot => slot.slotKey === '
 assert.strictEqual(complementarySupport.grade, 'SUP-S2', 'complementarity must outrank the recommended support grade');
 assert(!complementarySupport.supportDemand.includes('抗伸展'));
 
+for (const level of ['L1', 'L2', 'L3', 'L4']) {
+  const actions = { C: new Set(), CORE: new Set() };
+  for (const combination of composer.combinations()) {
+    const course = composer.resolve({ ...combination, level });
+    const core = course.slots.find(slot => slot.slotKey === 'CORE');
+    assert.strictEqual(core.coreDemandMatch, 'EXACT');
+    for (const slot of course.slots) actions[slot.slotKey]?.add(slot.actionId);
+  }
+  for (const [key, ids] of Object.entries(actions)) assert(ids.size > 1, level + ' repeats ' + key);
+}
+
 console.log('support_core_quality_test: PASS');

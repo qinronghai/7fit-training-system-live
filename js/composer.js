@@ -115,7 +115,7 @@
     const action=actionView(id),meta=supportMetaFor(id),level=context.level||'L1',window=supportWindow(level);
     const normal=new Set(window.normal||[]),expanded=new Set(window.expanded||[]),tradeoffs=[],reasons=[];
     const coreDemands=coreDemandLabels(context);
-    const repeatedCoreDemand=coreDemands.find(demand=>meta.supportDemand.includes(demand));
+    const repeatedCoreDemand=meta.supportDemand.find(tag=>coreDemands.some(demand=>demand.includes(tag)));
     if(!normal.has(action.grade)){
       tradeoffs.push(expanded.has(action.grade)?'超出当前等级常规窗口，属于扩展选项':'超出当前等级常规窗口');
     }
@@ -210,11 +210,22 @@
     const base=(D().coreIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.coreGrade||a.tier;return a;}).filter(x=>allowed.has(x.grade));
     return sortCoreCandidates(base,recommended,recentContext);
   }
-  function coreDecision(level,demandKey='anti_extension',includeExpanded=false,selectedId='',recentContext={}){
+  function coreDecision(level,demandKey='anti_extension',includeExpanded=false,selectedId='',recentContext={},combinationIndex=0,maxCoreLoad=Infinity){
     const exactCandidates=coreCandidates(level,demandKey,includeExpanded,recentContext),fallbackCandidates=coreFallbackCandidates(level,includeExpanded,recentContext);
     const allowed=new Set(fallbackCandidates.map(item=>item.grade));
     const selected=selectedId?((D().coreIds||[]).map(id=>actionView(id)).find(item=>item.id===selectedId)||null):null;
-    const chosen=selected||exactCandidates[0]||fallbackCandidates[0]||null;
+    const eligible=exactCandidates.filter(item=>coreMetaFor(item.id).autoRecommendable);
+    const first=eligible[0];
+    // For a demanding main block, an adjacent lower grade can keep the same core task.
+    const suitable=eligible.filter(item=>item.historyScore===first.historyScore
+      &&coreGradeRank(item.grade)>=coreGradeRank(first.grade)-1
+      &&trunkLoadAudit([{slotKey:'CORE',actionId:item.id}],level).total<=maxCoreLoad);
+    const pool=suitable.length?suitable:eligible;
+    const peers=pool.filter(item=>item.grade===pool[0].grade&&item.historyScore===pool[0].historyScore);
+    const accessible=peers.filter(item=>coreMetaFor(item.id).spaceRequirement!=='walk_lane');
+    const rotation=accessible.length?accessible:peers;
+    const automatic=rotation.length?rotation[combinationIndex%rotation.length]:fallbackCandidates.find(item=>coreMetaFor(item.id).autoRecommendable);
+    const chosen=selected||automatic||null;
     const exact=!!chosen&&matchesDemand(chosen,demandKey);
     const tradeoffs=[];
     if(!exactCandidates.length)tradeoffs.push('当前等级没有该 CORE 任务动作');
@@ -261,23 +272,55 @@
     return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
   }
   function chooseById(options,id){return options.find(x=>x.id===id)||options[0]||null;}
+  // Anchor the combination to a coached preset, preferring the lower main pattern.
+  function referenceSlots(level,lowerMode,upperMode){
+    const presets=Object.entries(cfg().officialPresetMap||{});
+    const match=presets.find(([,modes])=>modes[0]===lowerMode&&modes[1]===upperMode)
+      ||presets.find(([,modes])=>modes[0]===lowerMode)
+      ||presets.find(([,modes])=>modes[1]===upperMode);
+    return match?D().sessions?.[match[0]+'-'+level]?.slots||[]:[];
+  }
+  function defaultCoreDemand(level,lowerMode,upperMode){
+    const core=referenceSlots(level,lowerMode,upperMode).find(slot=>slot.slotKey.endsWith('__CORE'));
+    const action=actionView(core?.baselineId);
+    return Object.keys(cfg().coreDemands).find(key=>matchesDemand(action,key))||'anti_extension';
+  }
   function resolve(input={}){
     const level=/^L[1-4]$/.test(input.level)?input.level:'L1';
     const lowerMode=cfg().lowerModes?.[input.lowerMode]?input.lowerMode:Object.keys(cfg().lowerModes||{})[0];
     const upperMode=cfg().upperModes?.[input.upperMode]?input.upperMode:Object.keys(cfg().upperModes||{})[0];
     const lower=cfg().lowerModes[lowerMode],upper=cfg().upperModes[upperMode],selections=input.selections||{};
-    const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:'anti_extension';
+    const coreDemand=cfg().coreDemands?.[input.coreDemand]?input.coreDemand:defaultCoreDemand(level,lowerMode,upperMode);
     const Aopts=mainCandidates('lower',lowerMode,level,!!input.includeExpandedMain), Bopts=mainCandidates('upper',upperMode,level,!!input.includeExpandedMain);
     const A=chooseById(Aopts,selections.A),B=chooseById(Bopts,selections.B);
+    const Copts=supportSelectionOptions();
+    const manualSupport=Copts.find(option=>option.id===selections.C);
+    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:manualSupport?.id}}),D1=chooseById(D1opts,selections.D1);
+    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
+    const mainBlock=[['A',A],['B',B],['D1',D1],['D2',D2]].map(([slotKey,action])=>({slotKey,actionId:action?.id}));
+    const mainLoad=trunkLoadAudit(mainBlock,level);
+    const plannedSupport=manualSupport||supportCandidates(level,false,{coreDemand,recentContext:input.recentContext}).find(option=>option.autoRecommendable);
+    const supportLoad=trunkLoadAudit([{slotKey:'C',actionId:plannedSupport?.id}],level).total;
     const COREopts=coreSelectionOptions();
-    const COREdecision=coreDecision(level,coreDemand,!!input.includeExpandedCore,selections.CORE,input.recentContext);
+    const combinationIndex=combinations().findIndex(item=>item.lowerMode===lowerMode&&item.upperMode===upperMode);
+    const COREdecision=coreDecision(level,coreDemand,!!input.includeExpandedCore,selections.CORE,input.recentContext,combinationIndex,mainLoad.budget-mainLoad.total-supportLoad);
     const CORE=COREopts.find(option=>option.id===COREdecision.selectedId)||COREdecision.selected;
     const Ccontext={level,coreDemand,coreDemandText:CORE?.coreDemand,selectedIds:[A?.id,B?.id],recentContext:input.recentContext};
-    const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport,Ccontext),Copts=supportSelectionOptions();
-    const C=Copts.find(option=>option.id===selections.C)||chooseById(CautoOptions);
+    const CautoOptions=supportCandidates(level,!!input.includeExpandedSupport,Ccontext);
+    const eligible=CautoOptions.filter(option=>option.autoRecommendable);
+    const bestSupport=eligible[0];
+    // Keep the strongest complement and history fit. Rotate feasible low/moderate-load peers.
+    const peers=eligible.filter(option=>option.complementarityScore===bestSupport.complementarityScore
+      &&option.historyScore===bestSupport.historyScore&&option.feasibilityScore===bestSupport.feasibilityScore
+      &&option.fatigueScore>=Math.min(2,bestSupport.fatigueScore)&&!option.needsConfirmation);
+    const otherSlots=[...mainBlock,{slotKey:'CORE',actionId:CORE?.id}];
+    const otherLoad=trunkLoadAudit(otherSlots,level);
+    const loads=peers.map(option=>trunkLoadAudit([{slotKey:'C',actionId:option.id}],level).total);
+    // When every option exceeds the budget, retain only the lightest alternatives.
+    const loadLimit=Math.max(otherLoad.budget-otherLoad.total,Math.min(...loads));
+    const rotation=peers.filter((option,index)=>loads[index]<=loadLimit);
+    const C=manualSupport||(rotation.length?rotation[combinationIndex%rotation.length]:bestSupport);
     const Cdecision=supportDecision(C?.id||'',Ccontext);
-    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:C?.id}}),D1=chooseById(D1opts,selections.D1);
-    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
     const coreMeta=coreMetaFor(CORE?.id||'');
     const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||'',...(key==='C'?{supportReason:Cdecision.supportReason,supportDemand:Cdecision.supportDemand,branch:Cdecision.branch,fatigueCost:Cdecision.fatigueCost,memberFeeling:Cdecision.memberFeeling,recommendedDose:Cdecision.recommendedDose,alternatives:Cdecision.sameDemandIds,needsConfirmation:Cdecision.needsConfirmation,tradeoffs:Cdecision.tradeoffs,recentlyUsed:Cdecision.recentlyUsed,recentNote:Cdecision.recentNote}: {}),...(key==='CORE'?{...coreMeta,coreBranch:coreMeta.branch,coreFatigueCost:coreMeta.fatigueCost,coreMemberFeeling:coreMeta.memberFeeling,coreRecommendedDose:coreMeta.recommendedDose,coreJointLoad:coreMeta.jointLoad,coreSpaceRequirement:coreMeta.spaceRequirement,coreReason:COREdecision.coreReason,coreDemandMatch:COREdecision.coreDemandMatch,coreNeedsConfirmation:COREdecision.coreNeedsConfirmation,coreTradeoffs:COREdecision.coreTradeoffs,coreAlternatives:coreMeta.sameDemandIds,recentlyUsed:COREdecision.recentlyUsed,historyNote:COREdecision.historyNote}: {})});
     const resolvedSlots=[slot('A','A｜下肢主项',A),slot('B','B｜上肢主项',B),slot('C','C｜支撑模式',C),slot('D1','D1｜下肢辅助',D1),slot('D2','D2｜上肢辅助',D2),slot('CORE','CORE｜核心模式',CORE)];
@@ -290,5 +333,5 @@
       slotOptions:{A:Aopts,B:Bopts,C:Copts,D1:D1opts,D2:D2opts,CORE:COREopts}
     };
   }
-  window.V14Composer={combinations,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,supportMetaFor,supportDecision,coreMetaFor,coreCandidates,coreFallbackCandidates,coreDecision,trunkLoadAudit,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
+  window.V14Composer={combinations,defaultCoreDemand,mainTierWindow,supportWindow,coreWindow,mainCandidates,supportCandidates,supportMetaFor,supportDecision,coreMetaFor,coreCandidates,coreFallbackCandidates,coreDecision,trunkLoadAudit,auxCandidates,auxiliaryRoutePolicy,isAuxiliaryRouteAllowed,resolve};
 })();

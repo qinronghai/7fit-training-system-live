@@ -57,7 +57,56 @@
     "PREP-53",
     "PREP-54",
     "PREP-55",
-    "PREP-56"
+    "PREP-56",
+    "PREP-57",
+    "PREP-58",
+    "PREP-59",
+    "PREP-60",
+    "PREP-61",
+    "PREP-62",
+    "PREP-63",
+    "PREP-64",
+    "PREP-65",
+    "PREP-66",
+    "PREP-67",
+    "PREP-68",
+    "PREP-69",
+    "PREP-70",
+    "PREP-71",
+    "PREP-72",
+    "PREP-73",
+    "PREP-74",
+    "PREP-75",
+    "PREP-76",
+    "PREP-77",
+    "PREP-78",
+    "PREP-79",
+    "PREP-80",
+    "PREP-81",
+    "PREP-82",
+    "PREP-83",
+    "PREP-84",
+    "PREP-85",
+    "PREP-86",
+    "PREP-87",
+    "PREP-88",
+    "PREP-89",
+    "PREP-90",
+    "PREP-91",
+    "PREP-92",
+    "PREP-93",
+    "PREP-94",
+    "PREP-95",
+    "PREP-96",
+    "PREP-97",
+    "PREP-98",
+    "PREP-99",
+    "PREP-100",
+    "PREP-101",
+    "PREP-102",
+    "PREP-103",
+    "PREP-104",
+    "PREP-105"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -2229,6 +2278,1934 @@
       "sourceStatus": "新增 PREP 动作；限轻负重、短距离，出现躯干侧倾立即降级",
       "route": "2F PREP",
       "sequencePhase": "standing-dynamic"
+    },
+    "PREP-57": {
+      "prepId": "PREP-57",
+      "name": "仰卧屈膝左右摆",
+      "alias": "仰卧屈膝左右摆",
+      "actionId": "warmup_supine_hip_rotation",
+      "movementFamily": "mobility-hip-rotation",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-L",
+      "role": "髋旋转动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "仰卧屈膝，双脚着地，双膝小幅左右摆，肩背保持放松。",
+      "why": "在地面准备髋旋转的可控范围。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-58": {
+      "prepId": "PREP-58",
+      "name": "仰卧抱大腿屈伸膝",
+      "alias": "仰卧抱大腿屈伸膝",
+      "actionId": "warmup_supine_hamstring_glide",
+      "movementFamily": "mobility-hamstring-dynamic",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-L",
+      "role": "腘绳肌动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "腘绳肌",
+        "髋"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "双手托住大腿后侧，缓慢伸膝到轻微牵拉再弯回。",
+      "why": "动态准备大腿后侧，减少髋折叠时的代偿。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-59": {
+      "prepId": "PREP-59",
+      "name": "仰卧屈髋画圈",
+      "alias": "仰卧屈髋画圈",
+      "actionId": "warmup_supine_hip_circles",
+      "movementFamily": "mobility-hip-circles",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-L",
+      "role": "髋关节动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "一脚踩地，抬起另一腿屈膝，用膝盖画小圈，保持骨盆平稳。",
+      "why": "用小幅主动动作准备髋关节多方向活动。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-60": {
+      "prepId": "PREP-60",
+      "name": "坐姿踝关节画圈",
+      "alias": "坐姿踝关节画圈",
+      "actionId": "warmup_seated_ankle_circles",
+      "movementFamily": "mobility-ankle-circles",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-L",
+      "role": "足踝动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "踝",
+        "足踝"
+      ],
+      "equipment": "长凳",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "坐稳后轻抬一脚，脚踝分别向两个方向画小圈。",
+      "why": "在承重前准备踝关节主动活动。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-61": {
+      "prepId": "PREP-61",
+      "name": "侧卧开书式",
+      "alias": "侧卧开书式",
+      "actionId": "warmup_side_lying_open_book",
+      "movementFamily": "mobility-thoracic-open-book",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-U",
+      "role": "胸椎旋转与肩带活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "胸椎",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "屈髋屈膝叠放，随呼气打开上侧手臂，保持膝盖叠放。",
+      "why": "用胸椎旋转带动肩带，准备上肢推拉。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-62": {
+      "prepId": "PREP-62",
+      "name": "仰卧双臂上举",
+      "alias": "仰卧双臂上举",
+      "actionId": "warmup_supine_reach_overhead",
+      "movementFamily": "mobility-shoulder-flexion",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-U",
+      "role": "肩屈动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩关节",
+        "胸廓"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "屈膝仰卧，双手缓慢举过头顶，保持下肋平稳。",
+      "why": "在低负荷下练习可控的肩屈幅度。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-63": {
+      "prepId": "PREP-63",
+      "name": "站姿肩胛前伸后收",
+      "alias": "站姿肩胛前伸后收",
+      "actionId": "warmup_standing_scapular_glide",
+      "movementFamily": "mobility-scapula-glide",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-U",
+      "role": "肩胛动态活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩胛",
+        "上背"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "双臂前伸，手肘保持微屈，小幅前送再还原肩胛。",
+      "why": "让肩胛在推拉前练习前伸和回收。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-64": {
+      "prepId": "PREP-64",
+      "name": "双前臂贴墙滑动",
+      "alias": "双前臂贴墙滑动",
+      "actionId": "warmup_wall_forearm_slide_basic",
+      "movementFamily": "activation-scapula-upward-rotation",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-U",
+      "role": "肩胛上旋活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "肩胛",
+        "肩带"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 6–8次",
+      "cue": "前臂贴墙向上滑到能控制的范围，避免耸肩和腰部过伸。",
+      "why": "准备上举时的肩胛上旋。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-65": {
+      "prepId": "PREP-65",
+      "name": "坐姿抱胸胸椎伸展",
+      "alias": "坐姿抱胸胸椎伸展",
+      "actionId": "warmup_seated_thoracic_extension",
+      "movementFamily": "mobility-thoracic-spine",
+      "prepGrade": "P1",
+      "f111Slot": "MOB-U",
+      "role": "胸椎动态伸展",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "胸椎",
+        "上背"
+      ],
+      "equipment": "长凳",
+      "prescription": "1组 × 6–8次",
+      "cue": "坐稳，双臂抱胸，轻抬胸骨再还原，保持腹部和腰部稳定。",
+      "why": "准备肩带运动所需的胸椎伸展。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-66": {
+      "prepId": "PREP-66",
+      "name": "徒手触凳深蹲",
+      "alias": "徒手触凳深蹲",
+      "actionId": "warmup_box_squat_hover",
+      "movementFamily": "primer-squat",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "蹲模式准备 / 髋膝协同",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "股四头肌"
+      ],
+      "equipment": "长凳 / 跳箱",
+      "prescription": "1组 × 6–8次",
+      "cue": "髋膝同时屈曲，轻触凳面后起立，脚掌保持着地。",
+      "why": "用固定深度预习当天蹲型。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-67": {
+      "prepId": "PREP-67",
+      "name": "徒手触墙髋铰链",
+      "alias": "徒手触墙髋铰链",
+      "actionId": "warmup_wall_tap_hinge",
+      "movementFamily": "primer-hip-hinge",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "髋铰链模式准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链"
+      ],
+      "regions": [
+        "髋",
+        "臀大肌",
+        "腘绳肌"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 6–8次",
+      "cue": "背对墙站，膝微屈，臀部后移轻触墙后站直。",
+      "why": "用墙面反馈找出髋向后折叠的路径。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-68": {
+      "prepId": "PREP-68",
+      "name": "四足跪姿髋折叠后坐",
+      "alias": "四足跪姿髋折叠后坐",
+      "actionId": "warmup_quadruped_hip_rockback",
+      "movementFamily": "primer-hip-hinge-floor",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "髋铰链模式准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "脊柱保持自然，髋向后坐，骨盆翻转前回到起点。",
+      "why": "卸载后预习髋折叠与骨盆控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-69": {
+      "prepId": "PREP-69",
+      "name": "坐姿髋铰链",
+      "alias": "坐姿髋铰链",
+      "actionId": "warmup_seated_hip_hinge",
+      "movementFamily": "primer-hip-hinge-seated",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "髋铰链模式准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链"
+      ],
+      "regions": [
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "长凳",
+      "prescription": "1组 × 6–8次",
+      "cue": "坐凳前缘，脚踏实，从髋前倾后坐直。",
+      "why": "在低平衡要求下区分髋折叠与弯腰。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-70": {
+      "prepId": "PREP-70",
+      "name": "分腿站姿前后移重",
+      "alias": "分腿站姿前后移重",
+      "actionId": "warmup_split_stance_shift",
+      "movementFamily": "primer-split-load",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "单腿模式准备 / 骨盆控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "分腿站，脚掌着地，重心慢慢移向前腿后还原。",
+      "why": "练习单侧承重时的髋膝对齐。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-71": {
+      "prepId": "PREP-71",
+      "name": "扶墙错步髋铰链",
+      "alias": "扶墙错步髋铰链",
+      "actionId": "warmup_supported_kickstand_hinge",
+      "movementFamily": "primer-hip-hinge-kickstand",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "髋铰链 / 单腿负重准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "臀大肌",
+        "腘绳肌"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "后脚点地、手轻扶墙，把重心留在前脚，向后折髋。",
+      "why": "保留支撑，预习单侧负重的髋折叠。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-72": {
+      "prepId": "PREP-72",
+      "name": "扶墙直腿后伸",
+      "alias": "扶墙直腿后伸",
+      "actionId": "warmup_standing_straight_leg_extension",
+      "movementFamily": "activation-glute-max-standing",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀部激活 / 髋伸准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "臀大肌",
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "扶墙，保持骨盆正对前方，小幅向后伸腿。",
+      "why": "练习用臀部伸髋，避免用腰部代偿。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-73": {
+      "prepId": "PREP-73",
+      "name": "俯卧屈膝髋伸",
+      "alias": "俯卧屈膝髋伸",
+      "actionId": "warmup_prone_bent_knee_hip_extension",
+      "movementFamily": "activation-glute-max-prone",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀部激活 / 髋伸准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋伸展"
+      ],
+      "regions": [
+        "臀大肌",
+        "髋"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "俯卧屈膝，保持髋骨接触地面，将大腿抬离地面少许。",
+      "why": "在稳定的躯干位置下找臀部主动发力。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-74": {
+      "prepId": "PREP-74",
+      "name": "仰卧脚跟轻压地",
+      "alias": "仰卧脚跟轻压地",
+      "actionId": "warmup_supine_heel_dig",
+      "movementFamily": "activation-posterior-chain",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "后侧链激活 / 髋伸准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "髋伸展"
+      ],
+      "regions": [
+        "腘绳肌",
+        "臀大肌",
+        "髋"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "仰卧屈膝，脚跟轻压垫面，骨盆保持着地，每次停两秒。",
+      "why": "低负荷唤醒伸髋所需的后侧链。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-75": {
+      "prepId": "PREP-75",
+      "name": "扶墙提膝定点",
+      "alias": "扶墙提膝定点",
+      "actionId": "warmup_wall_march_hold",
+      "movementFamily": "primer-single-leg-stance",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "单腿模式准备 / 支撑侧臀部激活",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "臀中肌",
+        "骨盆"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "双手轻扶墙，一腿提膝，支撑侧脚掌踩稳，停两秒换边。",
+      "why": "建立髋伸及单腿站立时的骨盆控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-76": {
+      "prepId": "PREP-76",
+      "name": "短幅臀桥停顿",
+      "alias": "短幅臀桥停顿",
+      "actionId": "warmup_supine_bridge_short_range",
+      "movementFamily": "activation-glute-max-short",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀部激活 / 髋伸准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "臀大肌",
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "双脚踩地，只抬到能稳住肋骨和骨盆的高度，顶端短暂停顿。",
+      "why": "用小幅停顿找伸髋发力，适合作为低幅度准备。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-77": {
+      "prepId": "PREP-77",
+      "name": "扶墙小幅分腿蹲",
+      "alias": "扶墙小幅分腿蹲",
+      "actionId": "warmup_supported_mini_split_squat",
+      "movementFamily": "primer-split-squat",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "单腿 / 蹲模式准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "股四头肌"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "单手扶墙，分腿站稳，上下移动少许，前膝朝脚趾方向。",
+      "why": "预习前腿承重以及髋膝同步屈伸。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-78": {
+      "prepId": "PREP-78",
+      "name": "站姿侧向重心转移",
+      "alias": "站姿侧向重心转移",
+      "actionId": "warmup_lateral_weight_transfer",
+      "movementFamily": "primer-lateral-load",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "单腿承重与蹲型控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "内收肌",
+        "膝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "宽站，小幅屈一侧髋膝，把重心移向该脚后回中。",
+      "why": "在低幅度下预习侧向下肢承重。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-79": {
+      "prepId": "PREP-79",
+      "name": "扶墙站姿髋外展",
+      "alias": "扶墙站姿髋外展",
+      "actionId": "warmup_wall_standing_hip_abduction",
+      "movementFamily": "activation-glute-medial-standing",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀中肌激活 / 髋稳定",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "臀中肌",
+        "骨盆"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "扶墙站直，把一侧腿向外移少许，骨盆保持正对。",
+      "why": "唤醒单腿和蹲型承重需要的髋稳定。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-80": {
+      "prepId": "PREP-80",
+      "name": "扶墙徒手半蹲",
+      "alias": "扶墙徒手半蹲",
+      "actionId": "warmup_wall_supported_squat",
+      "movementFamily": "primer-supported-squat",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "蹲模式准备 / 膝髋协同",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 6–8次",
+      "cue": "双手轻触墙面，髋向后下移动，保持脚掌完整着地。",
+      "why": "用轻扶降低平衡要求，预习屈伸节奏。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-81": {
+      "prepId": "PREP-81",
+      "name": "四足跪姿脚尖后滑",
+      "alias": "四足跪姿脚尖后滑",
+      "actionId": "warmup_quadruped_glute_set",
+      "movementFamily": "activation-glute-max-quadruped",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀部激活 / 髋伸控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋铰链",
+        "髋伸展"
+      ],
+      "regions": [
+        "髋",
+        "臀大肌",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "四足跪稳，脚尖沿地面向后滑，腰背保持平稳后收回。",
+      "why": "先保留脚尖支点，练习伸髋时骨盆不翻转。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-82": {
+      "prepId": "PREP-82",
+      "name": "徒手浅蹲接提踵",
+      "alias": "徒手浅蹲接提踵",
+      "actionId": "warmup_standing_squat_to_calf_raise",
+      "movementFamily": "primer-squat-calf-raise",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "蹲模式准备 / 髋膝踝协调",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "先从浅蹲站稳，再抬起脚跟，脚跟落稳后进入下一次。",
+      "why": "把下肢伸展连到足踝控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-83": {
+      "prepId": "PREP-83",
+      "name": "分腿站姿后侧收臀",
+      "alias": "分腿站姿后侧收臀",
+      "actionId": "warmup_split_stance_glute_set",
+      "movementFamily": "activation-glute-max-isometric",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER",
+      "role": "臀部激活 / 髋伸等长",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "髋伸展"
+      ],
+      "regions": [
+        "臀大肌",
+        "髋",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "分腿站稳，轻收后腿侧臀部两秒，保持骨盆正对。",
+      "why": "低负荷预习髋伸发力。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-84": {
+      "prepId": "PREP-84",
+      "name": "仰卧屈膝呼吸收腹",
+      "alias": "仰卧屈膝呼吸收腹",
+      "actionId": "warmup_hooklying_breath_brace",
+      "movementFamily": "core-bracing-breath",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心激活 / 呼吸与腹压",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "胸廓",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–6次呼吸",
+      "cue": "仰卧屈膝，慢呼气让下肋回落，保持腹部轻张力再吸气。",
+      "why": "在低负荷下练习胸廓与骨盆对齐。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-85": {
+      "prepId": "PREP-85",
+      "name": "仰卧交替滑脚跟",
+      "alias": "仰卧交替滑脚跟",
+      "actionId": "warmup_supine_heel_slide",
+      "movementFamily": "core-anti-extension-heel-slide",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗伸展 / 骨盆控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "仰卧屈膝，一只脚跟沿地向前滑后收回，保持骨盆稳定。",
+      "why": "让下肢移动时仍能控制肋骨与骨盆。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-86": {
+      "prepId": "PREP-86",
+      "name": "仰卧单膝外开",
+      "alias": "仰卧单膝外开",
+      "actionId": "warmup_supine_bent_knee_fallout",
+      "movementFamily": "core-anti-rotation-supine",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗旋转 / 骨盆控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "仰卧屈膝，一侧膝盖小幅外开，骨盆保持水平。",
+      "why": "用轻量单侧动作唤醒抗旋转控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-87": {
+      "prepId": "PREP-87",
+      "name": "屈膝侧平板",
+      "alias": "屈膝侧平板",
+      "actionId": "warmup_side_plank_knees",
+      "movementFamily": "core-anti-lateral-flexion-kneeling",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗侧屈 / 屈膝支撑",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 10–15秒/侧",
+      "cue": "侧卧屈膝，前臂撑地，抬髋成一直线并保持自然呼吸。",
+      "why": "短杠杆准备躯干侧向稳定。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-88": {
+      "prepId": "PREP-88",
+      "name": "墙面直臂平板",
+      "alias": "墙面直臂平板",
+      "actionId": "warmup_wall_plank",
+      "movementFamily": "core-anti-extension-wall",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗伸展 / 墙面支撑",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "肩带",
+        "骨盆"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 15–20秒",
+      "cue": "双手撑墙，双脚后移少许，保持耳、肩、髋对齐并自然呼吸。",
+      "why": "用低承重支撑准备躯干张力。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-89": {
+      "prepId": "PREP-89",
+      "name": "原地踏步摆臂",
+      "alias": "原地踏步摆臂",
+      "actionId": "warmup_march_arm_swing",
+      "movementFamily": "integrated-march",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 低强度升温",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "踝",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 30–45秒",
+      "cue": "原地交替踏步，手臂自然前后摆动，保持轻松呼吸。",
+      "why": "衔接上下肢并逐步升温。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-90": {
+      "prepId": "PREP-90",
+      "name": "侧向并步斜上伸手",
+      "alias": "侧向并步斜上伸手",
+      "actionId": "warmup_lateral_step_reach",
+      "movementFamily": "integrated-lateral-step",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 侧向移动与肩屈",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "踝",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 30–45秒",
+      "cue": "向侧方小步迈出并合拢，随迈步斜上伸手，左右交替。",
+      "why": "在低冲击下连接侧向移重和肩带活动。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-91": {
+      "prepId": "PREP-91",
+      "name": "前点步配合展臂",
+      "alias": "前点步配合展臂",
+      "actionId": "warmup_forward_step_arm_open",
+      "movementFamily": "integrated-forward-step",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 前后移重与肩带活动",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "胸廓",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "单脚向前轻点，同时双臂打开，小步撤回后换边。",
+      "why": "让前后移重和肩带开合进入连贯节奏。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-92": {
+      "prepId": "PREP-92",
+      "name": "踏步配合对侧前伸",
+      "alias": "踏步配合对侧前伸",
+      "actionId": "warmup_march_cross_body_reach",
+      "movementFamily": "integrated-cross-reach",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 对侧协调",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "胸椎",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 30–45秒",
+      "cue": "交替抬脚踏步，对侧手向斜前方伸出，胸椎自然随动。",
+      "why": "用低复杂度的对侧动作连接髋与胸廓。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-93": {
+      "prepId": "PREP-93",
+      "name": "提踵接双臂上举",
+      "alias": "提踵接双臂上举",
+      "actionId": "warmup_heel_raise_overhead_reach",
+      "movementFamily": "integrated-calf-reach",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 足踝与肩屈",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "踝",
+        "肩带",
+        "胸廓"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "慢慢提踵并上举到舒适范围，脚跟和手臂同步落回。",
+      "why": "让足踝和肩带在轻负荷下同步工作。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-94": {
+      "prepId": "PREP-94",
+      "name": "后点步配合徒手划船",
+      "alias": "后点步配合徒手划船",
+      "actionId": "warmup_step_back_low_row",
+      "movementFamily": "integrated-step-row",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 后侧链与肩胛",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "上背",
+        "肩胛"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "一脚向后点地，同时肘向后轻拉，回到站姿再换边。",
+      "why": "连接髋伸与肩胛回收。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-95": {
+      "prepId": "PREP-95",
+      "name": "小幅折髋配合前伸",
+      "alias": "小幅折髋配合前伸",
+      "actionId": "warmup_short_hinge_forward_reach",
+      "movementFamily": "integrated-hinge-reach",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 髋折叠与肩带",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "腘绳肌",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "膝盖微弯、髋向后移，双臂轻伸向前，再站直还原。",
+      "why": "在开始主训练前串联髋折叠和肩带动作。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-96": {
+      "prepId": "PREP-96",
+      "name": "宽步移重配合摆臂",
+      "alias": "宽步移重配合摆臂",
+      "actionId": "warmup_wide_step_arm_sweep",
+      "movementFamily": "integrated-side-sweep",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 髋与胸椎协调",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "内收肌",
+        "胸椎"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 30–45秒",
+      "cue": "宽站左右交替移重，手臂向移重侧轻摆，保持脚掌着地。",
+      "why": "在连续动作中练习髋、胸椎和重心协同。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-97": {
+      "prepId": "PREP-97",
+      "name": "上步配合侧向伸手",
+      "alias": "上步配合侧向伸手",
+      "actionId": "warmup_tall_step_reach",
+      "movementFamily": "integrated-step-side-reach",
+      "prepGrade": "P1",
+      "f111Slot": "INTEGRATED",
+      "role": "全身整合 / 步态及肩带协调",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "胸廓",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "小步上前时同侧手往侧上方伸，回中后换边。",
+      "why": "在低强度步态中准备多方向肩带活动。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-98": {
+      "prepId": "PREP-98",
+      "name": "扶墙侧弓步髋活动",
+      "alias": "扶墙侧弓步髋活动",
+      "actionId": "warmup_supported_lateral_hip_open",
+      "movementFamily": "mobility-lateral-hip",
+      "prepGrade": "P2",
+      "f111Slot": "MOB-L",
+      "role": "髋内收肌动态活动",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "内收肌",
+        "踝"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "扶墙宽站，把重心移向一侧，另一腿舒适伸长后回中。",
+      "why": "在承重中准备髋内收肌和侧向髋活动。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-99": {
+      "prepId": "PREP-99",
+      "name": "徒手深蹲底位停顿",
+      "alias": "徒手深蹲底位停顿",
+      "actionId": "warmup_squat_pause_bodyweight",
+      "movementFamily": "primer-squat-pause",
+      "prepGrade": "P3",
+      "f111Slot": "PRIMER",
+      "role": "蹲模式准备 / 底位控制",
+      "sessionLevels": [
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "踝"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 6–8次",
+      "cue": "下蹲到可控深度，停两秒后自然起立。",
+      "why": "进阶预习蹲型底位和起身路径。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-100": {
+      "prepId": "PREP-100",
+      "name": "徒手分腿蹲接对侧上举",
+      "alias": "徒手分腿蹲接对侧上举",
+      "actionId": "warmup_split_squat_overhead_control",
+      "movementFamily": "primer-split-squat-reach",
+      "prepGrade": "P4",
+      "f111Slot": "PRIMER",
+      "role": "蹲 / 单腿模式准备",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "单腿"
+      ],
+      "regions": [
+        "髋",
+        "膝",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "分腿蹲低时对侧手轻上举，前脚保持着地，躯干稳定。",
+      "why": "增加分腿承重时的对侧动作控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-101": {
+      "prepId": "PREP-101",
+      "name": "死虫式对侧手脚伸展",
+      "alias": "死虫式对侧手脚伸展",
+      "actionId": "warmup_dead_bug_contralateral",
+      "movementFamily": "core-anti-extension-dead-bug",
+      "prepGrade": "P4",
+      "f111Slot": "CORE-ACT",
+      "role": "高阶核心抗伸展 / 对侧协调",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "骨盆",
+        "胸廓"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–5次/侧",
+      "cue": "仰卧交替伸出对侧手脚，呼气时缓慢伸展，腰背控制不变。",
+      "why": "用对侧长杠杆控制准备躯干，保持次数和用力较低。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-102": {
+      "prepId": "PREP-102",
+      "name": "后撤弓步接提膝上举",
+      "alias": "后撤弓步接提膝上举",
+      "actionId": "warmup_reverse_lunge_to_march_reach",
+      "movementFamily": "integrated-lunge-thoracic",
+      "prepGrade": "P4",
+      "f111Slot": "INTEGRATED",
+      "role": "高阶全身整合 / 单腿与肩屈",
+      "sessionLevels": [
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "胸廓",
+        "肩带"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 4–5次/侧",
+      "cue": "小幅向后撤步，再站直转成提膝，同时轻上举，落稳后换边。",
+      "why": "用低负荷串联分腿承重、短暂停稳与肩屈。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-103": {
+      "prepId": "PREP-103",
+      "name": "折髋接侧移徒手划船",
+      "alias": "折髋接侧移徒手划船",
+      "actionId": "warmup_hinge_to_lateral_step_row",
+      "movementFamily": "integrated-step-row",
+      "prepGrade": "P2",
+      "f111Slot": "INTEGRATED",
+      "role": "进阶全身整合 / 髋折叠与肩胛",
+      "sessionLevels": [
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿",
+        "水平推",
+        "垂直推",
+        "水平拉",
+        "垂直拉"
+      ],
+      "regions": [
+        "髋",
+        "腘绳肌",
+        "肩胛"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "小幅折髋后还原，随侧向小步完成一次轻拉肘。",
+      "why": "让髋铰链、移重和肩胛回收连成整合热身。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "standing-dynamic"
+    },
+    "PREP-104": {
+      "prepId": "PREP-104",
+      "name": "四足跪姿左右移重",
+      "alias": "四足跪姿左右移重",
+      "actionId": "warmup_quadruped_lateral_shift",
+      "movementFamily": "core-quadruped-weight-shift",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗旋转 / 四足支撑",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "肩带",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "四点撑稳，左右小幅移重，避免胸廓或骨盆翻转。",
+      "why": "保留四点支撑，在重心变化中练习躯干控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-105": {
+      "prepId": "PREP-105",
+      "name": "仰卧屈膝交替抬脚",
+      "alias": "仰卧屈膝交替抬脚",
+      "actionId": "warmup_supine_alternating_foot_lift",
+      "movementFamily": "core-anti-extension-march",
+      "prepGrade": "P1",
+      "f111Slot": "CORE-ACT",
+      "role": "核心抗伸展 / 骨盆控制",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "蹲",
+        "髋铰链",
+        "髋伸展",
+        "单腿"
+      ],
+      "regions": [
+        "核心",
+        "骨盆"
+      ],
+      "equipment": "自重 / 场地",
+      "prescription": "1组 × 5–6次/侧",
+      "cue": "仰卧屈膝，交替把一只脚轻抬离地，保持下肋和骨盆平稳。",
+      "why": "用简短的单腿卸载准备下肢动作中的腹部控制。",
+      "sourceStatus": "F111 动态热身动作",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
     }
   },
   "warmupGradeMeta": {

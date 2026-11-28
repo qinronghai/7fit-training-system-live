@@ -56,8 +56,9 @@ for(const lowerMode of lowers){
 
 assert.strictEqual(signatures.filter(x=>x.kind==='preset').length,32);
 assert.strictEqual(signatures.filter(x=>x.kind==='composer').length,80);
+assert(signatures.filter(x=>x.kind==='composer').every(x=>x.result.hardCount===0));
 const payload=JSON.stringify(signatures);
 const hash=crypto.createHash('sha256').update(payload).digest('hex');
 console.log(`F111_CONFLICT_BASELINE_SHA=${hash}`);
-assert.strictEqual(hash,'8d681b2c11321f8b33742819a4a54e68fd6eb85e415c2c40fdbdbe0c76722a3d','F111 conflict behavior changed from the support/core quality contract');
+assert.strictEqual(hash,'7fc2b89da507ca32fbf15669d99d9827fb07c3e0a4cb2daba63beeea3b265da3','F111 conflict behavior changed from the support/core quality contract');
 console.log('f111_conflict_parity_test: support/core quality baseline GREEN');

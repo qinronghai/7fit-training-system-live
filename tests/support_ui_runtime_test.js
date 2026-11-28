@@ -22,8 +22,6 @@ assert(advanced.detail.includes('需确认'), 'support drawer must show confirma
 
 const supportSlot = resolved.slots.find(slot => slot.slotKey === 'C');
 const card = context.window.V14CoachModules.Slot.composerCard({ resolved, level: 'L1', stateKey: 'test' }, supportSlot);
-assert(card.includes('推荐依据：'), 'support card must show recommendation rationale');
-assert(card.includes('会员感受：'), 'support card must show member-facing feeling');
-assert(card.includes('同目的替代'), 'support card must show same-demand alternatives');
+assert(!card.includes('推荐理由'), 'support row must omit the recommendation disclosure');
 
 console.log('support_ui_runtime_test: PASS');
