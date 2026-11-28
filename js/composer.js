@@ -6,7 +6,8 @@
   const MAIN_TIER_RANK=Object.freeze({T1:1,T2:2,T3:3,T4:4});
   const CORE_GRADE_RANK=Object.freeze({'CORE-L1':1,'CORE-L2':2,'CORE-L3':3,'CORE-L4':4});
   const FATIGUE_LOAD=Object.freeze({low:1,medium:2,high:3,very_high:4});
-  const TRUNK_LOAD_BUDGET=Object.freeze({L1:11,L2:13,L3:16,L4:18});
+  // Calibrated so a normal session at each level passes; only stacking heavy support and core on top of the main lifts warns.
+  const TRUNK_LOAD_BUDGET=Object.freeze({L1:11,L2:13,L3:17,L4:20});
   const SUPPORT_FATIGUE_RANK=Object.freeze({low:1,medium:2,high:3});
   const SUPPORT_FATIGUE_TARGET=Object.freeze({L1:1,L2:1,L3:2,L4:2.5});
   function cfg(){return D().composer||{};}

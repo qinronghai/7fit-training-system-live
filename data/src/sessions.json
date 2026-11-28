@@ -30,15 +30,15 @@
         {
           "slotKey": "F111-01-L1__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-01-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -112,8 +112,8 @@
         {
           "slotKey": "F111-01-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -180,16 +180,16 @@
         {
           "slotKey": "F111-01-L3__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tunbu_houti",
+          "baselinePattern": "髋伸展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-01-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -253,15 +253,15 @@
         {
           "slotKey": "F111-01-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-01-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -336,8 +336,8 @@
         {
           "slotKey": "F111-02-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -403,16 +403,16 @@
         {
           "slotKey": "F111-02-L2__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-02-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "shengsuo_cepingju",
+          "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -484,8 +484,8 @@
         {
           "slotKey": "F111-02-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
-          "baselinePattern": "肩胛控制",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -553,16 +553,16 @@
         {
           "slotKey": "F111-02-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-02-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -626,15 +626,15 @@
         {
           "slotKey": "F111-03-L1__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangwai_zhan",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-03-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -700,16 +700,16 @@
         {
           "slotKey": "F111-03-L2__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tui_qushen",
+          "baselinePattern": "蹲",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-03-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -776,16 +776,16 @@
         {
           "slotKey": "F111-03-L3__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangnei_shou",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-03-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -849,15 +849,15 @@
         {
           "slotKey": "F111-03-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangwai_zhan",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-03-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -932,8 +932,8 @@
         {
           "slotKey": "F111-04-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -998,7 +998,7 @@
         {
           "slotKey": "F111-04-L2__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
+          "baselineId": "kuangwai_zhan",
           "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1006,7 +1006,7 @@
         {
           "slotKey": "F111-04-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1083,8 +1083,8 @@
         {
           "slotKey": "F111-04-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1159,8 +1159,8 @@
         {
           "slotKey": "F111-04-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1226,15 +1226,15 @@
         {
           "slotKey": "F111-05-L1__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-05-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1311,8 +1311,8 @@
         {
           "slotKey": "F111-05-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1378,7 +1378,7 @@
         {
           "slotKey": "F111-05-L3__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
+          "baselineId": "xiao_longmen_wai_zhan",
           "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1386,8 +1386,8 @@
         {
           "slotKey": "F111-05-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1452,15 +1452,15 @@
         {
           "slotKey": "F111-05-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-05-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
+          "baselineId": "shengsuo_cepingju",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1529,16 +1529,16 @@
         {
           "slotKey": "F111-06-L1__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-06-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_santou_xiaya",
-          "baselinePattern": "水平推",
+          "baselineId": "mianla",
+          "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1603,16 +1603,16 @@
         {
           "slotKey": "F111-06-L2__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-06-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_cepingju",
-          "baselinePattern": "肩胛控制",
+          "baselineId": "hudieji_fanxiang_feiniao",
+          "baselinePattern": "水平拉",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1678,16 +1678,16 @@
         {
           "slotKey": "F111-06-L3__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tunbu_houti",
+          "baselinePattern": "髋伸展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-06-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_santou_xiaya",
-          "baselinePattern": "水平推",
+          "baselineId": "shengsuo_ertou_wanju",
+          "baselinePattern": "垂直拉",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1753,15 +1753,15 @@
         {
           "slotKey": "F111-06-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_qushen",
-          "baselinePattern": "蹲",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-06-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_cepingju",
+          "baselineId": "mianla",
           "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -1828,16 +1828,16 @@
         {
           "slotKey": "F111-07-L1__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangwai_zhan",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-07-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_cepingju",
-          "baselinePattern": "肩胛控制",
+          "baselineId": "zhibi_xiala",
+          "baselinePattern": "垂直拉",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1910,8 +1910,8 @@
         {
           "slotKey": "F111-07-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_santou_xiaya",
-          "baselinePattern": "水平推",
+          "baselineId": "mianla",
+          "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -1978,16 +1978,16 @@
         {
           "slotKey": "F111-07-L3__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangnei_shou",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-07-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_cepingju",
-          "baselinePattern": "肩胛控制",
+          "baselineId": "shengsuo_ertou_wanju",
+          "baselinePattern": "垂直拉",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2053,16 +2053,16 @@
         {
           "slotKey": "F111-07-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "tui_wanju",
-          "baselinePattern": "髋铰链",
+          "baselineId": "kuangwai_zhan",
+          "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-07-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_santou_xiaya",
-          "baselinePattern": "水平推",
+          "baselineId": "zhibi_xiala",
+          "baselinePattern": "垂直拉",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2135,8 +2135,8 @@
         {
           "slotKey": "F111-08-L1__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "houzu_sanji",
-          "baselinePattern": "水平拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2203,7 +2203,7 @@
         {
           "slotKey": "F111-08-L2__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
+          "baselineId": "kuangwai_zhan",
           "baselinePattern": "髋外展",
           "baselineTier": "",
           "baselineCoreDemand": ""
@@ -2211,8 +2211,8 @@
         {
           "slotKey": "F111-08-L2__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "shengsuo_cepingju",
+          "baselinePattern": "肩胛控制",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2285,8 +2285,8 @@
         {
           "slotKey": "F111-08-L3__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "mianla",
-          "baselinePattern": "肩胛控制",
+          "baselineId": "shengsuo_santou_xiaya",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2354,16 +2354,16 @@
         {
           "slotKey": "F111-08-L4__2",
           "slotName": "D1｜下肢辅助",
-          "baselineId": "kuangnei_shou",
-          "baselinePattern": "髋外展",
+          "baselineId": "tui_wanju",
+          "baselinePattern": "髋铰链",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
         {
           "slotKey": "F111-08-L4__3",
           "slotName": "D2｜上肢辅助",
-          "baselineId": "shengsuo_ertou_wanju",
-          "baselinePattern": "垂直拉",
+          "baselineId": "xiongjia_jiaxiong",
+          "baselinePattern": "水平推",
           "baselineTier": "",
           "baselineCoreDemand": ""
         },
@@ -2517,9 +2517,14 @@
         ],
         "F111-01-L1__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -2539,14 +2544,9 @@
         ],
         "F111-01-L1__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -2561,6 +2561,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -2802,22 +2807,22 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-01-L2__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -2833,6 +2838,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -3091,9 +3101,14 @@
         ],
         "F111-01-L3__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tunbu_houti",
+            "label": "臀部后踢腿｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -3106,15 +3121,15 @@
             "kind": "同级替换"
           },
           {
-            "id": "tunbu_houti",
-            "label": "臀部后踢腿｜入门｜同级替换",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-01-L3__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -3128,8 +3143,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -3363,9 +3378,14 @@
         ],
         "F111-01-L4__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -3385,14 +3405,9 @@
         ],
         "F111-01-L4__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -3407,6 +3422,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -3623,18 +3643,18 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-02-L1__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -3659,6 +3679,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -3887,9 +3912,14 @@
         ],
         "F111-02-L2__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -3909,8 +3939,8 @@
         ],
         "F111-02-L2__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -3919,13 +3949,13 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -4197,12 +4227,17 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-02-L3__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -4216,11 +4251,6 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -4228,6 +4258,11 @@
           {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -4456,9 +4491,14 @@
         ],
         "F111-02-L4__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -4478,14 +4518,9 @@
         ],
         "F111-02-L4__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -4495,6 +4530,11 @@
           {
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -4713,9 +4753,14 @@
         ],
         "F111-03-L1__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -4723,26 +4768,21 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-03-L1__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -4757,6 +4797,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -4980,8 +5025,8 @@
         ],
         "F111-03-L2__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -4998,22 +5043,22 @@
             "id": "kuangwai_zhan",
             "label": "坐姿髋外展｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-03-L2__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -5029,6 +5074,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -5282,9 +5332,14 @@
         ],
         "F111-03-L3__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -5297,15 +5352,15 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-03-L3__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -5319,8 +5374,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -5544,9 +5599,14 @@
         ],
         "F111-03-L4__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -5554,26 +5614,21 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-03-L4__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -5588,6 +5643,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -5798,14 +5858,9 @@
         ],
         "F111-04-L1__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -5815,6 +5870,11 @@
           {
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6063,8 +6123,8 @@
         ],
         "F111-04-L2__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -6073,8 +6133,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6085,18 +6145,13 @@
         ],
         "F111-04-L2__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
             "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6112,6 +6167,11 @@
           {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6367,8 +6427,8 @@
         ],
         "F111-04-L3__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -6379,11 +6439,6 @@
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6399,6 +6454,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6644,14 +6704,9 @@
         ],
         "F111-04-L4__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -6661,6 +6716,11 @@
           {
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -6869,8 +6929,8 @@
         ],
         "F111-05-L1__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -6879,31 +6939,31 @@
             "kind": "同级替换"
           },
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-05-L1__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -6918,6 +6978,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7164,22 +7229,22 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-05-L2__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
+            "id": "xiongjia_jiaxiong",
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7195,6 +7260,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7438,13 +7508,18 @@
         ],
         "F111-05-L3__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "kuangwai_zhan",
             "label": "坐姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7465,8 +7540,8 @@
         ],
         "F111-05-L3__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -7480,8 +7555,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7710,8 +7785,8 @@
         ],
         "F111-05-L4__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -7720,31 +7795,31 @@
             "kind": "同级替换"
           },
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-05-L4__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "绳索侧平举｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "xiongjia_jiaxiong",
@@ -7759,6 +7834,11 @@
           {
             "id": "houzu_sanji",
             "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7957,13 +8037,18 @@
         ],
         "F111-06-L1__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "tui_qushen",
             "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -7979,14 +8064,9 @@
         ],
         "F111-06-L1__3": [
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "mianla",
-            "label": "面拉｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "面拉｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "hudieji_fanxiang_feiniao",
@@ -7996,6 +8076,11 @@
           {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -8224,9 +8309,14 @@
         ],
         "F111-06-L2__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -8246,18 +8336,13 @@
         ],
         "F111-06-L2__3": [
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜当前默认",
+            "id": "hudieji_fanxiang_feiniao",
+            "label": "蝴蝶机反向飞鸟｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "hudieji_fanxiang_feiniao",
-            "label": "蝴蝶机反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -8298,6 +8383,11 @@
           {
             "id": "qixie_xiong_tui_zhaiwo",
             "label": "器械窄握胸推｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -8506,8 +8596,8 @@
         ],
         "F111-06-L3__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tunbu_houti",
+            "label": "臀部后踢腿｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -8516,20 +8606,25 @@
             "kind": "同级替换"
           },
           {
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
             "id": "kuangwai_zhan",
             "label": "坐姿髋外展｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "tunbu_houti",
-            "label": "臀部后踢腿｜入门｜同级替换",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-06-L3__3": [
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜当前默认",
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -8543,8 +8638,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜同级替换",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -8768,9 +8863,14 @@
         ],
         "F111-06-L4__2": [
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "kuangnei_shou",
@@ -8790,14 +8890,9 @@
         ],
         "F111-06-L4__3": [
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "mianla",
-            "label": "面拉｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "面拉｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "hudieji_fanxiang_feiniao",
@@ -8842,6 +8937,11 @@
           {
             "id": "qixie_xiong_tui_zhaiwo",
             "label": "器械窄握胸推｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9005,9 +9105,14 @@
         ],
         "F111-07-L1__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -9015,26 +9120,21 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-07-L1__3": [
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "zhibi_xiala",
-            "label": "直臂下拉｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "直臂下拉｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "mianla",
@@ -9044,6 +9144,11 @@
           {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9280,22 +9385,22 @@
             "id": "kuangnei_shou",
             "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-07-L2__3": [
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜当前默认",
+            "id": "mianla",
+            "label": "面拉｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
-            "id": "mianla",
-            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9306,6 +9411,11 @@
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9539,9 +9649,14 @@
         ],
         "F111-07-L3__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -9554,15 +9669,15 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-07-L3__3": [
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜当前默认",
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -9576,8 +9691,8 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜同级替换",
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -9791,9 +9906,14 @@
         ],
         "F111-07-L4__2": [
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
+          },
+          {
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜同级替换",
+            "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
@@ -9801,26 +9921,21 @@
             "kind": "同级替换"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           }
         ],
         "F111-07-L4__3": [
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "zhibi_xiala",
-            "label": "直臂下拉｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "直臂下拉｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "mianla",
@@ -9835,6 +9950,11 @@
           {
             "id": "shengsuo_cepingju",
             "label": "绳索侧平举｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -10051,18 +10171,18 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-08-L1__3": [
           {
-            "id": "houzu_sanji",
-            "label": "哑铃俯身反向飞鸟｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -10087,6 +10207,11 @@
           {
             "id": "mianla",
             "label": "面拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "houzu_sanji",
+            "label": "哑铃俯身反向飞鸟｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -10305,13 +10430,13 @@
         ],
         "F111-08-L2__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "kuangwai_zhan",
+            "label": "坐姿髋外展｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
-            "id": "kuangwai_zhan",
-            "label": "坐姿髋外展｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -10328,12 +10453,17 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-08-L2__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
+            "id": "shengsuo_cepingju",
+            "label": "绳索侧平举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -10342,13 +10472,13 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_cepingju",
-            "label": "绳索侧平举｜入门｜同级替换",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -10625,12 +10755,17 @@
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-08-L3__3": [
           {
-            "id": "mianla",
-            "label": "面拉｜入门｜当前默认",
+            "id": "shengsuo_santou_xiaya",
+            "label": "绳索三头下压｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -10644,11 +10779,6 @@
             "kind": "同级替换"
           },
           {
-            "id": "shengsuo_santou_xiaya",
-            "label": "绳索三头下压｜入门｜同级替换",
-            "kind": "同级替换"
-          },
-          {
             "id": "shengsuo_ertou_wanju",
             "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
@@ -10656,6 +10786,11 @@
           {
             "id": "zhibi_xiala",
             "label": "直臂下拉｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "mianla",
+            "label": "面拉｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
@@ -10884,8 +11019,8 @@
         ],
         "F111-08-L4__2": [
           {
-            "id": "kuangnei_shou",
-            "label": "髋内收｜入门｜当前默认",
+            "id": "tui_wanju",
+            "label": "坐姿腿弯举｜入门｜当前默认",
             "kind": "当前默认"
           },
           {
@@ -10894,31 +11029,31 @@
             "kind": "同级替换"
           },
           {
-            "id": "tui_qushen",
-            "label": "坐姿腿屈伸｜入门｜同级替换",
+            "id": "kuangnei_shou",
+            "label": "髋内收｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
-            "id": "tui_wanju",
-            "label": "坐姿腿弯举｜入门｜同级替换",
+            "id": "tui_qushen",
+            "label": "坐姿腿屈伸｜入门｜同级替换",
             "kind": "同级替换"
           },
           {
             "id": "tunbu_houti",
             "label": "臀部后踢腿｜入门｜同级替换",
             "kind": "同级替换"
+          },
+          {
+            "id": "xiao_longmen_wai_zhan",
+            "label": "绳索站姿髋外展｜入门｜同级替换",
+            "kind": "同级替换"
           }
         ],
         "F111-08-L4__3": [
           {
-            "id": "shengsuo_ertou_wanju",
-            "label": "绳索二头弯举｜入门｜当前默认",
-            "kind": "当前默认"
-          },
-          {
             "id": "xiongjia_jiaxiong",
-            "label": "蝴蝶机夹胸｜入门｜同级替换",
-            "kind": "同级替换"
+            "label": "蝴蝶机夹胸｜入门｜当前默认",
+            "kind": "当前默认"
           },
           {
             "id": "shengsuo_cepingju",
@@ -10928,6 +11063,11 @@
           {
             "id": "shengsuo_santou_xiaya",
             "label": "绳索三头下压｜入门｜同级替换",
+            "kind": "同级替换"
+          },
+          {
+            "id": "shengsuo_ertou_wanju",
+            "label": "绳索二头弯举｜入门｜同级替换",
             "kind": "同级替换"
           },
           {

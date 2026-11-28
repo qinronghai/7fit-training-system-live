@@ -32,8 +32,8 @@
       {
         "key": "3",
         "label": "D2｜上肢辅助",
-        "actionId": "shengsuo_santou_xiaya",
-        "name": "绳索三头下压",
+        "actionId": "shengsuo_ertou_wanju",
+        "name": "绳索二头弯举",
         "tier": "",
         "grade": "",
         "prescription": "2组 × 15次左右",
@@ -42,8 +42,8 @@
       {
         "key": "2",
         "label": "D1｜下肢辅助",
-        "actionId": "kuangnei_shou",
-        "name": "髋内收",
+        "actionId": "tunbu_houti",
+        "name": "臀部后踢腿",
         "tier": "",
         "grade": "",
         "prescription": "2组 × 15次左右",
@@ -87,8 +87,8 @@
       "hake_shendun",
       "wotu_xiong_tui",
       "SUP-S3-02",
-      "kuangnei_shou",
-      "shengsuo_santou_xiaya",
+      "tunbu_houti",
+      "shengsuo_ertou_wanju",
       "CORE-L3-01"
     ],
     "targetMuscles": [],
@@ -111,40 +111,49 @@
       "hake_shendun",
       "wotu_xiong_tui",
       "SUP-S3-02",
-      "kuangnei_shou",
-      "shengsuo_santou_xiaya",
+      "tunbu_houti",
+      "shengsuo_ertou_wanju",
       "CORE-L3-01"
     ],
     "primary": [
-      "肱三头肌",
+      "臀大肌",
       "腹横肌",
       "腹内外斜肌",
-      "内收肌群",
       "股四头肌",
-      "臀大肌",
-      "胸大肌"
+      "胸大肌",
+      "肱二头肌"
     ],
     "secondary": [
       "肱三头肌",
       "内收肌群",
       "三角肌前束",
       "前锯肌",
+      "腘绳肌",
+      "肱肌",
+      "肱桡肌",
       "腹直肌"
     ],
     "stabilizers": [
       "腹壁",
       "臀中肌",
-      "肩胛稳定肌群",
       "肩袖肌群",
+      "肩胛稳定肌群",
       "竖脊肌",
-      "骨盆稳定肌群"
+      "对侧骨盆稳定肌群"
     ]
   },
   "conflictContext": {
     "status": "PASS",
     "hardCount": 0,
     "warnCount": 0,
-    "issues": []
+    "issues": [
+      {
+        "severity": "info",
+        "title": "器械复用",
+        "text": "eq-cable 有 2 个动作，可减少移动，但注意器械占用顺序。",
+        "code": ""
+      }
+    ]
   },
   "copyContext": {
     "title": "F111-06｜下肢推 + 水平推 + 支撑",
@@ -153,8 +162,8 @@
       "hake_shendun",
       "wotu_xiong_tui",
       "SUP-S3-02",
-      "kuangnei_shou",
-      "shengsuo_santou_xiaya",
+      "tunbu_houti",
+      "shengsuo_ertou_wanju",
       "CORE-L3-01"
     ]
   },
@@ -177,12 +186,12 @@
     },
     {
       "key": "2",
-      "actionId": "kuangnei_shou",
+      "actionId": "tunbu_houti",
       "source": "baseline"
     },
     {
       "key": "3",
-      "actionId": "shengsuo_santou_xiaya",
+      "actionId": "shengsuo_ertou_wanju",
       "source": "baseline"
     },
     {

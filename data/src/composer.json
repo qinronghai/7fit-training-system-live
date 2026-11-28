@@ -408,13 +408,15 @@
           "tui_qushen",
           "kuangnei_shou",
           "kuangwai_zhan",
-          "tunbu_houti"
+          "tunbu_houti",
+          "tui_wanju"
         ],
         "hinge": [
           "tui_wanju",
           "tunbu_houti",
           "kuangwai_zhan",
-          "kuangnei_shou"
+          "kuangnei_shou",
+          "tui_qushen"
         ],
         "hip_extension": [
           "tui_wanju",
@@ -427,7 +429,8 @@
           "kuangnei_shou",
           "tui_qushen",
           "tui_wanju",
-          "tunbu_houti"
+          "tunbu_houti",
+          "xiao_longmen_wai_zhan"
         ],
         "single_leg_hinge": [
           "tui_wanju",
