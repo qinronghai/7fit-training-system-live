@@ -42,7 +42,7 @@ test('coach defaults progress by level and keep primer aligned to the lower mode
 
   async function defaults(level){
     await page.goto(`/#/coach/f111/f111-07/${level}`);
-    await expect(page.locator('[data-prep-slot-card]')).toHaveCount(5);
+    await expect(page.locator('[data-prep-slot-card]')).toHaveCount(6);
     return page.locator('[data-prep-slot-card]').evaluateAll(cards=>cards.map(card=>({
       key:card.getAttribute('data-prep-slot-card'),
       text:card.innerText,

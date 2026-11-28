@@ -38,7 +38,7 @@
     const byKey=new Map(slots.map(slot=>[slot.label?.split('｜')[0]||slot.key,slot]));
     const planned=strengthKeys.map(key=>{
       const slot=byKey.get(key),action=actions[slot?.actionId];
-      const prescription=slot?.prescription||window.V14ModuleCopy?.prescriptionForF111Slot?.(key)||'';
+      const prescription=slot?.prescription||window.V14ModuleCopy?.prescriptionForF111Slot?.(key,slot?.actionId)||'';
       const seconds=doseSeconds(prescription);
       return action&&seconds>0?{name:action.name,seconds,met:strengthMet(action)}:null;
     });

@@ -28,7 +28,7 @@ test('Issue 71: F111 PREP uses whole-card detail navigation without a separate d
   for(const width of [390,1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/coach/f111/f111-01/l1');
-    await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+    await expect(page.locator('.prep-slot-card')).toHaveCount(6);
     const card=page.locator('.prep-slot-card').first();
     const detailRoute=await card.getAttribute('data-prep-detail-href');
     expect(detailRoute).toMatch(/^#\/system\/prep\?focus=/);

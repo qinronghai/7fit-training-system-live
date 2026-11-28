@@ -8,6 +8,7 @@ for(const file of ['data/system-data.js','data/anatomy-data.js','js/prep-grade.j
 const R=window.V14PrepResolver,D=window.V14_DATA;
 assert(R,'V14PrepResolver must exist');
 assert.deepStrictEqual(R.SLOT_ORDER,['MOB-L','MOB-U','PRIMER','CORE-ACT','INTEGRATED']);
+assert.deepStrictEqual(R.F111_SLOT_ORDER,['MOB-L','MOB-U','PRIMER','PRIMER-U','CORE-ACT','INTEGRATED']);
 assert.deepStrictEqual(R.CA_WINDOWS,{L1:['CA1'],L2:['CA2','CA1'],L3:['CA3','CA2','CA1'],L4:['CA4','CA3','CA2','CA1']});
 
 for(const template of ['f111','body','conditioning']){
@@ -61,10 +62,10 @@ assert.strictEqual(conditioning.impactDemand,'low');
 assert.strictEqual(conditioning.powerDemand,'moderate');
 
 const resolved=R.resolve(f111);
-assert.strictEqual(resolved.slots.length,5);
-assert.deepStrictEqual(resolved.slots.map(s=>s.slotKey),R.SLOT_ORDER);
-assert(resolved.slots.every(s=>s.actionId), 'all five functional slots need a resolved action for the F111 contract fixture');
-assert.strictEqual(new Set(resolved.slots.map(s=>s.actionId)).size,5,'resolved PREP cannot duplicate actionId across slots');
+assert.strictEqual(resolved.slots.length,6);
+assert.deepStrictEqual(resolved.slots.map(s=>s.slotKey),R.F111_SLOT_ORDER);
+assert(resolved.slots.every(s=>s.actionId), 'all six functional slots need a resolved action for the F111 contract fixture');
+assert.strictEqual(new Set(resolved.slots.map(s=>s.actionId)).size,6,'resolved PREP cannot duplicate actionId across slots');
 
 const allowed=window.V14PrepGrade.allowedGrades('L3');
 for(const slot of resolved.slots){

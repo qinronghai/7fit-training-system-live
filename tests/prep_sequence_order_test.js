@@ -66,7 +66,7 @@ const resolved = modules.Prep.resolvePresetPrep(sessionId, recipeId, level, sele
 const items = modules.Prep.resolvedItems(resolved);
 const expected = plain(items.map(item => item.name));
 const phaseRank = { floor: 0, 'floor-tool': 1, standing: 2, 'standing-dynamic': 3 };
-assert.strictEqual(expected.length, 5, 'shared PREP must resolve five warm-up items');
+assert.strictEqual(expected.length, 6, 'F111 PREP must resolve six warm-up items');
 assert.strictEqual(new Set(expected).size, expected.length, 'shared PREP must not duplicate warm-up items');
 assert(items.every(item => Number.isInteger(phaseRank[item.sequencePhase])), 'shared PREP items must expose known sequence phases');
 assert(items.every((item, index) => index === 0 || phaseRank[item.sequencePhase] >= phaseRank[items[index - 1].sequencePhase]), 'shared PREP items must follow floor-to-standing progression');

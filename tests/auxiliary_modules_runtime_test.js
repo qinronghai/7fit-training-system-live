@@ -22,6 +22,9 @@ assert.strictEqual(upper.total, 21, 'upper auxiliary pool should deduplicate to 
 assert.deepStrictEqual(
   [...upper.entries.map(entry => entry.id)],
   [
+    'shengsuo_cepingju',
+    'xiongjia_jiaxiong',
+    'shengsuo_santou_xiaya',
     'houzu_sanji',
     'mianla',
     'shengsuo_ertou_wanju',
@@ -35,13 +38,10 @@ assert.deepStrictEqual(
     'zhibi_xiala',
     'shengsuo_mianla',
     'shuanggang_zhicheng',
-    'shengsuo_santou_xiaya',
-    'xiongjia_jiaxiong',
     'shengsuo_jiaxiong_zhongwei',
     'shengsuo_jiaxiong_gaowei',
     'pecdeck_unilateral_press_main',
     'qixie_xiong_tui_zhaiwo',
-    'shengsuo_cepingju',
     'V13_VP_SEATED_LIGHT_DB',
   ],
 );
@@ -72,6 +72,7 @@ const upperFacePull = upper.entries.find(entry => entry.id === 'mianla');
 assert.deepStrictEqual([...upperFacePull.sourcePools.map(pool => pool.key)], [
   'horizontal_pull',
   'vertical_pull',
+  'horizontal_push',
   'vertical_push',
 ]);
 assert.strictEqual(upperFacePull.action.equipmentClass, 'cable_station');

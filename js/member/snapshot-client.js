@@ -183,7 +183,7 @@
       actionsById:window.V14_DATA?.actions||{},anatomyById:window.V14_ANATOMY?.records||{},
       prescriptionForSlot:slot=>{
         if(resolvedSession.templateId!=='f111')return slot.prescription;
-        return window.V14ModuleCopy?.prescriptionForF111Slot?.(slot.key)
+        return window.V14ModuleCopy?.prescriptionForF111Slot?.(slot.key,slot.actionId)
           ||slot.prescription
           ||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:resolvedSession.level})
           ||'';

@@ -22,7 +22,9 @@ function assertF111Alternatives(prep){
   for(const slot of prep.slots){
     const label=`${level} ${prep.context.mainPatterns.join('+')} ${slot.slotKey}`;
     const alternatives=slot.candidates.filter(item=>item.actionId!==slot.actionId);
-    assert(alternatives.length>=8,`${label} has only ${alternatives.length} replacements`);
+    // L1 only admits P1 drills, and the upper primer pool has five of them.
+    const minimum=slot.slotKey==='PRIMER-U'&&level==='L1'?5:8;
+    assert(alternatives.length>=minimum,`${label} has only ${alternatives.length} replacements`);
     assert.strictEqual(new Set(slot.candidates.map(item=>item.actionId)).size,slot.candidates.length,label);
     assert(slot.candidates.some(item=>item.actionId===slot.actionId),`${label} must include the current selection`);
     assert(alternatives.every(item=>!formalActionIds.includes(item.actionId)&&!currentIds.includes(item.actionId)),label);
@@ -44,7 +46,7 @@ const sessionId='F111-01-L3',recipeId='F111-01',level='L3';
 const session=D.sessions[sessionId];
 const selected=session.slots.map(slot=>slot.baselineId);
 let preset=M.Prep.resolvePresetPrep(sessionId,recipeId,level,selected);
-assert.deepStrictEqual(plain(preset.slots.map(x=>x.slotKey)),['MOB-L','MOB-U','PRIMER','CORE-ACT','INTEGRATED']);
+assert.deepStrictEqual(plain(preset.slots.map(x=>x.slotKey)),['MOB-L','MOB-U','PRIMER','PRIMER-U','CORE-ACT','INTEGRATED']);
 assert(preset.slots.every(x=>x.source==='auto'));
 let slot=firstReplaceableSlot(preset); assert(slot,'expected replaceable preset PREP slot');
 const manual=slot.candidates.find(c=>c.actionId!==slot.actionId); assert(manual);
@@ -96,11 +98,13 @@ for(const mode of ctx.window.V14Composer.combinations()){
   for(const level of ['L1','L2','L3','L4']){
     const resolved=ctx.window.V14Composer.resolve({...mode,level});
     const prep=M.Prep.resolveComposerPrep({level,stateKey:resolved.compositionId+'-'+level,resolved});
-    assert.strictEqual(prep.slots.length,5);
+    assert.strictEqual(prep.slots.length,6);
     assert(prep.slots.every(slot=>slot.actionId),resolved.compositionId+' '+level+' has an empty warm-up slot');
     assertF111Alternatives(prep);
     const primer=prep.slots.find(slot=>slot.slotKey==='PRIMER');
     assert(primer.targetPatterns.some(pattern=>prep.context.mainPatterns.includes(pattern)));
+    const upperPrimer=prep.slots.find(slot=>slot.slotKey==='PRIMER-U');
+    assert(upperPrimer.targetPatterns.includes(resolved.upper.name),resolved.compositionId+' '+level+' upper primer must prepare the upper main pattern');
   }
 }
 for(const [id,session] of Object.entries(D.sessions)){
@@ -115,7 +119,7 @@ assert.strictEqual(composerPrep.slots.find(x=>x.slotKey===slot.slotKey).actionId
 assert.strictEqual(composerPrep.slots.find(x=>x.slotKey===slot.slotKey).source,'manual');
 const composerHtml=M.Prep.composerPrepHtml(composerCtx);
 assert(composerHtml.includes('prep-slot-select'),'Composer PREP must render replacement selects');
-assert.strictEqual((composerHtml.match(/class="f111-prep-purpose"/g)||[]).length,5);
+assert.strictEqual((composerHtml.match(/class="f111-prep-purpose"/g)||[]).length,6);
 M.Prep.composerPrepItems=()=>{throw new Error('legacy composerPrepItems must not be used by copy');};
 const composerPayload=M.ComposerView.buildComposerCopyPayload(composerCtx);
 assert(composerPayload.warmups.some(x=>x.name===composerManual.name),'Composer copy must include current manual PREP');

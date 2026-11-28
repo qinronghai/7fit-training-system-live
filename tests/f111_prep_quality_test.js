@@ -26,7 +26,7 @@ function ordered(slots) {
 for (const recipeId of Object.keys(D.recipes)) {
   for (const level of levels) {
     const resolved = R.resolve(R.contextFromF111({ recipeId, level }));
-    assert.strictEqual(resolved.slots.length, 5, `${recipeId}-${level} must have five PREP slots`);
+    assert.strictEqual(resolved.slots.length, 6, `${recipeId}-${level} must have six PREP slots`);
     assert(resolved.slots.every(slot => slot.actionId), `${recipeId}-${level} must resolve every PREP slot`);
     assert(resolved.estimatedMinutes >= 6 && resolved.estimatedMinutes <= 12,
       `${recipeId}-${level} PREP estimate must stay within 6–12 minutes: ${resolved.estimatedMinutes}`);

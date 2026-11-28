@@ -31,7 +31,7 @@
         ],
         "properties": {
           "f111Slot": {
-            "enum": ["MOB-L", "MOB-U", "PRIMER", "CORE-ACT", "INTEGRATED"]
+            "enum": ["MOB-L", "MOB-U", "PRIMER", "PRIMER-U", "CORE-ACT", "INTEGRATED"]
           },
           "prepGrade": {
             "enum": [

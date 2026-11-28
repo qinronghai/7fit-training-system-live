@@ -56,8 +56,8 @@ test('Issue 79: upper auxiliary module deduplicates source pools and supports fi
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('');
   await module.locator('[data-aux-pool-button="horizontal_pull"]').click();
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('horizontal_pull');
-  await expect(module.locator('[data-aux-visible-count]')).toHaveText('10 个');
-  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(10);
+  await expect(module.locator('[data-aux-visible-count]')).toHaveText('13 个');
+  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(13);
   // 俯身Y举 is bodyweight: its class must reach the filter instead of being dropped.
   await expect(module.locator('[data-aux-filter="equipmentClass"] option[value="bodyweight"]')).toHaveCount(1);
   await module.locator('[data-aux-filter="pool"]').selectOption('');

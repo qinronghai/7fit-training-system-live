@@ -51,10 +51,12 @@
     if(p&&isStrength(actionId)&&!/RIR/i.test(p))p=`${p}｜${defaultRir(level)}`;
     return p||'按当前动作质量与课程目标执行';
   }
-  function prescriptionForF111Slot(slotKey){
+  // SUPPORT and CORE actions carry their own dose (seconds, per side, breaths); the slot default is a fallback.
+  function prescriptionForF111Slot(slotKey,actionId=''){
     const key=clean(slotKey).split('__').pop().split('｜')[0].trim();
     const canonicalKey=({SUPPORT:'C','2':'D1','3':'D2'})[key]||key;
-    return clean(D().composer?.prescriptionBySlot?.[canonicalKey]);
+    const ownDose=canonicalKey==='C'?D().supportMeta?.[actionId]?.recommendedDose:canonicalKey==='CORE'?D().coreMeta?.[actionId]?.recommendedDose:'';
+    return clean(ownDose)||clean(D().composer?.prescriptionBySlot?.[canonicalKey]);
   }
   function tierForAction(actionId){
     const a=D().actions?.[actionId]||{};

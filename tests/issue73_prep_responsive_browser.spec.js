@@ -28,7 +28,7 @@ test('Issue 73: PREP cards and replacement controls remain usable at mobile and 
   for(const width of [390,1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/coach/f111/f111-01/l1');
-    await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+    await expect(page.locator('.prep-slot-card')).toHaveCount(6);
     const card=page.locator('.prep-slot-card').first();
     const replacement=card.locator('[data-replacement-drawer]');
     await expect(card).toHaveAttribute('data-prep-detail-href',/^#\/system\/prep\?focus=/);

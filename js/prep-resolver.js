@@ -2,10 +2,14 @@
   'use strict';
 
   const SLOT_ORDER=Object.freeze(['MOB-L','MOB-U','PRIMER','CORE-ACT','INTEGRATED']);
+  // F111 trains one lower and one upper main lift, so each gets its own primer.
+  const F111_SLOT_ORDER=Object.freeze(['MOB-L','MOB-U','PRIMER','PRIMER-U','CORE-ACT','INTEGRATED']);
+  const slotOrderFor=ctx=>ctx?.template==='f111'?F111_SLOT_ORDER:SLOT_ORDER;
   const SLOT_META=Object.freeze({
     'MOB-L':Object.freeze({name:'下肢 / 髋踝活动',purpose:'为下肢主模式准备可用活动范围'}),
     'MOB-U':Object.freeze({name:'上肢 / 胸椎 / 肩带活动',purpose:'为上肢推拉准备胸椎、肩带与肩关节'}),
     'PRIMER':Object.freeze({name:'主动作模式准备',purpose:'用低疲劳动作预习当节主要模式或关键稳定需求'}),
+    'PRIMER-U':Object.freeze({name:'上肢动作准备',purpose:'用低疲劳动作预习当节上肢主项的肩胛与肩袖控制'}),
     'CORE-ACT':Object.freeze({name:'核心 / 躯干激活',purpose:'建立呼吸、骨盆与躯干稳定，不做到疲劳'}),
     'INTEGRATED':Object.freeze({name:'整合动态热身',purpose:'把多个区域连接成连续、低疲劳的全身准备'}),
   });
@@ -13,6 +17,7 @@
     'MOB-L':'髋踝活动',
     'MOB-U':'胸椎肩带活动',
     'PRIMER':'模式准备',
+    'PRIMER-U':'动作准备',
     'CORE-ACT':'核心激活',
     'INTEGRATED':'全身整合',
   });
@@ -67,6 +72,14 @@
     '垂直拉':Object.freeze({'activation-scapula-upward-rotation':10,'mobility-latissimus-tool':10,'mobility-shoulder-thoracic-tool':8,'mobility-thoracic-quadruped':7,'mobility-scapula-circumduction':7,'activation-rotator-cuff':6}),
     '水平推':Object.freeze({'activation-scapula-upward-rotation':11,'mobility-shoulder-thoracic-tool':9,'activation-rotator-cuff':8,'mobility-thoracic-quadruped':7,'mobility-scapula-circumduction':7}),
     '垂直推':Object.freeze({'activation-scapula-upward-rotation':11,'mobility-shoulder-thoracic-tool':9,'activation-rotator-cuff':8,'mobility-thoracic-quadruped':7,'mobility-scapula-circumduction':7}),
+  });
+  // Upper primers must prepare the shoulder action the main lift needs: serratus for pushing,
+  // retraction and depression for pulling. Families outside the map are not eligible.
+  const UPPER_PRIMER_FAMILY_SCORES=Object.freeze({
+    '水平推':Object.freeze({'activation-serratus':10,'activation-rotator-cuff':6}),
+    '垂直推':Object.freeze({'activation-serratus':9,'activation-scapula-upward-rotation':8,'activation-rotator-cuff':7}),
+    '水平拉':Object.freeze({'activation-scapula-retraction':10,'activation-rotator-cuff':6}),
+    '垂直拉':Object.freeze({'activation-scapula-depression':10,'activation-scapula-retraction':7}),
   });
   const UPPER_ROTATION_FAMILIES=Object.freeze({
     '水平拉':Object.freeze(['activation-scapula-upward-rotation','mobility-shoulder-thoracic-tool','activation-rotator-cuff','mobility-scapula-circumduction']),
@@ -231,7 +244,7 @@
 
   function normalizeSelections(input={}){
     const out={};
-    SLOT_ORDER.forEach(slotKey=>{
+    F111_SLOT_ORDER.forEach(slotKey=>{
       const value=input?.[slotKey];
       if(!value)return;
       const actionId=typeof value==='string'?value:value.actionId;
@@ -395,6 +408,13 @@
       if(lower==='髋伸展')return '针对髋伸展：激活臀部并稳定骨盆';
       return `针对${lower||'主动作模式'}：用低疲劳动作预习关键控制`;
     }
+    if(slotKey==='PRIMER-U'){
+      if(family==='activation-serratus')return `针对${upper||'推'}：肩胛贴合胸廓与前伸控制`;
+      if(family==='activation-scapula-retraction')return `针对${upper||'拉'}：肩胛后缩与上背发力`;
+      if(family==='activation-scapula-depression')return `针对${upper||'垂直拉'}：背阔肌发力与肩胛下沉`;
+      if(family==='activation-rotator-cuff')return `针对${upper||'上肢推拉'}：肩袖激活，稳定肱骨头`;
+      return `针对${upper||'上肢主项'}：用低疲劳动作预习肩胛控制`;
+    }
     if(slotKey==='CORE-ACT'){
       if(family==='core-anti-rotation-standing')return '核心抗旋转：保持胸廓与骨盆正对';
       if(family==='core-loaded-carry')return '核心抗侧屈：练习负重行走中的躯干稳定';
@@ -447,6 +467,19 @@
     // `role` is the node's authoritative purpose, and it is what separates a hip
     // mobility drill from core work that merely mentions 臀部 in its regions.
     const role=String(candidate.role||'');
+    if(slotKey==='PRIMER-U'){
+      if(ctx.template!=='f111')return null;
+      const upper=upperPatterns[0];
+      const familyScore=(UPPER_PRIMER_FAMILY_SCORES[upper]||{})[candidate.movementFamily]||0;
+      if(!upperHits&&upperPatterns.length)return null;
+      if(candidate.f111Slot&&candidate.f111Slot!=='PRIMER-U')return null;
+      if(CORE_RE.test(role))return null;
+      if(familyScore)return 10+familyScore+upperHits;
+      // Other upper primers and shoulder-girdle drills stay available as manual replacements.
+      if(candidate.f111Slot==='PRIMER-U')return 8+upperHits;
+      if(!UPPER_REGION_RE.test((candidate.regions||[]).join(' ')))return null;
+      return 4+upperHits;
+    }
     if(candidate.f111Slot){
       if(ctx.template!=='f111'||candidate.f111Slot!==slotKey)return null;
       if((slotKey==='MOB-L'||slotKey==='PRIMER')&&lowerPatterns.length&&!lowerHits)return null;
@@ -516,6 +549,7 @@
     'MOB-L':1,
     'MOB-U':1,
     'PRIMER':0,
+    'PRIMER-U':0,
     'CORE-ACT':0,
     'INTEGRATED':0,
   });
@@ -739,6 +773,7 @@
       return recentA.action-recentB.action
       ||recentA.family-recentB.family
       ||(modeFirst?b.modeFit-a.modeFit:0)
+      ||(slotKey==='PRIMER-U'?b.slotScore-a.slotScore:0)
       ||gradeDistance(slotKey,ctx,a.prepGrade)-gradeDistance(slotKey,ctx,b.prepGrade)
       ||(rotatedOrder&&!modeFirst?b.modeFit-a.modeFit:0)
       ||(rotatedOrder?rotationRank(a,slotKey,ctx)-rotationRank(b,slotKey,ctx):b.fitBand-a.fitBand)
@@ -776,7 +811,7 @@
   }
 
   function f111Replacements(pool,slotKey,ctx,resolvedMap){
-    const otherSlots=SLOT_ORDER.filter(key=>key!==slotKey).map(key=>resolvedMap[key].candidate).filter(Boolean);
+    const otherSlots=slotOrderFor(ctx).filter(key=>key!==slotKey&&resolvedMap[key]).map(key=>resolvedMap[key].candidate).filter(Boolean);
     const occupiedIds=new Set(otherSlots.map(candidate=>candidate.actionId));
     const occupiedFamilies=new Set(otherSlots.map(candidate=>candidateFamily(candidate,ctx)));
     return pool.filter(item=>!occupiedIds.has(item.actionId)&&!occupiedFamilies.has(candidateFamily(item,ctx)))
@@ -785,8 +820,8 @@
 
   function resolve(inputContext,{selections={}}={}){
     const ctx=normalizeContext(inputContext),normalizedSelections=normalizeSelections(selections);
-    const candidatePool={},candidateMap={};
-    SLOT_ORDER.forEach(slotKey=>{
+    const candidatePool={},candidateMap={},slotOrder=slotOrderFor(ctx);
+    slotOrder.forEach(slotKey=>{
       candidatePool[slotKey]=rankSlotCandidates(slotKey,ctx,{limit:Infinity});
       candidateMap[slotKey]=ctx.level==='L4'&&slotKey==='MOB-U'
         ?diversifyUpperCandidates(candidatePool[slotKey],5)
@@ -796,7 +831,7 @@
     });
 
     const used=new Set(),usedFamilies=new Set(),resolvedMap={};
-    SLOT_ORDER.forEach(slotKey=>{
+    slotOrder.forEach(slotKey=>{
       const selected=normalizedSelections[slotKey];
       if(!selected||selected.source!=='manual')return;
       const candidate=candidatePool[slotKey].find(c=>c.actionId===selected.actionId);
@@ -809,7 +844,7 @@
       }
     });
 
-    SLOT_ORDER.forEach(slotKey=>{
+    slotOrder.forEach(slotKey=>{
       if(resolvedMap[slotKey]?.candidate)return;
       const pool=(ctx.recentPrepActionIds?.length||ctx.recentPrepFamilies?.length)?candidatePool[slotKey]:candidateMap[slotKey];
       const candidate=pickAutomaticCandidate(pool,slotKey,ctx,used,usedFamilies)
@@ -823,7 +858,7 @@
       resolvedMap[slotKey]={candidate,source:'auto',fallbackReason};
     });
 
-    const slots=SLOT_ORDER.map(slotKey=>{
+    const slots=slotOrder.map(slotKey=>{
       const entry=resolvedMap[slotKey],candidate=entry.candidate;
       const recentActionIds=new Set(ctx.recentPrepActionIds||[]),recentFamilies=new Set(ctx.recentPrepFamilies||[]);
       return {
@@ -831,6 +866,7 @@
         slotName:SLOT_META[slotKey].name,
         shortName:ctx.template==='f111'?(slotKey==='PRIMER'
           ?`${mainPatternsFor(ctx,'lower')[0]||''}${F111_SLOT_LABELS[slotKey]}`
+          :slotKey==='PRIMER-U'?`${mainPatternsFor(ctx,'upper')[0]||'上肢'}${F111_SLOT_LABELS[slotKey]}`
           :F111_SLOT_LABELS[slotKey]):'',
         purpose:SLOT_META[slotKey].purpose,
         recommendedId:candidateMap[slotKey][0]?.actionId||'',
@@ -867,7 +903,7 @@
   }
 
   window.V14PrepResolver={
-    SLOT_ORDER,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
+    SLOT_ORDER,F111_SLOT_ORDER,slotOrderFor,SLOT_META,CA_WINDOWS,TEMPLATE_TYPES,
     isPrepRouteAllowed,isActionPrepEligible,caLevelFor,movementFamilyFor,
     normalizeContext,contextFromF111,contextFromBody,contextFromConditioning,contextFromHyrox,normalizeSelections,
     candidateFromWarmup,rankSlotCandidates,resolve,

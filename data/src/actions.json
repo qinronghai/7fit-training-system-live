@@ -6573,6 +6573,102 @@
         "P1"
       ],
       "isWarmupNew": true
+    },
+    "warmup_wall_scapular_pushup": {
+      "id": "warmup_wall_scapular_pushup",
+      "name": "扶墙肩胛俯卧撑",
+      "pattern": "肩胛控制",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "墙面",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_plank_scapular_pushup": {
+      "id": "warmup_plank_scapular_pushup",
+      "name": "高位平板肩胛俯卧撑",
+      "pattern": "肩胛控制",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "自重 / 垫子",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_band_pull_apart": {
+      "id": "warmup_band_pull_apart",
+      "name": "弹力带水平拉开",
+      "pattern": "肩胛控制",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "弹力带",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P1"
+      ],
+      "isWarmupNew": true
+    },
+    "warmup_band_straight_arm_pulldown": {
+      "id": "warmup_band_straight_arm_pulldown",
+      "name": "弹力带直臂下压",
+      "pattern": "肩胛控制",
+      "tier": "",
+      "sourceTier": "",
+      "route": "2F_ONLY",
+      "routeLabel": "2F 专用",
+      "equipment": "弹力带",
+      "equipmentId": "PREP_2F",
+      "status": "可自动编排",
+      "impact": "低冲击",
+      "loadFamily": "",
+      "isSupport": false,
+      "isCore": false,
+      "v11StandardTier": "",
+      "category": "热身",
+      "zone": "2F 体能热身大厅",
+      "warmupEligible": true,
+      "prepGrades": [
+        "P2"
+      ],
+      "isWarmupNew": true
     }
   },
   "actionDetails": {

@@ -16,7 +16,7 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
     const main = page.locator('.f111-strength-grid .f111-slot-card');
     const accessories = page.locator('.f111-accessory-list .f111-slot-card');
     await expect(prep.locator('.f111-foam-card').first()).toBeHidden();
-    await expect(prep.locator('.prep-slot-card')).toHaveCount(5);
+    await expect(prep.locator('.prep-slot-card')).toHaveCount(6);
     await expect(prep.locator('.prep-slot-card').first()).toBeVisible();
     await expect(prep.locator('.prep-slot-card p').first()).toHaveCSS('font-size', '12px');
     await expect(main).toHaveCount(2);
@@ -118,7 +118,7 @@ test('F111 warm-up shows slot purposes and level-ordered replacements on mobile'
   const card = warmup.locator('[data-prep-slot-card="CORE-ACT"]');
   const purpose = card.locator('.f111-prep-purpose');
   await expect(purpose).toHaveText('核心激活');
-  await expect(warmup.locator('.f111-prep-purpose')).toHaveCount(5);
+  await expect(warmup.locator('.f111-prep-purpose')).toHaveCount(6);
   const nameBox = await card.locator('.prep-card-action').boundingBox();
   const purposeBox = await purpose.boundingBox();
   expect(purposeBox.x).toBeGreaterThanOrEqual(nameBox.x + nameBox.width);

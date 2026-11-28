@@ -106,7 +106,11 @@
     "PREP-102",
     "PREP-103",
     "PREP-104",
-    "PREP-105"
+    "PREP-105",
+    "PREP-106",
+    "PREP-107",
+    "PREP-108",
+    "PREP-109"
   ],
   "warmupDetails": {
     "PREP-01": {
@@ -4206,6 +4210,155 @@
       "sourceStatus": "F111 动态热身动作",
       "route": "2F PREP",
       "sequencePhase": "floor"
+    },
+    "PREP-106": {
+      "prepId": "PREP-106",
+      "name": "扶墙肩胛俯卧撑",
+      "alias": "扶墙肩胛俯卧撑",
+      "actionId": "warmup_wall_scapular_pushup",
+      "movementFamily": "activation-serratus",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER-U",
+      "role": "前锯肌激活 / 推类肩胛准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推"
+      ],
+      "regions": [
+        "肩胛",
+        "前锯肌"
+      ],
+      "equipment": "墙面",
+      "prescription": "1组 × 8–10次",
+      "cue": "手撑墙，手肘伸直，只让肩胛前伸后收；身体保持一条线。",
+      "why": "推之前建立肩胛贴合胸廓与前伸控制。",
+      "sourceStatus": "F111 上肢动作准备",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-107": {
+      "prepId": "PREP-107",
+      "name": "高位平板肩胛俯卧撑",
+      "alias": "高位平板肩胛俯卧撑",
+      "actionId": "warmup_plank_scapular_pushup",
+      "movementFamily": "activation-serratus",
+      "prepGrade": "P2",
+      "f111Slot": "PRIMER-U",
+      "role": "前锯肌激活 / 推类肩胛准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平推",
+        "垂直推"
+      ],
+      "regions": [
+        "肩胛",
+        "前锯肌"
+      ],
+      "equipment": "自重 / 垫子",
+      "prescription": "1–2组 × 6–10次",
+      "cue": "高位平板撑住，手肘不弯，胸口在两手间下沉再推起。",
+      "why": "在承重姿势下预习推类动作的肩胛控制。",
+      "sourceStatus": "F111 上肢动作准备",
+      "route": "2F PREP",
+      "sequencePhase": "floor"
+    },
+    "PREP-108": {
+      "prepId": "PREP-108",
+      "name": "弹力带水平拉开",
+      "alias": "弹力带水平拉开",
+      "actionId": "warmup_band_pull_apart",
+      "movementFamily": "activation-scapula-retraction",
+      "prepGrade": "P1",
+      "f111Slot": "PRIMER-U",
+      "role": "肩胛后缩激活 / 拉类准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "水平拉",
+        "垂直拉",
+        "水平推"
+      ],
+      "regions": [
+        "肩胛",
+        "上背"
+      ],
+      "equipment": "弹力带",
+      "prescription": "1–2组 × 10–15次",
+      "cue": "手臂平举，向两侧拉开到胸口前，肩膀下沉不耸肩。",
+      "why": "拉之前唤醒菱形肌和三角肌后束，也平衡推类训练。",
+      "sourceStatus": "F111 上肢动作准备",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
+    },
+    "PREP-109": {
+      "prepId": "PREP-109",
+      "name": "弹力带直臂下压",
+      "alias": "弹力带直臂下压",
+      "actionId": "warmup_band_straight_arm_pulldown",
+      "movementFamily": "activation-scapula-depression",
+      "prepGrade": "P2",
+      "f111Slot": "PRIMER-U",
+      "role": "背阔肌与肩胛下沉激活 / 垂直拉准备",
+      "sessionLevels": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "mainTiers": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "targetPatterns": [
+        "垂直拉",
+        "水平拉"
+      ],
+      "regions": [
+        "背阔",
+        "肩胛"
+      ],
+      "equipment": "弹力带",
+      "prescription": "1–2组 × 10–12次",
+      "cue": "手臂伸直从头前方压到大腿两侧，肋骨收住，肩膀远离耳朵。",
+      "why": "下拉前建立背阔肌发力和肩胛下沉。",
+      "sourceStatus": "F111 上肢动作准备",
+      "route": "2F PREP",
+      "sequencePhase": "standing"
     }
   },
   "warmupGradeMeta": {
@@ -4427,7 +4580,10 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-106",
+      "PREP-107",
+      "PREP-108"
     ],
     "垂直推": [
       "PREP-01",
@@ -4461,7 +4617,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-106",
+      "PREP-107"
     ],
     "水平拉": [
       "PREP-01",
@@ -4496,7 +4654,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-108",
+      "PREP-109"
     ],
     "垂直拉": [
       "PREP-01",
@@ -4530,7 +4690,9 @@
       "PREP-47",
       "PREP-48",
       "PREP-49",
-      "PREP-50"
+      "PREP-50",
+      "PREP-108",
+      "PREP-109"
     ]
   }
 }

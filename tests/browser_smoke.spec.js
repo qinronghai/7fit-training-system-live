@@ -231,7 +231,7 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto('/#/coach/f111-06/l3');
-  await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+  await expect(page.locator('.prep-slot-card')).toHaveCount(6);
   const preset = await firstReplaceablePrep(page);
   expect(preset, 'expected a replaceable preset PREP slot').toBeTruthy();
   await page.locator(`.prep-slot-select[data-prep-slot="${preset.slotKey}"]`).selectOption(preset.target);
@@ -257,7 +257,7 @@ test('390px F111 PREP replacement persists through rerender and reload for prese
   )).toBeNull();
 
   await page.goto('/#/coach/compose?lower=single_leg_hinge&upper=horizontal_push&level=L3');
-  await expect(page.locator('.prep-slot-card')).toHaveCount(5);
+  await expect(page.locator('.prep-slot-card')).toHaveCount(6);
   const composer = await firstReplaceablePrep(page);
   expect(composer, 'expected a replaceable Composer PREP slot').toBeTruthy();
   await page.locator(`.prep-slot-select[data-prep-slot="${composer.slotKey}"]`).selectOption(composer.target);
