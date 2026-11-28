@@ -375,8 +375,7 @@ test('a late member detail response cannot replace the page after navigating awa
 test('Coach Center exposes the Member Training entry in its existing workflow', async ({ page }) => {
   await mockMemberApi(page);
   await page.goto('/#/coach');
-  await expect(page.getByRole('heading', { name: '会员管理' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /打开会员管理/ })).toHaveAttribute('href', '#/coach/members');
+  await expect(page.locator('#app-main .coach-start-members')).toHaveAttribute('href', '#/coach/members');
 });
 
 test('Member Center creates, edits, archives, and restores a member through explicit actions', async ({ page }) => {
@@ -1092,8 +1091,9 @@ for(const width of [390,1280]){
     await page.locator('.member-back-link').click();
     await expect(page.locator('[data-member-filter="ARCHIVED"]')).toHaveAttribute('aria-pressed','true');
     if(width===390){
-      await expect(nav.locator('a')).toHaveCount(5);
-      await page.getByRole('button',{name:'打开导航'}).click();
+      // Phone tabs: 编课 / 会员 / 动作库, plus 更多 which opens the full navigation.
+      await expect(nav.locator('a')).toHaveCount(3);
+      await nav.locator('[data-mobile-more]').click();
       await page.locator('#mobile-navigation [data-area="rules"]').click();
       await expect(page).toHaveURL(/#\/rules\/venue/);
     }

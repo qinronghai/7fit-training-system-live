@@ -127,7 +127,7 @@
   // dominate the end of a long course page.
   function renderCompact(result){
     if(!result||result.status!=='complete')return `<div class="recovery-empty" data-recovery-empty><b>暂时无法自动生成完整拉伸方案</b><span>${esc(result?.message||'当前动作库不足以生成 3 个不同部位的拉伸建议。')}</span><strong>请由教练人工安排恢复动作。</strong></div>`;
-    return `<div class="recovery-list" role="list">${result.items.map(item=>`<a class="recovery-row" role="listitem" data-recovery-card="${esc(item.region)}" data-recovery-action="${esc(item.id)}" href="#/library?focus=${encodeURIComponent(item.id)}"><span class="recovery-row-region">${esc(item.regionLabel)}</span><span class="recovery-row-main"><b>${esc(item.name)}</b><small>${esc(item.reason)}</small></span><span class="recovery-prescription">${esc(item.prescription)}</span></a>`).join('')}</div>`;
+    return `<div class="recovery-list" role="list">${result.items.map(item=>`<a class="recovery-row" role="listitem" data-recovery-card="${esc(item.region)}" data-recovery-action="${esc(item.id)}" href="#/library?focus=${encodeURIComponent(item.id)}"><span class="recovery-row-region">${esc(item.regionLabel)}</span><span class="recovery-row-main"><b>${esc(item.name)}</b></span><span class="recovery-prescription">${esc(item.prescription)}</span></a>`).join('')}</div>`;
   }
 
   function copyItems(result){return result?.status==='complete'?result.items.map(item=>`${item.name} · ${item.prescription}`):[];}

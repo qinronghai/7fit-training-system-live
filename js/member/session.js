@@ -116,6 +116,16 @@
     return `<label for="${esc(id)}"><span${key==='reps'?' data-session-dose-label':''}>${label}</span><input id="${esc(id)}" type="${type}" data-session-actual="${key}"${type==='number'?' min="'+min+'" max="'+max+'" step="'+step+'"':''}${inputmode?` inputmode="${inputmode}"`:''}${type==='text'?' maxlength="80"':''}></label>`;
   }
 
+  // Bead bucket for the Violet Bangle rows; the same hues as the composer.
+  function bucketFor(item){
+    if(item.phase==='PREP')return 'prep';
+    const key=String(item.slotKey||'').split('__').pop();
+    if(['A','D1','2'].includes(key))return 'lower';
+    if(['B','D2','3'].includes(key))return 'upper';
+    if(['C','SUPPORT'].includes(key))return 'support';
+    if(key==='CORE')return 'core';
+    return '';
+  }
   function executionItemMarkup(item,index){
     const prep=item.phase==='PREP',candidates=prep?prepReplacementCandidates(item):replacementCandidates(item);
     const options=candidates.map(action=>`<option value="${esc(prep?action.actionId:action.id)}">${esc(action.name)}${action.equipment?` · ${esc(action.equipment)}`:''}</option>`).join('');
@@ -125,7 +135,7 @@
     const plannedPrescription=item.plannedPrescriptionSnapshot?.rawText;
     const unit=doseUnit(plannedPrescription);
     const plannedPrescriptionMarkup=plannedPrescription?`<p class="member-session-planned-prescription" data-session-planned-prescription>计划处方：${esc(plannedPrescription)}</p>`:'';
-    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}"><div class="member-session-execution-heading"><div><span>${esc(itemPhaseLabel(item,index))}</span><strong>计划：${esc(plannedName(item))}</strong></div></div>${plannedPrescriptionMarkup}${replacement}<details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps',unitLabel(unit))}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
+    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}" data-vb-bucket="${bucketFor(item)}"><div class="member-session-execution-heading"><div><span>${esc(itemPhaseLabel(item,index))}</span><strong>计划：${esc(plannedName(item))}</strong></div></div>${plannedPrescriptionMarkup}${replacement}<details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps',unitLabel(unit))}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
   }
 
   function actualItemMarkup(item,compact=false){
