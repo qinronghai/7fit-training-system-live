@@ -264,7 +264,8 @@ test('Member Center searches active members on the server and switches to the ar
 test('the mobile member directory packs cards by height while keeping keyboard order', async ({ page }, testInfo) => {
   const names = ['林', '陈', '周', '许', '张', '王', '郑', '李', '吴', '何', '黄', '赵', '丁', '谢', '郭', '马', '罗', '孙', '刘', '高']
     .map(name => `${name}同学`).sort((left, right) => left.localeCompare(right));
-  const goals = ['提升下肢力量', '建立每周训练习惯，提升基础力量', '提升全身力量', '改善核心稳定',
+  // The second goal is long enough to wrap in any font, so the packing check does not depend on font metrics.
+  const goals = ['提升下肢力量', '建立每周训练习惯，提升基础力量，改善核心稳定和单腿控制，为下一阶段负重训练打好基础', '提升全身力量', '改善核心稳定',
     '掌握深蹲和髋铰链，打好力量基础', '提升上肢力量', '改善单腿稳定', '提高基础体能'];
   const members = names.map((name, index) => ({
     ...member(`e5000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, name),
