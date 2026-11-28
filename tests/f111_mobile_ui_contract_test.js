@@ -29,7 +29,7 @@ const html=M.ComposerView.render({query:{level:'L2',lower:'squat',upper:'horizon
 
 assert(html.includes('f111-compose-hero'),'F111 compose hero must use the frozen UI namespace');
 assert(html.includes('F111｜女性综合训练'),'hero must present the user-facing F111 course title');
-assert(html.includes('f111-compose-stepper'),'frozen step line must be present');
+assert(!html.includes('f111-compose-stepper'),'the static step line must not occupy the first screen');
 assert(html.includes('f111-mode-drawer-trigger'),'lower/upper modes must use drawer triggers');
 assert(!html.includes('composer-mobile-selectors'),'native stacked mode selectors must be removed from the page');
 assert(html.includes('f111-prep-grid'),'PREP must expose the frozen two-column grid hook');
@@ -38,8 +38,7 @@ assert(html.includes('data-f111-action-drawer="C"'),'support action selection mu
 assert(html.includes('data-f111-action-drawer="CORE"'),'core action selection must be a compact drawer entry');
 assert(fs.readFileSync(`${root}/js/coach/composer-view.js`,'utf8').includes('f111-anatomy-details'),'anatomy summary must be collapsed at the end of the strength section');
 assert(fs.readFileSync(`${root}/js/coach/prep.js`,'utf8').includes('prep-card-action'),'PREP action detail must be attached to the action card instead of a separate link');
-assert(html.includes('复制给教练'),'coach copy action must remain user-facing');
-assert(html.includes('复制给会员'),'member copy action must remain user-facing');
+assert(html.includes('复制课程'),'course copy must be available in the action bar');
 assert(M.ComposerView.composeHref({level:'L2',lowerMode:'squat',upperMode:'horizontal_pull',coreDemand:'anti_extension'}).startsWith('#/coach/f111?'),
   'F111 stage and mode choices must keep the home composer route canonical');
 assert(html.includes('data-f111-option-drawer'),'post-cardio choices must expose drawer triggers on the composer');

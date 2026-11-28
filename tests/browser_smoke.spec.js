@@ -141,7 +141,7 @@ test('free composer route loads in Chromium with no pageerror', async ({ page })
   const errors = capturePageErrors(page);
   await page.goto('/#/coach/compose');
   await expect(page.getByRole('heading', { name: 'F111｜女性综合训练' })).toBeVisible();
-  await expect(page.locator('.f111-mode-section')).toBeVisible();
+  await expect(page.locator('.f111-mode-grid')).toBeVisible();
   await expect(page.getByText('自由组合编课', { exact: true })).toHaveCount(0);
   await expectNoPageErrors(errors);
 });
@@ -153,7 +153,9 @@ test('L3 single-leg hinge x horizontal push renders six slots and supports one s
   await expect(page).toHaveURL(/lower=single_leg_hinge/);
   await expect(page).toHaveURL(/upper=horizontal_push/);
   await expect(page).toHaveURL(/level=L3/);
-  await expect(page.getByText('L3｜单腿拉 + 水平推', { exact: false })).toBeVisible();
+  await expect(page.locator('.f111-level-switch [aria-current="true"]')).toHaveText('L3');
+  await expect(page.locator('[data-f111-mode-drawer="lower"]')).toContainText('单腿拉');
+  await expect(page.locator('[data-f111-mode-drawer="upper"]')).toContainText('水平推');
   await expect(page.locator('.composer-slot-card')).toHaveCount(6);
 
   const swaps = page.locator('.composer-slot-select');

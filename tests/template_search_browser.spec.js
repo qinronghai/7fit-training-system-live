@@ -68,7 +68,7 @@ test('template-aware search finds actions and legal multi-template coach entries
   await f111Link.click();
   await expect(page).toHaveURL(/#\/coach\/f111\?/);
   await expect(page.getByRole('heading',{name:'F111｜女性综合训练'})).toBeVisible();
-  await expect(page.locator('.f111-mode-section')).toBeVisible();
+  await expect(page.locator('.f111-mode-grid')).toBeVisible();
 
   await expect390(page);
   expect(errors,errors.join(' | ')).toEqual([]);

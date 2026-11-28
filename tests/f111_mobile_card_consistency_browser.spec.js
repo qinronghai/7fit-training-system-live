@@ -9,77 +9,68 @@ async function openComposer(page, width) {
   await expect(page.locator('.f111-strength-section')).toBeVisible();
 }
 
-test('F111 prep and strength cards align replacement controls, typography, and surfaces at 390px and 428px', async ({ page }, testInfo) => {
-  for (const width of [390, 428]) {
+test('F111 shows two main cards, four accessory rows, and a reachable action bar', async ({ page }, testInfo) => {
+  for (const width of [320, 390, 428, 1440]) {
     await openComposer(page, width);
-
-    const result = await page.evaluate(() => {
-      const examples = [
-        { name: 'foam', card: document.querySelector('.f111-foam-card'), title: document.querySelector('.f111-foam-main b'), button: document.querySelector('.f111-foam-card .f111-replace-trigger') },
-        { name: 'warmup', card: document.querySelector('.prep-slot-card'), title: document.querySelector('.prep-slot-card .prep-card-action b'), button: document.querySelector('.prep-slot-card .f111-replace-trigger') },
-        { name: 'strength', card: document.querySelector('.f111-slot-card[data-composer-slot="A"]'), title: document.querySelector('.f111-slot-card[data-composer-slot="A"] .f111-slot-main h3'), button: document.querySelector('.f111-slot-card[data-composer-slot="A"] .f111-replace-trigger') },
-      ];
-      const rect = element => {
-        const box = element.getBoundingClientRect();
-        return { x: box.x, y: box.y, width: box.width, height: box.height };
-      };
+    const prep = page.locator('.f111-prep-section');
+    const main = page.locator('.f111-strength-grid .f111-slot-card');
+    const accessories = page.locator('.f111-accessory-list .f111-slot-card');
+    await expect(prep.locator('.f111-foam-card').first()).toBeHidden();
+    await expect(prep.locator('.prep-slot-card')).toHaveCount(5);
+    await expect(prep.locator('.prep-slot-card').first()).toBeVisible();
+    await expect(prep.locator('.prep-slot-card p').first()).toHaveCSS('font-size', '12px');
+    await expect(main).toHaveCount(2);
+    await expect(accessories).toHaveCount(4);
+    await expect(main.first().locator('h3 a')).toHaveAttribute('href', /#\/library\?focus=/);
+    const geometry = await page.evaluate(() => {
+      const nav = document.querySelector('#mobile-nav').getBoundingClientRect();
+      const footer = document.querySelector('.f111-course-output-section').getBoundingClientRect();
       return {
-        clientWidth: document.documentElement.clientWidth,
-        scrollWidth: document.documentElement.scrollWidth,
-        columns: [
-          getComputedStyle(document.querySelector('.f111-prep-section .foam-grid')).gridTemplateColumns.split(' ').length,
-          getComputedStyle(document.querySelector('.f111-prep-section .prep-slot-grid')).gridTemplateColumns.split(' ').length,
-          getComputedStyle(document.querySelector('.f111-strength-grid')).gridTemplateColumns.split(' ').length,
-        ],
-        cards: examples.map(({ name, card, title, button }) => {
-          const buttonRect = rect(button);
-          const labelRect = rect(button.querySelector('span'));
-          const caretRect = rect(button.querySelector('i'));
-          return {
-            name,
-            background: getComputedStyle(card).backgroundColor,
-            titleSize: getComputedStyle(title).fontSize,
-            button: {
-              width: buttonRect.width,
-              height: buttonRect.height,
-              visualHeight: parseFloat(getComputedStyle(button, '::before').height),
-              fontSize: getComputedStyle(button).fontSize,
-              color: getComputedStyle(button.querySelector('span')).color,
-              background: getComputedStyle(button.querySelector('span')).backgroundColor,
-              padding: getComputedStyle(button.querySelector('span')).padding,
-              centered: Math.abs((labelRect.x + caretRect.x + caretRect.width) / 2 - (buttonRect.x + buttonRect.width / 2)) < 1,
-              touchExpansion: getComputedStyle(button, '::after').inset,
-            },
-            warmupButtonInHeader: name !== 'warmup' || !!button.closest('.prep-card-meta'),
-          };
-        }),
+        viewport: document.documentElement.clientWidth,
+        page: document.documentElement.scrollWidth,
+        footerBottom: footer.bottom,
+        navTop: nav.top,
+        targets: [...document.querySelectorAll('.f111-strength-section button')].map(button => button.getBoundingClientRect().height),
       };
     });
+    expect(geometry.page).toBe(geometry.viewport);
+    expect(geometry.targets).toHaveLength(6);
+    expect(geometry.targets.every(height => height >= 44)).toBe(true);
+    if (width < 980) expect(geometry.footerBottom).toBeCloseTo(geometry.navTop, 0);
+    await page.screenshot({ path: testInfo.outputPath(`f111-${width}.png`) });
+  }
+});
 
-    expect(result.clientWidth, `viewport ${width}px`).toBe(width);
-    expect(result.scrollWidth, `horizontal overflow at ${width}px`).toBe(result.clientWidth);
-    expect(result.columns, `paired F111 grids at ${width}px`).toEqual([2, 2, 2]);
-    expect(result.cards.map(card => card.background), `role-based F111 card surfaces at ${width}px`).toEqual([
-      'rgb(255, 255, 255)', 'rgb(255, 255, 255)', 'rgb(239, 232, 255)',
-    ]);
-    expect(result.cards.map(card => card.titleSize), `action title scale at ${width}px`).toEqual(['14px', '14px', '16px']);
-    expect(result.cards.map(card => card.button), `replacement control geometry at ${width}px`).toEqual([
-      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
-      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
-      { width: 44, height: 44, visualHeight: 28, fontSize: '10px', color: 'rgb(31, 27, 45)', background: 'rgba(0, 0, 0, 0)', padding: '0px', centered: true, touchExpansion: 'auto' },
-    ]);
-    expect(result.cards.map(card => card.warmupButtonInHeader)).toEqual([true, true, true]);
-
-    await page.locator('.f111-prep-section').scrollIntoViewIfNeeded();
-    await page.screenshot({ path: testInfo.outputPath(`f111-mobile-${width}-prep.png`) });
-    await page.locator('.f111-strength-section').scrollIntoViewIfNeeded();
-    await page.screenshot({ path: testInfo.outputPath(`f111-mobile-${width}-strength.png`) });
+test('F111 mobile text wraps and the saved courses disclosure stays above the action bar', async ({ page }) => {
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`/?viewport=${width}#/coach/f111?level=L4&lower=single_leg_squat&upper=horizontal_push&core=anti_extension`);
+    const lower = page.locator('[data-f111-mode-drawer="lower"] b');
+    await expect(lower).toHaveText('单腿蹲 单侧膝主导');
+    expect(await lower.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+    const names = await page.locator('.f111-strength-grid h3').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().top));
+    expect(names[0]).toBeCloseTo(names[1], 0);
+    const warmup = page.locator('[data-f111-disclosure="warmup"] .prep-slot-card');
+    const edges = await warmup.evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().left));
+    expect(new Set(edges).size).toBe(1);
+    const save = page.getByRole('button', { name: '保存到会员', exact: true });
+    expect(await save.evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      return range.getBoundingClientRect().height <= parseFloat(getComputedStyle(node).lineHeight);
+    })).toBe(true);
+    const saved = page.locator('.f111-inline-saved-list > summary');
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await saved.click({ timeout: 3000 });
+    await expect(page.locator('.f111-inline-saved-list')).toHaveAttribute('open', '');
   }
 });
 
 test('replacement and C/CORE action drawers still open, select, and close', async ({ page }) => {
   await openComposer(page, 390);
   const actionDrawer = page.locator('#f111-action-drawer');
+  const foam = page.locator('[data-f111-disclosure="foam"]');
+  await foam.locator('summary').click();
 
   const foamCard = page.locator('.f111-foam-card').first();
   const foamButton = foamCard.locator('[data-replacement-drawer]');
@@ -90,6 +81,8 @@ test('replacement and C/CORE action drawers still open, select, and close', asyn
   await expect(foamChoice).toBeVisible();
   await foamChoice.click();
   await expect(actionDrawer).toBeHidden();
+  await expect(foamButton).toBeFocused();
+  await expect(foam).toHaveAttribute('open', '');
 
   const warmupCard = page.locator('.prep-slot-card').first();
   await warmupCard.locator('[data-replacement-drawer]').click();
@@ -116,4 +109,36 @@ test('replacement and C/CORE action drawers still open, select, and close', asyn
   ]);
   await page.keyboard.press('Escape');
   await expect(actionDrawer).toBeHidden();
+});
+
+test('F111 warm-up shows slot purposes and level-ordered replacements on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto(composeUrl.replace('level=L2', 'level=L4'));
+  const warmup = page.locator('[data-f111-disclosure="warmup"]');
+  const card = warmup.locator('[data-prep-slot-card="CORE-ACT"]');
+  const purpose = card.locator('.f111-prep-purpose');
+  await expect(purpose).toHaveText('核心激活');
+  await expect(warmup.locator('.f111-prep-purpose')).toHaveCount(5);
+  const nameBox = await card.locator('.prep-card-action').boundingBox();
+  const purposeBox = await purpose.boundingBox();
+  expect(purposeBox.x).toBeGreaterThanOrEqual(nameBox.x + nameBox.width);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+
+  await card.getByRole('button', { name: /替换/ }).click();
+  const drawer = page.getByRole('dialog', { name: '核心 / 躯干激活｜替换动作' });
+  const choices = drawer.locator('.f111-drawer-action:not(.is-current):enabled');
+  await expect(choices.nth(7)).toBeVisible();
+  const grades = (await drawer.locator('.f111-drawer-action small').allTextContents())
+    .map(label => Number(label.match(/P([1-4])/)?.[1]));
+  expect(grades[0]).toBe(4);
+  expect(grades.at(-1)).toBe(1);
+  expect(grades).toEqual(grades.slice().sort((a, b) => b - a));
+
+  const replacement = choices.first();
+  const action = await replacement.locator('b').textContent();
+  await replacement.click();
+  await expect(drawer).toBeHidden();
+  await expect(card.locator('.prep-card-action')).toHaveText(action);
+  await page.reload();
+  await expect(card.locator('.prep-card-action')).toHaveText(action);
 });

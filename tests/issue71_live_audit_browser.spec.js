@@ -93,8 +93,9 @@ test('Issue 71: library filters are responsive at mobile and desktop audit width
   for(const width of [390,1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/library');
+    await page.locator('.library-advanced-filters').evaluate(node=>{node.open=true;});
     await expect(page.locator('.template-search-controls')).toBeVisible();
-    await expect(page.locator('[data-filter]')).toHaveCount(8);
+    await expect(page.locator('[data-filter]')).toHaveCount(9);
     const boxes=await page.locator('.template-search-controls > *').evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().width));
     expect(boxes.every(value=>value>0&&value<=width)).toBeTruthy();
     await expectNoOverflow(page,width);

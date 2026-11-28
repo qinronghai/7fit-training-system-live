@@ -40,7 +40,7 @@
     };
   }
 
-  function f111OptionData(option,index){
+  function f111OptionData(option,index,isWarmup){
     const row=optionData(option);
     let name=row.label,grade=row.grade;
     if(!grade){
@@ -49,7 +49,7 @@
     }
     if(grade&&name.startsWith(`${grade}｜`))name=name.slice(grade.length+1);
     if(row.family&&name.endsWith(`｜${row.family}`))name=name.slice(0,-row.family.length-1);
-    const state=row.selected?'当前动作':index===0?'优先候选':'合法候选';
+    const state=row.selected?'当前动作':isWarmup?'':index===0?'优先候选':'合法候选';
     const pattern=[state,grade,row.family,row.role].filter(Boolean).join(' · ');
     const detail=[
       row.score?`推荐 ${row.score} 分`:'',
@@ -64,7 +64,8 @@
     const selector=button.dataset.replacementSelect||'select';
     const select=card?.querySelector(selector);
     if(!select)return;
-    const f111Rows=[...select.options].map(f111OptionData);
+    const isWarmup=select.matches('.prep-slot-select');
+    const f111Rows=[...select.options].map((option,index)=>f111OptionData(option,index,isWarmup));
     const isF111Replacement=button.hasAttribute('data-f111-replacement-drawer')||select.matches('.composer-slot-select,.prep-slot-select,.f111-foam-select');
     if(isF111Replacement&&M.F111ActionDrawer?.openReplacement){
       M.F111ActionDrawer.openReplacement(button,select,f111Rows);

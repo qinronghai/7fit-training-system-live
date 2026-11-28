@@ -44,25 +44,29 @@
     if(slotKey==='CORE'){const w=resolved.windows.core;return `推荐 ${(w.recommended||[]).join(' / ')}｜常规 ${(w.normal||[]).join('–')}`;}
     return '系统按主项互补、动作暴露和场馆路由推荐';
   }
-  function composerCard(ctx,slot,controls=''){
+  function composerCard(ctx,slot){
     const data=D(),opts=ctx.resolved.slotOptions[slot.slotKey]||[],a=data.actions[slot.actionId]||{},special=slot.slotKey==='C'||slot.slotKey==='CORE';
     const grouped=special?M.F111ComposeUI?.actionGroups?.(ctx,slot.slotKey):null;
     const selectOptions=grouped?.length?grouped.flatMap(group=>group.items):opts;
     const optionHtml=selectOptions.map(o=>{const grade=o.tier||o.grade||'';return `<option value="${esc(o.id)}" ${o.id===slot.actionId?'selected':''} ${o.disabled?'disabled':''} data-grade="${esc(grade)}">${esc([grade,o.name].filter(Boolean).join('｜'))}</option>`;}).join('');
-    const grade=slot.tier||slot.grade||'';
     const detailRoute=a.isSupport?`#/system/support?focus=${encodeURIComponent(slot.actionId)}`:a.isCore?`#/system/core?focus=${encodeURIComponent(slot.actionId)}`:`#/library?focus=${encodeURIComponent(slot.actionId)}`;
     const tierNote=slot.tierNote?`<small class="composer-tier-note">${esc(slot.tierNote)}</small>`:'';
     const rawPrescription=slot.prescriptionOverride||window.V14ModuleCopy?.prescriptionForAction?.(slot.actionId,{level:ctx.level})||'';
     const prescription=window.V14ModuleCopy?.memberPrescription?.(rawPrescription)||rawPrescription;
     const rx=prescription?`<small class="composer-rx-note">${esc(prescription)}</small>`:'';
-    const supportAlternatives=slot.slotKey==='C'?(slot.alternatives||[]).map(id=>data.actions?.[id]?.name||id).slice(0,3).join('、'):'';
-    const supportInfo=slot.slotKey==='C'?`<div class="composer-support-info"><small>推荐依据：${esc(slot.supportReason||'保持支撑任务多样性')}</small><small>会员感受：${esc(slot.memberFeeling||'保持呼吸，动作不变形')}</small><small>疲劳：${esc(slot.fatigueCost==='low'?'低':slot.fatigueCost==='high'?'高':'中')} · ${esc(slot.recommendedDose||'按动作质量调整')}</small>${slot.recentNote?`<small>多样性：${esc(slot.recentNote)}</small>`:''}${supportAlternatives?`<small>同目的替代：${esc(supportAlternatives)}</small>`:''}${slot.needsConfirmation?`<small class="composer-support-warning">需确认：${esc((slot.tradeoffs||[]).join('；'))}</small>`:''}</div>`:'';
-    const coreAlternatives=slot.slotKey==='CORE'?(slot.coreAlternatives||[]).map(id=>data.actions?.[id]?.name||id).slice(0,3).join('、'):'';
-    const coreInfo=slot.slotKey==='CORE'?`<div class="composer-core-info"><small>推荐依据：${esc(slot.coreReason||'按当前等级与核心任务匹配')}</small><small>核心分支：${esc(slot.coreBranch||slot.branch||'核心控制')}</small><small>会员感受：${esc(slot.coreMemberFeeling||slot.memberFeeling||'保持呼吸，动作不变形')}</small><small>疲劳：${esc(slot.coreFatigueCost==='low'?'低':slot.coreFatigueCost==='high'?'高':'中')} · ${esc(slot.coreRecommendedDose||slot.recommendedDose||'按动作质量调整')}</small>${slot.historyNote?`<small>多样性：${esc(slot.historyNote)}</small>`:''}${coreAlternatives?`<small>同任务替代：${esc(coreAlternatives)}</small>`:''}${slot.coreNeedsConfirmation?`<small class="composer-core-warning">需确认：${esc((slot.coreTradeoffs||[]).join('；'))}</small>`:''}</div>`:'';
+    const warning=slot.slotKey==='C'&&slot.needsConfirmation
+      ? (slot.tradeoffs||[]).join('；')
+      : slot.slotKey==='CORE'&&slot.coreNeedsConfirmation ? (slot.coreTradeoffs||[]).join('；') : '';
     const replace=special
       ?(M.F111ComposeUI?.actionTrigger?.(ctx,slot.slotKey)||'')
-      :`<button type="button" class="f111-replace-trigger" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="动作候选" data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span><i aria-hidden="true">⌄</i></button>`;
-    return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}" data-action-detail-href="${esc(detailRoute)}" tabindex="0" aria-label="查看${esc(slot.name||'动作')}详情"><div class="composer-slot-head"><div><span>${esc(slot.slotName||slot.slotKey)}</span><b>${esc(grade||'辅助')}</b></div>${replace}</div>${controls}<div class="f111-slot-main"><h3>${esc(slot.name||'暂无候选')}</h3></div>${supportInfo}${coreInfo}${rx}${tierNote}<select class="composer-slot-select f111-visually-hidden" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select></article>`;
+      :`<button type="button" class="f111-replace-trigger" data-f111-focus="slot-${esc(slot.slotKey)}" data-replacement-drawer data-f111-replacement-drawer="1" data-f111-replacement-group="动作候选" data-replacement-select=".composer-slot-select" data-replacement-title="${esc(slot.slotName||slot.slotKey)}｜替换动作" aria-haspopup="dialog" aria-label="替换${esc(slot.name||'动作')}"><span>替换</span></button>`;
+    const label=slot.slotKey==='C'?'支撑':slot.slotKey==='CORE'?'核心':(slot.slotName||slot.slotKey).replace(/^D[12]｜/,'').replace(/^[AB]｜/,match=>match[0]+' · ');
+    return `<article class="composer-slot-card f111-slot-card" data-composer-slot="${esc(slot.slotKey)}">
+      <span class="f111-slot-label">${esc(label)}</span>
+      <div class="f111-slot-main"><h3><a href="${esc(detailRoute)}">${esc(slot.name||'暂无候选')}</a></h3>${rx}</div>
+      ${replace}${tierNote}${warning?`<small class="f111-slot-warning">需确认：${esc(warning)}</small>`:''}
+      <select class="composer-slot-select f111-visually-hidden" tabindex="-1" aria-hidden="true" aria-label="${esc(slot.slotName||slot.slotKey)}：替换动作" data-composer-key="${esc(ctx.stateKey)}" data-slot-key="${esc(slot.slotKey)}">${optionHtml}</select>
+    </article>`;
   }
   M.Slot={sessionCard,composerCard,windowText};
 })();

@@ -21,9 +21,10 @@ async function expectNoOverflow(page,width){
 async function expectRecovery(page,{compact=false}={}){
   const section=page.locator('[data-f111-recovery]');
   await expect(section).toHaveCount(1);
-  await expect(section.getByRole('heading',{name:compact?'训练后拉伸｜约 5–8 分钟':'完成拉伸｜约 5–8 分钟'})).toBeVisible();
-  await expect(section).toContainText('训练结束后完成 3 个主要部位拉伸。');
   if(compact){
+    await expect(section.locator('summary')).toContainText('训练后拉伸');
+    await expect(section.locator('summary')).toContainText('约 5–8 分钟');
+    await expect(section).toHaveAttribute('open', '');
     const rows=section.locator('.recovery-row[data-recovery-card]');
     await expect(rows).toHaveCount(3);
     await expect(section.locator('.recovery-detail-link')).toHaveCount(0);
@@ -35,6 +36,8 @@ async function expectRecovery(page,{compact=false}={}){
       await expect(rows.nth(i).locator('.recovery-prescription')).toContainText('45 秒');
     }
   }else{
+    await expect(section.getByRole('heading',{name:'完成拉伸｜约 5–8 分钟'})).toBeVisible();
+    await expect(section).toContainText('训练结束后完成 3 个主要部位拉伸。');
     const cards=section.locator('[data-recovery-card]');
     await expect(cards).toHaveCount(3);
     for(let i=0;i<3;i++)await expect(cards.nth(i)).toContainText('45 秒');

@@ -23,6 +23,7 @@ test('Issue 13: Maintenance exposes honest review metadata and responsive filter
   for(const width of [390,1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/maintenance');
+    await page.locator('.maintenance-deep-dive').evaluate(node=>{node.open=true;});
     await expect(page.locator('[data-content-review-panel]')).toBeVisible();
     await expect(page.getByRole('heading',{name:'Content Review 元数据'})).toBeVisible();
     await page.locator('[data-content-review-filter="domain"]').selectOption('');

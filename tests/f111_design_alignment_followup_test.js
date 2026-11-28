@@ -19,17 +19,17 @@ assert(foamSource.includes('f111-foam-selections'),'foam replacement choices mus
 assert(!prepSource.includes('<a class="prep-card-action"'),'PREP action cards must not keep a separate detail-link arrow');
 assert(!prepSource.includes('<i aria-hidden="true">↗</i>'),'PREP action cards must remove the visible detail arrow');
 const slotSource=fs.readFileSync(`${root}/js/coach/slot.js`,'utf8');
-assert(slotSource.includes('data-action-detail-href'),'strength action cards must expose whole-card detail navigation');
+assert(slotSource.includes('<h3><a href='),'strength action names must link to action details');
 assert(!slotSource.includes('f111-slot-arrow'),'strength action cards must remove the visible detail arrow');
 const viewsSource=fs.readFileSync(`${root}/js/views-coach.js`,'utf8');
 assert(viewsSource.includes('data-prep-detail-href')&&viewsSource.includes('data-action-detail-href'),'coach binding must support whole-card detail navigation');
 
 const css=fs.readFileSync(`${root}/assets/app.css`,'utf8');
-assert(css.includes('.f111-replace-trigger')&&css.includes('color:#1f1b2d'),'replacement controls must use the unified dark text treatment');
-assert(css.includes('.f111-prep-section .foam-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:'),'foam cards must remain a real two-column grid at the mobile breakpoint');
+assert(css.includes('.f111-replace-trigger')&&css.includes('.f111-replace-trigger,.f111-action-drawer-trigger{color:var(--theme-ink, #1f1b2d)}'),'replacement controls must use the theme text color');
+assert(css.includes('.f111-workspace .f111-prep-section :is(.foam-grid,.prep-slot-grid)'),'composer PREP must use the shared row layout');
 
 const view=fs.readFileSync(`${root}/js/coach/composer-view.js`,'utf8');
-assert(view.includes('f111-recovery-section')&&view.includes('PostCardio.render'),'recovery and post-cardio must remain rendered');
+assert(view.includes('f111-recovery-section')&&view.includes('PostCardio?.render'),'recovery and post-cardio must remain rendered');
 assert(view.includes('renderCompact'),'F111 composer must use the compact recovery presentation');
 assert(!view.includes('f111-core-demand-wrap'),'composer page must not render the extra core-demand selector block');
 assert(view.includes('coreDemand'),'core demand must remain available to the resolver even when its extra UI block is removed');

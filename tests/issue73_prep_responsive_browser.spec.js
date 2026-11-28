@@ -33,6 +33,11 @@ test('Issue 73: PREP cards and replacement controls remain usable at mobile and 
     const replacement=card.locator('[data-replacement-drawer]');
     await expect(card).toHaveAttribute('data-prep-detail-href',/^#\/system\/prep\?focus=/);
     await expect(replacement).toBeVisible();
+    const purpose=card.locator('.f111-prep-purpose');
+    await expect(purpose).toBeVisible();
+    const actionBox=await card.locator('.prep-card-action').boundingBox();
+    const purposeBox=await purpose.boundingBox();
+    expect(purposeBox.x).toBeGreaterThanOrEqual(actionBox.x+actionBox.width);
     const metrics=await replacement.evaluate(node=>{
       return {
         width:node.getBoundingClientRect().width,
@@ -61,7 +66,9 @@ test('Issue 73: PREP replacement drawer applies a legal choice and survives relo
   await card.locator('[data-replacement-drawer]').click();
   const drawer=page.locator('#f111-action-drawer');
   await expect(drawer).toBeVisible();
-  const choice=drawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)').first();
+  const choices=drawer.locator('.f111-drawer-action:not([disabled]):not(.is-current)');
+  await expect(choices.nth(7)).toBeVisible();
+  const choice=choices.first();
   const target=await choice.getAttribute('data-f111-action-choice');
   expect(target).toBeTruthy();
   expect(target).not.toBe(current);
@@ -80,9 +87,10 @@ test('Issue 73: action-library desktop filters adapt without fixed 130px columns
   for(const width of [1080,1280,1440]){
     await page.setViewportSize({width,height:844});
     await page.goto('/#/library');
+    await page.locator('.library-advanced-filters').evaluate(node=>{node.open=true;});
     const controls=page.locator('.template-search-controls');
     await expect(controls).toBeVisible();
-    await expect(page.locator('[data-filter]')).toHaveCount(8);
+    await expect(page.locator('[data-filter]')).toHaveCount(9);
     const layout=await controls.evaluate(node=>({
       columns:getComputedStyle(node).gridTemplateColumns,
       boxes:Array.from(node.children).map(child=>child.getBoundingClientRect().width),

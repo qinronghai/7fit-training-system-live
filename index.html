@@ -6,6 +6,7 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="__BUILD_ID__" name="7fit-build"/>
 <title>7Fit 教练工作台 · 编课中心 V14.7</title>
+<script src="js/theme.js"></script>
 <link href="assets/app.css" rel="stylesheet"/>
 <link href="assets/replacement-drawer.css" rel="stylesheet"/>
 <link href="assets/7fit-logo-official.jpeg" rel="icon" type="image/jpeg"/></head>
@@ -34,8 +35,13 @@
 <button id="mobile-menu-button" aria-controls="app-sidebar" aria-expanded="false" aria-label="打开导航" class="mobile-menu-button" type="button">☰</button>
 <div class="topbar-copy"><b id="page-title">编课中心</b></div>
 <div class="topbar-actions">
+<button id="member-directory-create" class="member-primary-action" data-member-create type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增会员</button>
 <button class="quick-feedback" data-feedback-open type="button" aria-label="反馈问题">反馈</button>
 <a class="quick-library" href="#/library">搜索动作</a>
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="深色模式" aria-pressed="false" hidden>
+<svg class="theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20.8 14.2A9 9 0 0 1 9.8 3.2a9 9 0 1 0 11 11Z"/></svg>
+<svg class="theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+</button>
 </div>
 </header>
 <main id="app-main" tabindex="-1"></main>
@@ -90,6 +96,9 @@
 <script src="js/coach/saved-sessions.js"></script>
 <script src="js/coach/favorites.js"></script>
 <script src="js/member/api.js"></script>
+<script src="js/member/session-recording.js"></script>
+<script src="js/member/session-draft.js"></script>
+<script src="js/member/session-panel.js"></script>
 <script src="js/member/session.js"></script>
 <script src="js/member/center.js"></script>
 <script src="js/member/snapshot-client.js"></script>
@@ -112,6 +121,7 @@
 <script src="js/coach/conflict-view.js"></script>
 <script src="js/recovery-protocol-adapter.js"></script>
 <script src="js/recovery-matcher.js"></script>
+<script src="js/coach/f111-energy.js"></script>
 <script src="js/coach/session.js"></script>
 <script src="js/coach/composer-view.js"></script>
 <script src="js/coach/body-home.js"></script>

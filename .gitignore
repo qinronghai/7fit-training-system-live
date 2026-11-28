@@ -6,3 +6,6 @@
 .impeccable/config.local.json
 .impeccable/hook.cache.json
 .impeccable/critique/
+
+# Supabase CLI local state
+supabase/.temp/

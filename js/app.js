@@ -2,7 +2,8 @@
   function labels(route){
     if(route.area==='coach'){
       if(route.page==='home')return ['编课中心','7Fit 教练工作台'];
-      if(route.page==='member-list'||route.page==='member-detail')return ['会员训练','近期完成情况与课程记录'];
+      if(route.page==='member-list')return ['会员管理'];
+      if(route.page==='member-detail')return ['会员训练','近期完成情况与课程记录'];
       if(route.page==='template'||route.page==='template-compose'){
         if(route.templateId==='f111')return ['编课中心','女性综合 1+1+1'];
         const record=window.V14_DATA?.templateRegistry?.[route.templateId];
@@ -40,23 +41,35 @@
     window.V14CoachModules?.MemberCenter?.routeChanged?.(route);
     if(!isF111ComposerRoute(route))window.V14CoachModules?.ComposerView?.resetMemberContextBinding?.();
     const main=document.getElementById('app-main');
-    if(!window.V14Router.isValid(route)){
-      document.getElementById('page-title').textContent='页面不存在';
+    const titleNode=document.getElementById('page-title');
+    const valid=window.V14Router.isValid(route);
+    const memberDirectory=valid&&route.area==='coach'&&route.page==='member-list';
+    document.getElementById('member-directory-create').hidden=!memberDirectory;
+    if(memberDirectory){
+      titleNode.setAttribute('role','heading');
+      titleNode.setAttribute('aria-level','1');
+    }else{
+      titleNode.removeAttribute('role');
+      titleNode.removeAttribute('aria-level');
+    }
+    if(!valid){
+      titleNode.textContent='页面不存在';
       setActive('');
       main.innerHTML='<section class="empty-state" aria-labelledby="route-error-title"><h1 id="route-error-title"><b>页面不存在</b></h1><span>这个地址不属于当前训练系统信息架构。当前内容没有被修改。</span><div class="empty-state-actions"><a href="#/coach">返回编课中心</a><button type="button" data-feedback-open>反馈问题</button></div></section>';
       main.focus({preventScroll:true});
       return;
     }
     const [title]=labels(route);
-    document.getElementById('page-title').textContent=title;
+    titleNode.textContent=title;
     setActive(route.area);
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
+    const restoreUi=isF111ComposerRoute(route)?window.V14CoachModules?.ComposerView?.captureUi(main):null;
     if(typeof fn==='function') main.innerHTML=fn(route);
     else main.innerHTML='<section class="empty-state"><b>'+title+'</b><span>该模块将在后续任务中迁入训练系统。</span></section>';
     const bind=window.V14Bind?.[route.area]; if(typeof bind==='function') bind(route);
     if(window.V14ModuleCopy?.bind) window.V14ModuleCopy.bind(main);
-    main.focus({preventScroll:true});
+    if(!restoreUi?.())main.focus({preventScroll:true});
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const mode=window.V14State?.getMode?.()||'coach'; document.body.dataset.mode=mode;

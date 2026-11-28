@@ -95,7 +95,7 @@ assert(!/跑步机爬坡 \/ 楼梯机 \/ 快走 \/ 其他有氧/.test(coachCopy)
 // --- the two F111 surfaces render the selector ------------------------------
 for(const file of ['js/coach/session.js','js/coach/composer-view.js']){
   const source=fs.readFileSync(`${root}/${file}`,'utf8');
-  assert(source.includes('PostCardio.render'),`${file} must render the selector`);
+  assert(/PostCardio\??\.render/.test(source),`${file} must render the selector`);
   assert(source.includes('postCardioPlan'),`${file} must ship the structured plan into copy`);
   assert(!source.includes('class="post-cardio-note"'),`${file} must not keep the static post-cardio note`);
 }

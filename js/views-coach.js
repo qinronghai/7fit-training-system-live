@@ -66,10 +66,19 @@
 
   function bind(route){
     const root=document.getElementById('app-main');
-    const rerender=()=>{
+    const rerender=({preserveMemberContext=false}={})=>{
       const current=window.V14Router.parseHash(location.hash);
-      root.innerHTML=render(current);
+      const restoreUi=isF111Composer(current)?ComposerView.captureUi(root):null;
+      const presetEnergyOpen=!restoreUi&&root.querySelector('[data-f111-energy]')?.open;
+      const course=preserveMemberContext?root.querySelector('.f111-course-content'):null;
+      if(course){
+        const template=document.createElement('template');
+        template.innerHTML=render(current);
+        course.replaceWith(template.content.querySelector('.f111-course-content'));
+      }else root.innerHTML=render(current);
       bind(current);
+      restoreUi?.();
+      if(presetEnergyOpen)root.querySelector('[data-f111-energy]')?.setAttribute('open','');
       if(window.V14ModuleCopy?.bind)window.V14ModuleCopy.bind(root);
     };
     if(!isF111Composer(route))ComposerView?.resetMemberContextBinding?.();
@@ -97,6 +106,7 @@
     if(isF111Composer(route)){
       ComposerView.bindMemberContext?.(route,root,rerender);
       const ctx=ComposerView.composerContext(route);
+      M.F111Energy?.bind(root,()=>ctx.resolvedSession,ctx.memberId);
       document.querySelectorAll('.composer-slot-select').forEach(sel=>sel.addEventListener('change',()=>{
         const contextKey=Recent()?.context?.f111Composer?.({
           lowerMode:ctx.lowerMode,upperMode:ctx.upperMode,level:ctx.level,coreDemand:ctx.coreDemand,slotKey:sel.dataset.slotKey,
@@ -122,14 +132,11 @@
       }));
       document.querySelectorAll('.f111-foam-select').forEach(sel=>sel.addEventListener('change',()=>{M.Foam?.setComposerFoamSelection?.(sel.dataset.foamSession,sel.dataset.foamSlot,sel.value,ctx.level);rerender();}));
       document.querySelectorAll('[data-compose-query]').forEach(sel=>sel.addEventListener('change',()=>{const key=sel.dataset.composeQuery;location.hash=ComposerView.composeHref(ctx,{[key]:sel.value});}));
-      const status=document.getElementById('copy-session-status');
-      const doCopy=async audience=>{const payload=ComposerView.buildComposerCopyPayload(ComposerView.composerContext(window.V14Router.parseHash(location.hash))),formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;if(typeof formatter!=='function')return;try{await window.V14SessionCopy.copyText(formatter(payload));if(status){status.textContent='已复制，可直接发送';status.className='success';}}catch(_){if(status){status.textContent='复制失败，请手动选择内容复制';status.className='error';}}};
-      document.getElementById('copy-coach-session')?.addEventListener('click',()=>doCopy('coach'));
-      document.getElementById('copy-member-session')?.addEventListener('click',()=>doCopy('member'));
+      ComposerView.bindCopy?.(root);
       M.MemberSelector?.bind?.(root,()=>ctx.resolvedSession,()=>ctx.memberId,()=>ComposerView.buildComposerSessionDetails(ctx));
       document.getElementById('reset-composer')?.addEventListener('click',()=>{window.V14State.resetComposer(ctx.stateKey);rerender();});
       bindPostCardio(rerender);
-      M.F111ActionDrawer?.bind?.(root,ctx,rerender);
+      M.F111ActionDrawer?.bind?.(root,ctx);
       bindReplacementDrawer();
       bindSaved();
       bindFavorites();
@@ -143,6 +150,7 @@
       return;
     }
     const sessionId=`${route.recipeId}-${route.level}`;
+    M.F111Energy?.bind(root,()=>Session.resolveResolvedSession(sessionId,route.recipeId,route.level),route.query?.memberId||null);
     document.querySelectorAll('.session-swap').forEach(sel=>sel.addEventListener('change',()=>{
       const contextKey=Recent()?.context?.f111Preset?.({sessionId,slotKey:sel.dataset.slotKey});
       Recent()?.record?.({templateId:'f111',contextKey,actionId:sel.value,candidates:selectCandidates(sel)});

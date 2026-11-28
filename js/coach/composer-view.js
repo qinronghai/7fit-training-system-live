@@ -6,7 +6,6 @@
   const UI=M.F111ComposeUI||{};
   const esc=C.esc||((value)=>String(value??''));
   const D=C.D||(()=>window.V14_DATA||{});
-  const copyToolbar=()=>'<div class="session-copy-actions"><button id="copy-coach-session" type="button">复制给教练</button><button id="copy-member-session" type="button">复制给会员</button><span id="copy-session-status" role="status" aria-live="polite"></span></div>';
   let memberContextMemberId=null,memberContextState=null,memberContextRequest=0;
 
   function resetMemberContextBinding(){
@@ -16,7 +15,8 @@
   }
 
   function composeHref(current,overrides={}){
-    const q={level:current.level,lower:current.lowerMode,upper:current.upperMode,core:current.coreDemand,...overrides};
+    const q={level:current.level,lower:current.lowerMode,upper:current.upperMode,...overrides};
+    if(!q.core&&current.explicitCoreDemand)q.core=current.explicitCoreDemand;
     if(current.memberId)q.memberId=current.memberId;
     if(current.includeExpandedMain)q.em='1';
     if(current.includeExpandedSupport)q.es='1';
@@ -30,7 +30,7 @@
     const level=/^L[1-4]$/.test(q.level||'')?q.level:'L1';
     const lowerMode=cfg.lowerModes?.[q.lower]?q.lower:'squat';
     const upperMode=cfg.upperModes?.[q.upper]?q.upper:'horizontal_pull';
-    const coreDemand=cfg.coreDemands?.[q.core]?q.core:'anti_extension';
+    const coreDemand=cfg.coreDemands?.[q.core]?q.core:window.V14Composer.defaultCoreDemand(level,lowerMode,upperMode);
     const flags={includeExpandedMain:q.em==='1',includeExpandedSupport:q.es==='1',includeExpandedCore:q.ec==='1'};
     const memberContext=memberContextMemberId===q.memberId&&memberContextState?.status==='ready'?memberContextState.context:null;
     const input={mode:'composer',level,lowerMode,upperMode,coreDemand,recentContext:memberContext,...flags};
@@ -39,7 +39,7 @@
     const selections=window.V14State.getComposerSelections(stateKey);
     const resolvedSession=window.V15TemplateResolver.resolve('f111',{...input,selections});
     const resolved=window.V14Composer.resolve({level,lowerMode,upperMode,coreDemand,selections,recentContext:memberContext,...flags});
-    return {level,lowerMode,upperMode,coreDemand,stateKey,resolved,resolvedSession,memberId:q.memberId||null,memberContext,...flags};
+    return {level,lowerMode,upperMode,coreDemand,explicitCoreDemand:q.core,stateKey,resolved,resolvedSession,memberId:q.memberId||null,memberContext,...flags};
   }
 
   function sessionAgoLabel(sessionsAgo){
@@ -61,7 +61,7 @@
     if(state?.status==='ready'){
       const last=context?.lastCompletedSession;
       if(!last){
-        content=`<p class="member-first-context-state">暂无已完成训练。待训练和已取消的课程不会计入训练上下文。</p><a class="member-first-context-empty-return" href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a>`;
+        content=`<p class="member-first-context-state">暂无已完成训练</p><a class="member-first-context-empty-return" href="#/coach/members/${encodeURIComponent(memberId)}">返回会员</a>`;
       }else{
         const patterns=Array.isArray(context.recentPatterns)?context.recentPatterns:[];
         const actions=Array.isArray(context.recentActions)?context.recentActions:[];
@@ -74,26 +74,29 @@
     return content;
   }
 
+  function memberContextPanel(route,state){
+    const name=state?.member?.displayName||state?.context?.displayName;
+    const heading=`<h2 id="member-first-context-title">${name?`会员 · ${esc(name)}`:'会员'}</h2>`;
+    const content=memberContextContentMarkup(route,state);
+    if(state?.context?.lastCompletedSession){
+      return `<details data-f111-disclosure="history"><summary>${heading}<span>上次实练 <i aria-hidden="true">⌄</i></span></summary><div class="member-first-context-live">${content}</div></details>`;
+    }
+    return `${heading}<div class="member-first-context-live">${content}</div>`;
+  }
+
   function memberContextMarkup(route){
     const memberId=route.query?.memberId;
     if(!memberId)return '';
-    const ctx=composerContext(route),state=memberContextMemberId===memberId?memberContextState:null;
-    const member=state?.member,context=state?.context;
-    const name=member?.displayName||context?.displayName||'会员';
-    const title=`正在为${name} · ${ctx.level} 编排训练`;
-    return `<section class="member-first-context" data-member-first-context aria-labelledby="member-first-context-title"><div class="member-first-context-heading"><div><span>会员训练上下文 · 仅作编排提示</span><h2 id="member-first-context-title">${esc(title)}</h2><p>训练记录帮助回看近期安排，动作选择仍由教练决定。</p></div></div><div class="member-first-context-live" data-member-context-live aria-live="polite" aria-atomic="true">${memberContextContentMarkup(route,state)}</div></section>`;
+    const state=memberContextMemberId===memberId?memberContextState:null;
+    return `<section class="member-first-context" data-member-first-context aria-labelledby="member-first-context-title"><div data-member-context-live aria-live="polite">${memberContextPanel(route,state)}</div></section>`;
   }
 
   function updateMemberContextPanel(route,root){
-    const panel=root.querySelector('[data-member-first-context]');
+    const panel=root.querySelector('[data-member-context-live]');
     if(!panel)return;
     const memberId=route.query?.memberId;
     const state=memberContextMemberId===memberId?memberContextState:null;
-    const ctx=composerContext(route),name=state?.member?.displayName||state?.context?.displayName||'会员';
-    const heading=panel.querySelector('#member-first-context-title');
-    const liveRegion=panel.querySelector('[data-member-context-live]');
-    if(heading)heading.textContent=`正在为${name} · ${ctx.level} 编排训练`;
-    if(liveRegion)liveRegion.innerHTML=memberContextContentMarkup(route,state);
+    panel.innerHTML=memberContextPanel(route,state);
   }
 
   function bindMemberContext(route,root,rerender){
@@ -104,9 +107,7 @@
         if(!event.target.closest('[data-member-context-retry]'))return;
         const current=window.V14Router.parseHash(location.hash);
         resetMemberContextBinding();
-        const panel=root.querySelector('[data-member-first-context]');
-        const liveRegion=panel?.querySelector('[data-member-context-live]');
-        if(liveRegion)liveRegion.innerHTML=memberContextContentMarkup(current,null);
+        updateMemberContextPanel(current,root);
         bindMemberContext(current,root,rerender);
       });
     }
@@ -119,8 +120,8 @@
       Promise.all([window.V14MemberAPI.getMember(memberId),window.V14MemberAPI.getMemberTrainingContext(memberId)]).then(([member,context])=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
         memberContextState={status:'ready',member,context};
-        if(typeof rerender==='function')rerender();
-        else updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
+        updateMemberContextPanel(window.V14Router.parseHash(location.hash),root);
+        rerender?.({preserveMemberContext:true});
       }).catch(error=>{
         if(requestId!==memberContextRequest||memberContextMemberId!==memberId)return;
         memberContextState={status:'error',errorStatus:error?.status||0};
@@ -132,25 +133,11 @@
   function isF111ComposerRoute(route){return route?.page==='compose'||(route?.page==='template'&&route.templateId==='f111');}
 
   function levelSwitch(ctx){
-    return `<div class="f111-level-switch" aria-label="选择训练阶段">${['L1','L2','L3','L4'].map(level=>`<a class="${ctx.level===level?'active':''}" href="${composeHref(ctx,{level})}">${level}</a>`).join('')}</div>`;
-  }
-
-  function modeSection(ctx){
-    return `<section class="f111-mode-section"><div class="f111-section-title"><div><h2>选择训练模式</h2></div></div><div class="f111-mode-grid">${UI.modeTrigger(ctx,'lower')}${UI.modeTrigger(ctx,'upper')}</div><div class="f111-current-combination"><small>当前组合</small><b>${esc(UI.currentLabel(ctx))}</b></div></section>`;
-  }
-
-  function courseHero(){
-    return `<section class="view-hero f111-compose-hero"><span class="eyebrow">F111 课程说明</span><h1>F111｜女性综合训练</h1><p>围绕女性常见的下肢力量、体态改善与核心稳定需求，把下肢、上肢和核心训练灵活组合。每次训练既能强化臀腿、改善体态，也能提升身体稳定与整体力量，适合循序渐进地塑形和建立长期训练习惯。</p><div class="chips"><span class="chip">强化臀腿</span><span class="chip">改善体态</span><span class="chip">提升核心稳定</span></div></section>`;
+    return `<nav class="f111-level-switch" aria-label="训练等级">${['L1','L2','L3','L4'].map(level=>`<a data-f111-focus="level-${level}"${ctx.level===level?' class="active" aria-current="true"':''} href="${esc(composeHref(ctx,{level}))}">${level}</a>`).join('')}</nav>`;
   }
 
   function stageSection(ctx){
-    return `<section class="section-card f111-builder-section"><div class="f111-section-title"><div><h2>① 选择训练阶段</h2><p>先选择课程阶段，系统会匹配相应难度的动作。</p></div></div>${levelSwitch(ctx)}${modeSection(ctx)}</section>`;
-  }
-
-  function demandSwitch(ctx){
-    const cfg=D().composer||{};
-    const items=Object.entries(cfg.coreDemands||{}).slice(0,3).map(([key,value])=>`<a class="${ctx.coreDemand===key?'active':''}" aria-current="${ctx.coreDemand===key?'true':'false'}" href="${composeHref(ctx,{core:key})}">${esc(value.name)}</a>`).join('');
-    return `<div class="f111-demand-switch"><div><b>核心功能</b><small>选择训练方向</small></div><nav aria-label="核心功能">${items}</nav></div>`;
+    return `<div class="f111-builder-section">${levelSwitch(ctx)}<div class="f111-mode-grid">${UI.modeTrigger(ctx,'lower')}${UI.modeTrigger(ctx,'upper')}</div></div>`;
   }
 
   function composerRecovery(ctx){return D().sessionViews?.[`F111-01-${ctx.level}`]||{};}
@@ -180,33 +167,75 @@
 
   function strengthSection(ctx){
     const slotsByKey=new Map(ctx.resolved.slots.map(slot=>[slot.slotKey,slot]));
-    const slots=['A','B','D2','D1','C','CORE'].map(key=>slotsByKey.get(key)).filter(Boolean);
-    const cardHtml=key=>slots.filter(slot=>slot.slotKey===key).map(slot=>M.Slot.composerCard(ctx,slot,'')).join('');
-    return `<section class="section-card f111-strength-section"><div class="section-head"><div><h2>1F｜力量训练</h2><p>各级剂量相同；组数、次数见卡片。</p></div><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${['A','B','D2','D1'].map(cardHtml).join('')}</div><div class="f111-strength-grid f111-support-grid">${['C','CORE'].map(cardHtml).join('')}</div></section>`;
+    const cards=keys=>keys.map(key=>slotsByKey.get(key)).filter(Boolean).map(slot=>M.Slot.composerCard(ctx,slot)).join('');
+    return `<section class="f111-strength-section"><div class="f111-section-heading"><h2>1F｜力量训练</h2><span class="time-badge">约 40–43 分钟</span></div><div class="f111-strength-grid">${cards(['A','B'])}</div><div class="f111-accessory-list">${cards(['D2','D1','C','CORE'])}</div></section>`;
   }
 
   function anatomySection(ctx){
     const allIds=ctx.resolvedSession.main.content.map(x=>x.actionId).filter(Boolean);
     const anatomy=M.Summary?.render?.(allIds)||'';
-    return anatomy?`<details class="f111-anatomy-details" open><summary>训练肌群概览</summary>${anatomy}</details>`:'';
+    return anatomy?`<details class="f111-anatomy-details" data-f111-disclosure="anatomy"><summary>训练肌群概览</summary>${anatomy}</details>`:'';
   }
 
   function saveAndCopySection(route){
     return M.SavedSessionsUI?.compactControls?.(route)||'';
   }
 
-  function courseOutputSection(){
-    return `<section class="section-card f111-course-output-section"><div class="section-head"><div><h2>课程输出</h2><p>复制完整课程：热身、力量训练、训练后拉伸与课后有氧设置。</p></div></div><div class="session-toolbar-actions f111-course-output-actions">${copyToolbar()}${M.MemberSelector?.buttonMarkup?.()||''}</div></section>`;
+  function courseOutputSection(ctx){
+    return `<footer class="f111-course-output-section${ctx.memberId?' has-member':''}"><div id="copy-session-status" role="status"></div><div class="f111-course-output-actions"><button class="f111-copy-trigger" type="button" data-f111-copy aria-haspopup="dialog">复制课程</button>${M.MemberSelector?.buttonMarkup?.()||''}</div></footer>`;
   }
 
   function recoverySection(recovery){
-    return `<section class="section-card f111-recovery-section" data-f111-recovery><div class="section-head f111-recovery-head"><div><div class="f111-recovery-title-row"><h2>训练后拉伸｜约 5–8 分钟</h2><span class="time-badge">训练后</span></div><p>训练结束后完成 3 个主要部位拉伸。</p></div></div>${recovery}</section>`;
+    return `<details class="f111-recovery-section f111-disclosure" data-f111-recovery data-f111-disclosure="recovery" open><summary><div><b>训练后拉伸</b><small>约 5–8 分钟</small></div><i aria-hidden="true">⌄</i></summary><div class="f111-disclosure-content">${recovery}</div></details>`;
   }
 
   function render(route){
-    const ctx=composerContext(route),view=composerRecovery(ctx),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
-    return memberContextMarkup(route)+courseHero(ctx)+`<div class="f111-compose-step-wrap">${UI.stepper('select')}</div>`+stageSection(ctx)+`<div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>`+strengthSection(ctx)+anatomySection(ctx)+(M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||'')+saveAndCopySection(route)+recoverySection(recovery)+(M.PostCardio?M.PostCardio.render(ctx.stateKey):'')+courseOutputSection();
+    const ctx=composerContext(route),recoveryResult=window.V14RecoveryMatcher.match(ctx.resolvedSession),recovery=window.V14RecoveryMatcher.renderCompact?window.V14RecoveryMatcher.renderCompact(recoveryResult):window.V14RecoveryMatcher.render(recoveryResult);
+    return `<div class="f111-workspace">
+      <header class="f111-compose-hero"><h1>F111｜女性综合训练</h1>${memberContextMarkup(route)}</header>
+      <div class="f111-course-content">
+        ${stageSection(ctx)}
+        <div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>
+        ${strengthSection(ctx)}
+        ${M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||''}
+        <div class="f111-after-training">${recoverySection(recovery)}${M.PostCardio?.render?.(ctx.stateKey,{compact:true})||''}</div>
+        ${M.F111Energy?.render(ctx.resolvedSession,ctx.memberId)||''}
+        ${anatomySection(ctx)}
+        ${saveAndCopySection(route)}
+        ${courseOutputSection(ctx)}
+      </div>
+    </div>`;
   }
 
-  M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,buildComposerSessionDetails,render,bindMemberContext,resetMemberContextBinding};
+  function captureUi(root){
+    const workspace=root.querySelector('.f111-workspace');
+    if(!workspace)return null;
+    const open=new Set([...workspace.querySelectorAll('details[open][data-f111-disclosure]')].map(node=>node.dataset.f111Disclosure));
+    const focus=workspace.contains(document.activeElement)?document.activeElement.dataset.f111Focus:'';
+    return ()=>{
+      root.querySelectorAll('details[data-f111-disclosure]').forEach(node=>{node.open=open.has(node.dataset.f111Disclosure);});
+      const target=[...root.querySelectorAll('[data-f111-focus]')].find(node=>node.dataset.f111Focus===focus);
+      target?.focus({preventScroll:true});
+      return !!target;
+    };
+  }
+
+  function bindCopy(root){
+    const status=document.getElementById('copy-session-status');
+    const doCopy=async audience=>{
+      const formatter=audience==='coach'?window.V14SessionCopy?.formatCoach:window.V14SessionCopy?.formatMember;
+      if(typeof formatter!=='function')return;
+      try{
+        const payload=buildComposerCopyPayload(composerContext(window.V14Router.parseHash(location.hash)));
+        await window.V14SessionCopy.copyText(formatter(payload));
+        if(status){status.className='success';status.textContent='已复制，可直接发送';}
+      }catch(_){
+        if(status){status.className='error';status.textContent='复制失败，请重试';}
+      }
+    };
+    const copyTrigger=root.querySelector('[data-f111-copy]');
+    copyTrigger?.addEventListener('click',()=>M.F111ActionDrawer?.openCopy(copyTrigger,doCopy));
+  }
+
+  M.ComposerView={composeHref,composerContext,buildComposerCopyPayload,buildComposerSessionDetails,render,captureUi,bindMemberContext,resetMemberContextBinding,bindCopy};
 })();
