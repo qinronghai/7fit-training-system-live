@@ -84,12 +84,13 @@ button,input,select,textarea{font-family:inherit}
 
   /* The band: every screen opens under it; sheets overlap its lower edge. */
   /* The top bar repeats the band's first strip so it stays seamless while it sticks. */
-  .app-column,.topbar{--vb-band-layers:
-    radial-gradient(circle at 94% -18%,var(--vb-band-disc) 0 205px,transparent 205.5px) 0 0/100% var(--vb-band-h) no-repeat,
-    radial-gradient(circle at 4% 128%,var(--vb-band-disc) 0 150px,transparent 150.5px) 0 0/100% var(--vb-band-h) no-repeat,
-    var(--vb-band) 0 0/100% var(--vb-band-h) no-repeat}
+  /* Opened from the home screen the status bar overlays the page, so the band grows by the safe area. */
+  .app-column,.topbar{--vb-safe-top:env(safe-area-inset-top,0px);--vb-band-full:calc(var(--vb-band-h) + var(--vb-safe-top));--vb-band-layers:
+    radial-gradient(circle at 94% -18%,var(--vb-band-disc) 0 205px,transparent 205.5px) 0 0/100% var(--vb-band-full) no-repeat,
+    radial-gradient(circle at 4% 128%,var(--vb-band-disc) 0 150px,transparent 150.5px) 0 0/100% var(--vb-band-full) no-repeat,
+    var(--vb-band) 0 0/100% var(--vb-band-full) no-repeat}
   .app-column{min-height:100vh;background:var(--vb-band-layers),var(--vb-page)}
-  .topbar{background:var(--vb-band-layers)!important;border-bottom:0!important;backdrop-filter:none;color:var(--vb-on-band)}
+  .topbar{height:calc(60px + var(--vb-safe-top));padding-top:var(--vb-safe-top);background:var(--vb-band-layers)!important;border-bottom:0!important;backdrop-filter:none;color:var(--vb-on-band)}
   .topbar-copy b{color:var(--vb-on-band);font-size:17px;font-weight:var(--vb-weight-heavy);letter-spacing:.02em}
   .mobile-menu-button{color:var(--vb-on-band)}
   .theme-toggle{border:0!important;background:var(--vb-on-band-capsule)!important;color:var(--vb-on-band)!important;box-shadow:none!important}
@@ -211,8 +212,9 @@ button,input,select,textarea{font-family:inherit}
   .member-session-planned-prescription{display:inline-flex;margin-top:4px;padding:3px 9px;border-radius:var(--vb-radius-pill);background:var(--vb-well);color:var(--vb-ink)!important;font-size:13.5px;font-weight:var(--vb-weight-demi)}
 
   /* Session panel: the band heads the sheet. */
-  .member-session-dialog .member-session-head{background:var(--vb-band)!important;color:var(--vb-on-band);border-bottom:0!important}
+  .member-session-dialog .member-session-head{padding-top:max(12px,env(safe-area-inset-top));background:var(--vb-band)!important;color:var(--vb-on-band);border-bottom:0!important}
   .member-session-dialog .member-session-head :is(h2,h3,p,span,small){color:var(--vb-on-band)!important}
   .member-session-dialog .member-session-head button{border:0!important;background:var(--vb-on-band-capsule)!important;color:var(--vb-on-band)!important;border-radius:var(--vb-radius-capsule)!important}
   .member-session-dialog [data-session-footer] button.primary,.member-session-dialog .session-coach-navigation .primary,.member-session-dialog [data-session-tool="start"],.member-session-dialog button[data-session-complete]{background:var(--vb-band-violet)!important;border-color:var(--vb-band-violet)!important;color:#fff!important}
 }
+@media(max-width:979px){.sidebar.is-mobile-open{padding-top:max(18px,env(safe-area-inset-top))}}

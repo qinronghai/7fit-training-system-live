@@ -1,0 +1,20 @@
+{
+  "name": "7Fit 教练工作台",
+  "short_name": "7Fit",
+  "lang": "zh-CN",
+  "start_url": "../index.html#/coach",
+  "scope": "../",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F4F9",
+  "theme_color": "#8A3CE6",
+  "icons": [
+    { "src": "icons/7fit-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/7fit-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/7fit-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "F111 编课", "url": "../index.html#/coach/compose", "icons": [{ "src": "icons/7fit-192.png", "sizes": "192x192" }] },
+    { "name": "会员", "url": "../index.html#/coach/members", "icons": [{ "src": "icons/7fit-192.png", "sizes": "192x192" }] }
+  ]
+}
