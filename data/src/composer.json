@@ -284,32 +284,31 @@
       "L2": {
         "recommended": "SUP-S2",
         "normal": [
-          "SUP-S1",
           "SUP-S2",
           "SUP-S3"
         ],
-        "expanded": []
+        "expanded": [
+          "SUP-S1"
+        ]
       },
       "L3": {
         "recommended": "SUP-S3",
         "normal": [
-          "SUP-S2",
           "SUP-S3",
           "SUP-S4"
         ],
         "expanded": [
-          "SUP-S5"
+          "SUP-S2"
         ]
       },
       "L4": {
         "recommended": "SUP-S4",
         "normal": [
-          "SUP-S3",
           "SUP-S4",
-          "SUP-S5"
+          "SUP-S6"
         ],
         "expanded": [
-          "SUP-S6"
+          "SUP-S3"
         ]
       }
     },
@@ -409,13 +408,15 @@
           "tui_qushen",
           "kuangnei_shou",
           "kuangwai_zhan",
-          "tunbu_houti"
+          "tunbu_houti",
+          "tui_wanju"
         ],
         "hinge": [
           "tui_wanju",
           "tunbu_houti",
           "kuangwai_zhan",
-          "kuangnei_shou"
+          "kuangnei_shou",
+          "tui_qushen"
         ],
         "hip_extension": [
           "tui_wanju",
@@ -428,7 +429,8 @@
           "kuangnei_shou",
           "tui_qushen",
           "tui_wanju",
-          "tunbu_houti"
+          "tunbu_houti",
+          "xiao_longmen_wai_zhan"
         ],
         "single_leg_hinge": [
           "tui_wanju",
@@ -440,6 +442,9 @@
       },
       "upper": {
         "horizontal_pull": [
+          "shengsuo_cepingju",
+          "xiongjia_jiaxiong",
+          "shengsuo_santou_xiaya",
           "houzu_sanji",
           "mianla",
           "shengsuo_ertou_wanju",
@@ -452,6 +457,9 @@
           "V13_HR_SCAP_ROW"
         ],
         "vertical_pull": [
+          "xiongjia_jiaxiong",
+          "shengsuo_cepingju",
+          "shengsuo_santou_xiaya",
           "shengsuo_ertou_wanju",
           "zhibi_xiala",
           "mianla",
@@ -466,6 +474,9 @@
           "V13_HR_SCAP_ROW"
         ],
         "horizontal_push": [
+          "mianla",
+          "hudieji_fanxiang_feiniao",
+          "shengsuo_ertou_wanju",
           "shengsuo_santou_xiaya",
           "xiongjia_jiaxiong",
           "shengsuo_jiaxiong_zhongwei",
@@ -477,9 +488,11 @@
           "V13_VP_SEATED_LIGHT_DB"
         ],
         "vertical_push": [
+          "zhibi_xiala",
+          "mianla",
+          "shengsuo_ertou_wanju",
           "shengsuo_cepingju",
           "shengsuo_santou_xiaya",
-          "mianla",
           "shengsuo_jianwai_xuanzhuan",
           "shuanggang_zhicheng",
           "fushen_y_ju",

@@ -56,8 +56,8 @@ test('Issue 79: upper auxiliary module deduplicates source pools and supports fi
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('');
   await module.locator('[data-aux-pool-button="horizontal_pull"]').click();
   await expect(module.locator('[data-aux-filter="pool"]')).toHaveValue('horizontal_pull');
-  await expect(module.locator('[data-aux-visible-count]')).toHaveText('10 个');
-  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(10);
+  await expect(module.locator('[data-aux-visible-count]')).toHaveText('13 个');
+  await expect(module.locator('[data-aux-entry]:not([hidden])')).toHaveCount(13);
   // 俯身Y举 is bodyweight: its class must reach the filter instead of being dropped.
   await expect(module.locator('[data-aux-filter="equipmentClass"] option[value="bodyweight"]')).toHaveCount(1);
   await module.locator('[data-aux-filter="pool"]').selectOption('');
@@ -121,7 +121,8 @@ test('Issues 79/122: F111 D1 consumes shared lower candidates while D2 keeps its
   const d2=page.locator('.session-slot[data-slot="F111-01-L3__3"]');
   await expect(d2.locator('.slot-kicker')).toHaveText('D2｜上肢辅助');
   const d2Options=await d2.locator('select option').evaluateAll(nodes=>nodes.map(node=>node.value));
-  expect(d2Options[0]).toBe('houzu_sanji');
+  expect(d2Options[0]).toBe('shengsuo_santou_xiaya');
+  expect(d2Options).toContain('houzu_sanji');
   expect(d2Options).toContain('fushen_y_ju');
   expect(d2Options).toContain('V13_HR_SCAP_ROW');
   expect(d2Options).toContain('dixie_mianla_shangju');
@@ -132,8 +133,9 @@ test('Issues 79/122: F111 D1 consumes shared lower candidates while D2 keeps its
   const d1=page.locator('.session-slot[data-slot="F111-01-L3__2"]');
   await expect(d1.locator('.slot-kicker')).toHaveText('D1｜下肢辅助');
   const d1Options=await d1.locator('select option').evaluateAll(nodes=>nodes.map(node=>node.value));
-  expect(d1Options[0]).toBe('tui_qushen');
-  expect(d1Options).toContain('tunbu_houti');
+  // F111-01 is a squat day, so its L3 default covers the posterior chain instead of repeating the quads.
+  expect(d1Options[0]).toBe('tunbu_houti');
+  expect(d1Options).toContain('tui_qushen');
   expect(d1Options).toContain('shengsuo_kuan_neishou');
   expect(d1Options).toContain('tui_wanju');
   // Main-only / high-fatigue lower lifts must not leak into D1.

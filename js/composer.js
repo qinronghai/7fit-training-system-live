@@ -6,7 +6,10 @@
   const MAIN_TIER_RANK=Object.freeze({T1:1,T2:2,T3:3,T4:4});
   const CORE_GRADE_RANK=Object.freeze({'CORE-L1':1,'CORE-L2':2,'CORE-L3':3,'CORE-L4':4});
   const FATIGUE_LOAD=Object.freeze({low:1,medium:2,high:3,very_high:4});
-  const TRUNK_LOAD_BUDGET=Object.freeze({L1:11,L2:13,L3:16,L4:18});
+  // Calibrated so a normal session at each level passes; only stacking heavy support and core on top of the main lifts warns.
+  const TRUNK_LOAD_BUDGET=Object.freeze({L1:11,L2:13,L3:17,L4:20});
+  const SUPPORT_FATIGUE_RANK=Object.freeze({low:1,medium:2,high:3});
+  const SUPPORT_FATIGUE_TARGET=Object.freeze({L1:1,L2:1,L3:2,L4:2.5});
   function cfg(){return D().composer||{};}
   function auxiliaryRoutePolicy(){return [...AUXILIARY_ROUTE_POLICY];}
   function isAuxiliaryRouteAllowed(route){return AUXILIARY_ROUTE_POLICY.includes(route);}
@@ -138,7 +141,8 @@
       supportReason:reasons.join('；')||'保持支撑任务多样性',
       needsConfirmation:tradeoffs.length>0,
       complementarityScore:repeatedCoreDemand?0:1,
-      fatigueScore:meta.fatigueCost==='low'?3:meta.fatigueCost==='medium'?2:1,
+      // Lower levels favour low-cost support; higher levels should feel like a progression, not a regression.
+      fatigueScore:3-Math.abs((SUPPORT_FATIGUE_RANK[meta.fatigueCost]||2)-(SUPPORT_FATIGUE_TARGET[level]||1)),
       jointLoadScore:Math.max(0,4-meta.jointLoad.length),
       feasibilityScore:meta.spaceRequirement==='open_lane'?0:1,
       historyScore:history.score,
@@ -176,9 +180,10 @@
     return (D().supportIds||[]).map(id=>{const a=actionView(id);a.grade=D().actions[id]?.grade||D().actions[id]?.supportGrade||id.split('-').slice(0,2).join('-');return {...a,...supportDecision(id,{...context,level})};}).filter(x=>allowed.has(x.grade)).sort((a,b)=>
       b.complementarityScore-a.complementarityScore
       ||b.historyScore-a.historyScore
+      ||Number(a.needsConfirmation)-Number(b.needsConfirmation)
+      ||b.feasibilityScore-a.feasibilityScore
       ||b.fatigueScore-a.fatigueScore
       ||b.jointLoadScore-a.jointLoadScore
-      ||b.feasibilityScore-a.feasibilityScore
       ||(a.grade===rec?0:1)-(b.grade===rec?0:1)
       ||b.recommendationScore-a.recommendationScore
       ||String(a.id).localeCompare(String(b.id))
@@ -272,6 +277,15 @@
     return ids.filter(id=>!blocked.has(id)).map(actionView).filter(x=>x.status==='可自动编排'&&isAuxiliaryRouteAllowed(x.route));
   }
   function chooseById(options,id){return options.find(x=>x.id===id)||options[0]||null;}
+  // Rotate the default accessory among the leading complementary options so combinations and levels do not all share one action.
+  function rotateDefault(options,id,rotationIndex,pool=3){
+    const chosen=options.find(x=>x.id===id);
+    if(chosen)return chosen;
+    const best=options[0];
+    if(!best)return null;
+    const leading=options.slice(0,pool).filter(x=>typeof x.recommendationScore!=='number'||x.recommendationScore>=best.recommendationScore-8);
+    return leading[rotationIndex%leading.length]||best;
+  }
   // Anchor the combination to a coached preset, preferring the lower main pattern.
   function referenceSlots(level,lowerMode,upperMode){
     const presets=Object.entries(cfg().officialPresetMap||{});
@@ -295,8 +309,10 @@
     const A=chooseById(Aopts,selections.A),B=chooseById(Bopts,selections.B);
     const Copts=supportSelectionOptions();
     const manualSupport=Copts.find(option=>option.id===selections.C);
-    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:manualSupport?.id}}),D1=chooseById(D1opts,selections.D1);
-    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=chooseById(D2opts,selections.D2);
+    const levelIndex=Number(level.slice(1))-1;
+    const upperIndex=Object.keys(cfg().upperModes||{}).indexOf(upperMode),lowerIndex=Object.keys(cfg().lowerModes||{}).indexOf(lowerMode);
+    const D1opts=auxCandidates('lower',lowerMode,[A?.id,B?.id],{level,currentSelections:{A:A?.id,B:B?.id,C:manualSupport?.id}}),D1=rotateDefault(D1opts,selections.D1,upperIndex+levelIndex);
+    const D2opts=auxCandidates('upper',upperMode,[A?.id,B?.id,D1?.id]),D2=rotateDefault(D2opts,selections.D2,lowerIndex+levelIndex);
     const mainBlock=[['A',A],['B',B],['D1',D1],['D2',D2]].map(([slotKey,action])=>({slotKey,actionId:action?.id}));
     const mainLoad=trunkLoadAudit(mainBlock,level);
     const plannedSupport=manualSupport||supportCandidates(level,false,{coreDemand,recentContext:input.recentContext}).find(option=>option.autoRecommendable);
@@ -312,7 +328,7 @@
     // Keep the strongest complement and history fit. Rotate feasible low/moderate-load peers.
     const peers=eligible.filter(option=>option.complementarityScore===bestSupport.complementarityScore
       &&option.historyScore===bestSupport.historyScore&&option.feasibilityScore===bestSupport.feasibilityScore
-      &&option.fatigueScore>=Math.min(2,bestSupport.fatigueScore)&&!option.needsConfirmation);
+      &&option.fatigueScore>=Math.min(level==='L3'||level==='L4'?2.5:2,bestSupport.fatigueScore)&&!option.needsConfirmation);
     const otherSlots=[...mainBlock,{slotKey:'CORE',actionId:CORE?.id}];
     const otherLoad=trunkLoadAudit(otherSlots,level);
     const loads=peers.map(option=>trunkLoadAudit([{slotKey:'C',actionId:option.id}],level).total);
@@ -322,7 +338,7 @@
     const C=manualSupport||(rotation.length?rotation[combinationIndex%rotation.length]:bestSupport);
     const Cdecision=supportDecision(C?.id||'',Ccontext);
     const coreMeta=coreMetaFor(CORE?.id||'');
-    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||'',...(key==='C'?{supportReason:Cdecision.supportReason,supportDemand:Cdecision.supportDemand,branch:Cdecision.branch,fatigueCost:Cdecision.fatigueCost,memberFeeling:Cdecision.memberFeeling,recommendedDose:Cdecision.recommendedDose,alternatives:Cdecision.sameDemandIds,needsConfirmation:Cdecision.needsConfirmation,tradeoffs:Cdecision.tradeoffs,recentlyUsed:Cdecision.recentlyUsed,recentNote:Cdecision.recentNote}: {}),...(key==='CORE'?{...coreMeta,coreBranch:coreMeta.branch,coreFatigueCost:coreMeta.fatigueCost,coreMemberFeeling:coreMeta.memberFeeling,coreRecommendedDose:coreMeta.recommendedDose,coreJointLoad:coreMeta.jointLoad,coreSpaceRequirement:coreMeta.spaceRequirement,coreReason:COREdecision.coreReason,coreDemandMatch:COREdecision.coreDemandMatch,coreNeedsConfirmation:COREdecision.coreNeedsConfirmation,coreTradeoffs:COREdecision.coreTradeoffs,coreAlternatives:coreMeta.sameDemandIds,recentlyUsed:COREdecision.recentlyUsed,historyNote:COREdecision.historyNote}: {})});
+    const slot=(key,label,x)=>({slotKey:key,slotName:label,actionId:x?.id||'',name:x?.name||'',tier:x?.tier||'',grade:x?.grade||'',coreDemand:x?.coreDemand||'',prescriptionOverride:clean(key==='C'?Cdecision.recommendedDose:key==='CORE'?coreMeta.recommendedDose:'')||clean(cfg().prescriptionBySlot?.[key])||x?.prescriptionOverride||'',tierNote:x?.tierNote||'',...(key==='C'?{supportReason:Cdecision.supportReason,supportDemand:Cdecision.supportDemand,branch:Cdecision.branch,fatigueCost:Cdecision.fatigueCost,memberFeeling:Cdecision.memberFeeling,recommendedDose:Cdecision.recommendedDose,alternatives:Cdecision.sameDemandIds,needsConfirmation:Cdecision.needsConfirmation,tradeoffs:Cdecision.tradeoffs,recentlyUsed:Cdecision.recentlyUsed,recentNote:Cdecision.recentNote}: {}),...(key==='CORE'?{...coreMeta,coreBranch:coreMeta.branch,coreFatigueCost:coreMeta.fatigueCost,coreMemberFeeling:coreMeta.memberFeeling,coreRecommendedDose:coreMeta.recommendedDose,coreJointLoad:coreMeta.jointLoad,coreSpaceRequirement:coreMeta.spaceRequirement,coreReason:COREdecision.coreReason,coreDemandMatch:COREdecision.coreDemandMatch,coreNeedsConfirmation:COREdecision.coreNeedsConfirmation,coreTradeoffs:COREdecision.coreTradeoffs,coreAlternatives:coreMeta.sameDemandIds,recentlyUsed:COREdecision.recentlyUsed,historyNote:COREdecision.historyNote}: {})});
     const resolvedSlots=[slot('A','A｜下肢主项',A),slot('B','B｜上肢主项',B),slot('C','C｜支撑模式',C),slot('D1','D1｜下肢辅助',D1),slot('D2','D2｜上肢辅助',D2),slot('CORE','CORE｜核心模式',CORE)];
     return {
       compositionId:`F111-C-${lower.code}-${upper.code}`,

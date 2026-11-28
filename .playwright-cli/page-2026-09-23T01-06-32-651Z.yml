@@ -1,0 +1,67 @@
+- generic [ref=e1]:
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - button "打开导航" [ref=e348]: ☰
+      - generic [ref=e28]:
+        - generic [ref=e29]: 训练体系
+        - generic [ref=e30]: 十大动作模式 · PREP 热身
+    - main [active] [ref=e33]:
+      - navigation [ref=e360]:
+        - link "十大动作模式" [ref=e361] [cursor=pointer]:
+          - /url: "#/system/patterns"
+        - link "PREP 热身" [ref=e362] [cursor=pointer]:
+          - /url: "#/system/prep"
+      - link "← 返回 PREP 热身体系" [ref=e363] [cursor=pointer]:
+        - /url: "#/system/prep"
+      - generic [ref=e364]:
+        - text: TRAINING KNOWLEDGE
+        - heading "青蛙趴内收肌伸展" [level=1] [ref=e365]
+        - paragraph [ref=e366]: P1｜髋内收肌活动｜2F PREP
+        - text: "7"
+      - generic [ref=e367]:
+        - generic [ref=e368]:
+          - generic [ref=e369]: 热身等级
+          - generic [ref=e370]: P1
+        - generic [ref=e371]:
+          - generic [ref=e372]: 兼容课程等级
+          - generic [ref=e373]: L1 / L2 / L3 / L4
+        - generic [ref=e374]:
+          - generic [ref=e375]: 主训练 T 参考
+          - generic [ref=e376]: T1 / T2 / T3
+        - generic [ref=e377]:
+          - generic [ref=e378]: 匹配主训练
+          - generic [ref=e379]: 蹲 · 单腿 · 髋伸展
+        - generic [ref=e380]:
+          - generic [ref=e381]: 主要区域
+          - generic [ref=e382]: 髋内收肌 · 髋关节
+        - generic [ref=e383]:
+          - generic [ref=e384]: 器械
+          - generic [ref=e385]: 自重 / 垫子
+      - generic [ref=e386]:
+        - generic [ref=e388]:
+          - button "复制本模块" [ref=e389] [cursor=pointer]
+          - status
+        - generic [ref=e390]:
+          - heading "为什么安排它" [level=3] [ref=e391]
+          - paragraph [ref=e392]: 改善大腿内侧和髋外展位活动，为深蹲、单腿和臀部训练做准备。
+          - heading "建议处方" [level=3] [ref=e393]
+          - paragraph [ref=e394]: 1组 × 20–30秒或动态后坐6–8次
+          - heading "教练口令" [level=3] [ref=e395]
+          - paragraph [ref=e396]: 双膝打开到舒适范围，骨盆保持中立；不要靠塌腰换取幅度。
+          - heading "等级规则" [level=3] [ref=e397]
+          - paragraph [ref=e398]: 正式准入只看 P1 与 Session L 的向下兼容窗口；主训练 T 仅作为动作匹配参考，不作为 PREP 准入门槛。
+          - heading "数据状态" [level=3] [ref=e399]
+          - paragraph [ref=e400]: V14.3 新增动作
+          - link "查看动作库记录 →" [ref=e401] [cursor=pointer]:
+            - /url: "#/library?focus=warmup_frog_stretch"
+  - navigation "移动端主导航" [ref=e349]:
+    - link "编课" [ref=e350] [cursor=pointer]:
+      - /url: "#/coach"
+    - link "体系" [ref=e352] [cursor=pointer]:
+      - /url: "#/system/patterns"
+    - link "规则" [ref=e354] [cursor=pointer]:
+      - /url: "#/rules/venue"
+    - link "动作库" [ref=e356] [cursor=pointer]:
+      - /url: "#/library"
+    - link "更多" [ref=e358] [cursor=pointer]:
+      - /url: "#/maintenance"

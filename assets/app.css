@@ -5,6 +5,67 @@
   font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
 }
 
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#15131b;
+  --surface:#211e29;
+  --ink:#f1edf6;
+  --muted:#b9b1c4;
+  --line:#3d3648;
+  --purple-dark:#c4a7ff;
+  --purple-soft:#3b2b58;
+  --purple-pale:#2c233a;
+  --ok:#87dcb8;
+  --warn:#f5c77d;
+  --danger:#f5a5af;
+  --theme-primary:#7145bd;
+  --theme-primary-hover:#8053ca;
+  --theme-surface-hover:#282432;
+  --theme-surface-tint:#2b2437;
+  --theme-surface-selected:#382a50;
+  --theme-surface-success:#1c332a;
+  --theme-surface-warning:#372b1b;
+  --theme-surface-danger:#39242e;
+  --theme-line-tint:#473953;
+  --theme-line-selected:#74569f;
+  --theme-line-success:#366250;
+  --theme-line-warning:#715731;
+  --theme-line-danger:#754652;
+  --theme-line-strong:#827890;
+  --theme-topbar-background:rgba(21,19,27,.94);
+  --theme-nav-background:rgba(33,30,41,.96);
+  --theme-sheet-footer-background:rgba(33,30,41,.98);
+  --theme-surface-glass:rgba(33,30,41,.78);
+  --theme-focus:#bd9bf9;
+  --theme-line:var(--line);
+  --theme-ink:var(--ink);
+  --theme-muted:var(--muted);
+  --theme-purple-dark:var(--purple-dark);
+  --theme-ok:var(--ok);
+  --theme-warn:var(--warn);
+  --theme-danger:var(--danger);
+}
+
+.theme-toggle:not([hidden]){
+  display:grid;
+  place-items:center;
+  flex:none;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:var(--surface);
+  color:var(--ink);
+  cursor:pointer;
+}
+.theme-toggle:hover{background:var(--purple-pale);color:var(--purple-dark)}
+.theme-toggle:focus-visible{outline:2px solid var(--purple-dark);outline-offset:2px}
+.theme-toggle svg{width:20px;height:20px}
+.theme-toggle[aria-pressed="true"] .theme-icon-moon,
+.theme-toggle[aria-pressed="false"] .theme-icon-sun{display:none}
+
+
 /* F111 mobile composer freeze: scoped to the production composer only. */
 .f111-compose-hero{margin-bottom:12px;padding:20px 18px;border-radius:20px}
 .f111-compose-hero h1{font-size:27px;line-height:1.12;margin:8px 0 10px}
@@ -2413,3 +2474,49 @@ body:has(.f111-workspace) .f111-action-drawer-close{width:44px;height:44px;flex-
 .prep-card-actions{display:flex;justify-content:flex-end;min-height:30px}
 .f111-workspace .member-composer-profile{color:var(--f111-meta-color);font-size:var(--f111-meta-size)}
 .f111-workspace .member-composer-profile p{margin:4px 0 0}
+
+/* ---------- Phone pass (2026-11): coach-first navigation, one bottom bar, 44px targets ---------- */
+.sidebar-feedback{display:none}
+.coach-start{display:grid;gap:10px;margin-bottom:18px}
+.coach-start-f111{display:grid;gap:12px;padding:16px;border:1px solid var(--theme-line-selected, #d8c6ff);border-radius:18px;background:var(--purple-pale)}
+.coach-start-f111-title,.coach-start-members,.coach-start-template{display:flex;align-items:center;gap:10px;min-height:44px;color:inherit;text-decoration:none}
+.coach-start-f111-title b{font-size:20px;font-weight:800}
+.coach-start-f111-title i,.coach-start-members i,.coach-start-template i{margin-left:auto;font-style:normal;font-size:22px;color:var(--purple-dark)}
+.coach-start-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.coach-start-level{display:grid;place-items:center;min-height:48px;border-radius:12px;background:var(--theme-primary, var(--purple-dark));color:#fff;font-size:16px;font-weight:800;text-decoration:none}
+.coach-start-members{padding:0 16px;min-height:56px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.coach-start-members b{font-size:17px;font-weight:800}
+.coach-start-others{margin-bottom:18px}
+.coach-start-others h2{margin:0 0 6px;font-size:13px;font-weight:700;color:var(--muted)}
+.coach-start-others ul{margin:0;padding:0;list-style:none;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.coach-start-others li+li{border-top:1px solid var(--line)}
+.coach-start-template{padding:0 16px;min-height:52px}
+.coach-start-template b{font-size:15px;font-weight:700}
+.coach-start-template small{color:var(--muted);font-size:12px}
+.coach-start-template.future{opacity:.65}
+.mobile-nav button{border:0;background:none;font:inherit;cursor:pointer}
+
+@media(max-width:979px){
+  body{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+  .mobile-nav{grid-template-columns:repeat(4,1fr);height:calc(56px + env(safe-area-inset-bottom))}
+  .mobile-nav a,.mobile-nav button{display:grid;place-items:center;min-height:56px;font-size:12px;font-weight:700;color:var(--muted)}
+  .mobile-nav .active{color:var(--purple-dark)}
+  .mobile-menu-button,.quick-feedback{display:none!important}
+  .sidebar-foot .sidebar-feedback{display:block;margin-bottom:8px}
+  .sidebar.is-mobile-open{z-index:60;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  /* The composer is a focused task screen: its copy/save bar replaces the tab bar. */
+  body:has(.f111-workspace) .mobile-menu-button{display:block!important;min-width:44px;min-height:44px}
+  body:has(.f111-workspace){--f111-nav-height:env(safe-area-inset-bottom)}
+  body:has(.f111-workspace) .mobile-nav{display:none}
+  html:has(.f111-workspace){scroll-padding-block:68px calc(72px + env(safe-area-inset-bottom))}
+  .f111-workspace .f111-course-output-section{padding-bottom:calc(7px + env(safe-area-inset-bottom))}
+  .f111-workspace .f111-prep-section .f111-replace-trigger,.f111-workspace .f111-strength-section .f111-replace-trigger,.f111-workspace .f111-foam-card .f111-replace-trigger{min-width:44px;height:44px;min-height:44px}
+}
+@media(max-width:979px){
+  /* Grow the tap area of action-name links without changing the row layout. */
+  .f111-workspace .f111-slot-main h3 a{position:relative}
+  .f111-workspace .f111-slot-main h3 a::after{content:'';position:absolute;inset:-12px -6px}
+  .member-back-link{display:inline-flex;align-items:center;min-height:44px}
+  .member-session-delete-action{min-width:44px}
+}
+.coach-start,.coach-start-others{max-width:760px}

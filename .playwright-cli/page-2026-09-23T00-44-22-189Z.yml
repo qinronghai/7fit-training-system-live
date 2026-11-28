@@ -1,0 +1,519 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - button "打开导航" [ref=f2e5]: ☰
+      - generic [ref=f2e6]:
+        - generic [ref=f2e7]: F111｜女性综合训练
+        - generic [ref=f2e8]: 自由组合编课
+    - main [ref=f2e9]:
+      - generic [ref=f2e413]:
+        - text: F111 课程说明
+        - heading "F111｜女性综合训练" [level=1] [ref=f2e414]
+        - paragraph [ref=f2e415]: 围绕女性常见的下肢力量、体态改善与核心稳定需求，把下肢、上肢和核心训练灵活组合。每次训练既能强化臀腿、改善体态，也能提升身体稳定与整体力量，适合循序渐进地塑形和建立长期训练习惯。
+        - generic [ref=f2e416]:
+          - generic [ref=f2e417]: 强化臀腿
+          - generic [ref=f2e418]: 改善体态
+          - generic [ref=f2e419]: 提升核心稳定
+        - text: "7"
+      - navigation "编课步骤" [ref=f2e421]:
+        - generic [ref=f2e422]:
+          - generic [aria-hidden] [ref=f2e423]: "01"
+          - generic [ref=f2e424]: 选择阶段
+        - generic [ref=f2e425]:
+          - generic [aria-hidden] [ref=f2e426]: "02"
+          - generic [ref=f2e427]: 选择模式
+        - generic [ref=f2e428]:
+          - generic [aria-hidden] [ref=f2e429]: "03"
+          - generic [ref=f2e430]: 查看课程
+      - generic [ref=f2e431]:
+        - generic [ref=f2e433]:
+          - heading "① 选择训练阶段" [level=2] [ref=f2e434]
+          - paragraph [ref=f2e435]: 先选择课程阶段，系统会匹配相应难度的动作。
+        - generic "选择训练阶段" [ref=f2e436]:
+          - link "L1" [ref=f2e437] [cursor=pointer]:
+            - /url: "#/coach/f111/compose?level=L1&lower=squat&upper=horizontal_pull&core=anti_lateral_flexion"
+          - link "L2" [ref=f2e438] [cursor=pointer]:
+            - /url: "#/coach/f111/compose?level=L2&lower=squat&upper=horizontal_pull&core=anti_lateral_flexion"
+          - link "L3" [ref=f2e439] [cursor=pointer]:
+            - /url: "#/coach/f111/compose?level=L3&lower=squat&upper=horizontal_pull&core=anti_lateral_flexion"
+          - link "L4" [ref=f2e440] [cursor=pointer]:
+            - /url: "#/coach/f111/compose?level=L4&lower=squat&upper=horizontal_pull&core=anti_lateral_flexion"
+        - generic [ref=f2e441]:
+          - heading "选择训练模式" [level=2] [ref=f2e444]
+          - generic [ref=f2e445]:
+            - generic [ref=f2e446]:
+              - generic [ref=f2e447]: 下肢模式
+              - button "下肢模式" [ref=f2e448] [cursor=pointer]:
+                - generic [ref=f2e449]: 下肢推｜蹲 / 膝主导
+                - generic [aria-hidden] [ref=f2e450]: ⌄
+            - generic [ref=f2e451]:
+              - generic [ref=f2e452]: 上肢模式
+              - button "上肢模式" [ref=f2e453] [cursor=pointer]:
+                - generic [ref=f2e454]: 水平拉
+                - generic [aria-hidden] [ref=f2e455]: ⌄
+          - generic [ref=f2e456]:
+            - generic [ref=f2e457]: 当前组合
+            - generic [ref=f2e458]: L2｜下肢推 + 水平拉
+      - generic [ref=f2e460]:
+        - generic [ref=f2e461]:
+          - heading "2F｜热身" [level=2] [ref=f2e463]
+          - generic [ref=f2e464]: 约 10–12 分钟
+        - generic [ref=f2e465]:
+          - generic [ref=f2e466]: 泡沫轴
+          - generic [ref=f2e467]: 训练前激活
+        - generic [ref=f2e468]:
+          - article [ref=f2e469]:
+            - generic [ref=f2e470]:
+              - generic [ref=f2e471]: 放松
+              - button "替换泡沫轴松解-肩部" [ref=f2e472] [cursor=pointer]:
+                - generic [ref=f2e473]: 替换
+                - generic [aria-hidden] [ref=f2e474]: ⌄
+            - link "肩部 · 三角肌 · 肩周软组织 泡沫轴松解-肩部 1组 × 30–45秒/侧" [ref=f2e475] [cursor=pointer]:
+              - /url: "#/system/prep?foam=FOAM-02"
+              - generic [ref=f2e476]: 肩部 · 三角肌 · 肩周软组织
+              - generic [ref=f2e477]: 泡沫轴松解-肩部
+              - paragraph [ref=f2e478]: 1组 × 30–45秒/侧
+            - combobox "泡沫轴松解-肩部：替换动作" [ref=f2e479]:
+              - option "泡沫轴松解-大腿前侧"
+              - option "泡沫轴松解-肩部" [selected]
+              - option "泡沫轴松解-臀部"
+              - option "泡沫轴松解-背阔肌/背侧"
+              - option "泡沫轴松解-大腿内侧"
+              - option "泡沫轴松解-大腿后侧"
+              - option "泡沫轴松解-肱二头肌"
+              - option "泡沫轴松解-胸大肌"
+              - option "泡沫轴松解-肱三头肌"
+              - option "泡沫轴松解-大腿外侧"
+              - option "泡沫轴松解-竖脊肌旁（胸腰段）"
+              - option "泡沫轴松解-小腿"
+          - article [ref=f2e480]:
+            - generic [ref=f2e481]:
+              - generic [ref=f2e482]: 放松
+              - button "替换泡沫轴松解-肩部" [ref=f2e483] [cursor=pointer]:
+                - generic [ref=f2e484]: 替换
+                - generic [aria-hidden] [ref=f2e485]: ⌄
+            - link "肩部 · 三角肌 · 肩周软组织 泡沫轴松解-肩部 1组 × 30–45秒/侧" [ref=f2e486] [cursor=pointer]:
+              - /url: "#/system/prep?foam=FOAM-02"
+              - generic [ref=f2e487]: 肩部 · 三角肌 · 肩周软组织
+              - generic [ref=f2e488]: 泡沫轴松解-肩部
+              - paragraph [ref=f2e489]: 1组 × 30–45秒/侧
+            - combobox "泡沫轴松解-肩部：替换动作" [ref=f2e490]:
+              - option "泡沫轴松解-大腿前侧"
+              - option "泡沫轴松解-肩部" [selected]
+              - option "泡沫轴松解-臀部"
+              - option "泡沫轴松解-背阔肌/背侧"
+              - option "泡沫轴松解-大腿内侧"
+              - option "泡沫轴松解-大腿后侧"
+              - option "泡沫轴松解-肱二头肌"
+              - option "泡沫轴松解-胸大肌"
+              - option "泡沫轴松解-肱三头肌"
+              - option "泡沫轴松解-大腿外侧"
+              - option "泡沫轴松解-竖脊肌旁（胸腰段）"
+              - option "泡沫轴松解-小腿"
+          - article [ref=f2e491]:
+            - generic [ref=f2e492]:
+              - generic [ref=f2e493]: 放松
+              - button "替换泡沫轴松解-臀部" [ref=f2e494] [cursor=pointer]:
+                - generic [ref=f2e495]: 替换
+                - generic [aria-hidden] [ref=f2e496]: ⌄
+            - link "臀大肌 · 臀中肌 泡沫轴松解-臀部 1组 × 30–45秒/侧" [ref=f2e497] [cursor=pointer]:
+              - /url: "#/system/prep?foam=FOAM-11"
+              - generic [ref=f2e498]: 臀大肌 · 臀中肌
+              - generic [ref=f2e499]: 泡沫轴松解-臀部
+              - paragraph [ref=f2e500]: 1组 × 30–45秒/侧
+            - combobox "泡沫轴松解-臀部：替换动作" [ref=f2e501]:
+              - option "泡沫轴松解-大腿前侧"
+              - option "泡沫轴松解-肩部"
+              - option "泡沫轴松解-臀部" [selected]
+              - option "泡沫轴松解-背阔肌/背侧"
+              - option "泡沫轴松解-大腿内侧"
+              - option "泡沫轴松解-大腿后侧"
+              - option "泡沫轴松解-肱二头肌"
+              - option "泡沫轴松解-胸大肌"
+              - option "泡沫轴松解-肱三头肌"
+              - option "泡沫轴松解-大腿外侧"
+              - option "泡沫轴松解-竖脊肌旁（胸腰段）"
+              - option "泡沫轴松解-小腿"
+          - article [ref=f2e502]:
+            - generic [ref=f2e503]:
+              - generic [ref=f2e504]: 放松
+              - button "替换泡沫轴松解-背阔肌/背侧" [ref=f2e505] [cursor=pointer]:
+                - generic [ref=f2e506]: 替换
+                - generic [aria-hidden] [ref=f2e507]: ⌄
+            - link "背阔肌 · 大圆肌周围背侧 泡沫轴松解-背阔肌/背侧 1组 × 30–45秒/侧" [ref=f2e508] [cursor=pointer]:
+              - /url: "#/system/prep?foam=FOAM-08"
+              - generic [ref=f2e509]: 背阔肌 · 大圆肌周围背侧
+              - generic [ref=f2e510]: 泡沫轴松解-背阔肌/背侧
+              - paragraph [ref=f2e511]: 1组 × 30–45秒/侧
+            - combobox "泡沫轴松解-背阔肌/背侧：替换动作" [ref=f2e512]:
+              - option "泡沫轴松解-大腿前侧"
+              - option "泡沫轴松解-肩部"
+              - option "泡沫轴松解-臀部"
+              - option "泡沫轴松解-背阔肌/背侧" [selected]
+              - option "泡沫轴松解-大腿内侧"
+              - option "泡沫轴松解-大腿后侧"
+              - option "泡沫轴松解-肱二头肌"
+              - option "泡沫轴松解-胸大肌"
+              - option "泡沫轴松解-肱三头肌"
+              - option "泡沫轴松解-大腿外侧"
+              - option "泡沫轴松解-竖脊肌旁（胸腰段）"
+              - option "泡沫轴松解-小腿"
+        - generic [ref=f2e513]:
+          - generic [ref=f2e514]: 动态热身与激活
+          - generic [ref=f2e515]: 按课程自动匹配
+        - generic [ref=f2e516]:
+          - article [ref=f2e517]:
+            - generic [ref=f2e518]: 髋内收肌活动
+            - generic [ref=f2e520]:
+              - link "青蛙趴内收肌伸展" [ref=f2e521] [cursor=pointer]:
+                - /url: "#/system/prep?focus=PREP-11"
+                - generic [aria-hidden] [ref=f2e523]: ↗
+              - button "替换青蛙趴内收肌伸展" [ref=f2e524] [cursor=pointer]:
+                - generic [ref=f2e525]: 替换
+                - generic [aria-hidden] [ref=f2e526]: ⌄
+            - paragraph [ref=f2e527]: 1组 × 20–30秒或动态后坐6–8次
+            - combobox "下肢 / 髋踝活动：热身动作替换" [ref=f2e528]:
+              - option "P1｜青蛙趴内收肌伸展" [selected]
+              - option "P1｜90/90坐姿前倾臀部伸展"
+              - option "P1｜四足跪姿内收肌后坐"
+              - option "P1｜娃娃蹲"
+              - option "P2｜四足跪姿髋伸展"
+          - article [ref=f2e529]:
+            - generic [ref=f2e530]: 髋内外旋动态活动
+            - generic [ref=f2e532]:
+              - link "动态90/90髋旋转转换" [ref=f2e533] [cursor=pointer]:
+                - /url: "#/system/prep?focus=PREP-13"
+                - generic [aria-hidden] [ref=f2e535]: ↗
+              - button "替换动态90/90髋旋转转换" [ref=f2e536] [cursor=pointer]:
+                - generic [ref=f2e537]: 替换
+                - generic [aria-hidden] [ref=f2e538]: ⌄
+            - paragraph [ref=f2e539]: 1–2组 × 6–8次/侧
+            - combobox "主动作模式准备：热身动作替换" [ref=f2e540]:
+              - option "P2｜动态90/90髋旋转转换" [selected]
+              - option "P2｜弹力带臀桥外展"
+              - option "P2｜弹力带侧向螃蟹走"
+              - option "P1｜臀桥"
+              - option "P1｜侧卧蚌式开合"
+          - article [ref=f2e541]:
+            - generic [ref=f2e542]: 核心抗伸展 / 动态支撑
+            - generic [ref=f2e544]:
+              - link "平板支撑交替抬腿" [ref=f2e545] [cursor=pointer]:
+                - /url: "#/system/prep?focus=PREP-23"
+                - generic [aria-hidden] [ref=f2e547]: ↗
+              - button "替换平板支撑交替抬腿" [ref=f2e548] [cursor=pointer]:
+                - generic [ref=f2e549]: 替换
+                - generic [aria-hidden] [ref=f2e550]: ⌄
+            - paragraph [ref=f2e551]: 1–2组 × 6–10次/侧
+            - combobox "核心 / 躯干激活：热身动作替换" [ref=f2e552]:
+              - option "P2｜平板支撑交替抬腿" [selected]
+              - option "P2｜高位平板交替触肩"
+              - option "P2｜死虫式腿部交替伸展"
+              - option "P2｜四足跪姿髋伸展"
+              - option "P1｜仰卧双腿伸直保持"
+          - article [ref=f2e553]:
+            - generic [ref=f2e554]: 肩关节活动度
+            - generic [ref=f2e556]:
+              - link "弹力带肩关节前后绕环" [ref=f2e557] [cursor=pointer]:
+                - /url: "#/system/prep?focus=PREP-04"
+                - generic [aria-hidden] [ref=f2e559]: ↗
+              - button "替换弹力带肩关节前后绕环" [ref=f2e560] [cursor=pointer]:
+                - generic [ref=f2e561]: 替换
+                - generic [aria-hidden] [ref=f2e562]: ⌄
+            - paragraph [ref=f2e563]: 1–2组 × 8–12次
+            - combobox "上肢 / 胸椎 / 肩带活动：热身动作替换" [ref=f2e564]:
+              - option "P1｜弹力带肩关节前后绕环" [selected]
+              - option "P1｜跪姿背阔肌动态拉伸"
+              - option "P1｜猫牛式"
+              - option "P1｜弹力带肩关节水平绕环（左右）"
+              - option "P2｜四足跪姿胸椎旋转"
+          - article [ref=f2e565]:
+            - generic [ref=f2e566]: 肩带动态活动
+            - generic [ref=f2e568]:
+              - link "弹力带肩关节水平绕环（左右）" [ref=f2e569] [cursor=pointer]:
+                - /url: "#/system/prep?focus=PREP-05"
+                - generic [aria-hidden] [ref=f2e571]: ↗
+              - button "替换弹力带肩关节水平绕环（左右）" [ref=f2e572] [cursor=pointer]:
+                - generic [ref=f2e573]: 替换
+                - generic [aria-hidden] [ref=f2e574]: ⌄
+            - paragraph [ref=f2e575]: 1–2组 × 8–10次/方向
+            - combobox "整合动态热身：热身动作替换" [ref=f2e576]:
+              - option "P1｜弹力带肩关节水平绕环（左右）" [selected]
+              - option "P1｜四足跪姿内收肌后坐"
+              - option "P1｜高位平板支撑"
+              - option "P1｜前臂平板支撑"
+              - option "P2｜高位平板交替触肩"
+      - generic [ref=f2e577]:
+        - generic [ref=f2e578]:
+          - generic [ref=f2e579]:
+            - heading "1F｜力量训练" [level=2] [ref=f2e580]
+            - paragraph [ref=f2e581]: 主项、支撑、辅助和核心动作组成完整课程。
+          - generic [ref=f2e582]: 约 40–43 分钟
+        - generic [ref=f2e583]:
+          - article [ref=f2e584]:
+            - generic [ref=f2e585]:
+              - generic [ref=f2e586]:
+                - generic [ref=f2e587]: A｜下肢主项
+                - generic [ref=f2e588]: T2
+              - button "替换哑铃高脚杯深蹲" [ref=f2e589] [cursor=pointer]:
+                - generic [ref=f2e590]: 替换
+                - generic [aria-hidden] [ref=f2e591]: ⌄
+            - link "查看哑铃高脚杯深蹲详情" [ref=f2e592] [cursor=pointer]:
+              - /url: "#/library?focus=V13_SQ_DB_GOBLET"
+              - heading "哑铃高脚杯深蹲" [level=3] [ref=f2e593]
+              - generic [aria-hidden] [ref=f2e594]: ↗
+            - combobox "A｜下肢主项：替换动作" [ref=f2e595]:
+              - option "T2｜哑铃高脚杯深蹲" [selected]
+              - option "T1｜徒手深蹲"
+          - article [ref=f2e596]:
+            - generic [ref=f2e597]:
+              - generic [ref=f2e598]:
+                - generic [ref=f2e599]: B｜上肢主项
+                - generic [ref=f2e600]: T2
+              - button "替换飞机拉背中把位" [ref=f2e601] [cursor=pointer]:
+                - generic [ref=f2e602]: 替换
+                - generic [aria-hidden] [ref=f2e603]: ⌄
+            - link "查看飞机拉背中把位详情" [ref=f2e604] [cursor=pointer]:
+              - /url: "#/library?focus=feiji_labei_zhongba"
+              - heading "飞机拉背中把位" [level=3] [ref=f2e605]
+              - generic [aria-hidden] [ref=f2e606]: ↗
+            - combobox "B｜上肢主项：替换动作" [ref=f2e607]:
+              - option "T2｜飞机拉背中把位" [selected]
+              - option "T1｜基础肩胛划船（轻重量）"
+          - article [ref=f2e608]:
+            - generic [ref=f2e609]:
+              - generic [ref=f2e610]:
+                - generic [ref=f2e611]: D2｜上肢辅助
+                - generic [ref=f2e612]: 辅助
+              - button "替换哑铃俯身反向飞鸟" [ref=f2e613] [cursor=pointer]:
+                - generic [ref=f2e614]: 替换
+                - generic [aria-hidden] [ref=f2e615]: ⌄
+            - link "查看哑铃俯身反向飞鸟详情" [ref=f2e616] [cursor=pointer]:
+              - /url: "#/library?focus=houzu_sanji"
+              - heading "哑铃俯身反向飞鸟" [level=3] [ref=f2e617]
+              - generic [aria-hidden] [ref=f2e618]: ↗
+            - combobox "D2｜上肢辅助：替换动作" [ref=f2e619]:
+              - option "哑铃俯身反向飞鸟" [selected]
+              - option "面拉"
+              - option "绳索二头弯举"
+              - option "绳索肩外旋"
+              - option "俯身Y举"
+              - option "斜板Y/T/W（进阶）"
+              - option "蝴蝶机反向飞鸟"
+              - option "飞机拉背下把位"
+              - option "低斜面拉上举"
+              - option "T1｜基础肩胛划船（轻重量）"
+          - article [ref=f2e620]:
+            - generic [ref=f2e621]:
+              - generic [ref=f2e622]:
+                - generic [ref=f2e623]: D1｜下肢辅助
+                - generic [ref=f2e624]: 辅助
+              - button "替换坐姿腿屈伸" [ref=f2e625] [cursor=pointer]:
+                - generic [ref=f2e626]: 替换
+                - generic [aria-hidden] [ref=f2e627]: ⌄
+            - link "查看坐姿腿屈伸详情" [ref=f2e628] [cursor=pointer]:
+              - /url: "#/library?focus=tui_qushen"
+              - heading "坐姿腿屈伸" [level=3] [ref=f2e629]
+              - generic [aria-hidden] [ref=f2e630]: ↗
+            - combobox "D1｜下肢辅助：替换动作" [ref=f2e631]:
+              - option "坐姿腿屈伸" [selected]
+              - option "坐姿髋外展"
+              - option "坐姿腿弯举"
+              - option "绳索站姿髋外展"
+              - option "髋内收"
+              - option "臀部后踢腿"
+              - option "绳索站姿髋内收"
+              - option "T4｜单腿臀推"
+              - option "T2｜臀推机"
+              - option "T1｜三点杆髋铰链"
+              - option "T2｜山羊挺身"
+              - option "T2｜扶持哑铃单腿罗马尼亚硬拉"
+              - option "T1｜扶持单腿髋铰链（徒手）"
+              - option "T2｜徒手分腿蹲"
+              - option "T1｜扶持分腿蹲"
+        - generic [ref=f2e633]:
+          - generic [ref=f2e634]:
+            - generic [ref=f2e635]: 核心功能
+            - generic [ref=f2e636]: 选择训练方向
+          - navigation "核心功能" [ref=f2e637]:
+            - link "抗伸展" [ref=f2e638] [cursor=pointer]:
+              - /url: "#/coach/f111/compose?level=L2&lower=squat&upper=horizontal_pull&core=anti_extension"
+            - link "抗旋转" [ref=f2e639] [cursor=pointer]:
+              - /url: "#/coach/f111/compose?level=L2&lower=squat&upper=horizontal_pull&core=anti_rotation"
+            - link "抗侧屈" [ref=f2e640] [cursor=pointer]:
+              - /url: "#/coach/f111/compose?level=L2&lower=squat&upper=horizontal_pull&core=anti_lateral_flexion"
+        - generic [ref=f2e641]:
+          - article [ref=f2e642]:
+            - generic [ref=f2e643]:
+              - generic [ref=f2e644]:
+                - generic [ref=f2e645]: C｜支撑模式
+                - generic [ref=f2e646]: SUP-S2
+              - button "C｜支撑模式 四足跪姿单手抬起" [ref=f2e647] [cursor=pointer]:
+                - generic [ref=f2e648]: C｜支撑模式
+                - generic [ref=f2e649]: 四足跪姿单手抬起
+                - generic [aria-hidden] [ref=f2e650]: ⌄
+            - link "查看四足跪姿单手抬起详情" [ref=f2e651] [cursor=pointer]:
+              - /url: "#/system/support?focus=SUP-S2-01"
+              - heading "四足跪姿单手抬起" [level=3] [ref=f2e652]
+              - generic [aria-hidden] [ref=f2e653]: ↗
+            - combobox "C｜支撑模式：替换动作" [ref=f2e654]:
+              - option "SUP-S1｜四足跪姿支撑"
+              - option "SUP-S1｜跪姿高位平板支撑"
+              - option "SUP-S1｜跪姿前臂平板支撑"
+              - option "SUP-S1｜高位平板支撑"
+              - option "SUP-S1｜前臂平板支撑"
+              - option "SUP-S2｜四足跪姿单手抬起" [selected]
+              - option "SUP-S2｜四足跪姿单腿伸展"
+              - option "SUP-S2｜四足跪姿对侧手腿伸展"
+              - option "SUP-S2｜高位平板单腿抬起"
+              - option "SUP-S2｜熊式悬膝单手抬起"
+              - option "SUP-S3｜四足跪姿对侧手腿交替伸展"
+              - option "SUP-S3｜高位平板交替触肩"
+              - option "SUP-S3｜平板支撑交替抬腿"
+              - option "SUP-S3｜慢速登山"
+              - option "SUP-S3｜熊式悬膝交替触肩"
+              - option "SUP-S3｜直臂支撑前跨步"
+              - option "SUP-S4｜熊爬前进" [disabled]
+              - option "SUP-S4｜熊爬后退" [disabled]
+              - option "SUP-S4｜侧向熊爬" [disabled]
+              - option "SUP-S4｜平板支撑侧向移动" [disabled]
+              - option "SUP-S4｜站姿俯身平板走出" [disabled]
+              - option "SUP-S5｜四足跪姿胸椎旋转" [disabled]
+              - option "SUP-S5｜四足跪姿穿针旋转" [disabled]
+              - option "SUP-S5｜前跨支撑胸椎旋转" [disabled]
+              - option "SUP-S5｜高位平板转侧支撑" [disabled]
+              - option "SUP-S5｜侧支撑穿针旋转" [disabled]
+              - option "SUP-S6｜跪姿侧支撑" [disabled]
+              - option "SUP-S6｜屈膝侧平板支撑" [disabled]
+              - option "SUP-S6｜标准侧平板支撑" [disabled]
+              - option "SUP-S6｜侧平板髋部升降" [disabled]
+              - option "SUP-S6｜侧平板抬上侧腿" [disabled]
+          - article [ref=f2e655]:
+            - generic [ref=f2e656]:
+              - generic [ref=f2e657]:
+                - generic [ref=f2e658]: CORE｜核心模式
+                - generic [ref=f2e659]: CORE-L2
+              - button "CORE｜核心模式 死虫式" [ref=f2e660] [cursor=pointer]:
+                - generic [ref=f2e661]: CORE｜核心模式
+                - generic [ref=f2e662]: 死虫式
+                - generic [aria-hidden] [ref=f2e663]: ⌄
+            - link "查看死虫式详情" [ref=f2e664] [cursor=pointer]:
+              - /url: "#/system/core?focus=CORE-L2-01"
+              - heading "死虫式" [level=3] [ref=f2e665]
+              - generic [aria-hidden] [ref=f2e666]: ↗
+            - combobox "CORE｜核心模式：替换动作" [ref=f2e667]:
+              - option "CORE-L1｜仰卧脚跟滑动"
+              - option "CORE-L1｜仰卧90°脚跟点地"
+              - option "CORE-L1｜死虫静态90/90"
+              - option "CORE-L1｜仰卧交替抬腿"
+              - option "CORE-L1｜仰卧双臂上举配合核心控制"
+              - option "CORE-L2｜死虫式" [selected]
+              - option "CORE-L2｜死虫式对侧伸展"
+              - option "CORE-L2｜弹力带下拉死虫式"
+              - option "CORE-L2｜空心支撑"
+              - option "CORE-L2｜反向卷腹"
+              - option "CORE-L3｜Pallof抗旋转推举" [disabled]
+              - option "CORE-L3｜Pallof抗旋转保持" [disabled]
+              - option "CORE-L3｜农夫行走" [disabled]
+              - option "CORE-L3｜单侧提重行走" [disabled]
+              - option "CORE-L3｜半跪姿Pallof保持" [disabled]
+              - option "CORE-L4｜器械下卷腹" [disabled]
+              - option "CORE-L4｜双杠支撑提膝" [disabled]
+              - option "CORE-L4｜长杠杆死虫式" [disabled]
+              - option "CORE-L4｜绳索劈砍" [disabled]
+              - option "CORE-L4｜高负荷单侧提重行走" [disabled]
+        - generic [ref=f2e668]:
+          - generic [ref=f2e669]:
+            - button "保存当前课程" [ref=f2e670] [cursor=pointer]
+            - button "恢复已保存课程" [disabled] [ref=f2e671]
+          - group [ref=f2e672]:
+            - generic "已保存课程" [ref=f2e673] [cursor=pointer]
+        - generic [ref=f2e676]:
+          - button "复制给教练" [ref=f2e677] [cursor=pointer]
+          - button "复制给会员" [ref=f2e678] [cursor=pointer]
+          - status [ref=f2e679]
+        - generic [ref=f2e680]:
+          - generic [ref=f2e681]:
+            - generic [ref=f2e682]: ✓ 通过
+            - generic [ref=f2e683]: 课程检查
+          - group [ref=f2e684]:
+            - generic "查看检查详情" [ref=f2e685] [cursor=pointer]
+        - group [ref=f2e686]:
+          - generic "训练肌群概览" [ref=f2e687] [cursor=pointer]
+      - generic [ref=f2e688]:
+        - generic [ref=f2e689]:
+          - generic [ref=f2e690]:
+            - heading "完成拉伸｜约 5–8 分钟" [level=2] [ref=f2e691]
+            - paragraph [ref=f2e692]: 训练结束后完成 3 个主要部位拉伸。
+          - text: RECOVERY
+        - generic [ref=f2e693]:
+          - article [ref=f2e694]:
+            - generic [ref=f2e695]:
+              - generic [ref=f2e696]: 主要部位
+              - generic [ref=f2e697]: 上背与腋下
+            - strong [ref=f2e698]: 背阔肌拉伸
+            - generic [ref=f2e699]: 45 秒
+            - paragraph [ref=f2e700]: 本节练到较多上背与腋下
+            - link "查看动作详情" [ref=f2e701] [cursor=pointer]:
+              - /url: "#/library?focus=beikuo_lashen"
+          - article [ref=f2e702]:
+            - generic [ref=f2e703]:
+              - generic [ref=f2e704]: 主要部位
+              - generic [ref=f2e705]: 髋前侧
+            - strong [ref=f2e706]: 髋屈肌拉伸
+            - generic [ref=f2e707]: 45 秒
+            - paragraph [ref=f2e708]: 本节练到较多髋前侧
+            - link "查看动作详情" [ref=f2e709] [cursor=pointer]:
+              - /url: "#/library?focus=lashen_kuanju"
+          - article [ref=f2e710]:
+            - generic [ref=f2e711]:
+              - generic [ref=f2e712]: 主要部位
+              - generic [ref=f2e713]: 肩后侧
+            - strong [ref=f2e714]: 教练被动肩后侧拉伸
+            - generic [ref=f2e715]: 45 秒
+            - paragraph [ref=f2e716]: 本节练到较多肩后侧
+            - link "查看动作详情" [ref=f2e717] [cursor=pointer]:
+              - /url: "#/library?focus=passive_posterior_shoulder_stretch"
+      - generic [ref=f2e718]:
+        - generic [ref=f2e719]:
+          - generic [ref=f2e720]:
+            - heading "POST CARDIO ONLY｜课后自主有氧" [level=2] [ref=f2e721]
+            - paragraph [ref=f2e722]: 不计入 F111 的 60 分钟力量模板；按会员独立有氧处方执行。
+          - text: 约 30 分钟
+        - generic [ref=f2e723]:
+          - generic [ref=f2e724]:
+            - generic [ref=f2e725]: 器械
+            - combobox "器械" [ref=f2e726]:
+              - option "跑步机" [selected]
+              - option "楼梯机"
+              - option "其他有氧"
+          - generic [ref=f2e727]:
+            - generic [ref=f2e728]: 时长
+            - combobox "时长" [ref=f2e729]:
+              - option "约 20 分钟"
+              - option "约 25 分钟"
+              - option "约 30 分钟" [selected]
+              - option "约 35 分钟"
+              - option "约 40 分钟"
+              - option "约 45 分钟"
+          - generic [ref=f2e730]:
+            - generic [ref=f2e731]: 平均心率
+            - combobox "平均心率" [ref=f2e732]:
+              - option "120–130 bpm"
+              - option "130–140 bpm" [selected]
+              - option "140–150 bpm"
+              - option "150–160 bpm"
+          - generic [ref=f2e733]:
+            - button "复制本模块" [ref=f2e734] [cursor=pointer]
+            - status
+        - paragraph [ref=f2e735]: 跑步机 · 约 30 分钟 · 平均心率 130–140 bpm
+  - navigation "移动端主导航" [ref=f2e333]:
+    - link "编课" [ref=f2e334] [cursor=pointer]:
+      - /url: "#/coach"
+    - link "体系" [ref=f2e336] [cursor=pointer]:
+      - /url: "#/system/patterns"
+    - link "规则" [ref=f2e338] [cursor=pointer]:
+      - /url: "#/rules/venue"
+    - link "动作库" [ref=f2e340] [cursor=pointer]:
+      - /url: "#/library"
+    - link "更多" [ref=f2e342] [cursor=pointer]:
+      - /url: "#/maintenance"

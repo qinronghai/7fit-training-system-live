@@ -60,5 +60,5 @@ assert(signatures.filter(x=>x.kind==='composer').every(x=>x.result.hardCount===0
 const payload=JSON.stringify(signatures);
 const hash=crypto.createHash('sha256').update(payload).digest('hex');
 console.log(`F111_CONFLICT_BASELINE_SHA=${hash}`);
-assert.strictEqual(hash,'7fc2b89da507ca32fbf15669d99d9827fb07c3e0a4cb2daba63beeea3b265da3','F111 conflict behavior changed from the support/core quality contract');
+assert.strictEqual(hash,'b38c050772a13fa5c3f3ff50430a47d57f8d24abd29449c172b3d0c085145b42','F111 conflict behavior changed from the support/core quality contract');
 console.log('f111_conflict_parity_test: support/core quality baseline GREEN');

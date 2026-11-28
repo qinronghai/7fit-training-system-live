@@ -34,8 +34,8 @@ const squatL3=A.candidates({
   currentActionIds:['hake_shendun','feiji_labei_zhongba'],
 });
 const ids=squatL3.candidates.map(x=>x.actionId);
-assert.strictEqual(ids[0],'tui_qushen','legacy default should stay first while the replacement pool expands');
-assert(ids.includes('tui_wanju'));
+assert.strictEqual(ids[0],'tui_wanju','a squat day leads with knee flexion to cover the posterior chain');
+assert(ids.includes('tui_qushen'));
 assert(ids.includes('shengsuo_kuan_neishou'),'new shared-domain candidate should reach F111 D1');
 assert(!ids.includes('hake_shendun'),'current main must not appear as D1');
 assert(!ids.includes('gangling_yingla'),'high-fatigue main lift must not leak into D1');

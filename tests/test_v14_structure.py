@@ -67,9 +67,9 @@ def test_all_local_assets_exist():
 
 def test_mobile_navigation_has_five_primary_destinations():
     s = soup()
-    links = s.select('#mobile-nav a')
-    assert len(links) == 5
-    assert [a.get_text(' ', strip=True) for a in links] == ['编课','会员','体系','动作库','更多']
+    items = s.select('#mobile-nav a, #mobile-nav button')
+    assert [a.get_text(' ', strip=True) for a in items] == ['编课','会员','动作库','更多']
+    assert s.select_one('#mobile-nav [data-mobile-more]')
 
 
 def test_f111_home_uses_the_composer_without_the_preset_landing():

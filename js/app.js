@@ -36,6 +36,8 @@
       link.classList.toggle('active',active);
       if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
     });
+    // System, rules and maintenance live behind the phone 更多 tab.
+    document.querySelector('[data-mobile-more]')?.classList.toggle('active',['system','rules','maintenance'].includes(area));
   }
   function isF111ComposerRoute(route){
     return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
@@ -67,6 +69,7 @@
     titleNode.textContent=title;
     document.getElementById('page-subtitle').textContent=sub;
     setActive(['member-list','member-detail'].includes(route.page)?'members':route.area);
+    document.querySelectorAll('dialog[data-member-save-dialog][open]').forEach(dialog=>dialog.close());
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
     const restoreUi=isF111ComposerRoute(route)?window.V14CoachModules?.ComposerView?.captureUi(main):null;
@@ -81,6 +84,7 @@
     const menu=document.getElementById('mobile-navigation');
     menu.append(document.querySelector('.primary-nav').cloneNode(true));
     document.getElementById('mobile-menu-button').addEventListener('click',()=>menu.showModal());
+    document.querySelector('[data-mobile-more]')?.addEventListener('click',()=>menu.showModal());
     menu.addEventListener('click',event=>{if(event.target.closest('a,button'))menu.close();});
     const mode=window.V14State?.getMode?.()||'coach'; document.body.dataset.mode=mode;
     const btn=document.getElementById('mode-toggle');

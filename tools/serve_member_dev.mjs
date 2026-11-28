@@ -21,7 +21,7 @@ const memberApi = createMemberApi({ auth: { verify: () => ({ ok: true }) }, repo
 const types = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript',
   '.mjs': 'text/javascript', '.json': 'application/json', '.jpeg': 'image/jpeg',
-  '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml',
+  '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json',
   '.gif': 'image/gif', '.mp4': 'video/mp4', '.woff2': 'font/woff2',
 };
 

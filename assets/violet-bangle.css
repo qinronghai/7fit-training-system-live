@@ -1,0 +1,223 @@
+/*
+ * Violet Bangle — style layer for the coach app. Spec: DESIGN.md. Tokens: assets/tokens.css.
+ * Loaded after app.css: it bridges the legacy variables to the tokens, then restyles the phone screens.
+ */
+
+/* ---------- 1. Bridge: legacy variables read the tokens ---------- */
+:root,:root[data-theme="dark"]{
+  --bg:var(--vb-page);
+  --surface:var(--vb-sheet);
+  --surface-soft:var(--vb-well);
+  --ink:var(--vb-ink);
+  --muted:var(--vb-ink-2);
+  --line:var(--vb-hairline);
+  --purple:var(--vb-bead-violet);
+  --purple-dark:var(--vb-band-violet);
+  --purple-soft:var(--vb-well);
+  --purple-pale:var(--vb-well);
+  /* Colour never carries a verdict: status reads from its words. */
+  --ok:var(--vb-ink);
+  --warn:var(--vb-ink);
+  --danger:var(--vb-ink);
+  --theme-primary:var(--vb-band-violet);
+  --theme-primary-hover:var(--vb-band-orchid);
+  --theme-ink:var(--vb-ink);
+  --theme-muted:var(--vb-ink-2);
+  --theme-line:var(--vb-hairline);
+  --theme-line-tint:var(--vb-hairline);
+  --theme-line-selected:var(--vb-bead-lilac);
+  --theme-line-strong:var(--vb-ink-2);
+  --theme-line-success:var(--vb-hairline);
+  --theme-line-warning:var(--vb-hairline);
+  --theme-line-danger:var(--vb-hairline);
+  --theme-surface-hover:var(--vb-well);
+  --theme-surface-tint:var(--vb-well);
+  --theme-surface-selected:var(--vb-well);
+  --theme-surface-success:var(--vb-well);
+  --theme-surface-warning:var(--vb-well);
+  --theme-surface-danger:var(--vb-well);
+  --theme-ok:var(--vb-ink);
+  --theme-warn:var(--vb-ink);
+  --theme-danger:var(--vb-ink);
+  --theme-purple-dark:var(--vb-band-violet);
+  --theme-focus:var(--vb-bead-lilac);
+  --theme-topbar-background:transparent;
+  --theme-nav-background:var(--vb-sheet);
+  --theme-sheet-footer-background:var(--vb-sheet);
+  --theme-surface-glass:var(--vb-sheet);
+  --f111-meta-color:var(--vb-ink-2);
+  font-family:var(--vb-font);
+}
+:root[data-theme="dark"]{--purple-dark:var(--vb-bead-lilac);--theme-purple-dark:var(--vb-bead-lilac)}
+body{background:var(--vb-page);color:var(--vb-ink);font-family:var(--vb-font)}
+button,input,select,textarea{font-family:inherit}
+
+/* ---------- 2. Shared components: beads, pills, labels, the bangle ---------- */
+.vb-label{font-size:var(--vb-type-label);font-weight:var(--vb-weight-bold);letter-spacing:var(--vb-tracking-label);text-transform:uppercase;color:var(--vb-ink-2)}
+.vb-pill{display:inline-flex;align-items:center;min-height:28px;padding:2px 10px;border-radius:var(--vb-radius-pill);background:var(--vb-well);color:var(--vb-ink);font-family:var(--vb-font-figure),var(--vb-font);font-size:var(--vb-type-pill);font-weight:var(--vb-weight-demi);white-space:nowrap}
+.vb-bead{display:inline-grid;place-items:center;flex:0 0 var(--vb-bead);width:var(--vb-bead);height:var(--vb-bead);border-radius:50%;background:var(--vb-bead-color,var(--vb-bead-violet));color:#fff;font-size:13px;font-weight:var(--vb-weight-heavy);line-height:1}
+.vb-row{display:flex;align-items:center;gap:var(--vb-space-3);min-height:var(--vb-tap)}
+.vb-row-name{font-size:var(--vb-type-row);font-weight:var(--vb-weight-medium)}
+.vb-row .vb-pill{margin-left:auto}
+[data-vb-bucket="lower"]{--vb-bead-color:var(--vb-bucket-lower)}
+[data-vb-bucket="upper"]{--vb-bead-color:var(--vb-bucket-upper)}
+[data-vb-bucket="support"]{--vb-bead-color:var(--vb-bucket-support)}
+[data-vb-bucket="core"]{--vb-bead-color:var(--vb-bucket-core)}
+
+.vb-bangle{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--vb-space-5);margin:0 0 var(--vb-space-4);padding:var(--vb-space-4) var(--vb-space-5) var(--vb-space-4) var(--vb-space-4);border-radius:var(--vb-radius-sheet);background:var(--vb-sheet);box-shadow:var(--vb-shadow-sheet)}
+.vb-bangle-ring{position:relative;width:148px;height:148px}
+.vb-bangle-hoop{width:100%;height:100%;display:block}
+.vb-bangle-center{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:2px;text-align:center}
+.vb-bangle-disc{width:14px;height:14px;border-radius:50%;background:var(--vb-bead-violet)}
+.vb-bangle-center strong{font-family:var(--vb-font-figure),var(--vb-font);font-size:44px;font-weight:var(--vb-weight-heavy);line-height:1;letter-spacing:-.03em;color:var(--vb-ink)}
+.vb-bangle-center strong small{margin-left:2px;font-size:var(--vb-type-unit);font-weight:var(--vb-weight-bold)}
+.vb-bangle-center .vb-label{font-size:var(--vb-type-label-sm)}
+.vb-bangle-legend{display:grid;gap:2px;margin:0;padding:0;list-style:none}
+
+/* ---------- 3. Phone screens ---------- */
+@media(max-width:979px){
+  :root{--vb-band-h:158px}
+  body:has(.coach-start){--vb-band-h:150px}
+  body:has(.f111-workspace){--vb-band-h:262px}
+  body:has(.member-directory){--vb-band-h:226px}
+  body:has(.member-detail-page){--vb-band-h:300px}
+
+  /* The band: every screen opens under it; sheets overlap its lower edge. */
+  /* The top bar repeats the band's first strip so it stays seamless while it sticks. */
+  /* Opened from the home screen the status bar overlays the page, so the band grows by the safe area. */
+  .app-column,.topbar{--vb-safe-top:env(safe-area-inset-top,0px);--vb-band-full:calc(var(--vb-band-h) + var(--vb-safe-top));--vb-band-layers:
+    radial-gradient(circle at 94% -18%,var(--vb-band-disc) 0 205px,transparent 205.5px) 0 0/100% var(--vb-band-full) no-repeat,
+    radial-gradient(circle at 4% 128%,var(--vb-band-disc) 0 150px,transparent 150.5px) 0 0/100% var(--vb-band-full) no-repeat,
+    var(--vb-band) 0 0/100% var(--vb-band-full) no-repeat}
+  .app-column{min-height:100vh;background:var(--vb-band-layers),var(--vb-page)}
+  .topbar{height:calc(60px + var(--vb-safe-top));padding-top:var(--vb-safe-top);background:var(--vb-band-layers)!important;border-bottom:0!important;backdrop-filter:none;color:var(--vb-on-band)}
+  .topbar-copy b{color:var(--vb-on-band);font-size:17px;font-weight:var(--vb-weight-heavy);letter-spacing:.02em}
+  .mobile-menu-button{color:var(--vb-on-band)}
+  .theme-toggle{border:0!important;background:var(--vb-on-band-capsule)!important;color:var(--vb-on-band)!important;box-shadow:none!important}
+  #app-header .member-primary-action{border:0;background:var(--vb-on-band-capsule);color:var(--vb-on-band)}
+
+  /* Sheets. */
+  #app-main :is(.section-card,.f111-disclosure,.f111-energy,.conflict-box,.f111-mode-drawer-trigger,.coach-start-f111,.coach-start-members,.coach-start-others ul,.member-recent-context,.member-recent-empty,.member-profile,.member-timeline,.member-card,.member-directory-search,.vb-bangle,.f111-strength-grid>.f111-slot-card,.f111-accessory-list,.saved-session-library,.favorites-library){border:0!important;border-radius:var(--vb-radius-sheet)!important;background:var(--vb-sheet)!important;box-shadow:var(--vb-shadow-sheet)}
+  #app-main :is(h1,h2,h3){font-weight:var(--vb-weight-heavy)}
+  #app-main :is(h2){font-size:var(--vb-type-section);letter-spacing:-.01em}
+
+  /* Bottom bars. */
+  .mobile-nav{border-top:0;background:var(--vb-sheet);box-shadow:0 -10px 30px -16px rgba(138,60,230,.3)}
+  .mobile-nav a,.mobile-nav button{font-size:13px;font-weight:var(--vb-weight-bold);color:var(--vb-ink-2)}
+  .mobile-nav .active{color:var(--vb-band-violet)}
+  :root[data-theme="dark"] .mobile-nav .active{color:var(--vb-bead-lilac)}
+
+  /* Home. */
+  .coach-start{margin-top:4px}
+  .coach-start-f111{padding:18px}
+  .coach-start-f111-title b{font-size:24px;font-weight:var(--vb-weight-heavy)}
+  .coach-start-f111-title .recipe-code,.coach-start-template .recipe-code{font-size:var(--vb-type-label-sm);font-weight:var(--vb-weight-bold);letter-spacing:var(--vb-tracking-label);text-transform:uppercase;color:var(--vb-ink-2)}
+  .coach-start-level{min-height:52px;border-radius:var(--vb-radius-pill);background:var(--vb-band-violet);font-family:var(--vb-font-figure),var(--vb-font);font-size:18px;font-weight:var(--vb-weight-heavy)}
+  .coach-start-members b,.coach-start-template b{font-size:var(--vb-type-row);font-weight:var(--vb-weight-bold)}
+  .coach-start-others h2{font-size:var(--vb-type-label)!important;letter-spacing:var(--vb-tracking-label);color:var(--vb-ink-2)}
+  .coach-start-others ul{border:0}
+  .coach-start-template{position:relative}
+  .coach-start-template+*{border:0}
+  .coach-start-others li+li{border-top:1px solid var(--vb-hairline)}
+
+  /* Composer: lead title and level tabs sit on the band. */
+  .f111-workspace .f111-compose-hero h1{color:var(--vb-on-band);font-size:clamp(26px,7.4vw,40px);font-weight:var(--vb-weight-heavy);letter-spacing:-.02em;line-height:1.1}
+  .f111-workspace .f111-compose-hero :is(p,small,span,a){color:var(--vb-on-band-muted)}
+  .f111-workspace .f111-level-switch{gap:6px;margin-bottom:var(--vb-space-4);padding:0;border:0;background:none}
+  .f111-workspace .f111-level-switch a{min-height:44px;border:0!important;border-radius:var(--vb-radius-capsule)!important;background:transparent!important;box-shadow:none!important;color:var(--vb-on-band)!important;font-family:var(--vb-font-figure),var(--vb-font);font-size:var(--vb-type-tab);font-weight:var(--vb-weight-bold);letter-spacing:.08em}
+  .f111-workspace .f111-level-switch a[aria-current="true"]{background:var(--vb-on-band-capsule)!important}
+  .f111-workspace .f111-mode-drawer-trigger .f111-mode-label{font-size:var(--vb-type-label-sm);font-weight:var(--vb-weight-bold);letter-spacing:var(--vb-tracking-label);color:var(--vb-ink-2)}
+  .f111-workspace .f111-mode-drawer-trigger b{font-size:var(--vb-type-row);font-weight:var(--vb-weight-heavy)}
+  .f111-workspace .f111-section-heading h2{font-size:var(--vb-type-section)}
+  .f111-workspace .time-badge{border:0;background:none;color:var(--vb-ink-2);font-size:var(--vb-type-label);font-weight:var(--vb-weight-bold)}
+
+  /* Rows: bead · name · amount pill. Bead hue names the bucket. */
+  .f111-workspace .f111-slot-card[data-composer-slot="A"],.f111-workspace .f111-slot-card[data-composer-slot="D1"]{--vb-bead-color:var(--vb-bucket-lower);--vb-glyph:'下'}
+  .f111-workspace .f111-slot-card[data-composer-slot="B"],.f111-workspace .f111-slot-card[data-composer-slot="D2"]{--vb-bead-color:var(--vb-bucket-upper);--vb-glyph:'上'}
+  .f111-workspace .f111-slot-card[data-composer-slot="C"]{--vb-bead-color:var(--vb-bucket-support);--vb-glyph:'撑'}
+  .f111-workspace .f111-slot-card[data-composer-slot="CORE"]{--vb-bead-color:var(--vb-bucket-core);--vb-glyph:'核'}
+  .f111-workspace .f111-slot-card{background:transparent}
+  .f111-workspace .f111-slot-card .f111-slot-label{display:inline-flex;align-items:center;gap:8px;font-size:var(--vb-type-label-sm);font-weight:var(--vb-weight-bold);letter-spacing:.12em;color:var(--vb-ink-2)}
+  .f111-workspace .f111-slot-card .f111-slot-label::before{content:var(--vb-glyph);display:inline-grid;place-items:center;flex:0 0 var(--vb-bead);width:var(--vb-bead);height:var(--vb-bead);border-radius:50%;background:var(--vb-bead-color);color:#fff;font-size:13px;font-weight:var(--vb-weight-heavy);letter-spacing:0}
+  /* Accessory rows: the bead names the bucket, so the text label stays for screen readers only. */
+  .f111-workspace .f111-slot-card:is([data-composer-slot="C"],[data-composer-slot="D1"],[data-composer-slot="D2"],[data-composer-slot="CORE"]) .f111-slot-label{font-size:0;gap:0}
+  .f111-workspace .f111-slot-main h3,.f111-workspace .f111-slot-main h3 a{font-size:var(--vb-type-row);font-weight:var(--vb-weight-bold);color:var(--vb-ink);text-decoration:none}
+  .f111-workspace :is(.composer-rx-note,.f111-prep-row-text>p,.recovery-prescription,.f111-foam-main>p){display:inline-flex;align-items:center;width:max-content;max-width:100%;margin-top:4px;padding:3px 9px;border-radius:var(--vb-radius-pill);background:var(--vb-well);color:var(--vb-ink);font-family:var(--vb-font-figure),var(--vb-font);font-size:13.5px;font-weight:var(--vb-weight-demi)}
+  .f111-workspace .prep-slot-card{--vb-bead-color:var(--vb-bucket-prep)}
+  .f111-workspace .f111-prep-section .prep-slot-card{display:grid;grid-template-columns:var(--vb-bead) minmax(0,1fr) auto auto;align-items:center;column-gap:var(--vb-space-3)}
+  .f111-workspace .f111-prep-section .prep-slot-card::before{content:'热';display:grid;place-items:center;width:var(--vb-bead);height:var(--vb-bead);border-radius:50%;background:var(--vb-bucket-prep);color:#fff;font-size:13px;font-weight:var(--vb-weight-heavy)}
+  .f111-workspace .f111-prep-section .prep-slot-card .prep-card-action b{font-size:var(--vb-type-row);font-weight:var(--vb-weight-bold)}
+  .f111-workspace .f111-prep-purpose{font-size:var(--vb-type-label-sm);font-weight:var(--vb-weight-bold);letter-spacing:.08em;color:var(--vb-ink-2)}
+  .f111-workspace .recovery-row{display:grid!important;grid-template-columns:var(--vb-bead) minmax(0,1fr) auto!important;align-items:center;column-gap:var(--vb-space-3)}
+  .f111-workspace .recovery-row>span{min-width:0;margin:0;padding:0;justify-self:start}
+  .f111-workspace .recovery-row::before{content:'伸';display:grid;place-items:center;width:var(--vb-bead);height:var(--vb-bead);border-radius:50%;background:var(--vb-bucket-recovery);color:#fff;font-size:13px;font-weight:var(--vb-weight-heavy)}
+  .f111-workspace .recovery-row .recovery-row-region{grid-column:2;grid-row:2;font-size:var(--vb-type-label-sm);font-weight:var(--vb-weight-bold);letter-spacing:.12em;color:var(--vb-ink-2)}
+  .f111-workspace .recovery-row .recovery-row-main{grid-column:2;grid-row:1}
+  .f111-workspace .recovery-row .recovery-row-main b{font-size:var(--vb-type-row);font-weight:var(--vb-weight-bold)}
+  .f111-workspace .recovery-row::before{grid-row:1/span 2}
+  .f111-workspace .recovery-row .recovery-prescription{grid-column:3;grid-row:1/span 2;margin:0}
+  .f111-workspace .f111-replace-trigger{border:0!important;background:transparent!important;color:var(--vb-band-violet)!important;font-weight:var(--vb-weight-bold)}
+  :root[data-theme="dark"] .f111-workspace .f111-replace-trigger{color:var(--vb-bead-lilac)!important}
+  .f111-workspace .f111-disclosure>summary b,.f111-workspace .f111-energy summary span{font-size:18px;font-weight:var(--vb-weight-heavy)}
+
+  /* Course check: neutral sheet, the words carry the status. */
+  .f111-workspace .f111-course-check,.f111-workspace .f111-course-check :is(.issue,.f111-check-reasons){background:var(--vb-sheet)!important;border-color:var(--vb-hairline)!important;color:var(--vb-ink)}
+  .f111-workspace .f111-course-check-status{padding:4px 10px;border-radius:var(--vb-radius-pill);background:var(--vb-well)!important;color:var(--vb-ink)!important;font-weight:var(--vb-weight-heavy)}
+  .f111-workspace .f111-check-details-trigger{color:var(--vb-band-violet);font-weight:var(--vb-weight-bold)}
+
+  /* Copy/save bar. */
+  .f111-workspace .f111-course-output-section{border-top:0!important;background:var(--vb-sheet)!important;box-shadow:0 -10px 30px -16px rgba(138,60,230,.3)}
+  .f111-workspace .f111-course-output-actions button{border-radius:var(--vb-radius-pill)!important;font-weight:var(--vb-weight-heavy)!important}
+  .f111-workspace .f111-copy-trigger,.f111-workspace .has-member .f111-save-member-trigger{background:var(--vb-band-violet)!important;border-color:var(--vb-band-violet)!important;color:#fff!important}
+  .f111-workspace .f111-course-output-section:not(.has-member) .f111-save-member-trigger,.f111-workspace .has-member .f111-copy-trigger{background:var(--vb-well)!important;border-color:var(--vb-well)!important;color:var(--vb-ink)!important}
+
+  /* Member list: the total is the hero figure, status filters are band tabs. */
+  .member-directory{display:flex;flex-direction:column}
+  .member-directory>*{order:4}
+  .member-directory .member-directory-total{order:1;display:flex;align-items:baseline;gap:6px;margin:0 0 6px;padding:0;border:0;background:none!important;color:var(--vb-on-band)}
+  .member-directory .member-directory-total span{color:var(--vb-on-band-muted);font-size:var(--vb-type-label);font-weight:var(--vb-weight-bold);letter-spacing:var(--vb-tracking-label)}
+  .member-directory .member-directory-total strong{font-family:var(--vb-font-figure),var(--vb-font);font-size:var(--vb-type-figure);font-weight:var(--vb-weight-heavy);line-height:1;color:var(--vb-on-band)}
+  .member-directory .member-filter-tabs{order:2;margin-bottom:var(--vb-space-4);border:0!important;gap:6px}
+  .member-directory .member-filter-tabs button{min-height:44px;border:0!important;border-radius:var(--vb-radius-capsule);background:transparent!important;color:var(--vb-on-band)!important;font-size:var(--vb-type-tab);font-weight:var(--vb-weight-bold);box-shadow:none!important}
+  .member-directory .member-filter-tabs button::after{display:none!important}
+  .member-directory .member-filter-tabs button[aria-pressed="true"]{background:var(--vb-on-band-capsule)!important}
+  .member-directory .member-filter-tabs button span{color:inherit;opacity:.85}
+  .member-directory .member-directory-search{order:3;margin-bottom:var(--vb-space-4)}
+
+  /* Member detail: back link, name and actions on the band. */
+  .member-detail-page .member-back-link{color:var(--vb-on-band);font-weight:var(--vb-weight-bold)}
+  .member-detail-page .member-detail-heading h1{color:var(--vb-on-band);font-size:var(--vb-type-lead-phone);font-weight:var(--vb-weight-heavy);letter-spacing:-.02em;line-height:1.05}
+  .member-detail-page .member-detail-heading p{color:var(--vb-on-band-muted);font-size:var(--vb-type-label);font-weight:var(--vb-weight-bold);letter-spacing:var(--vb-tracking-label)}
+  .member-detail-page .member-detail-heading :is(span,summary){color:var(--vb-on-band-muted)!important;font-weight:var(--vb-weight-bold)}
+  .member-detail-page .member-more>summary{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:var(--vb-radius-capsule);background:var(--vb-on-band-capsule);color:var(--vb-on-band)!important}
+  #app-main :is(.member-last-practice,details.member-recent-context){border:0!important;border-radius:var(--vb-radius-sheet)!important;background:var(--vb-sheet)!important;box-shadow:var(--vb-shadow-sheet)}
+  .member-detail-page .member-detail-actions button{border:0!important;background:var(--vb-on-band-capsule)!important;color:var(--vb-on-band)!important;border-radius:var(--vb-radius-capsule)!important}
+  .member-detail-page .member-next-session{border-radius:var(--vb-radius-pill);background:var(--vb-band-violet)!important;color:#fff!important;font-weight:var(--vb-weight-heavy)}
+
+  /* Page heroes become sheets; section sub-navigation becomes band tabs. */
+  #app-main .view-hero{border:0!important;border-radius:var(--vb-radius-sheet)!important;background:var(--vb-sheet)!important;color:var(--vb-ink)!important;box-shadow:var(--vb-shadow-sheet)}
+  #app-main .view-hero::after,#app-main .view-hero:after{content:none!important}
+  #app-main .view-hero :is(h1,h2,h3,b,strong,dd){color:var(--vb-ink)!important}
+  #app-main .view-hero :is(p,span,small,dt){color:var(--vb-ink-2)!important}
+  #app-main .view-hero h1{font-size:clamp(26px,7.4vw,40px);letter-spacing:-.02em}
+  #app-main>.subnav{gap:6px;margin-bottom:var(--vb-space-3);border:0;background:none}
+  #app-main>.subnav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:0!important;border-radius:var(--vb-radius-capsule)!important;background:transparent!important;color:var(--vb-on-band)!important;font-size:var(--vb-type-tab);font-weight:var(--vb-weight-bold);box-shadow:none!important}
+  #app-main>.subnav a.active{background:var(--vb-on-band-capsule)!important}
+
+  /* Session panel rows carry the same bucket beads. */
+  [data-vb-bucket="prep"]{--vb-bead-color:var(--vb-bucket-prep);--vb-glyph:'热'}
+  [data-vb-bucket="lower"]{--vb-glyph:'下'}
+  [data-vb-bucket="upper"]{--vb-glyph:'上'}
+  [data-vb-bucket="support"]{--vb-glyph:'撑'}
+  [data-vb-bucket="core"]{--vb-glyph:'核'}
+  .member-session-execution-item[data-vb-bucket]:not([data-vb-bucket=""]) .member-session-execution-heading strong{display:flex;align-items:center;gap:var(--vb-space-3);font-size:var(--vb-type-row);font-weight:var(--vb-weight-bold)}
+  .member-session-execution-item[data-vb-bucket]:not([data-vb-bucket=""]) .member-session-execution-heading strong::before{content:var(--vb-glyph);display:inline-grid;place-items:center;flex:0 0 var(--vb-bead);width:var(--vb-bead);height:var(--vb-bead);border-radius:50%;background:var(--vb-bead-color);color:#fff;font-size:13px;font-weight:var(--vb-weight-heavy)}
+  .member-session-planned-prescription{display:inline-flex;margin-top:4px;padding:3px 9px;border-radius:var(--vb-radius-pill);background:var(--vb-well);color:var(--vb-ink)!important;font-size:13.5px;font-weight:var(--vb-weight-demi)}
+
+  /* Session panel: the band heads the sheet. */
+  .member-session-dialog .member-session-head{padding-top:max(12px,env(safe-area-inset-top));background:var(--vb-band)!important;color:var(--vb-on-band);border-bottom:0!important}
+  .member-session-dialog .member-session-head :is(h2,h3,p,span,small){color:var(--vb-on-band)!important}
+  .member-session-dialog .member-session-head button{border:0!important;background:var(--vb-on-band-capsule)!important;color:var(--vb-on-band)!important;border-radius:var(--vb-radius-capsule)!important}
+  .member-session-dialog [data-session-footer] button.primary,.member-session-dialog .session-coach-navigation .primary,.member-session-dialog [data-session-tool="start"],.member-session-dialog button[data-session-complete]{background:var(--vb-band-violet)!important;border-color:var(--vb-band-violet)!important;color:#fff!important}
+}
+@media(max-width:979px){.sidebar.is-mobile-open{padding-top:max(18px,env(safe-area-inset-top))}}

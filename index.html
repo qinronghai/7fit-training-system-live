@@ -6,9 +6,19 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="__BUILD_ID__" name="7fit-build"/>
 <title>7Fit 教练工作台 · 编课中心 V14.7</title>
+<script src="js/theme.js"></script>
+<link href="assets/tokens.css" rel="stylesheet"/>
 <link href="assets/app.css" rel="stylesheet"/>
 <link href="assets/replacement-drawer.css" rel="stylesheet"/>
-<link href="assets/7fit-logo-official.jpeg" rel="icon" type="image/jpeg"/></head>
+<link href="assets/violet-bangle.css" rel="stylesheet"/>
+<link href="assets/7fit-logo-official.jpeg" rel="icon" type="image/jpeg"/>
+<link href="assets/manifest.webmanifest" rel="manifest"/>
+<link href="assets/icons/7fit-180.png" rel="apple-touch-icon"/>
+<meta content="#8A3CE6" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="7Fit" name="apple-mobile-web-app-title"/></head>
 <body data-mode="coach">
 <div class="app-shell">
 <aside aria-label="主导航" class="sidebar" id="app-sidebar">
@@ -37,6 +47,10 @@
 <div class="topbar-actions">
 <button id="member-directory-create" class="member-primary-action" data-member-create type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增会员</button>
 <a class="quick-library" href="#/library">搜索动作</a>
+<button id="theme-toggle" class="theme-toggle" type="button" aria-label="深色模式" aria-pressed="false" hidden>
+<svg class="theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20.8 14.2A9 9 0 0 1 9.8 3.2a9 9 0 1 0 11 11Z"/></svg>
+<svg class="theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+</button>
 </div>
 </header>
 <main aria-live="polite" id="app-main" tabindex="-1"></main>
@@ -45,9 +59,8 @@
 <nav aria-label="移动端主导航" class="mobile-nav" id="mobile-nav">
 <a data-area="coach" href="#/coach"><span>编课</span></a>
 <a data-area="members" href="#/coach/members"><span>会员</span></a>
-<a data-area="system" href="#/system/patterns"><span>体系</span></a>
 <a data-area="library" href="#/library"><span>动作库</span></a>
-<a data-area="maintenance" href="#/maintenance"><span>更多</span></a>
+<button data-area="more" data-mobile-more type="button" aria-controls="mobile-navigation" aria-haspopup="dialog"><span>更多</span></button>
 </nav>
 <dialog id="mobile-navigation" aria-label="主导航"><button type="button" autofocus>关闭导航</button></dialog>
 <div class="drawer" hidden="" id="global-drawer"></div>

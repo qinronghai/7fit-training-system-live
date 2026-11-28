@@ -1,0 +1,139 @@
+- generic [ref=e2]:
+  - complementary "主导航" [ref=e3]:
+    - generic [ref=e4]:
+      - generic "7Fit" [ref=e5]:
+        - img "7Fit" [ref=e6]
+      - generic [ref=e7]:
+        - strong [ref=e8]: 7Fit Training
+        - generic [ref=e9]: 教练工作台
+    - navigation [ref=e10]:
+      - link "编课中心" [ref=e11] [cursor=pointer]:
+        - /url: "#/coach"
+      - link "训练体系" [ref=e19] [cursor=pointer]:
+        - /url: "#/system/patterns"
+      - link "编排规则" [ref=e25] [cursor=pointer]:
+        - /url: "#/rules/venue"
+      - link "动作库" [ref=e30] [cursor=pointer]:
+        - /url: "#/library"
+      - link "系统维护" [ref=e36] [cursor=pointer]:
+        - /url: "#/maintenance"
+    - button "切换界面模式" [ref=e43] [cursor=pointer]:
+      - generic [ref=e45]: 教练模式
+      - generic [ref=e46]: 编写课程、查找动作和收藏常用训练
+  - generic [ref=e47]:
+    - generic [ref=e48]:
+      - generic [ref=e49]: 编课中心
+      - generic [ref=e51]:
+        - button "反馈问题" [ref=e52] [cursor=pointer]: 反馈
+        - link "搜索动作" [ref=e53] [cursor=pointer]:
+          - /url: "#/library"
+    - main [active] [ref=e54]:
+      - region [ref=e55]:
+        - generic [ref=e56]:
+          - heading "选择模板，开始编课" [level=1] [ref=e57]
+          - paragraph [ref=e58]: 根据本次训练目标选择模板，安排动作并保存课程。
+        - generic "编课步骤" [ref=e59]:
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - generic [ref=e63]: "01"
+              - generic [ref=e64]:
+                - strong [ref=e65]: 选择模板
+                - generic [ref=e66]: 根据训练目标选择合适的模板。
+            - listitem [ref=e67]:
+              - generic [ref=e68]: "02"
+              - generic [ref=e69]:
+                - strong [ref=e70]: 编排训练内容
+                - generic [ref=e71]: 添加动作并安排训练顺序。
+            - listitem [ref=e72]:
+              - generic [ref=e73]: "03"
+              - generic [ref=e74]:
+                - strong [ref=e75]: 保存课程
+                - generic [ref=e76]: 保存后可在下方查看本次编写的课程。
+        - text: "7"
+      - region [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - heading "选择训练模板" [level=2] [ref=e80]
+            - paragraph [ref=e81]: 按课程目标和训练方式选择模板。
+          - generic [ref=e82]: 5 个模板
+        - generic [ref=e83]:
+          - article [ref=e84]:
+            - generic [ref=e85]:
+              - generic [ref=e86]: F111
+              - generic [ref=e87]: 可使用
+            - heading "女性全身塑形" [level=3] [ref=e88]
+            - paragraph [ref=e89]: 每节课安排一个下肢动作、一个上肢动作和一个支撑动作。
+            - link "选择女性全身塑形" [ref=e90] [cursor=pointer]:
+              - /url: "#/coach/f111"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=e91]: →
+          - article [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]: Body
+              - generic [ref=e95]: 可使用
+            - heading "健美式塑形训练" [level=3] [ref=e96]
+            - paragraph [ref=e97]: 选择目标肌群和复合动作，并安排训练量。
+            - link "选择健美式塑形训练" [ref=e98] [cursor=pointer]:
+              - /url: "#/coach/body"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=e99]: →
+          - article [ref=e100]:
+            - generic [ref=e101]:
+              - generic [ref=e102]: Conditioning
+              - generic [ref=e103]: 可使用
+            - heading "体能训练" [level=3] [ref=e104]
+            - paragraph [ref=e105]: 围绕体能目标组合训练项目，安排训练顺序和强度。
+            - link "选择体能训练" [ref=e106] [cursor=pointer]:
+              - /url: "#/coach/conditioning"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=e107]: →
+          - article [ref=e108]:
+            - generic [ref=e109]:
+              - generic [ref=e110]: HYROX
+              - generic [ref=e111]: 可使用
+            - heading "HYROX 训练" [level=3] [ref=e112]
+            - paragraph [ref=e113]: 结合场地和器械，编排 HYROX 技能、体能、综合训练或体能测试。
+            - link "选择HYROX 训练" [ref=e114] [cursor=pointer]:
+              - /url: "#/coach/hyrox"
+              - text: 选择这个模板
+              - generic [aria-hidden] [ref=e115]: →
+          - article [ref=e116]:
+            - generic [ref=e117]:
+              - generic [ref=e118]: Posture
+              - generic [ref=e119]: 即将开放
+            - heading "体态评估与调整" [level=3] [ref=e120]
+            - paragraph [ref=e121]: 用于体态评估和针对性训练，开放后即可使用。
+            - link "查看体态评估与调整" [ref=e122] [cursor=pointer]:
+              - /url: "#/coach/posture"
+              - text: 查看体态训练规划
+              - generic [aria-hidden] [ref=e123]: →
+      - region [ref=e124]:
+        - generic [ref=e126]:
+          - heading "常用内容" [level=2] [ref=e127]
+          - paragraph [ref=e128]: 查找收藏的动作和训练组合，或查看已保存的课程。
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - heading "常用收藏" [level=2] [ref=e133]
+                - paragraph [ref=e134]: 收藏的动作和训练组合会显示在这里。
+              - link "打开动作库 →" [ref=e135] [cursor=pointer]:
+                - /url: "#/library"
+            - generic [ref=e136]:
+              - generic [ref=e137]: 还没有收藏内容
+              - generic [ref=e138]: 在动作库收藏动作或训练组合后，可在这里快速找到。
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - heading "已保存课程" [level=2] [ref=e142]
+                - paragraph [ref=e143]: 课程只在本次打开期间保留，关闭页面后会清除。
+              - generic [ref=e144]: 临时保存
+            - generic [ref=e145]: 还没有保存的课程。
+      - region [ref=e146]:
+        - generic [ref=e147]:
+          - heading "会员训练记录" [level=2] [ref=e148]
+          - paragraph [ref=e149]: 查看近期完成训练、会员训练重点和课程历史。
+        - link "打开会员训练" [ref=e150] [cursor=pointer]:
+          - /url: "#/coach/members"
+          - text: 打开会员训练
+          - generic [aria-hidden] [ref=e151]: →
