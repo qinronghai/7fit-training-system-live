@@ -152,6 +152,16 @@
     return `<label for="${esc(id)}">${label}<input id="${esc(id)}" type="${type}" data-session-actual="${key}"${type==='number'?' min="'+min+'" max="'+max+'" step="'+step+'"':''}${inputmode?` inputmode="${inputmode}"`:''}${type==='text'?' maxlength="80"':''}></label>`;
   }
 
+  // Bead bucket for the Violet Bangle rows; the same hues as the composer.
+  function bucketFor(item){
+    if(item.phase==='PREP')return 'prep';
+    const key=String(item.slotKey||'').split('__').pop();
+    if(['A','D1','2'].includes(key))return 'lower';
+    if(['B','D2','3'].includes(key))return 'upper';
+    if(['C','SUPPORT'].includes(key))return 'support';
+    if(key==='CORE')return 'core';
+    return '';
+  }
   function executionItemMarkup(item){
     const prep=item.phase==='PREP',available=replacementOptions(item,()=>null).byId;
     const candidates=[...available.values()].filter(action=>action.actionId!==item.plannedActionId);
@@ -161,7 +171,7 @@
       :`<p class="member-session-no-replacements">${prep?'没有找到符合此热身槽位规则的替换动作':'没有找到同训练模式的可选动作'}，仍可按计划完成。</p>`;
     const plannedPrescription=item.plannedPrescriptionSnapshot?.rawText;
     const plannedPrescriptionMarkup=plannedPrescription?`<p class="member-session-planned-prescription" data-session-planned-prescription>计划处方：${esc(plannedPrescription)}</p>`:'';
-    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}"><div class="member-session-execution-heading"><div><strong>${esc(plannedName(item))}</strong>${plannedPrescriptionMarkup}</div>${item.plannedActionSnapshot ? `<button type="button" data-session-tool="record" data-value="${esc(item.id)}" aria-label="记录 ${esc(plannedName(item))}">记录</button>` : ''}</div><details class="member-session-batch"><summary>补记整项</summary>${replacement}<button type="button" data-session-tool="clear-batch" data-value="${esc(item.id)}">清空补记</button><details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps','次数')}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
+    return `<li class="member-session-execution-item" data-session-item="${esc(item.id)}" data-vb-bucket="${bucketFor(item)}"><div class="member-session-execution-heading"><div><strong>${esc(plannedName(item))}</strong>${plannedPrescriptionMarkup}</div>${item.plannedActionSnapshot ? `<button type="button" data-session-tool="record" data-value="${esc(item.id)}" aria-label="记录 ${esc(plannedName(item))}">记录</button>` : ''}</div><details class="member-session-batch"><summary>补记整项</summary>${replacement}<button type="button" data-session-tool="clear-batch" data-value="${esc(item.id)}">清空补记</button><details class="member-session-actual"><summary>添加实际数据（可选）</summary><div class="member-session-actual-grid">${actualField(item,'sets','组数',{type:'number',min:0,max:100,step:1,inputmode:'numeric'})}${actualField(item,'reps','次数')}${actualField(item,'loadKg','负重 kg',{type:'number',min:0,max:2000,step:0.1,inputmode:'decimal'})}${actualField(item,'rir','RIR',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}${actualField(item,'rpe','RPE',{type:'number',min:0,max:10,step:0.5,inputmode:'decimal'})}<label class="member-session-actual-note">备注（可选）<textarea data-session-actual="note" rows="2" maxlength="2000"></textarea></div></details></li>`;
   }
 
   function readOnlyItemMarkup(item,session){
@@ -215,7 +225,7 @@
     dialog.querySelector('[data-session-detail-subtitle]').textContent=[memberContext?.displayName,
       currentSession.templateKey?.toUpperCase(),currentSession.levelSnapshot,dateLabel(currentSession.sessionDate),statusLabel(currentSession.status)].filter(Boolean).join(' · ');
     dialog.querySelector('[data-session-tool="browse"]').hidden=false;
-    const foamRows=(Array.isArray(details.foam)?details.foam:[]).map(item=>`<li><strong>${esc(item.name||'泡沫轴动作')}</strong>${item.prescription?`<span>${esc(item.prescription)}</span>`:''}${item.safety?`<small>${esc(item.safety)}</small>`:''}</li>`).join('');
+    const foamRows=(Array.isArray(details.foam)?details.foam:[]).map(item=>`<li><strong>${esc(item.name||'泡沫轴动作')}</strong>${item.prescription?`<span>${esc(item.prescription)}</span>`:''}</li>`).join('');
     const itemMarkup=planned?executionItemMarkup:item=>readOnlyItemMarkup(item,currentSession);
     const savedWarmups=Array.isArray(details.warmups)?details.warmups:[];
     const prepRows=prepItems.length?prepItems.map(itemMarkup).join(''):savedWarmups.map(item=>`<li class="member-session-item"><div><strong>${esc(item.name||'热身动作')}</strong>${item.role?`<span>${esc(item.role)}</span>`:''}</div><p>${esc(item.prescription||'剂量未记录')}</p></li>`).join('');

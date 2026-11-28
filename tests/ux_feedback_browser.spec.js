@@ -21,6 +21,7 @@ test('coach flow keeps a contextual feedback action available on desktop and mob
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
+  await page.locator('[data-mobile-more]').click();
   await expect(page.getByRole('button', { name: '反馈问题' })).toBeVisible();
   const widths = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,

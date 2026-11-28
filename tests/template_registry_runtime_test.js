@@ -55,11 +55,11 @@ for(const id of D.templateIds){
   const record=D.templateRegistry[id];
   assert(center.includes(`data-template-id="${id}"`),`Coach Center missing data-driven card ${id}`);
   assert(center.includes(coachHomeNames[id]||record.name),`Coach Center missing user-facing name for ${id}`);
-  assert(center.includes(record.description),`Coach Center missing registry description ${id}`);
+  assert(center.includes(record.routeBase),`Coach Center missing entry route ${id}`);
 }
 assert(center.includes('即将开放'),'FUTURE template status should be visible');
-assert(center.includes('选择模板，开始编课'),'Coach Center should explain the first action in plain language');
-assert(center.includes('id="templates"')&&center.includes('选择训练模板'),'Coach Center should show the template list directly below the introduction');
+assert(['L1','L2','L3','L4'].every(level=>center.includes(`#/coach/compose?level=${level}`)),'Coach Center should start F111 directly at each level');
+assert(center.includes('href="#/coach/members"'),'Coach Center should open members directly');
 assert(!center.includes('coach-home-action'),'Coach Center should not repeat the template-list link above the visible templates');
 assert(!/Training Template Registry|业务分支|Session Storage|当前 Search \/ Router/.test(center),'Coach Center must not expose implementation terminology');
 assert(!center.includes('8 个推荐预设'),'generic Coach Center must not hard-code F111 metrics');

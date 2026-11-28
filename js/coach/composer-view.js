@@ -196,6 +196,7 @@
       <div class="f111-course-content">
         ${stageSection(ctx)}
         <div class="f111-prep-grid">${M.Prep.composerPrepHtml(ctx)}</div>
+        ${M.Bangle?.render?.(ctx.resolved.slots)||''}
         ${strengthSection(ctx)}
         ${M.ConflictView?.render?.(ctx.resolvedSession.conflictContext)||''}
         <div class="f111-after-training">${recoverySection(recovery)}${M.PostCardio?.render?.(ctx.stateKey,{compact:true})||''}</div>

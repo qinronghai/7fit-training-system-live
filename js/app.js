@@ -31,8 +31,15 @@
     const map={system:['训练体系','十大动作模式 · PREP 热身'],rules:['编排规则','场馆动线 · 替换 · 冲突'],library:['搜索','动作、模板与编课入口'],maintenance:['系统维护','数据健康度与审计']};
     return map[route.area]||['页面不存在',''];
   }
-  function setActive(area){
-    document.querySelectorAll('[data-area]').forEach(a=>a.classList.toggle('active',a.dataset.area===area));
+  // Member pages live under the coach area but have their own phone tab; system, rules and maintenance sit behind 更多.
+  function navKey(route){
+    if(route?.area==='coach'&&/^member-/.test(route.page||''))return 'members';
+    return route?.area||'';
+  }
+  function setActive(route){
+    const key=navKey(route);
+    document.querySelectorAll('.primary-nav [data-area]').forEach(a=>a.classList.toggle('active',a.dataset.area===(route?.area||'')));
+    document.querySelectorAll('.mobile-nav [data-area]').forEach(a=>a.classList.toggle('active',a.dataset.area===key||(a.dataset.area==='more'&&['system','rules','maintenance'].includes(key))));
   }
   function isF111ComposerRoute(route){
     return route?.area==='coach'&&(route.page==='compose'||(route.page==='template'&&route.templateId==='f111'));
@@ -54,14 +61,15 @@
     }
     if(!valid){
       titleNode.textContent='页面不存在';
-      setActive('');
+      setActive(null);
       main.innerHTML='<section class="empty-state" aria-labelledby="route-error-title"><h1 id="route-error-title"><b>页面不存在</b></h1><span>这个地址不属于当前训练系统信息架构。当前内容没有被修改。</span><div class="empty-state-actions"><a href="#/coach">返回编课中心</a><button type="button" data-feedback-open>反馈问题</button></div></section>';
       main.focus({preventScroll:true});
       return;
     }
     const [title]=labels(route);
     titleNode.textContent=title;
-    setActive(route.area);
+    setActive(route);
+    document.querySelectorAll('dialog[data-member-save-dialog][open]').forEach(dialog=>dialog.close());
     const renderers=window.V14Views||{};
     const fn=renderers[route.area];
     const restoreUi=isF111ComposerRoute(route)?window.V14CoachModules?.ComposerView?.captureUi(main):null;
@@ -81,7 +89,9 @@
       sidebar.classList.toggle('is-mobile-open',open);
       mobileMenu.setAttribute('aria-expanded',String(open));
       mobileMenu.setAttribute('aria-label',open?'关闭导航':'打开导航');
+      document.querySelector('[data-mobile-more]')?.setAttribute('aria-expanded',String(open));
     };
+    document.querySelector('[data-mobile-more]')?.addEventListener('click',()=>setMobileMenu(!sidebar.classList.contains('is-mobile-open')));
     if(mobileMenu&&sidebar){
       mobileMenu.addEventListener('click',()=>setMobileMenu(!sidebar.classList.contains('is-mobile-open')));
       sidebar.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setMobileMenu(false)));

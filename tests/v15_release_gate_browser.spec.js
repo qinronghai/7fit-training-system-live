@@ -52,7 +52,7 @@ test('V15 release: cross-template back forward refresh and Posture future route 
   await page.setViewportSize({width:390,height:844});
 
   await page.goto('/#/coach');
-  await expect(page.locator('.template-card')).toHaveCount(5);
+  await expect(page.locator('[data-template-id]')).toHaveCount(5);
   await page.goto('/#/coach/body/body-02/l3');
   await expect(page.locator('.body-slot-card')).toHaveCount(6);
   await page.goto('/#/coach/conditioning/con-03/l2');

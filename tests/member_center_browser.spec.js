@@ -373,8 +373,7 @@ test('a late member detail response cannot replace the page after navigating awa
 test('Coach Center exposes the Member Training entry in its existing workflow', async ({ page }) => {
   await mockMemberApi(page);
   await page.goto('/#/coach');
-  await expect(page.getByRole('heading', { name: '会员训练记录' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /打开会员训练/ })).toHaveAttribute('href', '#/coach/members');
+  await expect(page.locator('#app-main .coach-start-members')).toHaveAttribute('href', '#/coach/members');
 });
 
 test('Member Center creates, edits, archives, and restores a member through explicit actions', async ({ page }) => {

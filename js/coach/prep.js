@@ -182,8 +182,8 @@
         : `${metaMarkup}<div class="prep-card-title-row">${detail}${purpose}${replace}</div><p>${esc(prescription)}</p>`;
       return `<article class="session-warmup-card prep-slot-card prep-card" data-prep-slot-card="${esc(slot.slotKey)}" ${detailHref?`data-prep-detail-href="${esc(detailHref)}" tabindex="0" aria-label="查看${esc(slot.name||'热身动作')}详情"`:''}>${content}<select class="prep-slot-select prep-select f111-visually-hidden" ${compact?'tabindex="-1" aria-hidden="true"':''} aria-label="${esc(slot.slotName||slot.slotKey)}：热身动作替换" data-prep-session="${esc(sessionKey)}" data-prep-slot="${esc(slot.slotKey)}" ${slot.candidates?.length?'':'disabled'}>${slotOptions(slot)}</select></article>`;
     }).join('');
-    const timeNote=Number.isFinite(resolved?.estimatedMinutes)
-      ?`<small class="prep-time-note">${compact?'':`动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，`}按动作质量调整，不做到疲劳。</small>`:'';
+    const timeNote=!compact&&Number.isFinite(resolved?.estimatedMinutes)
+      ?`<small class="prep-time-note">动态热身预计 ${esc(resolved.estimatedMinutes)} 分钟，按动作质量调整，不做到疲劳。</small>`:'';
     return `${fallback}${timeNote}<div class="session-warmup-grid prep-slot-grid prep-grid">${cards}</div>`;
   }
 

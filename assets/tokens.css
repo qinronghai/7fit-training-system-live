@@ -1,0 +1,94 @@
+/*
+ * Violet Bangle design tokens — the single source for colour, type, shape and depth.
+ * Spec: DESIGN.md. Components read these through var(--vb-*); legacy variables are bridged in violet-bangle.css.
+ */
+:root{
+  /* Band: violet → orchid → fuchsia, top-left to bottom-right, with two crisp tonal discs. */
+  --vb-band-violet:#8A3CE6;
+  --vb-band-orchid:#A93BF2;
+  --vb-band-fuchsia:#D650DC;
+  --vb-band:linear-gradient(135deg,var(--vb-band-violet) 0%,var(--vb-band-orchid) 52%,var(--vb-band-fuchsia) 100%);
+  --vb-band-disc:rgba(255,255,255,.065);
+  /* Optional section re-dye: deep teal → leaf. */
+  --vb-band-teal:#07806F;
+  --vb-band-leaf:#3DBB86;
+  --vb-band-alt:linear-gradient(135deg,var(--vb-band-teal) 0%,var(--vb-band-leaf) 100%);
+  --vb-on-band:#FFFFFF;
+  --vb-on-band-muted:rgba(255,255,255,.78);
+  --vb-on-band-capsule:rgba(255,255,255,.18);
+
+  /* Ground. */
+  --vb-page:#F5F4F9;
+  --vb-sheet:#FFFFFF;
+  --vb-well:#F4F3F8;
+
+  /* Text. */
+  --vb-ink:#1D1B26;
+  --vb-ink-2:#6B6877;
+  --vb-hairline:#EEEDF3;
+
+  /* Bead hues: one per bucket on every screen. Colour names the bucket, never good or bad. */
+  --vb-bead-violet:#9A4DF0;
+  --vb-bead-teal:#3FCFB6;
+  --vb-bead-sky:#7FA8EC;
+  --vb-bead-amber:#EEB14B;
+  --vb-bead-pink:#E88FC3;
+  --vb-bead-coral:#ED7A78;
+  --vb-bead-rose:#FF93B8;
+  --vb-bead-lilac:#BD8CF5;
+  --vb-seal:#0B0812;
+
+  /* Training buckets → bead hues. */
+  --vb-bucket-lower:var(--vb-bead-violet);
+  --vb-bucket-upper:var(--vb-bead-teal);
+  --vb-bucket-support:var(--vb-bead-sky);
+  --vb-bucket-core:var(--vb-bead-amber);
+  --vb-bucket-prep:var(--vb-bead-pink);
+  --vb-bucket-recovery:var(--vb-bead-coral);
+  --vb-bucket-cardio:var(--vb-bead-lilac);
+
+  /* Type: one heavy geometric grotesk; PingFang SC carries Chinese; figures keep the grotesk. */
+  --vb-font:"Avenir Next","Avenir","PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --vb-font-figure:"Avenir Next","Avenir",system-ui,sans-serif;
+  --vb-type-lead:58px;
+  --vb-type-lead-phone:clamp(34px,9.6vw,58px);
+  --vb-type-section:23px;
+  --vb-type-figure:52px;
+  --vb-type-unit:16px;
+  --vb-type-row:16.5px;
+  --vb-type-pill:15px;
+  --vb-type-tab:14px;
+  --vb-type-label:12px;
+  --vb-type-label-sm:10.5px;
+  --vb-tracking-label:.17em;
+  --vb-weight-heavy:900;
+  --vb-weight-bold:700;
+  --vb-weight-demi:600;
+  --vb-weight-medium:500;
+
+  /* Shape & depth. */
+  --vb-radius-sheet:16px;
+  --vb-radius-pill:8px;
+  --vb-radius-capsule:999px;
+  --vb-bead:28px;
+  --vb-hoop:18px;
+  --vb-shadow-sheet:0 22px 48px -18px rgba(138,60,230,.28);
+  --vb-band-overlap:96px;
+  --vb-tap:44px;
+  --vb-space-1:4px;
+  --vb-space-2:8px;
+  --vb-space-3:12px;
+  --vb-space-4:16px;
+  --vb-space-5:24px;
+}
+
+:root[data-theme="dark"]{
+  --vb-page:#14111C;
+  --vb-sheet:#1E1A29;
+  --vb-well:#2A2538;
+  --vb-ink:#F4F1FA;
+  --vb-ink-2:#A7A2B5;
+  --vb-hairline:#2E293B;
+  --vb-shadow-sheet:0 22px 48px -18px rgba(0,0,0,.6);
+  /* The band is unchanged in dark. */
+}

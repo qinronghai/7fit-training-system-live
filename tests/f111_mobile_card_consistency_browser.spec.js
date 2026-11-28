@@ -30,13 +30,15 @@ test('F111 shows two main cards, four accessory rows, and a reachable action bar
         page: document.documentElement.scrollWidth,
         footerBottom: footer.bottom,
         navTop: nav.top,
+        viewportHeight: window.innerHeight,
         targets: [...document.querySelectorAll('.f111-strength-section button')].map(button => button.getBoundingClientRect().height),
       };
     });
     expect(geometry.page).toBe(geometry.viewport);
     expect(geometry.targets).toHaveLength(6);
     expect(geometry.targets.every(height => height >= 44)).toBe(true);
-    if (width < 980) expect(geometry.footerBottom).toBeCloseTo(geometry.navTop, 0);
+    // On phones the copy/save bar replaces the tab bar and sits on the bottom edge.
+    if (width < 980) expect(geometry.footerBottom).toBeCloseTo(geometry.viewportHeight, 0);
     await page.screenshot({ path: testInfo.outputPath(`f111-${width}.png`) });
   }
 });
